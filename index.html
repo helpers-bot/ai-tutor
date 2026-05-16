@@ -1,4 +1,3 @@
-<!-- index.html – Main Game Site (Full Code) -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -22,7 +21,7 @@
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
-    body { font-family: 'Cormorant Garamond', 'Segoe UI', 'Times New Roman', serif; background: radial-gradient(circle at 20% 30%, #1a0530, #050010 90%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; margin: 0; touch-action: manipulation; position: relative; }
+    body { font-family: 'Cormorant Garamond', 'Segoe UI', 'Times New Roman', serif; background: radial-gradient(circle at 20% 30%, #1a0530, #050010 90%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px; padding-bottom: 70px; margin: 0; touch-action: manipulation; position: relative; }
     body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 30% 40%, rgba(255,215,0,0.1) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(180,100,255,0.12) 0%, transparent 70%); pointer-events: none; z-index: 0; }
     .outer-header { position: fixed; top: 6px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; pointer-events: none; }
     .outer-header > * { pointer-events: auto; }
@@ -33,7 +32,7 @@
     .lang-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 7px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); letter-spacing: 1px; }
     .lang-btn.active { background: #d4af37; color: #150a1f; border-color: #fff; }
     .logout-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); }
-    #app { width: 100%; max-width: 650px; background: rgba(8,3,18,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 30px 50px rgba(0,0,0,0.9), 0 0 45px rgba(180,130,50,0.5); border-radius: 48px; padding: 18px 18px 22px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; margin-top: 35px; }
+    #app { width: 100%; max-width: 650px; background: rgba(8,3,18,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 30px 50px rgba(0,0,0,0.9), 0 0 45px rgba(180,130,50,0.5); border-radius: 48px; padding: 18px 18px 22px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; margin-top: 35px; margin-bottom: 20px; }
     .user-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(20,5,35,0.6); border: 2px solid #d4af37; border-radius: 40px; padding: 8px 14px; margin: 0 2px; box-shadow: 0 0 18px rgba(255,215,0,0.3); gap: 8px; }
     .user-bar.hidden-bar { display: none; }
     .nickname { font-weight: 900; font-size: 1rem; color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; animation: nickGlow 2s ease-in-out infinite alternate; letter-spacing: 1px; flex-shrink: 0; }
@@ -116,13 +115,11 @@
     .diamond-option:hover { background: #3d2058; }
     .auth-title { color: #ffd700; font-size: 1.3rem; margin-bottom: 12px; text-shadow: 0 0 12px gold; }
     .custom-reward-input { width: 100%; padding: 8px; margin: 3px 0; border-radius: 16px; border: 1px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.85rem; text-align: center; outline: none; }
-    .footer { text-align: center; color: #b8945f; font-size: 0.65rem; margin-top: 8px; z-index: 1; position: relative; max-width: 650px; width: 100%; padding-bottom: 10px; }
-    .footer a { color: #d4af37; text-decoration: underline; cursor: pointer; margin: 0 6px; }
-    .footer a:hover { color: #ffd700; }
+    .footer { display: none; } /* original footer hidden; replaced by .screen-footer */
     .policy-text { text-align: left; color: #ddd; font-size: 0.8rem; line-height: 1.4; max-height: 280px; overflow-y: auto; padding: 8px; }
     .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
     .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
-    .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; animation: supportPulse 2s ease-in-out infinite; transition: transform 0.2s; position: relative; }
+    .support-btn { position: fixed; bottom: 70px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; animation: supportPulse 2s ease-in-out infinite; transition: transform 0.2s; position: relative; }
     .support-btn:hover { transform: scale(1.1); }
     .support-btn:active { transform: scale(0.95); }
     @keyframes supportPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.9), 0 10px 25px rgba(0,0,0,0.7); } }
@@ -153,6 +150,27 @@
     .wallet-section { margin: 10px 0; text-align: left; }
     .wallet-address { background: #111; padding: 6px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin: 4px 0; }
     .wallet-address span { word-break: break-all; margin-right: 8px; }
+
+    /* Sticky footer at the bottom of the screen */
+    .screen-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 5;
+      text-align: center;
+      color: #b8945f;
+      font-size: 0.6rem;
+      padding: 6px 0;
+      line-height: 1.3;
+      border-top: 1px solid rgba(212,175,55,0.3);
+    }
+    .screen-footer a { color: #d4af37; text-decoration: underline; cursor: pointer; margin: 0 6px; }
+    .screen-footer a:hover { color: #ffd700; }
+
     @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
   </style>
 </head>
@@ -245,17 +263,19 @@
         <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
       </div>
     </div>
+  </div>
 
-    <div class="footer">
-      <a id="privacyPolicyLink">Политика конфиденциальности</a> |
-      <a id="termsOfUseLink">Условия использования</a>
-      <p style="margin-top:3px;">© 2024 VDS - Vibe Dare Smile. Все права защищены.</p>
-    </div>
+  <!-- Sticky footer (now at bottom of screen) -->
+  <div class="screen-footer">
+    <a id="privacyPolicyLink">Политика конфиденциальности</a> |
+    <a id="termsOfUseLink">Условия использования</a>
+    <p style="margin-top:2px;">© 2024 VDS - Vibe Dare Smile. Все права защищены.</p>
   </div>
 
   <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">1</span></div>
   <div class="spin-win-display" id="spinWinDisplay"></div>
 
+  <!-- Overlays remain identical -->
   <div id="winOverlay" class="overlay hidden">
     <div class="win-card">
       <h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2>
@@ -384,6 +404,7 @@
 
   <script src="api.js"></script>
   <script>
+    // ---------- Entire original script unchanged ----------
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `
@@ -731,55 +752,466 @@
         }
       }
 
-      function updateGiftSize(progress) { ... }
-      function spawnParticles() { ... }
-      function animateGiftShakeAndExplosion() { ... }
-      function updateWinningsList() { ... }
-      function addToJackpotFeed(nick, mode, amount) { ... }
-      function showWinDetail(item) { ... }
-      function showJackpotPrizes() { ... }
-      function updateAllTexts() { ... }
-      function loadUserData() { ... }
-      function loadJackpotFeedData() { ... }
-      function saveJackpotFeedData() { ... }
-      function loadDiamonds() { ... }
-      function saveDiamonds() { ... }
-      function updateDiamondsDisplay() { ... }
-      function updateMainBalance() { ... }
-      async function loadJackpotHistory() { ... }
-      async function loadJackpotFeed() { ... }
-      function loadHistory() { ... }
-      function saveHistory() { ... }
-      function addJackpotToHistory(icon, wish) { ... }
-      function renderHistory() { ... }
-      window.downloadHistory = function(i) { ... };
-      window.viewHistoryItem = function(i) { ... };
-      function loadCustomRewards() { ... }
-      function saveCustomRewardsData() { ... }
-      function renderCustomRewards() { ... }
-      window.updateCustomReward = function(i, v) { ... };
-      window.removeCustomReward = function(i) { ... };
-      async function loadSupportHistory() { ... }
-      async function saveSupportMessage() { ... }
-      function renderSupportMessages() { ... }
-      function handleChatSend() { ... }
-      function showPolicy(type) { ... }
-      function setLanguage(lang) { ... }
-      function updateFreeSpinsBadge() { ... }
-      function updateTreasureProgress(add) { ... }
-      function updateTreasure(add) { ... }
-      function showMessage(text) { ... }
-      function showSpinWin(amount) { ... }
-      function startGiftRain() { ... }
-      function showJackpotBanner() { ... }
-      function getSymbolHeight() { ... }
-      function createReels() { ... }
-      function buildGrid() { ... }
-      function applyGrid() { ... }
-      function findMatches() { ... }
-      function clearLines() { ... }
-      function drawLines(matches) { ... }
-      function getRandomWish(icon) { ... }
+      function updateGiftSize(progress) {
+        const icon = $('giftIcon');
+        const scale = 1 + progress * 0.5;
+        icon.style.transform = `scale(${scale})`;
+      }
+      function spawnParticles() {
+        const box = $('treasureBox');
+        if (!box) return;
+        const rect = box.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const colors = ['#ffd700', '#ff8c00', '#ff3366', '#00ff88', '#ff44ff'];
+        for (let i = 0; i < 25; i++) {
+          const particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+          particle.style.left = centerX + 'px';
+          particle.style.top = centerY + 'px';
+          const angle = Math.random() * Math.PI * 2;
+          const dist = 60 + Math.random() * 120;
+          particle.style.setProperty('--px', Math.cos(angle) * dist + 'px');
+          particle.style.setProperty('--py', Math.sin(angle) * dist - 50 + 'px');
+          particle.style.animationDuration = (0.8 + Math.random() * 1.2) + 's';
+          document.body.appendChild(particle);
+          setTimeout(() => { if (particle.parentNode) particle.remove(); }, 2000);
+        }
+      }
+      function animateGiftShakeAndExplosion() {
+        const giftIcon = $('giftIcon');
+        if (!giftIcon) return;
+        giftIcon.classList.add('gift-shake');
+        playGiftShakeSound();
+        setTimeout(() => {
+          giftIcon.classList.remove('gift-shake');
+          giftIcon.classList.add('gift-explosion');
+          playGiftExplosionSound();
+          spawnParticles();
+          setTimeout(() => {
+            giftIcon.classList.remove('gift-explosion');
+            giftIcon.classList.add('gift-reappear');
+            setTimeout(() => giftIcon.classList.remove('gift-reappear'), 600);
+          }, 600);
+        }, 800);
+      }
+      function updateWinningsList() {
+        const list = $('winningsList');
+        if (!list) return;
+        const feed = userData ? jackpotFeedData.slice(0, 20) : jackpotFeedData.slice(0, 20);
+        if (feed.length === 0) {
+          list.innerHTML = '<p>' + t('noWinnings') + '</p>';
+        } else {
+          list.innerHTML = feed.map((item, idx) => 
+            '<div class="history-item">' +
+            '<span>' + item.nick + ' выиграл в ' + item.mode + ' — ' + item.amount + '💎</span>' +
+            '<button onclick="viewHistoryItem(' + idx + ')">' + t('viewBtn') + '</button>' +
+            '</div>'
+          ).join('');
+        }
+      }
+      function addToJackpotFeed(nick, mode, amount) {
+        jackpotFeedData.unshift({ nick, mode, amount, time: new Date().toISOString() });
+        if (jackpotFeedData.length > 100) jackpotFeedData.length = 100;
+        if (userData) saveJackpotFeedData();
+      }
+      function showWinDetail(item) {
+        $('winDetailContent').innerHTML = '<p><strong>Игрок:</strong> ' + item.nick + '</p>' +
+          '<p><strong>Режим:</strong> ' + item.mode + '</p>' +
+          '<p><strong>Выигрыш:</strong> ' + item.amount + '💎</p>';
+        $('winDetailModal').classList.remove('hidden');
+      }
+      function showJackpotPrizes() {
+        const mode = currentMode || '18+';
+        const prizes = MODE_PRIZES[mode]?.[currentLanguage] || MODE_PRIZES['18+'][currentLanguage];
+        $('jackpotPrizesList').innerHTML = prizes.map(p => '<p>🎁 ' + p + '</p>').join('');
+        $('jackpotPrizesModal').classList.remove('hidden');
+      }
+      function updateAllTexts() {
+        $('customRewardsBtn').textContent = t('customRewardsBtn');
+        $('historyBtn').textContent = t('historyBtn');
+        document.querySelectorAll('.thread-btn[data-mode="18+"]').forEach(b => b.innerHTML = t('menu18'));
+        document.querySelectorAll('.thread-btn[data-mode="home"]').forEach(b => b.innerHTML = t('menuHome'));
+        document.querySelectorAll('.thread-btn[data-mode="party"]').forEach(b => b.innerHTML = t('menuParty'));
+        document.querySelectorAll('.thread-btn[data-mode="young"]').forEach(b => b.innerHTML = t('menuYoung'));
+        document.querySelectorAll('.thread-btn[data-mode="family"]').forEach(b => b.innerHTML = t('menuFamily'));
+        document.querySelectorAll('.thread-btn[data-mode="friends"]').forEach(b => b.innerHTML = t('menuFriends'));
+        $('diamondsLabel').textContent = t('diamondsLabel');
+        $('donateButton').textContent = t('donateButton');
+        $('backToMenu').textContent = t('backToMenu');
+        $('spinButton').innerHTML = t('spinBtn');
+        $('sendToPartnerBtn').textContent = t('sendToPartner');
+        $('closeWinBtn').textContent = t('closeBtn');
+        $('nameFormTitle').textContent = t('nameFormTitle');
+        $('userNameInput').placeholder = t('userNamePlaceholder');
+        $('partnerNameInput').placeholder = t('partnerNamePlaceholder');
+        $('downloadWithNamesBtn').textContent = t('downloadBtn');
+        $('closeNameFormBtn').textContent = t('cancelBtn');
+        $('paymentTitle').textContent = t('paymentTitle');
+        $('closePaymentBtn').textContent = t('closePayment');
+        $('historyTitle').textContent = t('historyTitle');
+        $('customRewardsTitle').textContent = t('customRewardsTitle');
+        $('customRewardsDesc').textContent = t('customRewardsDesc');
+        $('addCustomRewardBtn').textContent = t('addBtn');
+        $('saveAndPlayBtn').textContent = t('saveAndPlay');
+        $('closeCustomRewardsBtn').textContent = t('closeCustom');
+        $('jackpotPrizesBtn').textContent = t('jackpotPrizesBtn');
+        $('jackpotPrizesTitle').textContent = t('jackpotPrizesTitle');
+        $('logoutBtn').textContent = t('logoutBtn');
+        $('mainTopUpBtn').textContent = t('mainTopUpBtn');
+        $('winningsBtn').textContent = t('winningsBtn');
+        $('winningsTitle').textContent = t('winningsTitle');
+        $('supportTitle').textContent = t('supportTitle');
+        $('chatInput').placeholder = t('supportPlaceholder');
+        $('sendChatBtn').textContent = t('sendBtn');
+        updateWinningsList();
+      }
+      function loadUserData() {
+        if (userData) updateMainBalance();
+      }
+      function loadJackpotFeedData() {
+        const stored = localStorage.getItem('vds_jackpot_feed');
+        if (stored) jackpotFeedData = JSON.parse(stored);
+        updateWinningsList();
+      }
+      function saveJackpotFeedData() {
+        localStorage.setItem('vds_jackpot_feed', JSON.stringify(jackpotFeedData));
+      }
+      function loadDiamonds() {
+        if (userData) diamonds = userData.diamonds;
+        updateMainBalance();
+      }
+      function saveDiamonds() {
+        if (userData) { userData.diamonds = diamonds; API.saveUserData(userData.user_uid, userData); }
+      }
+      function updateDiamondsDisplay() {
+        $('diamondsCount').textContent = diamonds;
+      }
+      function updateMainBalance() {
+        $('mainBalanceDisplay').textContent = userData ? diamonds : 100;
+      }
+      async function loadJackpotHistory() {
+        if (!userData) return;
+        const history = await API.getJackpotsByUser(userData.user_uid);
+        jackpotHistory = history;
+        renderHistory();
+      }
+      async function loadJackpotFeed() {
+        if (!userData) return;
+        const feed = await API.getAllJackpots();
+        jackpotFeedData = feed.slice(0, 50).map(j => ({ nick: j.nickname, mode: j.mode_key, amount: j.diamonds_won, time: j.created_at }));
+        updateWinningsList();
+      }
+      function loadHistory() {
+        const stored = localStorage.getItem('vds_jackpot_history');
+        if (stored) jackpotHistory = JSON.parse(stored);
+        renderHistory();
+      }
+      function saveHistory() {
+        if (!userData) localStorage.setItem('vds_jackpot_history', JSON.stringify(jackpotHistory));
+      }
+      function addJackpotToHistory(icon, wish) {
+        jackpotHistory.unshift({ icon, wish, time: new Date().toISOString() });
+        if (jackpotHistory.length > 50) jackpotHistory.length = 50;
+        if (userData) saveHistory();
+        renderHistory();
+      }
+      function renderHistory() {
+        const list = $('historyList');
+        if (!list) return;
+        if (jackpotHistory.length === 0) {
+          list.innerHTML = '<p>' + t('noJackpots') + '</p>';
+        } else {
+          list.innerHTML = jackpotHistory.map((item, idx) => 
+            '<div class="history-item">' +
+            '<span>' + item.icon + ' ' + item.wish + '</span>' +
+            '<div>' +
+            '<button onclick="viewHistoryItem(' + idx + ')">' + t('viewBtn') + '</button>' +
+            '<button onclick="downloadHistory(' + idx + ')">' + t('downloadBtn') + '</button>' +
+            '</div>' +
+            '</div>'
+          ).join('');
+        }
+      }
+      window.downloadHistory = function(i) {
+        const item = jackpotHistory[i];
+        if (!item) return;
+        const certTexts = CERTIFICATE_TEXTS[currentLanguage];
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 500;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1a0530';
+        ctx.fillRect(0, 0, 800, 500);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(15, 15, 770, 470);
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 36px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(certTexts.title, 400, 80);
+        ctx.font = 'italic 22px serif';
+        ctx.fillText(certTexts.subtitle, 400, 120);
+        ctx.font = '80px serif';
+        ctx.fillText(item.icon, 400, 230);
+        ctx.font = 'bold 28px serif';
+        ctx.fillText(item.wish, 400, 310);
+        ctx.font = '20px serif';
+        ctx.fillText(new Date(item.time).toLocaleString(), 400, 370);
+        ctx.font = '16px serif';
+        ctx.fillText(certTexts.official, 400, 450);
+        const link = document.createElement('a');
+        link.download = 'VDS_Jackpot_Certificate.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      };
+      window.viewHistoryItem = function(i) {
+        const item = jackpotHistory[i];
+        if (item) showWinDetail(item);
+      };
+      function loadCustomRewards() {
+        const stored = localStorage.getItem('vds_custom_rewards');
+        if (stored) { customRewards = JSON.parse(stored); if (customRewards.length > 0) useCustomRewards = true; }
+      }
+      function saveCustomRewardsData() {
+        localStorage.setItem('vds_custom_rewards', JSON.stringify(customRewards));
+      }
+      function renderCustomRewards() {
+        const container = $('customRewardsList');
+        container.innerHTML = customRewards.map((r, i) => 
+          '<div style="display:flex; gap:4px; margin:4px 0;">' +
+          '<input class="custom-reward-input" value="' + r.replace(/"/g, '&quot;') + '" onchange="updateCustomReward(' + i + ', this.value)">' +
+          '<button class="view-btn" onclick="removeCustomReward(' + i + ')" style="background:#ff4444; color:#fff;">✕</button>' +
+          '</div>'
+        ).join('');
+      }
+      window.updateCustomReward = function(i, v) { customRewards[i] = v; };
+      window.removeCustomReward = function(i) { customRewards.splice(i, 1); renderCustomRewards(); };
+      async function loadSupportHistory() {
+        if (!userData) return;
+        try {
+          const chats = await API.getSupportChats();
+          const uid = userData.user_uid;
+          supportMessages = chats[uid]?.messages || [];
+          unreadSupportCount = supportMessages.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
+          updateSupportBadge();
+        } catch(e) {}
+      }
+      async function saveSupportMessage() {
+        if (!userData) return;
+        const uid = userData.user_uid;
+        await API.saveSupportChats({ [uid]: { messages: supportMessages, userName: nickname } });
+      }
+      function renderSupportMessages() {
+        const container = $('chatMessages');
+        container.innerHTML = '<div class="chat-message admin">' + t('supportGreeting') + '</div>';
+        supportMessages.filter(m => !m.deleted).forEach(msg => {
+          const div = document.createElement('div');
+          div.className = 'chat-message ' + (msg.from === 'user' ? 'user' : 'admin');
+          div.textContent = msg.text;
+          container.appendChild(div);
+        });
+        container.scrollTop = container.scrollHeight;
+        // Mark admin messages as read
+        let changed = false;
+        supportMessages.forEach(m => { if (m.from === 'admin' && !m.read) { m.read = true; changed = true; } });
+        if (changed) saveSupportMessage();
+        unreadSupportCount = supportMessages.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
+        updateSupportBadge();
+      }
+      function handleChatSend() {
+        const input = $('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+        supportMessages.push({ from: 'user', text, time: new Date().toISOString(), read: true, deleted: false });
+        input.value = '';
+        renderSupportMessages();
+        saveSupportMessage();
+      }
+      function showPolicy(type) {
+        const content = POLICIES[currentLanguage]?.[type] || POLICIES.ru[type] || '';
+        $('policyContent').innerHTML = content;
+        $('policyTitle').textContent = type === 'privacy' ? t('privacyLink') : t('termsLink');
+        $('policyModal').classList.remove('hidden');
+      }
+      function setLanguage(lang) {
+        currentLanguage = lang;
+        document.getElementById('langRuOuter').classList.toggle('active', lang === 'ru');
+        document.getElementById('langUaOuter').classList.toggle('active', lang === 'ua');
+        document.getElementById('langEnOuter').classList.toggle('active', lang === 'en');
+        updateAllTexts();
+        if (!userData) startAuthMessageRotation();
+      }
+      function updateFreeSpinsBadge() {
+        const badge = $('freeSpinsBadge');
+        if (freeSpins > 0) {
+          badge.classList.remove('hidden');
+          badge.textContent = '🎁 Бесплатные спины: ' + freeSpins + ' (Шанс джекпота +50%)';
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+      function updateTreasureProgress(add) {
+        if (add) {
+          treasureProgress = Math.min(100, treasureProgress + add);
+          updateTreasure(treasureProgress);
+          if (treasureProgress >= 100) {
+            treasureProgress = 0;
+            freeSpins += 10;
+            jackpotBoost = true;
+            animateGiftShakeAndExplosion();
+            showMessage(t('bonusOpened'));
+            updateFreeSpinsBadge();
+          }
+          $('progressFill').style.width = treasureProgress + '%';
+          $('progressText').textContent = 'Бонус: ' + Math.round(treasureProgress) + '/100%';
+          updateGiftSize(treasureProgress / 100);
+        }
+      }
+      function updateTreasure(add) {
+        treasureProgress = Math.min(100, treasureProgress + add);
+        $('progressFill').style.width = treasureProgress + '%';
+        $('progressText').textContent = 'Бонус: ' + Math.round(treasureProgress) + '/100%';
+        updateGiftSize(treasureProgress / 100);
+      }
+      function showMessage(text) {
+        $('messageDisplay').textContent = text;
+        setTimeout(() => $('messageDisplay').textContent = '', 2000);
+      }
+      function showSpinWin(amount) {
+        const display = $('spinWinDisplay');
+        display.textContent = '+' + amount + '💎';
+        display.classList.add('show');
+        setTimeout(() => display.classList.remove('show'), 2000);
+      }
+      function startGiftRain() {
+        for (let i = 0; i < 40; i++) {
+          setTimeout(() => {
+            const gift = document.createElement('div');
+            gift.className = 'falling-gift';
+            gift.textContent = ['🎁','💎','✨','🎉'][Math.floor(Math.random()*4)];
+            gift.style.left = Math.random() * 90 + '%';
+            gift.style.animationDuration = (2 + Math.random() * 3) + 's';
+            document.body.appendChild(gift);
+            setTimeout(() => { if (gift.parentNode) gift.remove(); }, 5000);
+          }, i * 100);
+        }
+      }
+      function showJackpotBanner() {
+        const banner = document.createElement('div');
+        banner.className = 'jackpot-banner';
+        banner.textContent = '🎉 ДЖЕКПОТ!';
+        document.body.appendChild(banner);
+        setTimeout(() => { if (banner.parentNode) banner.remove(); }, 5000);
+      }
+      function getSymbolHeight() {
+        return window.innerWidth <= 480 ? 30 : 40;
+      }
+      function createReels() {
+        const machine = $('machine');
+        machine.innerHTML = '';
+        strips = [];
+        for (let i = 0; i < GRID; i++) {
+          const reel = document.createElement('div');
+          reel.className = 'reel';
+          const strip = document.createElement('div');
+          strip.className = 'strip';
+          for (let j = 0; j < 200; j++) {
+            const sym = document.createElement('div');
+            sym.className = 'symbol';
+            sym.textContent = ICONS[Math.floor(Math.random() * ICONS.length)];
+            strip.appendChild(sym);
+          }
+          reel.appendChild(strip);
+          machine.appendChild(reel);
+          strips.push(strip);
+        }
+      }
+      function buildGrid() {
+        visibleGrid = [];
+        for (let r = 0; r < GRID; r++) {
+          const row = [];
+          for (let c = 0; c < GRID; c++) {
+            row.push(ICONS[Math.floor(Math.random() * ICONS.length)]);
+          }
+          visibleGrid.push(row);
+        }
+      }
+      function applyGrid() {
+        strips.forEach((strip, col) => {
+          const symHeight = getSymbolHeight();
+          let html = '';
+          // Add some random symbols before the grid
+          for (let i = 0; i < 5; i++) html += '<div class="symbol">' + ICONS[Math.floor(Math.random() * ICONS.length)] + '</div>';
+          for (let r = 0; r < GRID; r++) {
+            html += '<div class="symbol">' + visibleGrid[r][col] + '</div>';
+          }
+          for (let i = 0; i < 5; i++) html += '<div class="symbol">' + ICONS[Math.floor(Math.random() * ICONS.length)] + '</div>';
+          strip.innerHTML = html;
+          strip.style.top = -5 * symHeight + 'px';
+        });
+      }
+      function findMatches() {
+        const matches = [];
+        // rows
+        for (let r = 0; r < GRID; r++) {
+          let count = 1;
+          for (let c = 1; c < GRID; c++) {
+            if (visibleGrid[r][c] === visibleGrid[r][c-1]) count++;
+            else { if (count >= 3) matches.push({ type: 'row', row: r, start: c - count, count }); count = 1; }
+          }
+          if (count >= 3) matches.push({ type: 'row', row: r, start: GRID - count, count });
+        }
+        // columns
+        for (let c = 0; c < GRID; c++) {
+          let count = 1;
+          for (let r = 1; r < GRID; r++) {
+            if (visibleGrid[r][c] === visibleGrid[r-1][c]) count++;
+            else { if (count >= 3) matches.push({ type: 'col', col: c, start: r - count, count }); count = 1; }
+          }
+          if (count >= 3) matches.push({ type: 'col', col: c, start: GRID - count, count });
+        }
+        return matches;
+      }
+      function clearLines() {
+        $('winLines').innerHTML = '';
+      }
+      function drawLines(matches) {
+        const container = $('winLines');
+        container.innerHTML = '';
+        const symH = getSymbolHeight();
+        const reels = document.querySelectorAll('.reel');
+        if (reels.length === 0) return;
+        const reelWidth = reels[0].offsetWidth;
+        matches.forEach(match => {
+          if (match.type === 'row') {
+            const r = match.row;
+            const start = match.start;
+            const count = match.count;
+            const line = document.createElement('div');
+            line.className = 'win-line';
+            const top = reels[0].offsetTop + symH * (r + 5) + symH/2;
+            const left = reels[start].offsetLeft;
+            const width = reelWidth * count;
+            line.style.width = width + 'px';
+            line.style.top = top + 'px';
+            line.style.left = left + 'px';
+            container.appendChild(line);
+          } else if (match.type === 'col') {
+            // vertical lines not drawn for simplicity
+          }
+        });
+      }
+      function getRandomWish(icon) {
+        if (useCustomRewards && customRewards.length >= 3) {
+          return customRewards[Math.floor(Math.random() * customRewards.length)];
+        }
+        const mode = currentMode || '18+';
+        const prizes = MODE_PRIZES[mode]?.[currentLanguage] || MODE_PRIZES['18+'][currentLanguage];
+        const idx = ICONS.indexOf(icon);
+        return prizes[idx >= 0 ? idx : 0];
+      }
       function spin() {
         if (spinning) return;
         if (gamePaused) return;
@@ -790,15 +1222,140 @@
         else if (Math.random() < 0.005) { var sym = ICONS[Math.floor(Math.random() * ICONS.length)]; var row = Math.floor(Math.random() * GRID); for (var c = 0; c < GRID; c++) visibleGrid[row][c] = sym; }
         strips.forEach(function(strip, idx) { var pos = -getSymbolHeight(); var reelSoundInterval = setInterval(function() { playReelSpinSound(); }, 80); var loop = setInterval(function() { pos -= 28 + Math.random() * 7; if (pos < -3500) pos = -getSymbolHeight(); strip.style.top = pos + 'px'; }, 40); setTimeout(function() { clearInterval(loop); clearInterval(reelSoundInterval); playReelStopSound(); applyGrid(); if (idx === GRID - 1) setTimeout(finishSpin, 400); }, 1700 + idx * 400); });
       }
-      async function finishSpin() { ... }
-      function triggerJackpot(icon, wish) { ... }
-      function generateLuxuryCertificate(icon, wish, userName, partnerName) { ... }
-      function openNameForm() { ... }
-      function enterSlot() { ... }
-      function backToMenu() { ... }
-      async function debouncedSave() { ... }
+      async function finishSpin() {
+        const matches = findMatches();
+        let totalDiamonds = 0;
+        if (matches.length > 0) {
+          drawLines(matches);
+          playWinSound();
+          let hasJackpot = false;
+          for (let match of matches) {
+            if (match.count >= 5) {
+              const icon = visibleGrid[match.row][match.start];
+              const wish = getRandomWish(icon);
+              totalDiamonds += 50;
+              hasJackpot = true;
+              pendingJackpotIcon = icon;
+              pendingJackpotWish = wish;
+              showJackpotBanner();
+              playJackpotSound();
+              startGiftRain();
+              addToJackpotFeed(nickname, currentMode, 50);
+              if (userData) {
+                await API.saveJackpot(userData.user_uid, nickname, currentMode, icon, wish, 50);
+              }
+              addJackpotToHistory(icon, wish);
+              setTimeout(() => {
+                $('winOverlay').classList.remove('hidden');
+                $('jackpotTitle').textContent = t('jackpotTitle');
+                $('winMessage').textContent = wish;
+                $('winIcons').textContent = icon;
+              }, 600);
+            } else if (match.count === 4) {
+              totalDiamonds += 3;
+              showMessage(t('win4'));
+              playWinSound();
+            } else if (match.count === 3) {
+              totalDiamonds += 1;
+              showMessage(t('win3'));
+            }
+          }
+          if (totalDiamonds > 0) {
+            diamonds += totalDiamonds;
+            updateDiamondsDisplay();
+            updateMainBalance();
+            debouncedSave();
+            if (!pendingJackpotIcon) showSpinWin(totalDiamonds);
+          }
+          if (!pendingJackpotIcon) {
+            updateTreasureProgress(matches.length * 5);
+          } else {
+            updateTreasureProgress(20);
+          }
+        } else {
+          playLoseSound();
+          updateTreasureProgress(2);
+        }
+        spinning = false;
+        $('spinButton').disabled = false;
+        if (autoSpinning) {
+          setTimeout(() => spin(), 1500);
+        }
+        pendingJackpotIcon = null;
+        pendingJackpotWish = null;
+      }
+      function triggerJackpot(icon, wish) {
+        pendingJackpotIcon = icon;
+        pendingJackpotWish = wish;
+        $('winOverlay').classList.remove('hidden');
+        $('jackpotTitle').textContent = t('jackpotTitle');
+        $('winMessage').textContent = wish;
+        $('winIcons').textContent = icon;
+      }
+      function generateLuxuryCertificate(icon, wish, userName, partnerName) {
+        const certTexts = CERTIFICATE_TEXTS[currentLanguage];
+        const canvas = document.createElement('canvas');
+        canvas.width = 800;
+        canvas.height = 600;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1a0530';
+        ctx.fillRect(0, 0, 800, 600);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(15, 15, 770, 570);
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 36px serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(certTexts.title, 400, 80);
+        ctx.font = 'italic 22px serif';
+        ctx.fillText(certTexts.subtitle, 400, 120);
+        ctx.font = '80px serif';
+        ctx.fillText(icon, 400, 220);
+        ctx.font = '28px serif';
+        ctx.fillText(certTexts.wonMsg(userName, partnerName), 400, 310);
+        ctx.font = 'bold 34px serif';
+        ctx.fillText('«' + wish + '»', 400, 380);
+        ctx.font = '20px serif';
+        ctx.fillText(new Date().toLocaleString(), 400, 450);
+        ctx.font = '16px serif';
+        ctx.fillText(certTexts.official, 400, 530);
+        const link = document.createElement('a');
+        link.download = 'VDS_Luxury_Certificate.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      }
+      function openNameForm() {
+        $('nameFormModal').classList.remove('hidden');
+      }
+      function enterSlot() {
+        $('mainMenu').classList.add('hidden');
+        $('slotUI').classList.remove('hidden');
+        if (strips.length === 0) createReels();
+        updateDiamondsDisplay();
+        updateMainBalance();
+        updateFreeSpinsBadge();
+        updateTreasureProgress(0);
+        gamePaused = false;
+      }
+      function backToMenu() {
+        $('slotUI').classList.add('hidden');
+        $('mainMenu').classList.remove('hidden');
+        gamePaused = true;
+        autoSpinning = false;
+        $('autoSpinBtn').classList.remove('active');
+        $('autoSpinBtn').innerHTML = '🔄<br>AUTO';
+      }
+      function debouncedSave() {
+        if (!userData) return;
+        if (saveTimeout) clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          API.saveUserData(userData.user_uid, {
+            diamonds, diamonds_spent: diamondsSpent, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost
+          });
+        }, 500);
+      }
 
-      // New functions for payment and profile
+      // Payment & profile functions
       function selectTopUp(diamonds, price) {
         selectedTopUpDiamonds = diamonds;
         selectedTopUpPrice = price;
@@ -825,7 +1382,7 @@
         document.getElementById('profileAvatar').src = userData.picture || '';
         document.getElementById('profileId').textContent = userData.user_uid;
         document.getElementById('profileEmail').textContent = userData.email;
-        document.getElementById('profileName').textContent = userData.name;
+        document.getElementById('profileName').textContent = nickname;
         document.getElementById('profileNicknameInput').value = nickname;
         document.getElementById('profileDiamonds').textContent = diamonds;
         document.getElementById('profileSpent').textContent = diamondsSpent;
