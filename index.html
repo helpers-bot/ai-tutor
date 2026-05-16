@@ -39,6 +39,7 @@
     @keyframes nickGlow { 0% { text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b; } 100% { text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00; } }
     .balance-display { font-weight: 900; font-size: 1rem; color: #ffd966; text-shadow: 0 0 10px #ffd700; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
     .top-up-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
+    .profile-btn { background: none; border: 1px solid #d4af37; color: #ffd966; padding: 4px 8px; border-radius: 16px; font-weight: bold; font-size: 0.8rem; cursor: pointer; margin-left: 2px; white-space: nowrap; }
     .spin-win-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 3rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; z-index: 300; pointer-events: none; opacity: 0; animation: none; }
     .spin-win-display.show { animation: winPopup 2s ease-out forwards; }
     @keyframes winPopup { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%,-50%) scale(1.2); } 40% { opacity: 1; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 0; transform: translate(-50%,-120%) scale(0.8); } }
@@ -120,10 +121,11 @@
     .policy-text { text-align: left; color: #ddd; font-size: 0.8rem; line-height: 1.4; max-height: 280px; overflow-y: auto; padding: 8px; }
     .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
     .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
-    .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; animation: supportPulse 2s ease-in-out infinite; transition: transform 0.2s; }
+    .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; animation: supportPulse 2s ease-in-out infinite; transition: transform 0.2s; position: relative; }
     .support-btn:hover { transform: scale(1.1); }
     .support-btn:active { transform: scale(0.95); }
     @keyframes supportPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.9), 0 10px 25px rgba(0,0,0,0.7); } }
+    .support-badge { position: absolute; top: -4px; right: -4px; background: #ff3366; color: white; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: bold; border: 1px solid white; box-shadow: 0 0 6px red; z-index: 151; }
     .chat-messages { max-height: 280px; overflow-y: auto; text-align: left; color: #f0dbb0; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 16px; }
     .chat-message { margin: 5px 0; padding: 7px 10px; border-radius: 14px; font-size: 0.8rem; }
     .chat-message.admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; text-align: left; margin-right: 16px; }
@@ -135,6 +137,9 @@
     .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; background: #fff; color: #333; border: none; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin: 8px 0; transition: all 0.2s; }
     .google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
+    .registration-message-container { margin-top: 14px; }
+    .registration-message { font-size: 1rem; font-weight: bold; background: linear-gradient(90deg, #ffd700, #ff8c00, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: gradientShift 3s ease-in-out infinite; transition: opacity 0.4s; }
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
   </style>
 </head>
@@ -163,6 +168,9 @@
           Войти через Google
         </button>
         <p id="authError" style="color:#ff4444;font-size:0.8rem;margin-top:6px;"></p>
+        <div class="registration-message-container">
+          <p class="registration-message" id="registrationMessage"></p>
+        </div>
       </div>
     </div>
 
@@ -170,6 +178,7 @@
       <span style="display:flex;align-items:center;gap:8px;">
         <img class="user-avatar hidden" id="userAvatar" src="" alt="">
         <span class="nickname" id="nicknameDisplay">Игрок</span>
+        <button class="profile-btn" id="profileBtn">👤</button>
       </span>
       <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
     </div>
@@ -228,7 +237,7 @@
     </div>
   </div>
 
-  <div class="support-btn" id="supportBtn">💬</div>
+  <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">1</span></div>
   <div class="spin-win-display" id="spinWinDisplay"></div>
 
   <div id="winOverlay" class="overlay hidden">
@@ -329,6 +338,23 @@
       <h3 style="color:#ffd966;" id="policyTitle">Политика конфиденциальности</h3>
       <div class="policy-text" id="policyContent"></div>
       <button id="closePolicyBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
+    </div>
+  </div>
+
+  <div id="profileModal" class="overlay hidden">
+    <div class="win-card" style="max-width:400px;">
+      <h3 style="color:#ffd966;">👤 Профиль</h3>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:10px; color:#f0dbb0;">
+        <img id="profileAvatar" class="user-avatar" src="" style="width:64px;height:64px;border-width:3px;" alt="Avatar">
+        <div><strong>ID:</strong> <span id="profileId"></span> <button id="copyProfileIdBtn" style="background:#d4af37; color:#150a1f; border:none; border-radius:12px; padding:2px 8px; font-size:0.7rem; cursor:pointer;">Копировать</button></div>
+        <div><strong>Email:</strong> <span id="profileEmail"></span></div>
+        <div><strong>Имя:</strong> <span id="profileName"></span></div>
+        <div><strong>Никнейм:</strong> <input type="text" id="profileNicknameInput" class="form-input" style="width:auto; display:inline-block; margin:0;"></div>
+        <div><strong>Алмазы:</strong> <span id="profileDiamonds"></span></div>
+        <div><strong>Прогресс бонуса:</strong> <span id="profileProgress"></span></div>
+        <button id="saveProfileBtn" class="thread-btn" style="animation:none; margin-top:6px;">💾 Сохранить никнейм</button>
+        <button id="closeProfileBtn" class="thread-btn" style="animation:none;">Закрыть</button>
+      </div>
     </div>
   </div>
 
@@ -446,7 +472,8 @@
           mainTopUpBtn: '💎 Пополнить', viewBtn: '👁 Смотреть', winDetailTitle: '📋 Детали выигрыша',
           supportTitle: '💬 Онлайн поддержка', supportPlaceholder: 'Введите сообщение...', sendBtn: '📤',
           winningsBtn: '🏆 Выигрыши', winningsTitle: '🏆 Последние джекпоты', noWinnings: 'Пока нет джекпотов',
-          supportGreeting: '👋 Здравствуйте! Чем могу помочь?'
+          supportGreeting: '👋 Здравствуйте! Чем могу помочь?',
+          registrationMessages: ['Добро пожаловать в VDS!', 'Крутите колесо и выигрывайте алмазы!', 'Исполняйте желания вместе!', 'Бонус за 5 совпадений!']
         },
         ua: {
           loginTitle: '🔐 ВХІД', customRewardsBtn: 'Мої бажання', historyBtn: 'Історія',
@@ -464,7 +491,8 @@
           mainTopUpBtn: '💎 Поповнити', viewBtn: '👁 Дивитись', winDetailTitle: '📋 Деталі виграшу',
           supportTitle: '💬 Онлайн підтримка', supportPlaceholder: 'Введіть повідомлення...', sendBtn: '📤',
           winningsBtn: '🏆 Виграші', winningsTitle: '🏆 Останні джекпоти', noWinnings: 'Поки немає джекпотів',
-          supportGreeting: '👋 Здравствуйте! Чим можу допомогти?'
+          supportGreeting: '👋 Здравствуйте! Чим можу допомогти?',
+          registrationMessages: ['Ласкаво просимо до VDS!', 'Крутіть колесо та вигравайте алмази!', 'Виконуйте бажання разом!', 'Бонус за 5 збігів!']
         },
         en: {
           loginTitle: '🔐 LOGIN', customRewardsBtn: 'My Wishes', historyBtn: 'History',
@@ -482,7 +510,8 @@
           mainTopUpBtn: '💎 Top Up', viewBtn: '👁 View', winDetailTitle: '📋 Win Details',
           supportTitle: '💬 Online Support', supportPlaceholder: 'Enter message...', sendBtn: '📤',
           winningsBtn: '🏆 Winnings', winningsTitle: '🏆 Latest Jackpots', noWinnings: 'No jackpots yet',
-          supportGreeting: '👋 Hello! How can I help you?'
+          supportGreeting: '👋 Hello! How can I help you?',
+          registrationMessages: ['Welcome to VDS!', 'Spin the wheel and win diamonds!', 'Fulfill wishes together!', 'Bonus for 5 matches!']
         }
       };
 
@@ -515,6 +544,8 @@
       let jackpotFeedData = [];
       let saveTimeout = null;
       let supportMessages = [];
+      let unreadSupportCount = 0;
+      let regMessageInterval = null;
 
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
       function $(id) { return document.getElementById(id); }
@@ -528,6 +559,59 @@
       function playJackpotSound() { [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.3, 'sine', 0.07); }, i * 100); }); }
       function playGiftShakeSound() { playTone(250 + Math.random() * 50, 0.05, 'square', 0.03); }
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
+      function playNotificationSound() { playTone(800, 0.15, 'sine', 0.05); setTimeout(function() { playTone(1000, 0.15, 'sine', 0.05); }, 150); }
+
+      function startRegistrationMessages() {
+        if (regMessageInterval) clearInterval(regMessageInterval);
+        const messages = TRANSLATIONS[currentLanguage]?.registrationMessages || TRANSLATIONS.ru.registrationMessages;
+        let index = 0;
+        function showNext() {
+          const el = $('registrationMessage');
+          if (!el) return;
+          el.style.opacity = 0;
+          setTimeout(() => {
+            el.textContent = messages[index];
+            el.style.opacity = 1;
+            index = (index + 1) % messages.length;
+          }, 400);
+        }
+        showNext();
+        regMessageInterval = setInterval(showNext, 4000);
+      }
+
+      function stopRegistrationMessages() {
+        if (regMessageInterval) clearInterval(regMessageInterval);
+        regMessageInterval = null;
+      }
+
+      function addAdminMessage(text) {
+        const msg = { from: 'admin', text: text, time: new Date().toISOString(), read: false };
+        supportMessages.push(msg);
+        // if support modal is not visible, increment unread count and show badge + sound
+        if ($('supportModal').classList.contains('hidden')) {
+          unreadSupportCount++;
+          updateSupportBadge();
+          playNotificationSound();
+        } else {
+          // if modal is open, just append the message and scroll
+          const div = document.createElement('div');
+          div.className = 'chat-message admin';
+          div.textContent = text;
+          $('chatMessages').appendChild(div);
+          $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+        }
+        saveSupportMessage();
+      }
+
+      function updateSupportBadge() {
+        const badge = $('supportBadge');
+        if (unreadSupportCount > 0) {
+          badge.classList.remove('hidden');
+          badge.textContent = unreadSupportCount > 99 ? '99+' : unreadSupportCount;
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
 
       function onLoginSuccess(data) {
         userData = data;
@@ -551,15 +635,22 @@
         loadCustomRewards();
         loadJackpotFeedData();
         loadSupportHistory();
+        stopRegistrationMessages();
+        // simulate a welcome admin message after a short delay (demonstrates notification)
+        setTimeout(() => {
+          if (userData) addAdminMessage('Добро пожаловать! Если будут вопросы, пишите.');
+        }, 8000);
       }
 
       async function logout() {
         if (userData) await API.logOut(userData.user_uid, nickname);
         userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
-        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = [];
+        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; unreadSupportCount = 0;
+        updateSupportBadge();
         $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
         $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
+        startRegistrationMessages();
       }
 
       function updateGiftSize(progress) {
@@ -753,13 +844,20 @@
       window.removeCustomReward = function(i) { customRewards.splice(i, 1); renderCustomRewards(); };
 
       async function loadSupportHistory() {
-        if (!userData) { supportMessages = []; return; }
+        if (!userData) { supportMessages = []; unreadSupportCount = 0; updateSupportBadge(); return; }
         try {
           var chats = await API.getSupportChats();
           var uid = userData.user_uid;
-          if (chats[uid] && chats[uid].messages) supportMessages = chats[uid].messages;
-          else supportMessages = [];
-        } catch (e) { supportMessages = []; }
+          if (chats[uid] && chats[uid].messages) {
+            supportMessages = chats[uid].messages;
+            // count unread admin messages
+            unreadSupportCount = supportMessages.filter(m => m.from === 'admin' && !m.read).length;
+          } else {
+            supportMessages = [];
+            unreadSupportCount = 0;
+          }
+        } catch (e) { supportMessages = []; unreadSupportCount = 0; }
+        updateSupportBadge();
       }
 
       async function saveSupportMessage() {
@@ -792,9 +890,13 @@
             div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
             div.textContent = msg.text;
             container.appendChild(div);
+            // mark admin messages as read when displayed
+            if (msg.from === 'admin') msg.read = true;
           });
         }
         container.scrollTop = container.scrollHeight;
+        unreadSupportCount = 0;
+        updateSupportBadge();
       }
 
       function handleChatSend() {
@@ -825,6 +927,7 @@
         else if (lang === 'ua') $('langUaOuter').classList.add('active');
         else $('langEnOuter').classList.add('active');
         updateAllTexts(); updateFreeSpinsBadge();
+        if ($('authOverlay') && !$('authOverlay').classList.contains('hidden')) startRegistrationMessages();
       }
 
       function updateFreeSpinsBadge() {
@@ -989,11 +1092,38 @@
         $('slotUI').classList.add('hidden'); $('mainMenu').classList.remove('hidden');
         $('winOverlay').classList.add('hidden'); $('paymentModal').classList.add('hidden'); $('historyModal').classList.add('hidden');
         $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
-        $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden'); $('winningsModal').classList.add('hidden');
+        $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden'); $('winningsModal').classList.add('hidden'); $('profileModal').classList.add('hidden');
         useCustomRewards = false; updateMainBalance(); debouncedSave();
       }
 
       async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
+
+      function updateNickname(newNick) {
+        if (!newNick || newNick.trim() === '') return;
+        newNick = newNick.trim();
+        nickname = newNick;
+        if (userData) userData.nickname = newNick;
+        $('nicknameDisplay').textContent = newNick;
+        $('profileNicknameInput').value = newNick;
+        if (userData) {
+          API.saveUserData(userData.user_uid, { nickname: newNick }).then(() => {
+            // also update support username
+            saveSupportMessage();
+          }).catch(e => console.error(e));
+        }
+      }
+
+      function openProfile() {
+        if (!userData) return;
+        $('profileAvatar').src = userData.picture || '';
+        $('profileId').textContent = userData.user_uid;
+        $('profileEmail').textContent = userData.email;
+        $('profileName').textContent = userData.name;
+        $('profileNicknameInput').value = nickname;
+        $('profileDiamonds').textContent = diamonds;
+        $('profileProgress').textContent = treasureProgress.toFixed(1) + '%';
+        $('profileModal').classList.remove('hidden');
+      }
 
       // Event listeners
       $('logoutBtn').addEventListener('click', logout);
@@ -1020,23 +1150,48 @@
       $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', function() { loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); }); });
+      $('supportBtn').addEventListener('click', function() {
+        loadSupportHistory().then(function() {
+          renderSupportMessages();
+          $('supportModal').classList.remove('hidden');
+        });
+      });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
-      $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
+      $('closeSupportBtn').addEventListener('click', function() {
+        $('supportModal').classList.add('hidden');
+        saveSupportMessage();
+      });
       $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
       $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
       $('closePolicyBtn').addEventListener('click', function() { $('policyModal').classList.add('hidden'); });
       $('langRuOuter').addEventListener('click', function() { setLanguage('ru'); });
       $('langUaOuter').addEventListener('click', function() { setLanguage('ua'); });
       $('langEnOuter').addEventListener('click', function() { setLanguage('en'); });
-      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
+      $('profileBtn').addEventListener('click', openProfile);
+      $('closeProfileBtn').addEventListener('click', function() { $('profileModal').classList.add('hidden'); });
+      $('saveProfileBtn').addEventListener('click', function() {
+        var newNick = $('profileNicknameInput').value.trim();
+        if (!newNick) return;
+        updateNickname(newNick);
+        $('profileModal').classList.add('hidden');
+      });
+      $('copyProfileIdBtn').addEventListener('click', function() {
+        var id = userData.user_uid;
+        navigator.clipboard.writeText(id).then(() => {
+          alert('ID скопирован!');
+        }).catch(() => {
+          alert('Не удалось скопировать');
+        });
+      });
+      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal'), $('profileModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
       setLanguage('ru');
       updateAllTexts();
       $('mainMenu').classList.add('hidden');
       $('slotUI').classList.add('hidden');
       $('authOverlay').classList.remove('hidden');
+      startRegistrationMessages();
     })();
   </script>
 </body>
