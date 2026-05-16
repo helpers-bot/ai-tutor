@@ -1,4 +1,4 @@
-// api.js (Database – no changes needed for these features; already supports addSupportMessage)
+// api.js – Supabase REST API wrapper
 const SUPABASE_URL = 'https://kmkgqegtulbmdjlmllka.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
 
@@ -270,6 +270,11 @@ class GameAPI {
         
         await this._saveTransaction(user_uid, user.nickname || user.email, amount, 'remove', 'Списание админом', adminName);
         return { success: true, new_balance: newBalance };
+    }
+
+    async recordTopUp(user_uid, nickname, amount, payment_method) {
+        // Records a pending top‑up transaction (diamonds not credited yet)
+        return await this._saveTransaction(user_uid, nickname, amount, 'topup', `Пополнение ${payment_method}`, 'user');
     }
 
     async _saveTransaction(user_uid, nickname, amount, type, reason, admin_username) {
