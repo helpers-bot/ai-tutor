@@ -273,7 +273,6 @@ class GameAPI {
     }
 
     async recordTopUp(user_uid, nickname, amount, payment_method) {
-        // Records a pending top‑up transaction (diamonds not credited yet)
         return await this._saveTransaction(user_uid, nickname, amount, 'topup', `Пополнение ${payment_method}`, 'user');
     }
 
@@ -371,6 +370,15 @@ class GameAPI {
         if (!chats[uid]) chats[uid] = { messages: [], userName: '', deleted: [] };
         chats[uid].messages.push(message);
         return await this.saveSupportChats(chats);
+    }
+
+    // ===== ДОБАВЛЕННЫЙ МЕТОД ДЛЯ СМЕНЫ НИКНЕЙМА =====
+    async updateNickname(user_uid, newNickname) {
+        const result = await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ nickname: newNickname })
+        });
+        return !!result;
     }
 }
 
