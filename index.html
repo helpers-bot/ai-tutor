@@ -101,8 +101,8 @@
     .spin-btn { background: radial-gradient(circle at 30% 30%, #ffea80, #b5891a); border: none; color: #1f0a2e; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; box-shadow: 0 0 25px #ffaa33; flex: 1; padding: 8px; animation: spinPulse 1.5s ease-in-out infinite; border-radius: 16px; }
     @keyframes spinPulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px #ffaa33; } 50% { transform: scale(1.03); box-shadow: 0 0 35px #ffcc00; } }
     .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; z-index: 200; }
-    .overlay-auth { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; z-index: 200; background: transparent; }
-    .win-card { background: #1f1233; border: 3px solid #e4b429; border-radius: 44px; padding: 24px 18px; max-width: 420px; width: 90vw; text-align: center; box-shadow: 0 0 60px gold; max-height: 80vh; overflow-y: auto; animation: winCardAppear 0.5s ease-out; }
+    .overlay-auth { position: fixed !important; inset: 0 !important; width: 100% !important; height: 100% !important; background: transparent; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 200; margin: 0 !important; padding: 0 !important; }
+    .win-card { background: #1f1233; border: 3px solid #e4b429; border-radius: 44px; padding: 24px 18px; max-width: 420px; width: 90vw; text-align: center; box-shadow: 0 0 60px gold; max-height: 80vh; overflow-y: auto; animation: winCardAppear 0.5s ease-out; margin: auto; }
     @keyframes winCardAppear { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .win-card.wide { max-width: 580px; }
     .hidden { display: none !important; }
@@ -144,7 +144,6 @@
     .notification-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1a0530, #2a1540); border: 2px solid #ffd700; color: #ffd700; padding: 12px 24px; border-radius: 30px; font-weight: bold; box-shadow: 0 0 30px rgba(255,215,0,0.5); z-index: 400; animation: fadeInUp 0.4s ease-out, fadeOut 0.4s 4.6s ease-in forwards; max-width: 90vw; text-align: center; font-size: 0.9rem; }
     @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    /* Profile modal */
     .profile-info { text-align: left; margin-bottom: 16px; }
     .profile-info p { margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .copy-btn { background: #4b2c6e; border: 1px solid #d4af37; color: #ffd966; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; white-space: nowrap; }
@@ -252,7 +251,7 @@
 
   <div class="spin-win-display" id="spinWinDisplay"></div>
 
-  <!-- Модальные окна (все остаются) -->
+  <!-- Все модальные окна -->
   <div id="winOverlay" class="overlay hidden">
     <div class="win-card">
       <h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2>
@@ -359,9 +358,7 @@
   <div id="supportModal" class="overlay hidden">
     <div class="win-card" style="max-width:400px;">
       <h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3>
-      <div class="chat-messages" id="chatMessages">
-        <div class="chat-message admin">👋 Здравствуйте! Чем могу помочь?</div>
-      </div>
+      <div class="chat-messages" id="chatMessages"></div>
       <div class="chat-input-row">
         <input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение...">
         <button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button>
@@ -597,7 +594,6 @@
         $('profileEmail').innerText = userData.email || '—';
         $('profileDiamonds').innerText = diamonds;
         $('profileSpent').innerText = diamondsSpent;
-        // Count user jackpots
         const userJackpots = jackpotHistory.length;
         $('profileJackpotCount').innerText = userJackpots;
         $('profileModal').classList.remove('hidden');
@@ -669,11 +665,11 @@
         updateDiamondsDisplay();
         updateFreeSpinsBadge();
         updateTreasureProgress(0);
-        loadJackpotHistory();
-        loadJackpotFeed();
+        await loadJackpotHistory();
+        await loadJackpotFeed();
         loadCustomRewards();
         loadJackpotFeedData();
-        loadSupportHistory();
+        await loadSupportHistory();
         stopAuthMessageRotation();
         startSupportPolling();
       }
@@ -682,7 +678,6 @@
         if (userData) await API.logOut(userData.user_uid, nickname);
         userData = null; nickname = ''; diamonds = 100; diamondsSpent = 0; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
         jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; unreadSupportCount = 0;
-        updateSupportBadge();
         $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
         $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
@@ -694,32 +689,16 @@
         if (supportPollInterval) clearInterval(supportPollInterval);
         supportPollInterval = setInterval(async () => {
           if (!userData) return;
-          try {
-            const chats = await API.getSupportChats();
-            const uid = userData.user_uid;
-            const msgs = chats[uid]?.messages || [];
-            const unreadAdminMsgs = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted);
-            if (unreadAdminMsgs.length > 0) {
-              const latest = unreadAdminMsgs[unreadAdminMsgs.length - 1];
-              showNotification(latest.text);
-              unreadAdminMsgs.forEach(m => m.read = true);
-              await API.saveSupportChats({ [uid]: { messages: msgs, userName: nickname } });
-              unreadSupportCount = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
-              updateSupportBadge();
-            }
-            unreadSupportCount = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
-            updateSupportBadge();
-          } catch (e) {}
+          await loadSupportHistory();
+          if ($('supportModal') && !$('supportModal').classList.contains('hidden')) {
+            renderSupportMessages();
+          }
         }, 10000);
       }
 
       function stopSupportPolling() {
         if (supportPollInterval) clearInterval(supportPollInterval);
         supportPollInterval = null;
-      }
-
-      function updateSupportBadge() {
-        // нет отдельного бейджа в подвале, можно не показывать
       }
 
       function updateGiftSize(progress) {
@@ -912,73 +891,63 @@
       window.removeCustomReward = function(i) { customRewards.splice(i, 1); renderCustomRewards(); };
 
       async function loadSupportHistory() {
-        if (!userData) { supportMessages = []; unreadSupportCount = 0; updateSupportBadge(); return; }
+        if (!userData) { supportMessages = []; return; }
         try {
-          var chats = await API.getSupportChats();
-          var uid = userData.user_uid;
+          const chats = await API.getSupportChats();
+          const uid = userData.user_uid;
           if (chats[uid] && chats[uid].messages) {
             supportMessages = chats[uid].messages;
-            unreadSupportCount = supportMessages.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
           } else {
             supportMessages = [];
-            unreadSupportCount = 0;
           }
-        } catch (e) { supportMessages = []; unreadSupportCount = 0; }
-        updateSupportBadge();
+          // Если нет приветственного сообщения, добавляем
+          if (supportMessages.length === 0) {
+            const greeting = t('supportGreeting');
+            supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true });
+            await saveSupportMessage();
+          }
+        } catch (e) {
+          console.error('loadSupportHistory error', e);
+          supportMessages = [];
+        }
       }
 
       async function saveSupportMessage() {
         if (!userData) return;
         try {
-          var chats = await API.getSupportChats();
-          var uid = userData.user_uid;
+          let chats = await API.getSupportChats();
+          const uid = userData.user_uid;
           if (!chats[uid]) chats[uid] = { messages: [], userName: nickname };
           chats[uid].messages = supportMessages;
           chats[uid].userName = nickname;
           await API.saveSupportChats(chats);
-        } catch (e) { console.error('Save support error:', e); }
+        } catch (e) {
+          console.error('saveSupportMessage error', e);
+        }
       }
 
       function renderSupportMessages() {
-        var container = $('chatMessages');
+        const container = $('chatMessages');
         if (!container) return;
         container.innerHTML = '';
-        var greeting = t('supportGreeting');
-        if (supportMessages.length === 0) {
-          var div = document.createElement('div');
-          div.className = 'chat-message admin';
-          div.textContent = greeting;
+        supportMessages.forEach(msg => {
+          if (msg.deleted) return;
+          const div = document.createElement('div');
+          div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
+          div.textContent = msg.text;
           container.appendChild(div);
-          supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true });
-          saveSupportMessage();
-        } else {
-          supportMessages.forEach(function(msg) {
-            if (msg.deleted) return;
-            var div = document.createElement('div');
-            div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
-            div.textContent = msg.text;
-            container.appendChild(div);
-            if (msg.from === 'admin') msg.read = true;
-          });
-        }
+        });
         container.scrollTop = container.scrollHeight;
-        unreadSupportCount = supportMessages.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
-        updateSupportBadge();
       }
 
-      function handleChatSend() {
-        var text = $('chatInput').value.trim();
-        if (!text) return;
-        var msg = { from: 'user', text: text, time: new Date().toISOString(), read: false };
-        supportMessages.push(msg);
-        var div = document.createElement('div');
-        div.className = 'chat-message user';
-        div.textContent = text;
-        $('chatMessages').appendChild(div);
-        $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+      async function handleChatSend() {
+        const text = $('chatInput').value.trim();
+        if (!text || !userData) return;
+        const newMsg = { from: 'user', text: text, time: new Date().toISOString(), read: false };
+        supportMessages.push(newMsg);
+        await saveSupportMessage();
+        renderSupportMessages();
         $('chatInput').value = '';
-        saveSupportMessage();
-        // Отправляем уведомление админу (в админ-панель)
         showNotification('Сообщение отправлено администратору');
       }
 
@@ -1197,17 +1166,15 @@
       $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', function() {
-        loadSupportHistory().then(function() {
-          renderSupportMessages();
-          $('supportModal').classList.remove('hidden');
-        });
+      $('supportBtn').addEventListener('click', async function() {
+        await loadSupportHistory();
+        renderSupportMessages();
+        $('supportModal').classList.remove('hidden');
       });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
       $('closeSupportBtn').addEventListener('click', function() {
         $('supportModal').classList.add('hidden');
-        saveSupportMessage();
       });
       $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
       $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
