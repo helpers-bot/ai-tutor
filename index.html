@@ -1,4 +1,4 @@
-<!-- index.html (Main Game Code) -->
+<!-- index.html (Main Game Code with notifications) -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -139,10 +139,14 @@
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
     /* Registration page pop-up messages */
     .auth-card-wide { max-width: 700px !important; display: flex; flex-direction: column; align-items: center; }
-    .auth-popup-container { display: flex; gap: 12px; align-items: center; margin: 12px 0; width: 100%; }
-    .auth-popup-side { flex: 1; color: #ffd700; font-weight: bold; font-size: 0.9rem; text-align: center; min-height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,215,0,0.1); border: 1px solid #d4af37; border-radius: 16px; padding: 8px; transition: all 0.5s; opacity: 0; transform: translateY(10px); }
+    .auth-popup-container { display: flex; gap: 12px; align-items: center; margin: 12px 0; width: 100%; flex-wrap: wrap; justify-content: center; }
+    .auth-popup-side { flex: 1 1 150px; color: #ffd700; font-weight: bold; font-size: 0.9rem; text-align: center; min-height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,215,0,0.1); border: 1px solid #d4af37; border-radius: 16px; padding: 8px; transition: all 0.5s; opacity: 0; transform: translateY(10px); }
     .auth-popup-side.visible { opacity: 1; transform: translateY(0); }
     .google-btn-wrapper { flex: 0 0 auto; min-width: 200px; }
+    /* Notification popup */
+    .notification-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1a0530, #2a1540); border: 2px solid #ffd700; color: #ffd700; padding: 12px 24px; border-radius: 30px; font-weight: bold; box-shadow: 0 0 30px rgba(255,215,0,0.5); z-index: 400; animation: fadeInUp 0.4s ease-out, fadeOut 0.4s 4.6s ease-in forwards; max-width: 90vw; text-align: center; font-size: 0.9rem; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
   </style>
 </head>
@@ -563,6 +567,7 @@
       let unreadSupportCount = 0;
       let authMessageInterval = null;
       let currentAuthMsgIndex = 0;
+      let supportPollInterval = null;
 
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
       function $(id) { return document.getElementById(id); }
@@ -577,6 +582,16 @@
       function playGiftShakeSound() { playTone(250 + Math.random() * 50, 0.05, 'square', 0.03); }
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
       function playNotificationSound() { playTone(800, 0.15, 'sine', 0.05); setTimeout(function() { playTone(1000, 0.15, 'sine', 0.05); }, 150); }
+
+      function showNotification(text) {
+        const popup = document.createElement('div');
+        popup.className = 'notification-popup';
+        popup.textContent = text;
+        document.body.appendChild(popup);
+        setTimeout(() => {
+          if (popup.parentNode) popup.remove();
+        }, 5000);
+      }
 
       function startAuthMessageRotation() {
         if (authMessageInterval) clearInterval(authMessageInterval);
@@ -643,7 +658,6 @@
         startAuthMessageRotation();
       }
 
-      let supportPollInterval = null;
       function startSupportPolling() {
         if (supportPollInterval) clearInterval(supportPollInterval);
         supportPollInterval = setInterval(async () => {
@@ -652,15 +666,26 @@
             const chats = await API.getSupportChats();
             const uid = userData.user_uid;
             const msgs = chats[uid]?.messages || [];
-            const newUnread = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
-            if (newUnread > unreadSupportCount) {
-              playNotificationSound();
+            const unreadAdminMsgs = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted);
+            if (unreadAdminMsgs.length > 0) {
+              // show notification for each unread message? just the latest
+              const latest = unreadAdminMsgs[unreadAdminMsgs.length - 1];
+              showNotification(latest.text);
+              // mark as read
+              unreadAdminMsgs.forEach(m => m.read = true);
+              // save support chats to update read status
+              await API.saveSupportChats({ [uid]: { messages: msgs, userName: nickname } });
+              // update badge count
+              unreadSupportCount = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
+              updateSupportBadge();
             }
-            unreadSupportCount = newUnread;
+            // check for new user messages unread count for badge
+            unreadSupportCount = msgs.filter(m => m.from === 'admin' && !m.read && !m.deleted).length;
             updateSupportBadge();
           } catch (e) {}
         }, 10000);
       }
+
       function stopSupportPolling() {
         if (supportPollInterval) clearInterval(supportPollInterval);
         supportPollInterval = null;
