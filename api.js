@@ -1,4 +1,4 @@
-// api.js - База данных через Supabase
+<!-- api.js (Database) -->
 const SUPABASE_URL = 'https://kmkgqegtulbmdjlmllka.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
 
