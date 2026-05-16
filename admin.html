@@ -1,4 +1,3 @@
-<!-- admin.html – Admin Panel -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -20,7 +19,7 @@
         .stat-card { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
         .stat-card .value { font-size: 2rem; color: #ffd700; font-weight: bold; }
         .stat-card .label { color: #888; font-size: 0.9rem; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; overflow: hidden; }
         th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #333; font-size: 0.85rem; word-break: break-word; }
         th { background: #2a2a3e; color: #ffd700; }
         tr:hover { background: #222236; }
@@ -43,7 +42,6 @@
         .chat-message { padding: 10px; margin: 5px 0; border-radius: 12px; font-size: 0.85rem; position: relative; word-break: break-word; }
         .chat-message.from-user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; }
         .chat-message.from-admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; }
-        .chat-message.deleted { opacity: 0.3; text-decoration: line-through; }
         .reply-box { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
         .reply-box input { flex: 1 1 auto; min-width: 150px; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.85rem; }
         .reply-box button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap; }
@@ -229,7 +227,12 @@
                     if (document.getElementById('tab-support').classList.contains('active')) {
                         loadSupportChats();
                     }
-                } catch (e) {}
+                    // Если открыт чат с пользователем, обновить его сообщения
+                    if (currentChatUID && document.getElementById('chatArea').style.display !== 'none') {
+                        await loadSupportChats(); // перезагружаем поддержку
+                        openChat(currentChatUID, false); // открыть чат без повторной пометки прочтения (false)
+                    }
+                } catch (e) { console.error('Polling error', e); }
             }, 10000);
         }
 
@@ -333,6 +336,7 @@
             try {
                 supportChats = await API.getSupportChats();
             } catch (e) {
+                console.error('loadSupportChats error', e);
                 supportChats = {};
             }
             const usersList = document.getElementById('supportUsersList');
@@ -358,8 +362,10 @@
             usersList.innerHTML = html;
         }
 
-        function openChat(uid) {
+        async function openChat(uid, markAsRead = true) {
             currentChatUID = uid;
+            // Перезагружаем чаты, чтобы получить свежие данные
+            supportChats = await API.getSupportChats();
             const chat = supportChats[uid];
             if (!chat) return;
             document.getElementById('chatArea').style.display = 'block';
@@ -377,12 +383,23 @@
                         '<button class="btn-delete" onclick="deleteMessage(\'' + uid + '\', ' + index + ')">🗑</button>';
                     messagesDiv.appendChild(div);
                 });
-                chat.messages.forEach(m => { if (!m.deleted) m.read = true; });
+                // Помечаем сообщения от пользователя как прочитанные, если нужно
+                if (markAsRead) {
+                    let changed = false;
+                    chat.messages.forEach(m => {
+                        if (!m.deleted && m.from === 'user' && !m.read) {
+                            m.read = true;
+                            changed = true;
+                        }
+                    });
+                    if (changed) {
+                        await API.saveSupportChats(supportChats);
+                    }
+                }
             }
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
-            API.saveSupportChats(supportChats);
-            loadSupportChats();
+            // Обновляем список чатов, чтобы убрать метку "Новое"
+            if (markAsRead) await loadSupportChats();
         }
 
         async function deleteMessage(uid, index) {
@@ -398,12 +415,15 @@
             const text = document.getElementById('replyInput').value.trim();
             if (!text) return;
 
+            // Загружаем свежие данные чата
+            supportChats = await API.getSupportChats();
             if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь', deleted: [] };
             supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
             await API.saveSupportChats(supportChats);
             
             document.getElementById('replyInput').value = '';
-            openChat(currentChatUID);
+            // Переоткрываем чат без повторной пометки прочтения (чтобы не сбросить только что добавленное)
+            await openChat(currentChatUID, false);
             showSuccess('Ответ отправлен');
         }
 
@@ -419,6 +439,7 @@
             document.getElementById('transactionsTable').innerHTML = html;
         }
 
+        // Проверка сохранённой сессии
         if (localStorage.getItem('vds_admin_logged_in') === 'true') {
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
