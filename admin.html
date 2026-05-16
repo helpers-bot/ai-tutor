@@ -1,4 +1,4 @@
-<!-- admin.html (Admin Panel) -->
+<!-- admin.html – Admin Panel -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -84,21 +84,21 @@
             <div class="tabs">
                 <button class="tab-btn active" onclick="switchTab('users')">👥 Пользователи</button>
                 <button class="tab-btn" onclick="switchTab('support')">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
-                <button class="tab-btn" onclick="switchTab('jackpots')">🎰 Джекпоты</button>
                 <button class="tab-btn" onclick="switchTab('transactions')">💳 Транзакции</button>
                 <button class="tab-btn" onclick="switchTab('stats')">📊 Статистика</button>
             </div>
 
             <div id="tab-users" class="tab-content active">
-                <h2>💎 Потрачено алмазов по категориям</h2>
-                <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="spentTable"></tbody></table>
                 <h2>🔍 Поиск пользователя</h2>
                 <div class="search-form">
                     <input type="text" id="searchQuery" placeholder="ID, email или имя...">
                     <button onclick="searchUsers()">Найти</button>
                     <button onclick="loadAllUsers()" style="background:#555;">Все</button>
                 </div>
-                <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>💎 Потрачено</th><th>Регистрация</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table>
+                <table>
+                    <thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>💎 Потрачено</th><th>Регистрация</th><th>Действия</th></tr></thead>
+                    <tbody id="usersTable"></tbody>
+                </table>
             </div>
 
             <div id="tab-support" class="tab-content">
@@ -115,19 +115,20 @@
                 </div>
             </div>
 
-            <div id="tab-jackpots" class="tab-content">
-                <h2>🎰 Последние джекпоты</h2>
-                <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Режим</th><th>Желание</th><th>Выигрыш</th></tr></thead><tbody id="jackpotsTable"></tbody></table>
-            </div>
-
             <div id="tab-transactions" class="tab-content">
                 <h2>💳 Последние транзакции</h2>
-                <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead><tbody id="transactionsTable"></tbody></table>
+                <table>
+                    <thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead>
+                    <tbody id="transactionsTable"></tbody>
+                </table>
             </div>
 
             <div id="tab-stats" class="tab-content">
                 <h2>📊 Статистика по категориям</h2>
-                <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="statsSpentTable"></tbody></table>
+                <table>
+                    <thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead>
+                    <tbody id="statsSpentTable"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -202,7 +203,6 @@
             document.getElementById('tab-' + name).classList.add('active');
             event.target.classList.add('active');
             if (name === 'support') loadSupportChats();
-            if (name === 'jackpots') loadJackpots();
             if (name === 'transactions') loadTransactions();
             if (name === 'stats') loadStatsTab();
         }
@@ -234,7 +234,7 @@
         }
 
         async function loadAllData() {
-            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions()]);
+            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadTransactions()]);
         }
 
         async function loadStats() {
@@ -263,7 +263,6 @@
             const spentHTML = Object.entries(spent).map(([mode, total]) => 
                 '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
             ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
-            document.getElementById('spentTable').innerHTML = spentHTML;
             document.getElementById('statsSpentTable').innerHTML = spentHTML;
         }
 
@@ -305,7 +304,6 @@
             if (result.success) {
                 showSuccess('+' + amount + '💎 → ' + uid);
                 loadAllData();
-                // Отправляем уведомление пользователю через чат
                 await API.addSupportMessage(uid, {
                     from: 'admin',
                     text: `Администратор начислил вам ${amount}💎`,
@@ -322,7 +320,6 @@
             if (result.success) {
                 showSuccess('-' + amount + '💎 → ' + uid);
                 loadAllData();
-                // Отправляем уведомление пользователю через чат
                 await API.addSupportMessage(uid, {
                     from: 'admin',
                     text: `Администратор списал ${amount}💎 с вашего счета`,
@@ -410,24 +407,13 @@
             showSuccess('Ответ отправлен');
         }
 
-        async function loadJackpots() {
-            const jackpots = await API.getAllJackpots();
-            const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-            const html = jackpots.slice(0, 100).map(j =>
-                '<tr><td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
-                '<td>' + j.user_uid + '</td><td>' + (j.nickname || '-') + '</td>' +
-                '<td>' + (modeNames[j.mode_key] || j.mode_key) + '</td>' +
-                '<td>' + (j.wish || '').substring(0, 30) + '...</td><td>' + j.diamonds_won + ' 💎</td></tr>'
-            ).join('') || '<tr><td colspan="6">Нет джекпотов</td></tr>';
-            document.getElementById('jackpotsTable').innerHTML = html;
-        }
-
         async function loadTransactions() {
             const transactions = await API.getTransactions();
             const html = transactions.slice(0, 100).map(t =>
                 '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
                 '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
-                '<td>' + t.amount + ' 💎</td><td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td>' +
+                '<td>' + t.amount + ' 💎</td><td>' + 
+                (t.type === 'add' ? '✅ Начислено' : t.type === 'remove' ? '❌ Списано' : '💱 Пополнение') + '</td>' +
                 '<td>' + (t.reason || '') + '</td></tr>'
             ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
             document.getElementById('transactionsTable').innerHTML = html;
