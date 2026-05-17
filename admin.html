@@ -33,39 +33,37 @@
         .actions button { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
         .btn-add { background: #28a745; color: #fff; }
         .btn-remove { background: #dc3545; color: #fff; }
-        .btn-delete { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.65rem; margin-left: 8px; }
+        .btn-reply { background: #007bff; color: #fff; }
         .tabs { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
         .tab-btn { padding: 10px 20px; background: #1a1a2e; border: 1px solid #444; color: #888; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: #2a2a3e; color: #ffd700; border-color: #d4af37; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .chat-message { padding: 10px; margin: 5px 0; border-radius: 12px; font-size: 0.85rem; position: relative; }
+        .chat-message { padding: 10px; margin: 5px 0; border-radius: 12px; font-size: 0.85rem; }
         .chat-message.from-user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; }
         .chat-message.from-admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; }
-        .chat-message.deleted { opacity: 0.3; text-decoration: line-through; }
         .reply-box { display: flex; gap: 8px; margin-top: 8px; }
         .reply-box input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.85rem; }
         .reply-box button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .unread-badge { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 6px; }
-        .notification-sound-toggle { display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; cursor: pointer; color: #888; font-size: 0.8rem; }
-        .notification-sound-toggle.enabled { color: #44ff44; }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="loginBlock" class="login-form">
             <h1>🔐 Админ-панель VDS</h1>
-            <p style="color:#888;font-size:0.8rem;text-align:center;">Пароль по умолчанию: admin123</p>
+            <p style="color:#888;font-size:0.8rem;text-align:center;">Введите GitHub токен с правами repo</p>
+            <input type="password" id="githubToken" placeholder="GitHub Personal Access Token">
             <input type="password" id="adminPassword" placeholder="Пароль админа">
             <button onclick="adminLogin()">Войти</button>
             <p class="error" id="loginError"></p>
+            <p style="color:#666;font-size:0.7rem;margin-top:10px;text-align:center;">Пароль по умолчанию: admin123</p>
         </div>
 
         <div id="adminPanel" style="display:none;">
             <h1>🎮 Админ-панель VDS Game</h1>
             <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
             <button class="btn-refresh" onclick="loadAllData()">🔄 Обновить</button>
-            <span class="notification-sound-toggle enabled" id="soundToggle" onclick="toggleSound()">🔔 Звук уведомлений</span>
             <p class="success" id="successMsg"></p>
             <p class="error" id="errorMsg"></p>
 
@@ -87,13 +85,15 @@
             <div id="tab-users" class="tab-content active">
                 <h2>💎 Потрачено алмазов по категориям</h2>
                 <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="spentTable"></tbody></table>
+
                 <h2>🔍 Поиск пользователя</h2>
                 <div class="search-form">
                     <input type="text" id="searchQuery" placeholder="ID, email или имя...">
                     <button onclick="searchUsers()">Найти</button>
                     <button onclick="loadAllUsers()" style="background:#555;">Все</button>
                 </div>
-                <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>💎 Потрачено</th><th>Регистрация</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table>
+
+                <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>Прогресс</th><th>Фриспины</th><th>Регистрация</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table>
             </div>
 
             <div id="tab-support" class="tab-content">
@@ -102,7 +102,7 @@
                 <div id="supportUsersList"></div>
                 <div id="chatArea" style="display:none; margin-top:16px;">
                     <h3>Переписка с <span id="chatUserName"></span></h3>
-                    <div id="chatMessages" style="max-height:400px;overflow-y:auto;padding:10px;background:#111;border-radius:8px;margin:8px 0;"></div>
+                    <div id="chatMessages" style="max-height:300px;overflow-y:auto;padding:10px;background:#111;border-radius:8px;margin:8px 0;"></div>
                     <div class="reply-box">
                         <input type="text" id="replyInput" placeholder="Введите ответ...">
                         <button onclick="sendReply()">📤 Отправить</button>
@@ -131,39 +131,6 @@
     <script>
         let currentChatUID = null;
         let supportChats = {};
-        let notificationSound = true;
-        let previousUnreadCount = 0;
-        let audioCtx = null;
-
-        function playNotificationSound() {
-            if (!notificationSound) return;
-            try {
-                if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                const o = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                o.type = 'sine';
-                o.frequency.setValueAtTime(800, audioCtx.currentTime);
-                o.frequency.setValueAtTime(1000, audioCtx.currentTime + 0.1);
-                g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
-                o.connect(g);
-                g.connect(audioCtx.destination);
-                o.start(audioCtx.currentTime);
-                o.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {}
-        }
-
-        function toggleSound() {
-            notificationSound = !notificationSound;
-            const el = document.getElementById('soundToggle');
-            if (notificationSound) {
-                el.classList.add('enabled');
-                el.textContent = '🔔 Звук уведомлений';
-            } else {
-                el.classList.remove('enabled');
-                el.textContent = '🔕 Звук выключен';
-            }
-        }
 
         async function sha256(message) {
             const encoder = new TextEncoder();
@@ -173,20 +140,31 @@
         }
 
         async function adminLogin() {
+            const token = document.getElementById('githubToken').value.trim();
             const password = document.getElementById('adminPassword').value;
             const errorEl = document.getElementById('loginError');
-            if (!password) { errorEl.textContent = 'Введите пароль'; return; }
+
+            if (!token || !password) { errorEl.textContent = 'Введите токен и пароль'; return; }
+
             const passwordHash = await sha256(password);
             const validHash = await sha256('admin123');
+
             if (passwordHash !== validHash) { errorEl.textContent = 'Неверный пароль'; return; }
-            localStorage.setItem('vds_admin_logged_in', 'true');
+
+            try {
+                const response = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!response.ok) { errorEl.textContent = 'Неверный GitHub токен'; return; }
+            } catch (e) { errorEl.textContent = 'Ошибка проверки токена'; return; }
+
+            localStorage.setItem('vds_github_token', token);
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             loadAllData();
-            startMessagePolling();
         }
 
-        function logout() { localStorage.removeItem('vds_admin_logged_in'); location.reload(); }
+        function logout() { localStorage.removeItem('vds_github_token'); location.reload(); }
 
         function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
         function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
@@ -200,32 +178,6 @@
             if (name === 'jackpots') loadJackpots();
             if (name === 'transactions') loadTransactions();
             if (name === 'stats') loadStatsTab();
-        }
-
-        function startMessagePolling() {
-            setInterval(async () => {
-                try {
-                    const chats = await API.getSupportChats();
-                    let unread = 0;
-                    Object.values(chats).forEach(chat => {
-                        if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
-                    });
-                    document.getElementById('unreadMessages').textContent = unread;
-                    if (unread > 0) {
-                        document.getElementById('unreadBadge').textContent = unread;
-                        document.getElementById('unreadBadge').classList.remove('hidden');
-                    } else {
-                        document.getElementById('unreadBadge').classList.add('hidden');
-                    }
-                    if (unread > previousUnreadCount) {
-                        playNotificationSound();
-                    }
-                    previousUnreadCount = unread;
-                    if (document.getElementById('tab-support').classList.contains('active')) {
-                        loadSupportChats();
-                    }
-                } catch (e) {}
-            }, 10000);
         }
 
         async function loadAllData() {
@@ -280,16 +232,17 @@
             const html = users.map(u => 
                 '<tr>' +
                 '<td><strong>' + u.user_uid + '</strong></td>' +
-                '<td>' + (u.nickname || '-') + '</td>' +
+                '<td>' + (u.nickname || u.name || '-') + '</td>' +
                 '<td>' + (u.email || '-') + '</td>' +
                 '<td>' + (u.diamonds || 0) + ' 💎</td>' +
-                '<td>' + (u.diamonds_spent || 0) + ' 💎</td>' +
+                '<td>' + (u.treasure_progress || 0) + '%</td>' +
+                '<td>' + (u.free_spins || 0) + '</td>' +
                 '<td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '-') + '</td>' +
                 '<td class="actions"><input type="number" id="amt_' + u.user_uid + '" placeholder="Сумма" value="100" min="1" style="width:60px;">' +
                 '<button class="btn-add" onclick="addDiamonds(\'' + u.user_uid + '\')">+</button>' +
                 '<button class="btn-remove" onclick="removeDiamonds(\'' + u.user_uid + '\')">-</button></td>' +
                 '</tr>'
-            ).join('') || '<tr><td colspan="7">Нет пользователей</td></tr>';
+            ).join('') || '<tr><td colspan="8">Нет пользователей</td></tr>';
             document.getElementById('usersTable').innerHTML = html;
         }
 
@@ -310,25 +263,19 @@
         }
 
         async function loadSupportChats() {
-            try {
-                supportChats = await API.getSupportChats();
-            } catch (e) {
-                supportChats = {};
-            }
+            const chats = await API.getSupportChats();
+            supportChats = chats;
             const usersList = document.getElementById('supportUsersList');
             
-            if (Object.keys(supportChats).length === 0) {
+            if (Object.keys(chats).length === 0) {
                 usersList.innerHTML = '<p style="color:#888;">Нет обращений</p>';
                 return;
             }
 
             let html = '<table><thead><tr><th>ID</th><th>Имя</th><th>Последнее сообщение</th><th>Статус</th></tr></thead><tbody>';
-            for (const [uid, chat] of Object.entries(supportChats)) {
-                if (!chat || !chat.messages || chat.messages.length === 0) continue;
-                const visibleMessages = chat.messages.filter(m => !m.deleted);
-                if (visibleMessages.length === 0) continue;
-                const lastMsg = visibleMessages[visibleMessages.length - 1];
-                const hasUnread = chat.messages.some(m => !m.read && m.from === 'user' && !m.deleted);
+            for (const [uid, chat] of Object.entries(chats)) {
+                const lastMsg = chat.messages && chat.messages.length > 0 ? chat.messages[chat.messages.length - 1] : null;
+                const hasUnread = chat.messages && chat.messages.some(m => !m.read && m.from === 'user');
                 const preview = lastMsg ? lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '...' : '') : 'Нет сообщений';
                 html += '<tr onclick="openChat(\'' + uid + '\')" style="cursor:pointer;' + (hasUnread ? 'background:rgba(255,215,0,0.1);' : '') + '">' +
                     '<td>' + uid + '</td><td>' + (chat.userName || '-') + '</td>' +
@@ -341,23 +288,20 @@
         function openChat(uid) {
             currentChatUID = uid;
             const chat = supportChats[uid];
-            if (!chat) return;
             document.getElementById('chatArea').style.display = 'block';
             document.getElementById('chatUserName').textContent = chat.userName || uid;
             
             const messagesDiv = document.getElementById('chatMessages');
             messagesDiv.innerHTML = '';
             if (chat.messages) {
-                chat.messages.forEach((msg, index) => {
-                    if (msg.deleted) return;
+                chat.messages.forEach(msg => {
                     const div = document.createElement('div');
                     div.className = 'chat-message ' + (msg.from === 'user' ? 'from-user' : 'from-admin');
-                    div.innerHTML = '<strong>' + (msg.from === 'user' ? (chat.userName || 'Пользователь') : 'Админ') + ':</strong> ' + msg.text +
-                        '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>' +
-                        '<button class="btn-delete" onclick="deleteMessage(\'' + uid + '\', ' + index + ')">🗑</button>';
+                    div.innerHTML = '<strong>' + (msg.from === 'user' ? chat.userName || 'Пользователь' : 'Админ') + ':</strong> ' + msg.text +
+                        '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>';
                     messagesDiv.appendChild(div);
                 });
-                chat.messages.forEach(m => { if (!m.deleted) m.read = true; });
+                chat.messages.forEach(m => m.read = true);
             }
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
@@ -365,20 +309,12 @@
             loadSupportChats();
         }
 
-        async function deleteMessage(uid, index) {
-            if (!confirm('Удалить сообщение?')) return;
-            await API.deleteSupportMessage(uid, index);
-            supportChats = await API.getSupportChats();
-            openChat(uid);
-            showSuccess('Сообщение удалено');
-        }
-
         async function sendReply() {
             if (!currentChatUID) return;
             const text = document.getElementById('replyInput').value.trim();
             if (!text) return;
 
-            if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь', deleted: [] };
+            if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: '' };
             supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
             await API.saveSupportChats(supportChats);
             
@@ -410,11 +346,10 @@
             document.getElementById('transactionsTable').innerHTML = html;
         }
 
-        if (localStorage.getItem('vds_admin_logged_in') === 'true') {
+        if (localStorage.getItem('vds_github_token')) {
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             loadAllData();
-            startMessagePolling();
         }
     </script>
 </body>
