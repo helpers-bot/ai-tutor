@@ -62,7 +62,6 @@ class GameAPI {
         let user = await this.findUserByGoogleId(googleId);
         
         if (user) {
-            // Обновляем last_login
             await this._fetch(`users?user_uid=eq.${user.user_uid}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
@@ -89,7 +88,6 @@ class GameAPI {
             };
         }
 
-        // Новый пользователь
         let uid;
         let existing;
         do {
@@ -330,6 +328,136 @@ class GameAPI {
             }
         }
         return true;
+    }
+
+    // ===== CRYPTO DONATIONS (BINANCE PAY) =====
+    async createCryptoDonation(donationData) {
+        return await this._fetch('crypto_donations', {
+            method: 'POST',
+            body: JSON.stringify({
+                user_uid: donationData.user_uid,
+                nickname: donationData.nickname,
+                email: donationData.email,
+                amount_usd: donationData.amount_usd,
+                diamonds: donationData.diamonds,
+                crypto_currency: donationData.crypto_currency,
+                crypto_amount: donationData.crypto_amount || null,
+                binance_order_id: donationData.binance_order_id || null,
+                qr_content: donationData.qr_content || null,
+                payment_link: donationData.payment_link || null,
+                status: donationData.status || 'pending',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            })
+        });
+    }
+
+    async updateCryptoDonation(orderId, updateData) {
+        return await this._fetch(`crypto_donations?binance_order_id=eq.${encodeURIComponent(orderId)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                ...updateData,
+                updated_at: new Date().toISOString()
+            })
+        });
+    }
+
+    async getCryptoDonationsByUser(user_uid) {
+        const data = await this._fetch(`crypto_donations?user_uid=eq.${encodeURIComponent(user_uid)}&order=created_at.desc&limit=50`);
+        return data || [];
+    }
+
+    async getAllCryptoDonations() {
+        const data = await this._fetch('crypto_donations?order=created_at.desc&limit=100');
+        return data || [];
+    }
+
+    async getPendingCryptoDonations() {
+        const data = await this._fetch('crypto_donations?status=eq.pending&order=created_at.asc&limit=50');
+        return data || [];
+    }
+
+    async completeCryptoDonation(orderId) {
+        const donation = await this._fetch(`crypto_donations?binance_order_id=eq.${encodeURIComponent(orderId)}&limit=1`);
+        if (!donation || donation.length === 0) return { success: false, error: 'Донат не найден' };
+        
+        const don = donation[0];
+        if (don.status === 'completed') return { success: false, error: 'Уже выполнен' };
+
+        // Начисляем алмазы
+        const user = await this.findUserByUID(don.user_uid);
+        if (!user) return { success: false, error: 'Пользователь не найден' };
+
+        const newBalance = (user.diamonds || 0) + don.diamonds;
+        await this._fetch(`users?user_uid=eq.${encodeURIComponent(don.user_uid)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ diamonds: newBalance })
+        });
+
+        // Записываем транзакцию
+        await this._saveTransaction(
+            don.user_uid,
+            don.nickname || user.nickname || user.email,
+            don.diamonds,
+            'add',
+            `Оплата криптовалютой (${don.crypto_currency}) на $${don.amount_usd}`,
+            'crypto'
+        );
+
+        // Обновляем статус доната
+        await this._fetch(`crypto_donations?binance_order_id=eq.${encodeURIComponent(orderId)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                status: 'completed',
+                updated_at: new Date().toISOString()
+            })
+        });
+
+        return { success: true, new_balance: newBalance, diamonds_added: don.diamonds };
+    }
+
+    // ===== КУРСЫ КРИПТОВАЛЮТ (BINANCE PUBLIC API) =====
+    async getCryptoRates() {
+        try {
+            const response = await fetch('https://api.binance.com/api/v3/ticker/price');
+            if (!response.ok) return null;
+            const data = await response.json();
+            
+            // Фильтруем только USDT пары
+            const usdtPairs = data.filter(p => p.symbol.endsWith('USDT'));
+            const rates = {};
+            
+            usdtPairs.forEach(p => {
+                const coin = p.symbol.replace('USDT', '');
+                rates[coin] = {
+                    symbol: p.symbol,
+                    price_usd: parseFloat(p.price),
+                    last_update: new Date().toISOString()
+                };
+            });
+            
+            return rates;
+        } catch (e) {
+            console.error('Error fetching crypto rates:', e);
+            return null;
+        }
+    }
+
+    async getCryptoRate(currency) {
+        try {
+            const symbol = `${currency}USDT`;
+            const response = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`);
+            if (!response.ok) return null;
+            const data = await response.json();
+            return {
+                symbol: data.symbol,
+                price_usd: parseFloat(data.price),
+                last_update: new Date().toISOString()
+            };
+        } catch (e) {
+            console.error('Error fetching crypto rate:', e);
+            return null;
+        }
     }
 }
 
