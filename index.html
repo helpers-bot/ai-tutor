@@ -135,6 +135,20 @@
     .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; background: #fff; color: #333; border: none; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin: 8px 0; transition: all 0.2s; }
     .google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
+    /* Crypto Payment Styles */
+    .crypto-payment-card { max-width: 450px; }
+    .crypto-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; justify-content: center; }
+    .crypto-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 10px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
+    .crypto-option:hover { border-color: #d4af37; }
+    .crypto-option.selected { border-color: #ffd700; background: #3d2058; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
+    .rate-display { color: #ffd966; font-size: 0.75rem; margin: 8px 0; text-align: center; }
+    .qr-container { display: flex; justify-content: center; margin: 12px 0; }
+    .qr-container img { border-radius: 12px; border: 2px solid #d4af37; }
+    .diamond-amount-select { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0; }
+    .diamond-amount-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
+    .diamond-amount-option:hover { border-color: #d4af37; }
+    .diamond-amount-option.selected { border-color: #ffd700; background: #3d2058; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
+    .copied-msg { color: #44ff44; font-size: 0.7rem; margin-top: 4px; }
     @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
   </style>
 </head>
@@ -188,19 +202,11 @@
     <div id="slotUI" class="slot-machine hidden">
       <div class="slot-top-row">
         <div class="treasure-section" id="treasureSection">
-          <div class="treasure-box" id="treasureBox">
-            <div class="gift-container" id="giftContainer">
-              <span class="gift-icon" id="giftIcon">🎁</span>
-            </div>
-          </div>
-          <div class="progress-container">
-            <div class="progress-text" id="progressText">Бонус: 0/100%</div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-          </div>
+          <div class="treasure-box" id="treasureBox"><div class="gift-container" id="giftContainer"><span class="gift-icon" id="giftIcon">🎁</span></div></div>
+          <div class="progress-container"><div class="progress-text" id="progressText">Бонус: 0/100%</div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
         </div>
         <div class="balance-row" style="margin:0; flex-shrink:0; gap: 6px;">
-          <span id="diamondsLabel">💎 Алмазы:</span>
-          <span id="diamondsCount">100</span>
+          <span id="diamondsLabel">💎 Алмазы:</span><span id="diamondsCount">100</span>
           <button class="winnings-btn" id="winningsBtn">🏆 Выигрыши</button>
           <button class="jackpot-prizes-btn" id="jackpotPrizesBtn">🎁 Призы</button>
         </div>
@@ -210,13 +216,8 @@
       <div class="win-lines" id="winLines"></div>
       <div style="color:#ffd966; text-align:center; min-height:20px; font-weight:bold; font-size:0.8rem;" id="messageDisplay"></div>
       <div class="controls-row">
-        <div class="left-buttons">
-          <button id="donateButton" class="thread-btn">💎 Пополнить</button>
-          <button id="backToMenu" class="thread-btn" style="background:#2a1738;">↩️ МЕНЮ</button>
-        </div>
-        <div class="middle-buttons">
-          <button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button>
-        </div>
+        <div class="left-buttons"><button id="donateButton" class="thread-btn">💎 Пополнить</button><button id="backToMenu" class="thread-btn" style="background:#2a1738;">↩️ МЕНЮ</button></div>
+        <div class="middle-buttons"><button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button></div>
         <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
       </div>
     </div>
@@ -231,119 +232,55 @@
   <div class="support-btn" id="supportBtn">💬</div>
   <div class="spin-win-display" id="spinWinDisplay"></div>
 
-  <div id="winOverlay" class="overlay hidden">
-    <div class="win-card">
-      <h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2>
-      <p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p>
-      <div style="font-size:2.8rem;" id="winIcons"></div>
-      <button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button>
-      <button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
+  <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
+  <div id="nameFormModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3><input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя"><input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра"><button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button><button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button></div></div>
+  <div id="paymentModal" class="overlay hidden"><div class="win-card" style="max-width:340px;"><h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3><div id="diamondOptions"><div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div><div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div><div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div><div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div><div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div></div><button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button></div></div>
+  <div id="historyModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="historyTitle">📜 История Джекпотов</h3><div id="historyList" class="history-list"></div><button id="closeHistoryBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+  <div id="winningsModal" class="overlay hidden"><div class="win-card" style="max-width:500px;"><h3 style="color:#ffd966;" id="winningsTitle">🏆 Последние джекпоты</h3><div id="winningsList" class="history-list"></div><button id="closeWinningsBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+  <div id="winDetailModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="winDetailTitle">📋 Детали выигрыша</h3><div class="win-detail-text" id="winDetailContent"></div><button id="closeWinDetailBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+  <div id="customRewardsModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="customRewardsTitle">🎁 Мои желания (3-10)</h3><p style="color:#ddd; font-size:0.75rem;" id="customRewardsDesc">Введите свои желания для джекпота</p><div id="customRewardsList"></div><button id="addCustomRewardBtn" class="thread-btn" style="animation:none; margin-top:6px;">+ Добавить</button><div class="custom-rewards-buttons"><button id="saveAndPlayBtn" class="thread-btn" style="background:#d4af37; color:#150a1f;">💾 Сохранить и играть</button><button id="closeCustomRewardsBtn" class="thread-btn">ЗАКРЫТЬ</button></div></div></div>
+  <div id="jackpotPrizesModal" class="overlay hidden"><div class="win-card" style="max-width:400px;"><h3 style="color:#ffd966;" id="jackpotPrizesTitle">🎁 Призы джекпота</h3><div class="prizes-list" id="jackpotPrizesList"></div><button id="closeJackpotPrizesBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+  <div id="supportModal" class="overlay hidden"><div class="win-card" style="max-width:400px;"><h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3><div class="chat-messages" id="chatMessages"><div class="chat-message admin">👋 Здравствуйте! Чем могу помочь?</div></div><div class="chat-input-row"><input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение..."><button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button></div><button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button></div></div>
+  <div id="policyModal" class="overlay hidden"><div class="win-card" style="max-width:500px;"><h3 style="color:#ffd966;" id="policyTitle">Политика конфиденциальности</h3><div class="policy-text" id="policyContent"></div><button id="closePolicyBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
 
-  <div id="nameFormModal" class="overlay hidden">
-    <div class="win-card">
-      <h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3>
-      <input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя">
-      <input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра">
-      <button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button>
-      <button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button>
-    </div>
-  </div>
-
-  <div id="paymentModal" class="overlay hidden">
-    <div class="win-card" style="max-width:340px;">
-      <h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3>
-      <div id="diamondOptions">
-        <div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div>
-        <div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div>
-        <div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div>
-        <div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div>
-        <div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div>
+  <!-- CRYPTO PAYMENT MODAL -->
+  <div id="cryptoPaymentModal" class="overlay hidden">
+    <div class="win-card crypto-payment-card">
+      <h3 style="color:#ffd700;margin-bottom:8px;">💎 Покупка алмазов</h3>
+      <p style="color:#ddd;font-size:0.8rem;margin-bottom:6px;">Выберите сумму:</p>
+      <div class="diamond-amount-select" id="diamondAmounts">
+        <div class="diamond-amount-option selected" data-usd="1" data-diamonds="100">100 💎 ($1)</div>
+        <div class="diamond-amount-option" data-usd="5" data-diamonds="500">500 💎 ($5)</div>
+        <div class="diamond-amount-option" data-usd="10" data-diamonds="1000">1000 💎 ($10)</div>
+        <div class="diamond-amount-option" data-usd="50" data-diamonds="5000">5000 💎 ($50)</div>
+        <div class="diamond-amount-option" data-usd="100" data-diamonds="10000">10000 💎 ($100)</div>
       </div>
-      <button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button>
-    </div>
-  </div>
-
-  <div id="historyModal" class="overlay hidden">
-    <div class="win-card wide">
-      <h3 style="color:#ffd966;" id="historyTitle">📜 История Джекпотов</h3>
-      <div id="historyList" class="history-list"></div>
-      <button id="closeHistoryBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="winningsModal" class="overlay hidden">
-    <div class="win-card" style="max-width:500px;">
-      <h3 style="color:#ffd966;" id="winningsTitle">🏆 Последние джекпоты</h3>
-      <div id="winningsList" class="history-list"></div>
-      <button id="closeWinningsBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="winDetailModal" class="overlay hidden">
-    <div class="win-card">
-      <h3 style="color:#ffd966;" id="winDetailTitle">📋 Детали выигрыша</h3>
-      <div class="win-detail-text" id="winDetailContent"></div>
-      <button id="closeWinDetailBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="customRewardsModal" class="overlay hidden">
-    <div class="win-card wide">
-      <h3 style="color:#ffd966;" id="customRewardsTitle">🎁 Мои желания (3-10)</h3>
-      <p style="color:#ddd; font-size:0.75rem;" id="customRewardsDesc">Введите свои желания для джекпота</p>
-      <div id="customRewardsList"></div>
-      <button id="addCustomRewardBtn" class="thread-btn" style="animation:none; margin-top:6px;">+ Добавить</button>
-      <div class="custom-rewards-buttons">
-        <button id="saveAndPlayBtn" class="thread-btn" style="background:#d4af37; color:#150a1f;">💾 Сохранить и играть</button>
-        <button id="closeCustomRewardsBtn" class="thread-btn">ЗАКРЫТЬ</button>
+      <p style="color:#ddd;font-size:0.8rem;margin:8px 0;">Выберите криптовалюту:</p>
+      <div class="crypto-list" id="cryptoList">
+        <div class="crypto-option selected" data-currency="USDT">USDT</div>
+        <div class="crypto-option" data-currency="BTC">BTC</div>
+        <div class="crypto-option" data-currency="ETH">ETH</div>
+        <div class="crypto-option" data-currency="BNB">BNB</div>
+        <div class="crypto-option" data-currency="BUSD">BUSD</div>
+        <div class="crypto-option" data-currency="USDC">USDC</div>
       </div>
-    </div>
-  </div>
-
-  <div id="jackpotPrizesModal" class="overlay hidden">
-    <div class="win-card" style="max-width:400px;">
-      <h3 style="color:#ffd966;" id="jackpotPrizesTitle">🎁 Призы джекпота</h3>
-      <div class="prizes-list" id="jackpotPrizesList"></div>
-      <button id="closeJackpotPrizesBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="supportModal" class="overlay hidden">
-    <div class="win-card" style="max-width:400px;">
-      <h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3>
-      <div class="chat-messages" id="chatMessages">
-        <div class="chat-message admin">👋 Здравствуйте! Чем могу помочь?</div>
-      </div>
-      <div class="chat-input-row">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение...">
-        <button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button>
-      </div>
-      <button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="policyModal" class="overlay hidden">
-    <div class="win-card" style="max-width:500px;">
-      <h3 style="color:#ffd966;" id="policyTitle">Политика конфиденциальности</h3>
-      <div class="policy-text" id="policyContent"></div>
-      <button id="closePolicyBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
+      <div class="rate-display" id="rateDisplay">Загрузка курса...</div>
+      <div class="qr-container" id="qrContainer"></div>
+      <p style="color:#ffd966;font-size:0.75rem;text-align:center;word-break:break-all;" id="cryptoAddress"></p>
+      <button id="copyAddressBtn" class="thread-btn" style="animation:none;font-size:0.7rem;padding:8px;margin:6px 0;width:100%;">📋 Копировать адрес</button>
+      <p class="copied-msg hidden" id="copiedMsg">Адрес скопирован!</p>
+      <p style="color:#888;font-size:0.65rem;text-align:center;margin:8px 0;">После оплаты алмазы начислятся автоматически</p>
+      <button id="closeCryptoPaymentBtn" class="thread-btn" style="margin-top:4px;animation:none;">ЗАКРЫТЬ</button>
     </div>
   </div>
 
   <script src="api.js"></script>
-    <script>
+  <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        const swCode = `
-          self.addEventListener('install', (event) => { self.skipWaiting(); });
-          self.addEventListener('activate', (event) => { event.waitUntil(clients.claim()); });
-          self.addEventListener('fetch', (event) => { event.respondWith(fetch(event.request)); });
-        `;
+        const swCode = `self.addEventListener('install',(e)=>{e.waitUntil(self.skipWaiting())});self.addEventListener('activate',(e)=>{e.waitUntil(self.clients.claim())});self.addEventListener('fetch',(e)=>{e.respondWith(fetch(e.request))});`;
         const blob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl).catch(() => {});
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
       });
     }
 
@@ -355,27 +292,11 @@
           client_id: GOOGLE_CLIENT_ID,
           scope: 'email profile openid',
           callback: async (response) => {
-            if (response.error) {
-              document.getElementById('authError').textContent = 'Ошибка входа через Google';
-              return;
-            }
+            if (response.error) { document.getElementById('authError').textContent = 'Ошибка входа через Google'; return; }
             const token = response.access_token;
-            const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-              headers: { 'Authorization': 'Bearer ' + token }
-            }).then(r => r.json());
-
-            const result = await API.registerOrLogin({
-              googleId: userInfo.sub,
-              email: userInfo.email,
-              name: userInfo.name,
-              picture: userInfo.picture
-            });
-
-            if (result.success) {
-              onLoginSuccess(result);
-            } else {
-              document.getElementById('authError').textContent = result.error || 'Ошибка';
-            }
+            const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
+            const result = await API.registerOrLogin({ googleId: userInfo.sub, email: userInfo.email, name: userInfo.name, picture: userInfo.picture });
+            if (result.success) { onLoginSuccess(result); } else { document.getElementById('authError').textContent = result.error || 'Ошибка'; }
           }
         });
         client.requestAccessToken();
@@ -391,99 +312,24 @@
       };
 
       const MODE_PRIZES = {
-        '18+': {
-          ru: ['Исполни моё романтическое желание', 'Надень наручники и повинуйся', 'Устрой незабываемую ночь', 'Подари мне особенный сюрприз', 'Закажи мою любимую пиццу'],
-          ua: ['Виконай моє романтичне бажання', 'Надягни наручники й підкорись', 'Влаштуй незабутню ніч', 'Подаруй мені особливий сюрприз', 'Замов мою улюблену піцу'],
-          en: ['Fulfill my romantic wish', 'Put on handcuffs and obey', 'Create an unforgettable night', 'Give me a special surprise', 'Order my favorite pizza']
-        },
-        'home': {
-          ru: ['Приготовь ужин', 'Убери в комнате', 'Помой посуду', 'Пропылесось квартиру', 'Сделай мне чай'],
-          ua: ['Приготуй вечерю', 'Прибери в кімнаті', 'Помий посуд', 'Пропилосось квартиру', 'Зроби мені чай'],
-          en: ['Cook dinner', 'Clean the room', 'Wash dishes', 'Vacuum the apartment', 'Make me tea']
-        },
-        'party': {
-          ru: ['Танцуй со мной', 'Спой караоке', 'Приготовь коктейль', 'Сделай смешное фото', 'Расскажи анекдот'],
-          ua: ['Танцюй зі мною', 'Заспівай караоке', 'Приготуй коктейль', 'Зроби смішне фото', 'Розкажи анекдот'],
-          en: ['Dance with me', 'Sing karaoke', 'Make a cocktail', 'Take a funny photo', 'Tell a joke']
-        },
-        'young': {
-          ru: ['Устрой романтический ужин', 'Напиши любовное письмо', 'Подари цветы', 'Сделай массаж', 'Посмотри фильм вместе'],
-          ua: ['Влаштуй романтичну вечерю', 'Напиши любовний лист', 'Подаруй квіти', 'Зроби масаж', 'Подивись фільм разом'],
-          en: ['Have a romantic dinner', 'Write a love letter', 'Give flowers', 'Give a massage', 'Watch a movie together']
-        },
-        'family': {
-          ru: ['Поиграй с детьми', 'Приготовь семейный ужин', 'Помоги с домашним заданием', 'Устрой семейную игру', 'Почитай сказку'],
-          ua: ['Пограй з дітьми', 'Приготуй сімейну вечерю', 'Допоможи з домашнім завданням', 'Влаштуй сімейну гру', 'Почитай казку'],
-          en: ['Play with kids', 'Cook family dinner', 'Help with homework', 'Have a family game', 'Read a story']
-        },
-        'friends': {
-          ru: ['Устрой вечеринку', 'Поиграй в настолки', 'Посмотри фильм вместе', 'Сходи в кафе', 'Поделись секретом'],
-          ua: ['Влаштуй вечірку', 'Пограй у настолки', 'Подивись фільм разом', 'Сходи в кафе', 'Поділись секретом'],
-          en: ['Throw a party', 'Play board games', 'Watch a movie together', 'Go to a cafe', 'Share a secret']
-        }
+        '18+': { ru: ['Исполни моё романтическое желание','Надень наручники и повинуйся','Устрой незабываемую ночь','Подари мне особенный сюрприз','Закажи мою любимую пиццу'], ua: ['Виконай моє романтичне бажання','Надягни наручники й підкорись','Влаштуй незабутню ніч','Подаруй мені особливий сюрприз','Замов мою улюблену піцу'], en: ['Fulfill my romantic wish','Put on handcuffs and obey','Create an unforgettable night','Give me a special surprise','Order my favorite pizza'] },
+        'home': { ru: ['Приготовь ужин','Убери в комнате','Помой посуду','Пропылесось квартиру','Сделай мне чай'], ua: ['Приготуй вечерю','Прибери в кімнаті','Помий посуд','Пропилосось квартиру','Зроби мені чай'], en: ['Cook dinner','Clean the room','Wash dishes','Vacuum the apartment','Make me tea'] },
+        'party': { ru: ['Танцуй со мной','Спой караоке','Приготовь коктейль','Сделай смешное фото','Расскажи анекдот'], ua: ['Танцюй зі мною','Заспівай караоке','Приготуй коктейль','Зроби смішне фото','Розкажи анекдот'], en: ['Dance with me','Sing karaoke','Make a cocktail','Take a funny photo','Tell a joke'] },
+        'young': { ru: ['Устрой романтический ужин','Напиши любовное письмо','Подари цветы','Сделай массаж','Посмотри фильм вместе'], ua: ['Влаштуй романтичну вечерю','Напиши любовний лист','Подаруй квіти','Зроби масаж','Подивись фільм разом'], en: ['Have a romantic dinner','Write a love letter','Give flowers','Give a massage','Watch a movie together'] },
+        'family': { ru: ['Поиграй с детьми','Приготовь семейный ужин','Помоги с домашним заданием','Устрой семейную игру','Почитай сказку'], ua: ['Пограй з дітьми','Приготуй сімейну вечерю','Допоможи з домашнім завданням','Влаштуй сімейну гру','Почитай казку'], en: ['Play with kids','Cook family dinner','Help with homework','Have a family game','Read a story'] },
+        'friends': { ru: ['Устрой вечеринку','Поиграй в настолки','Посмотри фильм вместе','Сходи в кафе','Поделись секретом'], ua: ['Влаштуй вечірку','Пограй у настолки','Подивись фільм разом','Сходи в кафе','Поділись секретом'], en: ['Throw a party','Play board games','Watch a movie together','Go to a cafe','Share a secret'] }
       };
 
       const CERTIFICATE_TEXTS = {
-        ru: { title: 'VDS СЕРТИФИКАТ ВЫИГРЫША', subtitle: 'Vibe Dare Smile', wonMsg: (u, p) => u + ' выиграл(а) задание для тебя, ' + p + '!', official: 'ОФИЦИАЛЬНЫЙ ЧЕК ВЫИГРЫША • VDS СЕРТИФИЦИРОВАНО' },
-        ua: { title: 'VDS СЕРТИФІКАТ ВИГРАШУ', subtitle: 'Vibe Dare Smile', wonMsg: (u, p) => u + ' виграв(ла) завдання для тебе, ' + p + '!', official: 'ОФІЦІЙНИЙ ЧЕК ВИГРАШУ • VDS СЕРТИФІКОВАНО' },
-        en: { title: 'VDS WINNINGS CERTIFICATE', subtitle: 'Vibe Dare Smile', wonMsg: (u, p) => u + ' won a task for you, ' + p + '!', official: 'OFFICIAL WINNINGS CHECK • VDS CERTIFIED' }
+        ru: { title: 'VDS СЕРТИФИКАТ ВЫИГРЫША', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' выиграл(а) для '+p+'!', official: 'ОФИЦИАЛЬНЫЙ ЧЕК • VDS' },
+        ua: { title: 'VDS СЕРТИФІКАТ ВИГРАШУ', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' виграв(ла) для '+p+'!', official: 'ОФІЦІЙНИЙ ЧЕК • VDS' },
+        en: { title: 'VDS WINNINGS CERTIFICATE', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' won for '+p+'!', official: 'OFFICIAL CHECK • VDS' }
       };
 
       const TRANSLATIONS = {
-        ru: {
-          loginTitle: '🔐 ВХОД', customRewardsBtn: 'Мои желания', historyBtn: 'История',
-          menu18: '🔞 18+', menuHome: '🏠 Для Дома', menuParty: '🎉 Для Вечеринки', menuYoung: '💑 Молодая Пара', menuFamily: '👨‍👩‍👧 Семейная Пара', menuFriends: '👫 Для Друзей',
-          diamondsLabel: '💎 Алмазы:', donateButton: '💎 Пополнить', backToMenu: '↩️ МЕНЮ', spinBtn: '🚀 ЗАПУСК',
-          jackpotTitle: '🎉 ДЖЕКПОТ!', sendToPartner: '💌 Отправить Партнёру', closeBtn: 'ЗАКРЫТЬ',
-          nameFormTitle: '📝 Введите имена', userNamePlaceholder: 'Ваше имя', partnerNamePlaceholder: 'Имя партнёра', downloadBtn: '📥 Скачать', cancelBtn: 'Отмена',
-          paymentTitle: '💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment: 'ОТМЕНА',
-          historyTitle: '📜 История Джекпотов', noJackpots: 'Нет джекпотов',
-          customRewardsTitle: '🎁 Мои желания (3-10)', customRewardsDesc: 'Введите свои желания для джекпота', addBtn: '+ Добавить', saveAndPlay: '💾 Сохранить и играть', closeCustom: 'ЗАКРЫТЬ',
-          jackpotPrizesTitle: '🎁 Призы джекпота', jackpotPrizesBtn: '🎁 Призы',
-          privacyLink: 'Политика конфиденциальности', termsLink: 'Условия использования', copyright: '© 2024 VDS - Vibe Dare Smile. Все права защищены.',
-          notEnoughDiamonds: '💔 Мало алмазов!', bonusOpened: '🎁 +10 бесплатных спинов!', tryAgain: '💫 Попробуй ещё',
-          win3: '🎉 3 совпадения! +1💎', win4: '🔥 4 совпадения! +3💎', logoutBtn: '🚪 Выйти',
-          mainTopUpBtn: '💎 Пополнить', viewBtn: '👁 Смотреть', winDetailTitle: '📋 Детали выигрыша',
-          supportTitle: '💬 Онлайн поддержка', supportPlaceholder: 'Введите сообщение...', sendBtn: '📤',
-          winningsBtn: '🏆 Выигрыши', winningsTitle: '🏆 Последние джекпоты', noWinnings: 'Пока нет джекпотов',
-          supportGreeting: '👋 Здравствуйте! Чем могу помочь?'
-        },
-        ua: {
-          loginTitle: '🔐 ВХІД', customRewardsBtn: 'Мої бажання', historyBtn: 'Історія',
-          menu18: '🔞 18+', menuHome: '🏠 Для Дому', menuParty: '🎉 Для Вечірки', menuYoung: '💑 Молода Пара', menuFamily: '👨‍👩‍👧 Сімейна Пара', menuFriends: '👫 Для Друзів',
-          diamondsLabel: '💎 Алмази:', donateButton: '💎 Поповнити', backToMenu: '↩️ МЕНЮ', spinBtn: '🚀 ЗАПУСК',
-          jackpotTitle: '🎉 ДЖЕКПОТ!', sendToPartner: '💌 Надіслати Партнеру', closeBtn: 'ЗАКРИТИ',
-          nameFormTitle: '📝 Введіть імена', userNamePlaceholder: 'Ваше ім\'я', partnerNamePlaceholder: 'Ім\'я партнера', downloadBtn: '📥 Завантажити', cancelBtn: 'Скасувати',
-          paymentTitle: '💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment: 'СКАСУВАТИ',
-          historyTitle: '📜 Історія Джекпотів', noJackpots: 'Немає джекпотів',
-          customRewardsTitle: '🎁 Мої бажання (3-10)', customRewardsDesc: 'Введіть свої бажання для джекпоту', addBtn: '+ Додати', saveAndPlay: '💾 Зберегти і грати', closeCustom: 'ЗАКРИТИ',
-          jackpotPrizesTitle: '🎁 Призи джекпоту', jackpotPrizesBtn: '🎁 Призи',
-          privacyLink: 'Політика конфіденційності', termsLink: 'Умови використання', copyright: '© 2024 VDS - Vibe Dare Smile. Усі права захищені.',
-          notEnoughDiamonds: '💔 Мало алмазів!', bonusOpened: '🎁 +10 безкоштовних спинів!', tryAgain: '💫 Спробуй ще',
-          win3: '🎉 3 збіги! +1💎', win4: '🔥 4 збіги! +3💎', logoutBtn: '🚪 Вийти',
-          mainTopUpBtn: '💎 Поповнити', viewBtn: '👁 Дивитись', winDetailTitle: '📋 Деталі виграшу',
-          supportTitle: '💬 Онлайн підтримка', supportPlaceholder: 'Введіть повідомлення...', sendBtn: '📤',
-          winningsBtn: '🏆 Виграші', winningsTitle: '🏆 Останні джекпоти', noWinnings: 'Поки немає джекпотів',
-          supportGreeting: '👋 Здравствуйте! Чим можу допомогти?'
-        },
-        en: {
-          loginTitle: '🔐 LOGIN', customRewardsBtn: 'My Wishes', historyBtn: 'History',
-          menu18: '🔞 18+', menuHome: '🏠 For Home', menuParty: '🎉 For Party', menuYoung: '💑 Young Couple', menuFamily: '👨‍👩‍👧 Family Couple', menuFriends: '👫 For Friends',
-          diamondsLabel: '💎 Diamonds:', donateButton: '💎 Top Up', backToMenu: '↩️ MENU', spinBtn: '🚀 LAUNCH',
-          jackpotTitle: '🎉 JACKPOT!', sendToPartner: '💌 Send to Partner', closeBtn: 'CLOSE',
-          nameFormTitle: '📝 Enter Names', userNamePlaceholder: 'Your name', partnerNamePlaceholder: 'Partner name', downloadBtn: '📥 Download', cancelBtn: 'Cancel',
-          paymentTitle: '💎 TOP UP DIAMONDS', closePayment: 'CANCEL',
-          historyTitle: '📜 Jackpot History', noJackpots: 'No jackpots yet',
-          customRewardsTitle: '🎁 My Wishes (3-10)', customRewardsDesc: 'Enter your wishes for jackpot', addBtn: '+ Add', saveAndPlay: '💾 Save & Play', closeCustom: 'CLOSE',
-          jackpotPrizesTitle: '🎁 Jackpot Prizes', jackpotPrizesBtn: '🎁 Prizes',
-          privacyLink: 'Privacy Policy', termsLink: 'Terms of Use', copyright: '© 2024 VDS - Vibe Dare Smile. All rights reserved.',
-          notEnoughDiamonds: '💔 Not enough diamonds!', bonusOpened: '🎁 +10 free spins!', tryAgain: '💫 Try again',
-          win3: '🎉 3 matches! +1💎', win4: '🔥 4 matches! +3💎', logoutBtn: '🚪 Logout',
-          mainTopUpBtn: '💎 Top Up', viewBtn: '👁 View', winDetailTitle: '📋 Win Details',
-          supportTitle: '💬 Online Support', supportPlaceholder: 'Enter message...', sendBtn: '📤',
-          winningsBtn: '🏆 Winnings', winningsTitle: '🏆 Latest Jackpots', noWinnings: 'No jackpots yet',
-          supportGreeting: '👋 Hello! How can I help you?'
-        }
+        ru: { loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История', menu18:'🔞 18+', menuHome:'🏠 Для Дома', menuParty:'🎉 Для Вечеринки', menuYoung:'💑 Молодая Пара', menuFamily:'👨‍👩‍👧 Семейная Пара', menuFriends:'👫 Для Друзей', diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ', nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена', paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов', customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ', jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', privacyLink:'Политика конфиденциальности', termsLink:'Условия использования', copyright:'© 2024 VDS - Vibe Dare Smile. Все права защищены.', notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎', logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша', supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов', supportGreeting:'👋 Здравствуйте! Чем могу помочь?' },
+        ua: { loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія', menu18:'🔞 18+', menuHome:'🏠 Для Дому', menuParty:'🎉 Для Вечірки', menuYoung:'💑 Молода Пара', menuFamily:'👨‍👩‍👧 Сімейна Пара', menuFriends:'👫 Для Друзів', diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ', nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати', paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів', customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ', jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', privacyLink:'Політика конфіденційності', termsLink:'Умови використання', copyright:'© 2024 VDS - Vibe Dare Smile. Усі права захищені.', notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎', logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу', supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів', supportGreeting:'👋 Здравствуйте! Чим можу допомогти?' },
+        en: { loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History', menu18:'🔞 18+', menuHome:'🏠 For Home', menuParty:'🎉 For Party', menuYoung:'💑 Young Couple', menuFamily:'👨‍👩‍👧 Family Couple', menuFriends:'👫 For Friends', diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE', nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel', paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet', customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE', jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', privacyLink:'Privacy Policy', termsLink:'Terms of Use', copyright:'© 2024 VDS - Vibe Dare Smile. All rights reserved.', notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎', logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details', supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet', supportGreeting:'👋 Hello! How can I help you?' }
       };
 
       const POLICIES = {
@@ -515,6 +361,57 @@
       let jackpotFeedData = [];
       let saveTimeout = null;
       let supportMessages = [];
+
+      // ===== CRYPTO PAYMENT =====
+      let cryptoRates = {};
+      let selectedCrypto = 'USDT';
+      let selectedUSD = 1;
+      let selectedDiamonds = 100;
+      let rateInterval = null;
+
+      async function loadCryptoRates() {
+        const rates = await API.getCryptoRates();
+        if (rates) { cryptoRates = rates; updateRateDisplay(); }
+      }
+
+      function updateRateDisplay() {
+        const rate = cryptoRates[selectedCrypto];
+        if (rate) {
+          const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8);
+          $('rateDisplay').textContent = `1 ${selectedCrypto} = $${rate.price_usd.toFixed(2)} | Сумма: ${cryptoAmount} ${selectedCrypto}`;
+        } else {
+          $('rateDisplay').textContent = 'Курс загружается...';
+        }
+      }
+
+      function generateQRCode(text) {
+        const container = $('qrContainer');
+        container.innerHTML = '';
+        if (!text) return;
+        const img = document.createElement('img');
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}`;
+        img.style.borderRadius = '12px';
+        img.style.border = '2px solid #d4af37';
+        img.onload = () => { container.innerHTML = ''; container.appendChild(img); };
+        img.onerror = () => { container.innerHTML = '<p style="color:#888;font-size:0.7rem;">QR-код недоступен</p>'; };
+      }
+
+      async function openCryptoPayment() {
+        if (!userData) return;
+        $('cryptoPaymentModal').classList.remove('hidden');
+        loadCryptoRates();
+        if (rateInterval) clearInterval(rateInterval);
+        rateInterval = setInterval(loadCryptoRates, 30000);
+        updateQRAndAddress();
+      }
+
+      function updateQRAndAddress() {
+        const rate = cryptoRates[selectedCrypto];
+        const cryptoAmount = rate ? (selectedUSD / rate.price_usd).toFixed(8) : '0';
+        const paymentText = `binance:${selectedCrypto}:payment:${cryptoAmount}:VDS Diamonds`;
+        generateQRCode(paymentText);
+        $('cryptoAddress').textContent = `Отправьте ${cryptoAmount} ${selectedCrypto} на ваш Binance Pay кошелёк`;
+      }
 
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
       function $(id) { return document.getElementById(id); }
@@ -560,6 +457,7 @@
         $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
         $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
+        if (rateInterval) clearInterval(rateInterval);
       }
 
       function updateGiftSize(progress) {
@@ -990,6 +888,8 @@
         $('winOverlay').classList.add('hidden'); $('paymentModal').classList.add('hidden'); $('historyModal').classList.add('hidden');
         $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
         $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden'); $('winningsModal').classList.add('hidden');
+        $('cryptoPaymentModal').classList.add('hidden');
+        if (rateInterval) clearInterval(rateInterval);
         useCustomRewards = false; updateMainBalance(); debouncedSave();
       }
 
@@ -997,11 +897,11 @@
 
       // Event listeners
       $('logoutBtn').addEventListener('click', logout);
-      $('mainTopUpBtn').addEventListener('click', function() { $('paymentModal').classList.remove('hidden'); });
+      $('mainTopUpBtn').addEventListener('click', function() { openCryptoPayment(); });
       document.querySelectorAll('.thread-btn[data-mode]').forEach(function(b) { b.addEventListener('click', function() { useCustomRewards = false; currentMode = this.dataset.mode; enterSlot(); }); });
       $('spinButton').addEventListener('click', spin);
       $('backToMenu').addEventListener('click', backToMenu);
-      $('donateButton').addEventListener('click', function() { $('paymentModal').classList.remove('hidden'); });
+      $('donateButton').addEventListener('click', function() { openCryptoPayment(); });
       $('closeWinBtn').addEventListener('click', function() { $('winOverlay').classList.add('hidden'); });
       $('closePaymentBtn').addEventListener('click', function() { $('paymentModal').classList.add('hidden'); });
       document.querySelectorAll('.diamond-option').forEach(function(o) { o.addEventListener('click', function() { diamonds += parseInt(this.dataset.diamonds); updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); $('paymentModal').classList.add('hidden'); showMessage('✨ +' + this.dataset.diamonds + '💎'); }); });
@@ -1030,7 +930,15 @@
       $('langRuOuter').addEventListener('click', function() { setLanguage('ru'); });
       $('langUaOuter').addEventListener('click', function() { setLanguage('ua'); });
       $('langEnOuter').addEventListener('click', function() { setLanguage('en'); });
-      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
+
+      // Crypto payment events
+      $('diamondAmounts').addEventListener('click', function(e) { var opt = e.target.closest('.diamond-amount-option'); if (!opt) return; document.querySelectorAll('.diamond-amount-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedUSD = parseFloat(opt.dataset.usd); selectedDiamonds = parseInt(opt.dataset.diamonds); updateRateDisplay(); updateQRAndAddress(); });
+      $('cryptoList').addEventListener('click', function(e) { var opt = e.target.closest('.crypto-option'); if (!opt) return; document.querySelectorAll('.crypto-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedCrypto = opt.dataset.currency; updateRateDisplay(); updateQRAndAddress(); });
+      $('copyAddressBtn').addEventListener('click', function() { var addr = $('cryptoAddress').textContent; navigator.clipboard.writeText(addr).then(function() { $('copiedMsg').classList.remove('hidden'); setTimeout(function() { $('copiedMsg').classList.add('hidden'); }, 2000); }); });
+      $('closeCryptoPaymentBtn').addEventListener('click', function() { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); });
+      $('cryptoPaymentModal').addEventListener('click', function(e) { if (e.target === $('cryptoPaymentModal')) { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); } });
+
+      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal'), $('cryptoPaymentModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
       setLanguage('ru');
       updateAllTexts();
