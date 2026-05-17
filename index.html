@@ -221,7 +221,6 @@
       </div>
     </div>
 
-    <!-- FOOTER MOVED INSIDE #app, AT THE VERY BOTTOM -->
     <div class="footer">
       <a id="privacyPolicyLink">Политика конфиденциальности</a> |
       <a id="termsOfUseLink">Условия использования</a>
@@ -334,7 +333,7 @@
   </div>
 
   <script src="api.js"></script>
-  <script>
+    <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `
@@ -488,7 +487,7 @@
       };
 
       const POLICIES = {
-        ru: { privacy: '<h4>Политика конфиденциальности</h4><p>1. Мы используем Google аккаунт для входа.</p><p>2. Игровые данные хранятся в JSON файлах на GitHub.</p><p>3. Мы не передаем данные третьим лицам.</p>', terms: '<h4>Условия использования</h4><p>1. Игра предназначена для развлекательных целей.</p><p>2. Администрация оставляет за собой право изменять правила.</p>' },
+        ru: { privacy: '<h4>Политика конфиденциальности</h4><p>1. Мы используем Google аккаунт для входа.</p><p>2. Игровые данные хранятся в Supabase.</p><p>3. Мы не передаем данные третьим лицам.</p>', terms: '<h4>Условия использования</h4><p>1. Игра предназначена для развлекательных целей.</p><p>2. Администрация оставляет за собой право изменять правила.</p>' },
         ua: { privacy: '<h4>Політика конфіденційності</h4><p>1. Використовуємо Google для входу.</p>', terms: '<h4>Умови використання</h4><p>1. Гра для розваг.</p>' },
         en: { privacy: '<h4>Privacy Policy</h4><p>1. We use Google for login.</p>', terms: '<h4>Terms of Use</h4><p>1. Game for entertainment.</p>' }
       };
