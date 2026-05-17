@@ -1,4 +1,4 @@
-// api.js – Supabase REST API wrapper (исправленный)
+// api.js – Supabase REST API wrapper
 const SUPABASE_URL = 'https://kmkgqegtulbmdjlmllka.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
 
@@ -14,6 +14,11 @@ class GameAPI {
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json'
         };
+
+        // Для операций записи запрашиваем представление, чтобы получить созданную/обновлённую запись
+        if (options.method && options.method !== 'GET') {
+            headers['Prefer'] = 'return=representation';
+        }
 
         const config = {
             method: options.method || 'GET',
@@ -127,7 +132,8 @@ class GameAPI {
                 body: JSON.stringify(newUser)
             });
 
-            if (!result) {
+            // После добавления Prefer заголовка result будет массивом с одной записью
+            if (!result || result.length === 0) {
                 return { success: false, error: 'Ошибка создания пользователя' };
             }
 
