@@ -668,7 +668,6 @@
         await loadJackpotHistory();
         await loadJackpotFeed();
         loadCustomRewards();
-        loadJackpotFeedData();
         await loadSupportHistory();
         stopAuthMessageRotation();
         startSupportPolling();
@@ -781,6 +780,8 @@
         var now = new Date();
         jackpotFeedData.unshift({ nickname: nick, mode: mode, amount: amount, date: now.toLocaleDateString(), time: now.toLocaleTimeString() });
         if (jackpotFeedData.length > 50) jackpotFeedData.pop();
+        // Больше не сохраняем в localStorage
+        updateWinningsList();
       }
 
       function showWinDetail(item) {
@@ -845,31 +846,42 @@
       }
 
       function loadUserData() {
-        nickname = localStorage.getItem('wdVdsNickname') || '';
-        if (!nickname) { $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden'); }
-        else { $('authOverlay').classList.add('hidden'); $('mainMenu').classList.remove('hidden'); $('nicknameDisplay').textContent = nickname; }
-        loadDiamonds(); loadHistory(); loadCustomRewards(); loadJackpotFeedData(); updateMainBalance();
+        // Старая локальная загрузка больше не используется, оставлена для совместимости
+        nickname = '';
+        $('authOverlay').classList.remove('hidden');
+        $('mainMenu').classList.add('hidden');
+        $('slotUI').classList.add('hidden');
       }
-
-      function loadJackpotFeedData() { var k = 'wdVdsJackpotFeed'; jackpotFeedData = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; }
-      function saveJackpotFeedData() { localStorage.setItem('wdVdsJackpotFeed', JSON.stringify(jackpotFeedData)); updateWinningsList(); }
-      function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
-      function saveDiamonds() { localStorage.setItem('wdVdsDiamonds_' + nickname, diamonds); updateDiamondsDisplay(); updateMainBalance(); }
-      function updateDiamondsDisplay() { if ($('diamondsCount')) $('diamondsCount').textContent = diamonds; }
-      function updateMainBalance() { if ($('mainBalanceDisplay')) $('mainBalanceDisplay').textContent = diamonds; }
 
       async function loadJackpotHistory() {
         if (!userData) return;
-        try { var data = await API.getJackpotsByUser(userData.user_uid); jackpotHistory = data.map(function(j) { return { icon: j.icon, wish: j.wish, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; }); renderHistory(); } catch (e) { loadHistory(); }
+        try {
+          var data = await API.getJackpotsByUser(userData.user_uid);
+          jackpotHistory = data.map(function(j) { return { icon: j.icon, wish: j.wish, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; });
+          renderHistory();
+        } catch (e) {
+          console.error('loadJackpotHistory error', e);
+          jackpotHistory = [];
+        }
       }
 
       async function loadJackpotFeed() {
-        try { var data = await API.getAllJackpots(); jackpotFeedData = data.slice(0, 10).map(function(j) { return { nickname: j.nickname, mode: j.mode_key, amount: j.diamonds_won, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; }); updateWinningsList(); } catch (e) { loadJackpotFeedData(); }
+        try {
+          var data = await API.getAllJackpots();
+          jackpotFeedData = data.slice(0, 50).map(function(j) { return { nickname: j.nickname, mode: j.mode_key, amount: j.diamonds_won, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; });
+          updateWinningsList();
+        } catch (e) {
+          console.error('loadJackpotFeed error', e);
+          // fallback к текущему массиву, если был
+        }
       }
 
-      function loadHistory() { var k = 'wdVdsHistory_' + nickname; jackpotHistory = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; renderHistory(); }
-      function saveHistory() { localStorage.setItem('wdVdsHistory_' + nickname, JSON.stringify(jackpotHistory)); renderHistory(); }
-      function addJackpotToHistory(icon, wish) { jackpotHistory.unshift({ icon: icon, wish: wish, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() }); if (jackpotHistory.length > 50) jackpotHistory.pop(); saveHistory(); }
+      function addJackpotToHistory(icon, wish) {
+        jackpotHistory.unshift({ icon: icon, wish: wish, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() });
+        if (jackpotHistory.length > 50) jackpotHistory.pop();
+        renderHistory();
+        // сохранение в БД делается отдельно через API.saveJackpot в finishSpin
+      }
 
       function renderHistory() {
         if (!$('historyList')) return;
@@ -921,10 +933,8 @@
           chats[uid].messages = supportMessages;
           chats[uid].userName = nickname;
           await API.saveSupportChats(chats);
-          // Дополнительно сохраняем в локальное хранилище как резервную копию (не обязательно)
         } catch (e) {
           console.error('saveSupportMessage error', e);
-          // Показываем уведомление об ошибке, но не теряем сообщение в памяти
           showNotification('Ошибка сохранения сообщения, повторите позже');
         }
       }
@@ -1079,7 +1089,6 @@
           addJackpotToHistory(icon, wish);
           if (userData) API.saveJackpot(userData.user_uid, nickname, currentMode, icon, wish, 20);
           addToJackpotFeed(nickname, currentMode, 20);
-          saveJackpotFeedData();
           playJackpotSound();
           if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
           showJackpotBanner();
@@ -1138,7 +1147,7 @@
         useCustomRewards = false; updateMainBalance(); debouncedSave();
       }
 
-      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, diamonds_spent: diamondsSpent, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
+      async function debouncedSave() { if (!userData) return; if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, diamonds_spent: diamondsSpent, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
 
       // Event listeners
       $('logoutBtn').addEventListener('click', logout);
@@ -1154,9 +1163,9 @@
       $('backToMenu').addEventListener('click', backToMenu);
       $('closeWinBtn').addEventListener('click', function() { $('winOverlay').classList.add('hidden'); });
       $('closePaymentBtn').addEventListener('click', function() { $('paymentModal').classList.add('hidden'); });
-      $('historyBtn').addEventListener('click', function() { if (userData) loadJackpotHistory(); else { loadHistory(); renderHistory(); } $('historyModal').classList.remove('hidden'); });
+      $('historyBtn').addEventListener('click', async function() { await loadJackpotHistory(); $('historyModal').classList.remove('hidden'); });
       $('closeHistoryBtn').addEventListener('click', function() { $('historyModal').classList.add('hidden'); });
-      $('winningsBtn').addEventListener('click', function() { if (userData) loadJackpotFeed(); else loadJackpotFeedData(); $('winningsModal').classList.remove('hidden'); });
+      $('winningsBtn').addEventListener('click', async function() { await loadJackpotFeed(); $('winningsModal').classList.remove('hidden'); });
       $('closeWinningsBtn').addEventListener('click', function() { $('winningsModal').classList.add('hidden'); });
       $('autoSpinBtn').addEventListener('click', function() { if (gamePaused) return; autoSpinning = !autoSpinning; if (autoSpinning) { $('autoSpinBtn').classList.add('active'); $('autoSpinBtn').innerHTML = '🔄<br>STOP'; if (!spinning) spin(); } else { $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } });
       $('sendToPartnerBtn').addEventListener('click', openNameForm);
