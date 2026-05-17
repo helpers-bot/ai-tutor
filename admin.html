@@ -19,11 +19,12 @@
         .stat-card { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
         .stat-card .value { font-size: 2rem; color: #ffd700; font-weight: bold; }
         .stat-card .label { color: #888; font-size: 0.9rem; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; overflow-x: auto; }
         th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #333; font-size: 0.85rem; }
         th { background: #2a2a3e; color: #ffd700; }
         tr:hover { background: #222236; }
-        .btn-logout { background: #dc3545; color: #fff; padding: 8px 20px; border-radius: 8px; text-decoration: none; display: inline-block; margin: 10px 0; cursor: pointer; border: none; font-size: 0.9rem; }
+        .btn-logout { background: #dc3545; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; margin: 10px 0; display: inline-block; }
+        .btn-refresh { background: #28a745; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; margin: 10px 0; display: inline-block; }
         .search-form { display: flex; gap: 8px; margin: 12px 0; }
         .search-form input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.9rem; }
         .search-form button { padding: 10px 20px; background: #d4af37; border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; }
@@ -32,9 +33,19 @@
         .actions button { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
         .btn-add { background: #28a745; color: #fff; }
         .btn-remove { background: #dc3545; color: #fff; }
-        .btn-view { background: #007bff; color: #fff; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: #1a1a2e; padding: 30px; border-radius: 16px; border: 2px solid #d4af37; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; }
+        .btn-reply { background: #007bff; color: #fff; }
+        .tabs { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 20px; background: #1a1a2e; border: 1px solid #444; color: #888; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; }
+        .tab-btn.active { background: #2a2a3e; color: #ffd700; border-color: #d4af37; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chat-message { padding: 10px; margin: 5px 0; border-radius: 12px; font-size: 0.85rem; }
+        .chat-message.from-user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; }
+        .chat-message.from-admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; }
+        .reply-box { display: flex; gap: 8px; margin-top: 8px; }
+        .reply-box input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.85rem; }
+        .reply-box button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .unread-badge { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 6px; }
     </style>
 </head>
 <body>
@@ -52,61 +63,98 @@
         <div id="adminPanel" style="display:none;">
             <h1>🎮 Админ-панель VDS Game</h1>
             <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
+            <button class="btn-refresh" onclick="loadAllData()">🔄 Обновить</button>
             <p class="success" id="successMsg"></p>
             <p class="error" id="errorMsg"></p>
 
-            <h2>📊 Статистика</h2>
             <div class="stats-grid">
                 <div class="stat-card"><div class="value" id="totalUsers">0</div><div class="label">Всего пользователей</div></div>
                 <div class="stat-card"><div class="value" id="onlineNow">0</div><div class="label">Онлайн (15 мин)</div></div>
                 <div class="stat-card"><div class="value" id="onlineToday">0</div><div class="label">За сегодня</div></div>
+                <div class="stat-card"><div class="value" id="unreadMessages">0</div><div class="label">Новых сообщений</div></div>
             </div>
 
-            <h2>💎 Потрачено алмазов по категориям</h2>
-            <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="spentTable"></tbody></table>
-
-            <h2>🔍 Поиск пользователя</h2>
-            <div class="search-form">
-                <input type="text" id="searchQuery" placeholder="ID или email или имя...">
-                <button onclick="searchUsers()">Найти</button>
-                <button onclick="loadAllUsers()" style="background:#555;">Все</button>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('users')">👥 Пользователи</button>
+                <button class="tab-btn" onclick="switchTab('support')">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
+                <button class="tab-btn" onclick="switchTab('jackpots')">🎰 Джекпоты</button>
+                <button class="tab-btn" onclick="switchTab('transactions')">💳 Транзакции</button>
+                <button class="tab-btn" onclick="switchTab('stats')">📊 Статистика</button>
             </div>
 
-            <h2>👥 Пользователи</h2>
-            <div style="overflow-x:auto;">
-                <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>Алмазы</th><th>Прогресс</th><th>Фриспины</th><th>Регистрация</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table>
+            <div id="tab-users" class="tab-content active">
+                <h2>💎 Потрачено алмазов по категориям</h2>
+                <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="spentTable"></tbody></table>
+                <h2>🔍 Поиск пользователя</h2>
+                <div class="search-form">
+                    <input type="text" id="searchQuery" placeholder="ID, email или имя...">
+                    <button onclick="searchUsers()">Найти</button>
+                    <button onclick="loadAllUsers()" style="background:#555;">Все</button>
+                </div>
+                <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>Прогресс</th><th>Фриспины</th><th>Регистрация</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table>
             </div>
 
-            <h2>💳 Последние транзакции</h2>
-            <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead><tbody id="transactionsTable"></tbody></table>
+            <div id="tab-support" class="tab-content">
+                <h2>💬 Обращения в поддержку</h2>
+                <p style="color:#888;font-size:0.8rem;">Выберите пользователя для просмотра переписки</p>
+                <div id="supportUsersList"></div>
+                <div id="chatArea" style="display:none; margin-top:16px;">
+                    <h3>Переписка с <span id="chatUserName"></span></h3>
+                    <div id="chatMessages" style="max-height:300px;overflow-y:auto;padding:10px;background:#111;border-radius:8px;margin:8px 0;"></div>
+                    <div class="reply-box">
+                        <input type="text" id="replyInput" placeholder="Введите ответ...">
+                        <button onclick="sendReply()">📤 Отправить</button>
+                    </div>
+                </div>
+            </div>
 
-            <h2>🎰 Последние джекпоты</h2>
-            <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Режим</th><th>Желание</th><th>Выигрыш</th></tr></thead><tbody id="jackpotsTable"></tbody></table>
+            <div id="tab-jackpots" class="tab-content">
+                <h2>🎰 Последние джекпоты</h2>
+                <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Режим</th><th>Желание</th><th>Выигрыш</th></tr></thead><tbody id="jackpotsTable"></tbody></table>
+            </div>
+
+            <div id="tab-transactions" class="tab-content">
+                <h2>💳 Последние транзакции</h2>
+                <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead><tbody id="transactionsTable"></tbody></table>
+            </div>
+
+            <div id="tab-stats" class="tab-content">
+                <h2>📊 Статистика по категориям</h2>
+                <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="statsSpentTable"></tbody></table>
+            </div>
         </div>
     </div>
 
     <script src="api.js"></script>
     <script>
-        const ADMIN_PASSWORD_HASH = '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8';
+        let currentChatUID = null;
+        let supportChats = {};
+
+        async function sha256(message) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
         async function adminLogin() {
             const token = document.getElementById('githubToken').value.trim();
             const password = document.getElementById('adminPassword').value;
-            
-            if (!token || !password) {
-                document.getElementById('loginError').textContent = 'Введите токен и пароль';
-                return;
-            }
+            const errorEl = document.getElementById('loginError');
 
-            const encoder = new TextEncoder();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(password));
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            if (!token || !password) { errorEl.textContent = 'Введите токен и пароль'; return; }
 
-            if (hashHex !== ADMIN_PASSWORD_HASH) {
-                document.getElementById('loginError').textContent = 'Неверный пароль';
-                return;
-            }
+            const passwordHash = await sha256(password);
+            const validHash = await sha256('admin123');
+
+            if (passwordHash !== validHash) { errorEl.textContent = 'Неверный пароль'; return; }
+
+            try {
+                const response = await fetch('https://api.github.com/user', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!response.ok) { errorEl.textContent = 'Неверный GitHub токен'; return; }
+            } catch (e) { errorEl.textContent = 'Ошибка проверки токена'; return; }
 
             localStorage.setItem('vds_github_token', token);
             document.getElementById('loginBlock').style.display = 'none';
@@ -114,42 +162,57 @@
             loadAllData();
         }
 
-        function logout() {
-            localStorage.removeItem('vds_github_token');
-            location.reload();
-        }
+        function logout() { localStorage.removeItem('vds_github_token'); location.reload(); }
 
-        function showError(msg) {
-            const el = document.getElementById('errorMsg');
-            el.textContent = msg;
-            setTimeout(() => el.textContent = '', 4000);
-        }
+        function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
+        function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
 
-        function showSuccess(msg) {
-            const el = document.getElementById('successMsg');
-            el.textContent = msg;
-            setTimeout(() => el.textContent = '', 4000);
+        function switchTab(name) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + name).classList.add('active');
+            event.target.classList.add('active');
+            if (name === 'support') loadSupportChats();
+            if (name === 'jackpots') loadJackpots();
+            if (name === 'transactions') loadTransactions();
+            if (name === 'stats') loadStatsTab();
         }
 
         async function loadAllData() {
-            await Promise.all([loadStats(), loadAllUsers(), loadTransactions(), loadJackpots()]);
+            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions()]);
         }
 
         async function loadStats() {
             const users = await API.getAllUsers();
             const online = await API.getOnlineStats();
             const spent = await API.getSpentByMode();
-            
+            const chats = await API.getSupportChats();
+
             document.getElementById('totalUsers').textContent = users.length;
             document.getElementById('onlineNow').textContent = online.online_now;
             document.getElementById('onlineToday').textContent = online.online_today;
 
+            let unread = 0;
+            Object.values(chats).forEach(chat => {
+                if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
+            });
+            document.getElementById('unreadMessages').textContent = unread;
+            if (unread > 0) {
+                document.getElementById('unreadBadge').textContent = unread;
+                document.getElementById('unreadBadge').classList.remove('hidden');
+            } else {
+                document.getElementById('unreadBadge').classList.add('hidden');
+            }
+
             const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
             const spentHTML = Object.entries(spent).map(([mode, total]) => 
-                `<tr><td>${modeNames[mode] || mode}</td><td>${total} 💎</td></tr>`
+                '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
             ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
             document.getElementById('spentTable').innerHTML = spentHTML;
+            document.getElementById('statsSpentTable').innerHTML = spentHTML;
         }
+
+        async function loadStatsTab() { await loadStats(); }
 
         async function loadAllUsers() {
             const users = await API.getAllUsers();
@@ -164,22 +227,20 @@
         }
 
         function renderUsers(users) {
-            const html = users.map(u => `
-                <tr>
-                    <td><strong>${u.user_uid}</strong></td>
-                    <td>${u.nickname || u.name || '-'}</td>
-                    <td>${u.email || '-'}</td>
-                    <td>${u.diamonds || 0} 💎</td>
-                    <td>${u.treasure_progress || 0}%</td>
-                    <td>${u.free_spins || 0}</td>
-                    <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}</td>
-                    <td class="actions">
-                        <input type="number" id="amt_${u.user_uid}" placeholder="Сумма" value="100" min="1" style="width:60px;">
-                        <button class="btn-add" onclick="addDiamonds('${u.user_uid}')">+</button>
-                        <button class="btn-remove" onclick="removeDiamonds('${u.user_uid}')">-</button>
-                    </td>
-                </tr>
-            `).join('') || '<tr><td colspan="8">Нет пользователей</td></tr>';
+            const html = users.map(u => 
+                '<tr>' +
+                '<td><strong>' + u.user_uid + '</strong></td>' +
+                '<td>' + (u.nickname || u.name || '-') + '</td>' +
+                '<td>' + (u.email || '-') + '</td>' +
+                '<td>' + (u.diamonds || 0) + ' 💎</td>' +
+                '<td>' + (u.treasure_progress || 0) + '%</td>' +
+                '<td>' + (u.free_spins || 0) + '</td>' +
+                '<td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '-') + '</td>' +
+                '<td class="actions"><input type="number" id="amt_' + u.user_uid + '" placeholder="Сумма" value="100" min="1" style="width:60px;">' +
+                '<button class="btn-add" onclick="addDiamonds(\'' + u.user_uid + '\')">+</button>' +
+                '<button class="btn-remove" onclick="removeDiamonds(\'' + u.user_uid + '\')">-</button></td>' +
+                '</tr>'
+            ).join('') || '<tr><td colspan="8">Нет пользователей</td></tr>';
             document.getElementById('usersTable').innerHTML = html;
         }
 
@@ -187,7 +248,7 @@
             const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
             if (!amount || amount <= 0) { showError('Введите сумму'); return; }
             const result = await API.addDiamonds(uid, amount, 'admin');
-            if (result.success) { showSuccess(`+${amount}💎 → ${uid}`); loadAllData(); }
+            if (result.success) { showSuccess('+' + amount + '💎 → ' + uid); loadAllData(); }
             else showError(result.error);
         }
 
@@ -195,42 +256,100 @@
             const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
             if (!amount || amount <= 0) { showError('Введите сумму'); return; }
             const result = await API.removeDiamonds(uid, amount, 'admin');
-            if (result.success) { showSuccess(`-${amount}💎 → ${uid}`); loadAllData(); }
+            if (result.success) { showSuccess('-' + amount + '💎 → ' + uid); loadAllData(); }
             else showError(result.error);
         }
 
-        async function loadTransactions() {
-            const transactions = await API.getTransactions();
-            const html = transactions.slice(0, 50).map(t => `
-                <tr>
-                    <td>${t.created_at ? new Date(t.created_at).toLocaleString() : '-'}</td>
-                    <td>${t.user_uid}</td>
-                    <td>${t.nickname || '-'}</td>
-                    <td>${t.amount} 💎</td>
-                    <td>${t.type === 'add' ? '✅ Начислено' : '❌ Списано'}</td>
-                    <td>${t.reason || ''}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
-            document.getElementById('transactionsTable').innerHTML = html;
+        async function loadSupportChats() {
+            try {
+                const chats = await API.getSupportChats();
+                supportChats = chats || {};
+            } catch (e) {
+                supportChats = {};
+            }
+            const usersList = document.getElementById('supportUsersList');
+            
+            if (Object.keys(supportChats).length === 0) {
+                usersList.innerHTML = '<p style="color:#888;">Нет обращений</p>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>ID</th><th>Имя</th><th>Последнее сообщение</th><th>Статус</th></tr></thead><tbody>';
+            for (const [uid, chat] of Object.entries(supportChats)) {
+                if (!chat || !chat.messages || chat.messages.length === 0) continue;
+                const lastMsg = chat.messages[chat.messages.length - 1];
+                const hasUnread = chat.messages.some(m => !m.read && m.from === 'user');
+                const preview = lastMsg ? lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '...' : '') : 'Нет сообщений';
+                html += '<tr onclick="openChat(\'' + uid + '\')" style="cursor:pointer;' + (hasUnread ? 'background:rgba(255,215,0,0.1);' : '') + '">' +
+                    '<td>' + uid + '</td><td>' + (chat.userName || '-') + '</td>' +
+                    '<td>' + preview + '</td><td>' + (hasUnread ? '🔴 Новое' : '✅ Прочитано') + '</td></tr>';
+            }
+            html += '</tbody></table>';
+            usersList.innerHTML = html || '<p style="color:#888;">Нет обращений</p>';
+        }
+
+        function openChat(uid) {
+            currentChatUID = uid;
+            const chat = supportChats[uid];
+            if (!chat) return;
+            document.getElementById('chatArea').style.display = 'block';
+            document.getElementById('chatUserName').textContent = chat.userName || uid;
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.innerHTML = '';
+            if (chat.messages) {
+                chat.messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = 'chat-message ' + (msg.from === 'user' ? 'from-user' : 'from-admin');
+                    div.innerHTML = '<strong>' + (msg.from === 'user' ? (chat.userName || 'Пользователь') : 'Админ') + ':</strong> ' + msg.text +
+                        '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>';
+                    messagesDiv.appendChild(div);
+                });
+                chat.messages.forEach(m => m.read = true);
+            }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            API.saveSupportChats(supportChats);
+            loadSupportChats();
+        }
+
+        async function sendReply() {
+            if (!currentChatUID) return;
+            const text = document.getElementById('replyInput').value.trim();
+            if (!text) return;
+
+            if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь' };
+            supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
+            await API.saveSupportChats(supportChats);
+            
+            document.getElementById('replyInput').value = '';
+            openChat(currentChatUID);
+            showSuccess('Ответ отправлен');
         }
 
         async function loadJackpots() {
             const jackpots = await API.getAllJackpots();
             const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-            const html = jackpots.slice(0, 50).map(j => `
-                <tr>
-                    <td>${j.created_at ? new Date(j.created_at).toLocaleString() : '-'}</td>
-                    <td>${j.user_uid}</td>
-                    <td>${j.nickname || '-'}</td>
-                    <td>${modeNames[j.mode_key] || j.mode_key}</td>
-                    <td>${(j.wish || '').substring(0, 25)}...</td>
-                    <td>${j.diamonds_won} 💎</td>
-                </tr>
-            `).join('') || '<tr><td colspan="6">Нет джекпотов</td></tr>';
+            const html = jackpots.slice(0, 100).map(j =>
+                '<tr><td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
+                '<td>' + j.user_uid + '</td><td>' + (j.nickname || '-') + '</td>' +
+                '<td>' + (modeNames[j.mode_key] || j.mode_key) + '</td>' +
+                '<td>' + (j.wish || '').substring(0, 30) + '...</td><td>' + j.diamonds_won + ' 💎</td></tr>'
+            ).join('') || '<tr><td colspan="6">Нет джекпотов</td></tr>';
             document.getElementById('jackpotsTable').innerHTML = html;
         }
 
-        // Автовход если токен уже есть
+        async function loadTransactions() {
+            const transactions = await API.getTransactions();
+            const html = transactions.slice(0, 100).map(t =>
+                '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
+                '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
+                '<td>' + t.amount + ' 💎</td><td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td>' +
+                '<td>' + (t.reason || '') + '</td></tr>'
+            ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
+            document.getElementById('transactionsTable').innerHTML = html;
+        }
+
         if (localStorage.getItem('vds_github_token')) {
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
