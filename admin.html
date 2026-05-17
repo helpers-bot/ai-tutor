@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>Админ-панель VDS Game</title>
     <style>
+        /* стили без изменений */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
         .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
@@ -236,69 +237,50 @@
         }
 
         async function loadAllData() {
-            try {
-                await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadTransactions()]);
-            } catch (e) {
-                console.error('loadAllData error', e);
-            }
+            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadTransactions()]);
         }
 
         async function loadStats() {
-            try {
-                const users = await API.getAllUsers();
-                const online = await API.getOnlineStats();
-                const spent = await API.getSpentByMode();
-                const chats = await API.getSupportChats();
+            const users = await API.getAllUsers();
+            const online = await API.getOnlineStats();
+            const spent = await API.getSpentByMode();
+            const chats = await API.getSupportChats();
 
-                document.getElementById('totalUsers').textContent = Array.isArray(users) ? users.length : 0;
-                document.getElementById('onlineNow').textContent = (online && online.online_now) || 0;
-                document.getElementById('onlineToday').textContent = (online && online.online_today) || 0;
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('onlineNow').textContent = online.online_now;
+            document.getElementById('onlineToday').textContent = online.online_today;
 
-                let unread = 0;
-                Object.values(chats).forEach(chat => {
-                    if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
-                });
-                document.getElementById('unreadMessages').textContent = unread;
-                if (unread > 0) {
-                    document.getElementById('unreadBadge').textContent = unread;
-                    document.getElementById('unreadBadge').classList.remove('hidden');
-                } else {
-                    document.getElementById('unreadBadge').classList.add('hidden');
-                }
-
-                const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-                const spentData = spent || {};
-                const spentHTML = Object.entries(spentData).map(([mode, total]) => 
-                    '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
-                ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
-                document.getElementById('statsSpentTable').innerHTML = spentHTML;
-            } catch (e) {
-                console.error('loadStats error', e);
+            let unread = 0;
+            Object.values(chats).forEach(chat => {
+                if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
+            });
+            document.getElementById('unreadMessages').textContent = unread;
+            if (unread > 0) {
+                document.getElementById('unreadBadge').textContent = unread;
+                document.getElementById('unreadBadge').classList.remove('hidden');
+            } else {
+                document.getElementById('unreadBadge').classList.add('hidden');
             }
+
+            const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
+            const spentHTML = Object.entries(spent).map(([mode, total]) => 
+                '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
+            ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
+            document.getElementById('statsSpentTable').innerHTML = spentHTML;
         }
 
         async function loadStatsTab() { await loadStats(); }
 
         async function loadAllUsers() {
-            try {
-                const users = await API.getAllUsers();
-                renderUsers(users || []);
-            } catch (e) {
-                showError('Ошибка загрузки пользователей');
-                console.error(e);
-            }
+            const users = await API.getAllUsers();
+            renderUsers(users);
         }
 
         async function searchUsers() {
-            try {
-                const query = document.getElementById('searchQuery').value.trim();
-                if (!query) { loadAllUsers(); return; }
-                const users = await API.searchUsers(query);
-                renderUsers(users || []);
-            } catch (e) {
-                showError('Ошибка поиска');
-                console.error(e);
-            }
+            const query = document.getElementById('searchQuery').value.trim();
+            if (!query) { loadAllUsers(); return; }
+            const users = await API.searchUsers(query);
+            renderUsers(users);
         }
 
         function renderUsers(users) {
@@ -319,54 +301,39 @@
         }
 
         async function addDiamonds(uid) {
-            try {
-                const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
-                if (!amount || amount <= 0) { showError('Введите сумму'); return; }
-                const result = await API.addDiamonds(uid, amount, 'admin');
-                if (result.success) {
-                    showSuccess('+' + amount + '💎 → ' + uid);
-                    loadAllData();
-                    await API.addSupportMessage(uid, {
-                        from: 'admin',
-                        text: `Администратор начислил вам ${amount}💎`,
-                        time: new Date().toISOString(),
-                        read: true
-                    });
-                } else showError(result.error || 'Ошибка');
-            } catch (e) {
-                showError('Ошибка начисления');
-                console.error(e);
-            }
+            const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
+            if (!amount || amount <= 0) { showError('Введите сумму'); return; }
+            const result = await API.addDiamonds(uid, amount, 'admin');
+            if (result.success) {
+                showSuccess('+' + amount + '💎 → ' + uid);
+                loadAllData();
+                await API.addSupportMessage(uid, {
+                    from: 'admin',
+                    text: `Администратор начислил вам ${amount}💎`,
+                    time: new Date().toISOString(),
+                    read: true
+                });
+            } else showError(result.error);
         }
 
         async function removeDiamonds(uid) {
-            try {
-                const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
-                if (!amount || amount <= 0) { showError('Введите сумму'); return; }
-                const result = await API.removeDiamonds(uid, amount, 'admin');
-                if (result.success) {
-                    showSuccess('-' + amount + '💎 → ' + uid);
-                    loadAllData();
-                    await API.addSupportMessage(uid, {
-                        from: 'admin',
-                        text: `Администратор списал ${amount}💎 с вашего счета`,
-                        time: new Date().toISOString(),
-                        read: true
-                    });
-                } else showError(result.error || 'Ошибка');
-            } catch (e) {
-                showError('Ошибка списания');
-                console.error(e);
-            }
+            const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
+            if (!amount || amount <= 0) { showError('Введите сумму'); return; }
+            const result = await API.removeDiamonds(uid, amount, 'admin');
+            if (result.success) {
+                showSuccess('-' + amount + '💎 → ' + uid);
+                loadAllData();
+                await API.addSupportMessage(uid, {
+                    from: 'admin',
+                    text: `Администратор списал ${amount}💎 с вашего счета`,
+                    time: new Date().toISOString(),
+                    read: true
+                });
+            } else showError(result.error);
         }
 
         async function loadSupportChats() {
-            try {
-                supportChats = await API.getSupportChats();
-            } catch (e) {
-                console.error('loadSupportChats error', e);
-                supportChats = {};
-            }
+            supportChats = await API.getSupportChats();
             const usersList = document.getElementById('supportUsersList');
             
             if (Object.keys(supportChats).length === 0) {
@@ -391,97 +358,77 @@
         }
 
         async function openChat(uid, markAsRead = true) {
-            try {
-                currentChatUID = uid;
-                supportChats = await API.getSupportChats();
-                const chat = supportChats[uid];
-                if (!chat) return;
-                document.getElementById('chatArea').style.display = 'block';
-                document.getElementById('chatUserName').textContent = chat.userName || uid;
-                
-                const messagesDiv = document.getElementById('chatMessages');
-                messagesDiv.innerHTML = '';
-                if (chat.messages) {
-                    chat.messages.forEach((msg, index) => {
-                        if (msg.deleted) return;
-                        const div = document.createElement('div');
-                        div.className = 'chat-message ' + (msg.from === 'user' ? 'from-user' : 'from-admin');
-                        div.innerHTML = '<strong>' + (msg.from === 'user' ? (chat.userName || 'Пользователь') : 'Админ') + ':</strong> ' + msg.text +
-                            '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>' +
-                            '<button class="btn-delete" onclick="deleteMessage(\'' + uid + '\', ' + index + ')">🗑</button>';
-                        messagesDiv.appendChild(div);
-                    });
-                    if (markAsRead) {
-                        let changed = false;
-                        chat.messages.forEach(m => {
-                            if (!m.deleted && m.from === 'user' && !m.read) {
-                                m.read = true;
-                                changed = true;
-                            }
-                        });
-                        if (changed) {
-                            await API.saveSupportChats(supportChats);
+            currentChatUID = uid;
+            supportChats = await API.getSupportChats();
+            const chat = supportChats[uid];
+            if (!chat) return;
+            document.getElementById('chatArea').style.display = 'block';
+            document.getElementById('chatUserName').textContent = chat.userName || uid;
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.innerHTML = '';
+            if (chat.messages) {
+                chat.messages.forEach((msg, index) => {
+                    if (msg.deleted) return;
+                    const div = document.createElement('div');
+                    div.className = 'chat-message ' + (msg.from === 'user' ? 'from-user' : 'from-admin');
+                    div.innerHTML = '<strong>' + (msg.from === 'user' ? (chat.userName || 'Пользователь') : 'Админ') + ':</strong> ' + msg.text +
+                        '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>' +
+                        '<button class="btn-delete" onclick="deleteMessage(\'' + uid + '\', ' + index + ')">🗑</button>';
+                    messagesDiv.appendChild(div);
+                });
+                if (markAsRead) {
+                    let changed = false;
+                    chat.messages.forEach(m => {
+                        if (!m.deleted && m.from === 'user' && !m.read) {
+                            m.read = true;
+                            changed = true;
                         }
+                    });
+                    if (changed) {
+                        await API.saveSupportChats(supportChats);
                     }
                 }
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                if (markAsRead) await loadSupportChats();
-            } catch (e) {
-                console.error('openChat error', e);
             }
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            if (markAsRead) await loadSupportChats();
         }
 
         async function deleteMessage(uid, index) {
-            try {
-                if (!confirm('Удалить сообщение?')) return;
-                await API.deleteSupportMessage(uid, index);
-                supportChats = await API.getSupportChats();
-                openChat(uid);
-                showSuccess('Сообщение удалено');
-            } catch (e) {
-                showError('Ошибка удаления');
-                console.error(e);
-            }
+            if (!confirm('Удалить сообщение?')) return;
+            await API.deleteSupportMessage(uid, index);
+            supportChats = await API.getSupportChats();
+            openChat(uid);
+            showSuccess('Сообщение удалено');
         }
 
         async function sendReply() {
-            try {
-                if (!currentChatUID) return;
-                const text = document.getElementById('replyInput').value.trim();
-                if (!text) return;
+            if (!currentChatUID) return;
+            const text = document.getElementById('replyInput').value.trim();
+            if (!text) return;
 
-                supportChats = await API.getSupportChats();
-                if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь', deleted: [] };
-                supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
-                await API.saveSupportChats(supportChats);
-                
-                document.getElementById('replyInput').value = '';
-                await openChat(currentChatUID, false);
-                showSuccess('Ответ отправлен');
-            } catch (e) {
-                showError('Ошибка отправки');
-                console.error(e);
-            }
+            supportChats = await API.getSupportChats();
+            if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь', deleted: [] };
+            supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
+            await API.saveSupportChats(supportChats);
+            
+            document.getElementById('replyInput').value = '';
+            await openChat(currentChatUID, false);
+            showSuccess('Ответ отправлен');
         }
 
         async function loadTransactions() {
-            try {
-                const transactions = await API.getTransactions();
-                const html = (transactions || []).slice(0, 100).map(t =>
-                    '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
-                    '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
-                    '<td>' + t.amount + ' 💎</td><td>' + 
-                    (t.type === 'add' ? '✅ Начислено' : t.type === 'remove' ? '❌ Списано' : '💱 Пополнение') + '</td>' +
-                    '<td>' + (t.reason || '') + '</td></tr>'
-                ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
-                document.getElementById('transactionsTable').innerHTML = html;
-            } catch (e) {
-                console.error('loadTransactions error', e);
-                document.getElementById('transactionsTable').innerHTML = '<tr><td colspan="6">Ошибка загрузки</td></tr>';
-            }
+            const transactions = await API.getTransactions();
+            const html = transactions.slice(0, 100).map(t =>
+                '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
+                '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
+                '<td>' + t.amount + ' 💎</td><td>' + 
+                (t.type === 'add' ? '✅ Начислено' : t.type === 'remove' ? '❌ Списано' : '💱 Пополнение') + '</td>' +
+                '<td>' + (t.reason || '') + '</td></tr>'
+            ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
+            document.getElementById('transactionsTable').innerHTML = html;
         }
 
-        // Проверка сохранённой сессии
         if (localStorage.getItem('vds_admin_logged_in') === 'true') {
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
