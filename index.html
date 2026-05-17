@@ -37,6 +37,8 @@
     .user-bar.hidden-bar { display: none; }
     .nickname { font-weight: 900; font-size: 1rem; color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; animation: nickGlow 2s ease-in-out infinite alternate; letter-spacing: 1px; flex-shrink: 0; }
     @keyframes nickGlow { 0% { text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b; } 100% { text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00; } }
+    .profile-btn { background: rgba(212,175,55,0.3); border: 1px solid #d4af37; color: #ffd700; padding: 3px 10px; border-radius: 16px; font-weight: bold; font-size: 0.7rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .profile-btn:hover { background: rgba(212,175,55,0.5); }
     .balance-display { font-weight: 900; font-size: 1rem; color: #ffd966; text-shadow: 0 0 10px #ffd700; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
     .top-up-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
     .spin-win-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 3rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; z-index: 300; pointer-events: none; opacity: 0; animation: none; }
@@ -136,7 +138,7 @@
     .google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
     /* Crypto Payment Styles */
-    .crypto-payment-card { max-width: 450px; }
+    .crypto-payment-card { max-width: 550px; width: 95vw; padding: 20px; }
     .crypto-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; justify-content: center; }
     .crypto-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 10px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
     .crypto-option:hover { border-color: #d4af37; }
@@ -144,11 +146,24 @@
     .rate-display { color: #ffd966; font-size: 0.75rem; margin: 8px 0; text-align: center; }
     .qr-container { display: flex; justify-content: center; margin: 12px 0; }
     .qr-container img { border-radius: 12px; border: 2px solid #d4af37; }
-    .diamond-amount-select { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0; }
-    .diamond-amount-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
+    .diamond-amount-select { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0; }
+    .diamond-amount-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 12px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .diamond-amount-option .amount { font-size: 1.2rem; }
+    .diamond-amount-option .price { font-size: 0.7rem; color: #b8945f; }
     .diamond-amount-option:hover { border-color: #d4af37; }
     .diamond-amount-option.selected { border-color: #ffd700; background: #3d2058; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
     .copied-msg { color: #44ff44; font-size: 0.7rem; margin-top: 4px; }
+    .wallet-address { background: #1a1030; border-radius: 12px; padding: 8px 12px; word-break: break-all; font-size: 0.75rem; color: #ddd; margin: 6px 0; }
+    .pay-btn { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; color: #000; font-weight: bold; padding: 12px; border-radius: 30px; width: 100%; cursor: pointer; font-size: 1rem; margin-top: 8px; }
+    /* Profile Modal */
+    .profile-modal-card { max-width: 450px; width: 90vw; animation: profileSlideIn 0.4s ease-out; }
+    @keyframes profileSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .profile-info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.2); color: #f0dbb0; font-size: 0.9rem; }
+    .profile-info-row strong { color: #ffd700; }
+    .copy-btn { background: #4b2c6e; border: 1px solid #cfaa4a; color: #ffd966; padding: 4px 12px; border-radius: 12px; cursor: pointer; font-size: 0.7rem; }
+    .profile-nickname-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
+    .profile-nickname-row input { flex: 1; }
+    .profile-nickname-row button { padding: 8px 16px; background: #d4af37; color: #150a1f; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
     @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
   </style>
 </head>
@@ -184,6 +199,7 @@
       <span style="display:flex;align-items:center;gap:8px;">
         <img class="user-avatar hidden" id="userAvatar" src="" alt="">
         <span class="nickname" id="nicknameDisplay">Игрок</span>
+        <button class="profile-btn" id="profileBtn" onclick="openProfile()">👤 Профиль</button>
       </span>
       <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
     </div>
@@ -246,31 +262,48 @@
   <!-- CRYPTO PAYMENT MODAL -->
   <div id="cryptoPaymentModal" class="overlay hidden">
     <div class="win-card crypto-payment-card">
-      <h3 style="color:#ffd700;margin-bottom:8px;">💎 Покупка алмазов</h3>
+      <h3 style="color:#ffd700;margin-bottom:12px;">💎 Покупка алмазов</h3>
       <p style="color:#ddd;font-size:0.8rem;margin-bottom:6px;">Выберите сумму:</p>
       <div class="diamond-amount-select" id="diamondAmounts">
-        <div class="diamond-amount-option selected" data-usd="1" data-diamonds="100">100 💎 ($1)</div>
-        <div class="diamond-amount-option" data-usd="5" data-diamonds="500">500 💎 ($5)</div>
-        <div class="diamond-amount-option" data-usd="10" data-diamonds="1000">1000 💎 ($10)</div>
-        <div class="diamond-amount-option" data-usd="50" data-diamonds="5000">5000 💎 ($50)</div>
-        <div class="diamond-amount-option" data-usd="100" data-diamonds="10000">10000 💎 ($100)</div>
+        <div class="diamond-amount-option selected" data-usd="1" data-diamonds="100"><span class="amount">100 💎</span><span class="price">$1.00</span></div>
+        <div class="diamond-amount-option" data-usd="5" data-diamonds="500"><span class="amount">500 💎</span><span class="price">$5.00</span></div>
+        <div class="diamond-amount-option" data-usd="10" data-diamonds="1000"><span class="amount">1000 💎</span><span class="price">$10.00</span></div>
+        <div class="diamond-amount-option" data-usd="50" data-diamonds="5000"><span class="amount">5000 💎</span><span class="price">$50.00</span></div>
+        <div class="diamond-amount-option" data-usd="100" data-diamonds="10000"><span class="amount">10000 💎</span><span class="price">$100.00</span></div>
       </div>
       <p style="color:#ddd;font-size:0.8rem;margin:8px 0;">Выберите криптовалюту:</p>
       <div class="crypto-list" id="cryptoList">
-        <div class="crypto-option selected" data-currency="USDT">USDT</div>
-        <div class="crypto-option" data-currency="BTC">BTC</div>
-        <div class="crypto-option" data-currency="ETH">ETH</div>
-        <div class="crypto-option" data-currency="BNB">BNB</div>
-        <div class="crypto-option" data-currency="BUSD">BUSD</div>
-        <div class="crypto-option" data-currency="USDC">USDC</div>
+        <div class="crypto-option selected" data-currency="USDT">USDT (TRC20)</div>
+        <div class="crypto-option" data-currency="TRX">TRX (TRC20)</div>
+        <div class="crypto-option" data-currency="BNB">BNB (BEP20)</div>
+        <div class="crypto-option" data-currency="ETH">ETH (ERC20)</div>
+        <div class="crypto-option" data-currency="BTC">BTC (BEP20)</div>
       </div>
       <div class="rate-display" id="rateDisplay">Загрузка курса...</div>
       <div class="qr-container" id="qrContainer"></div>
-      <p style="color:#ffd966;font-size:0.75rem;text-align:center;word-break:break-all;" id="cryptoAddress"></p>
+      <div class="wallet-address" id="walletAddress"></div>
       <button id="copyAddressBtn" class="thread-btn" style="animation:none;font-size:0.7rem;padding:8px;margin:6px 0;width:100%;">📋 Копировать адрес</button>
       <p class="copied-msg hidden" id="copiedMsg">Адрес скопирован!</p>
-      <p style="color:#888;font-size:0.65rem;text-align:center;margin:8px 0;">После оплаты алмазы начислятся автоматически</p>
+      <button id="simulatePaymentBtn" class="pay-btn">💰 Я оплатил — получить алмазы</button>
+      <p style="color:#888;font-size:0.65rem;text-align:center;margin:8px 0;">После нажатия алмазы начислятся мгновенно (демо)</p>
       <button id="closeCryptoPaymentBtn" class="thread-btn" style="margin-top:4px;animation:none;">ЗАКРЫТЬ</button>
+    </div>
+  </div>
+
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="overlay hidden">
+    <div class="win-card profile-modal-card">
+      <h3 style="color:#ffd700;text-align:center;margin-bottom:16px;">👤 Профиль</h3>
+      <div class="profile-info-row"><strong>ID:</strong> <span id="profileUID">-</span> <button class="copy-btn" onclick="copyUID()">📋 Копировать</button></div>
+      <div class="profile-info-row"><strong>Email:</strong> <span id="profileEmail">-</span></div>
+      <div class="profile-info-row"><strong>💎 Баланс:</strong> <span id="profileDiamonds">0</span></div>
+      <div class="profile-info-row"><strong>🎰 Всего джекпотов:</strong> <span id="profileJackpots">0</span></div>
+      <div class="profile-nickname-row">
+        <input type="text" class="form-input" id="profileNicknameInput" placeholder="Новый никнейм">
+        <button onclick="changeNickname()">💾 Сохранить</button>
+      </div>
+      <p id="profileMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;text-align:center;"></p>
+      <button id="closeProfileBtn" class="thread-btn" style="margin-top:12px;animation:none;width:100%;">ЗАКРЫТЬ</button>
     </div>
   </div>
 
@@ -363,6 +396,14 @@
       let supportMessages = [];
 
       // ===== CRYPTO PAYMENT =====
+      const WALLETS = {
+        USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
+        TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
+        BNB: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
+        ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
+        BTC: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f'
+      };
+
       let cryptoRates = {};
       let selectedCrypto = 'USDT';
       let selectedUSD = 1;
@@ -378,7 +419,7 @@
         const rate = cryptoRates[selectedCrypto];
         if (rate) {
           const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8);
-          $('rateDisplay').textContent = `1 ${selectedCrypto} = $${rate.price_usd.toFixed(2)} | Сумма: ${cryptoAmount} ${selectedCrypto}`;
+          $('rateDisplay').textContent = `1 ${selectedCrypto} ≈ $${rate.price_usd.toFixed(2)} | К отправке: ${cryptoAmount} ${selectedCrypto}`;
         } else {
           $('rateDisplay').textContent = 'Курс загружается...';
         }
@@ -408,9 +449,75 @@
       function updateQRAndAddress() {
         const rate = cryptoRates[selectedCrypto];
         const cryptoAmount = rate ? (selectedUSD / rate.price_usd).toFixed(8) : '0';
-        const paymentText = `binance:${selectedCrypto}:payment:${cryptoAmount}:VDS Diamonds`;
+        const address = WALLETS[selectedCrypto] || '';
+        $('walletAddress').innerHTML = `<strong>Адрес ${selectedCrypto}:</strong><br>${address}`;
+        const paymentText = `${selectedCrypto.toLowerCase()}:${address}?amount=${cryptoAmount}`;
         generateQRCode(paymentText);
-        $('cryptoAddress').textContent = `Отправьте ${cryptoAmount} ${selectedCrypto} на ваш Binance Pay кошелёк`;
+      }
+
+      async function simulatePayment() {
+        if (!userData) return;
+        $('simulatePaymentBtn').disabled = true;
+        $('simulatePaymentBtn').textContent = '⏳ Проверяем платёж...';
+        await new Promise(r => setTimeout(r, 2000));
+        diamonds += selectedDiamonds;
+        updateDiamondsDisplay();
+        updateMainBalance();
+        await API.saveUserData(userData.user_uid, { diamonds, treasure_progress, free_spins, jackpot_boost: jackpotBoost?1:0 });
+        await API.createCryptoDonation({
+          user_uid: userData.user_uid,
+          nickname: nickname,
+          email: userData.email,
+          amount_usd: selectedUSD,
+          diamonds: selectedDiamonds,
+          crypto_currency: selectedCrypto,
+          crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)),
+          status: 'completed'
+        });
+        showMessage(`✨ +${selectedDiamonds}💎 зачислено!`);
+        $('cryptoPaymentModal').classList.add('hidden');
+        $('simulatePaymentBtn').disabled = false;
+        $('simulatePaymentBtn').textContent = '💰 Я оплатил — получить алмазы';
+        if (rateInterval) clearInterval(rateInterval);
+      }
+
+      // ===== PROFILE =====
+      function openProfile() {
+        if (!userData) return;
+        $('profileUID').textContent = userData.user_uid;
+        $('profileEmail').textContent = userData.email || '-';
+        $('profileDiamonds').textContent = diamonds;
+        $('profileJackpots').textContent = jackpotHistory.length;
+        $('profileNicknameInput').value = nickname;
+        $('profileMsg').textContent = '';
+        $('profileModal').classList.remove('hidden');
+      }
+
+      function copyUID() {
+        if (!userData) return;
+        navigator.clipboard.writeText(userData.user_uid).then(() => {
+          $('profileMsg').textContent = 'ID скопирован!';
+          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
+        }).catch(() => { $('profileMsg').textContent = 'Ошибка копирования'; });
+      }
+
+      async function changeNickname() {
+        if (!userData) return;
+        const newNick = $('profileNicknameInput').value.trim();
+        if (!newNick || newNick.length < 2) { $('profileMsg').textContent = 'Никнейм должен быть от 2 символов'; return; }
+        if (newNick === nickname) { $('profileMsg').textContent = 'Это ваш текущий никнейм'; return; }
+        const result = await API.updateNickname(userData.user_uid, newNick);
+        if (result === true) {
+          nickname = newNick;
+          userData.nickname = newNick;
+          $('nicknameDisplay').textContent = newNick;
+          $('profileMsg').textContent = 'Никнейм изменён!';
+          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
+        } else if (result === 'taken') {
+          $('profileMsg').textContent = 'Этот никнейм уже занят';
+        } else {
+          $('profileMsg').textContent = 'Ошибка изменения';
+        }
       }
 
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
@@ -888,7 +995,7 @@
         $('winOverlay').classList.add('hidden'); $('paymentModal').classList.add('hidden'); $('historyModal').classList.add('hidden');
         $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
         $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden'); $('winningsModal').classList.add('hidden');
-        $('cryptoPaymentModal').classList.add('hidden');
+        $('cryptoPaymentModal').classList.add('hidden'); $('profileModal').classList.add('hidden');
         if (rateInterval) clearInterval(rateInterval);
         useCustomRewards = false; updateMainBalance(); debouncedSave();
       }
@@ -934,11 +1041,16 @@
       // Crypto payment events
       $('diamondAmounts').addEventListener('click', function(e) { var opt = e.target.closest('.diamond-amount-option'); if (!opt) return; document.querySelectorAll('.diamond-amount-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedUSD = parseFloat(opt.dataset.usd); selectedDiamonds = parseInt(opt.dataset.diamonds); updateRateDisplay(); updateQRAndAddress(); });
       $('cryptoList').addEventListener('click', function(e) { var opt = e.target.closest('.crypto-option'); if (!opt) return; document.querySelectorAll('.crypto-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedCrypto = opt.dataset.currency; updateRateDisplay(); updateQRAndAddress(); });
-      $('copyAddressBtn').addEventListener('click', function() { var addr = $('cryptoAddress').textContent; navigator.clipboard.writeText(addr).then(function() { $('copiedMsg').classList.remove('hidden'); setTimeout(function() { $('copiedMsg').classList.add('hidden'); }, 2000); }); });
+      $('copyAddressBtn').addEventListener('click', function() { var addr = ($('walletAddress').textContent || '').replace(/.*:\s*/, '').trim(); navigator.clipboard.writeText(addr).then(function() { $('copiedMsg').classList.remove('hidden'); setTimeout(function() { $('copiedMsg').classList.add('hidden'); }, 2000); }); });
+      $('simulatePaymentBtn').addEventListener('click', simulatePayment);
       $('closeCryptoPaymentBtn').addEventListener('click', function() { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); });
       $('cryptoPaymentModal').addEventListener('click', function(e) { if (e.target === $('cryptoPaymentModal')) { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); } });
 
-      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal'), $('cryptoPaymentModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
+      // Profile events
+      $('closeProfileBtn').addEventListener('click', function() { $('profileModal').classList.add('hidden'); });
+      $('profileModal').addEventListener('click', function(e) { if (e.target === $('profileModal')) $('profileModal').classList.add('hidden'); });
+
+      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal'), $('cryptoPaymentModal'), $('profileModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
       setLanguage('ru');
       updateAllTexts();
