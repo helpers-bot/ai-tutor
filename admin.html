@@ -19,7 +19,7 @@
         .stat-card { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
         .stat-card .value { font-size: 2rem; color: #ffd700; font-weight: bold; }
         .stat-card .label { color: #888; font-size: 0.9rem; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; }
         th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #333; font-size: 0.85rem; }
         th { background: #2a2a3e; color: #ffd700; }
         tr:hover { background: #222236; }
@@ -33,7 +33,6 @@
         .actions button { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
         .btn-add { background: #28a745; color: #fff; }
         .btn-remove { background: #dc3545; color: #fff; }
-        .btn-reply { background: #007bff; color: #fff; }
         .tabs { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
         .tab-btn { padding: 10px 20px; background: #1a1a2e; border: 1px solid #444; color: #888; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: #2a2a3e; color: #ffd700; border-color: #d4af37; }
@@ -52,12 +51,10 @@
     <div class="container">
         <div id="loginBlock" class="login-form">
             <h1>🔐 Админ-панель VDS</h1>
-            <p style="color:#888;font-size:0.8rem;text-align:center;">Введите GitHub токен с правами repo</p>
-            <input type="password" id="githubToken" placeholder="GitHub Personal Access Token">
+            <p style="color:#888;font-size:0.8rem;text-align:center;">Пароль по умолчанию: admin123</p>
             <input type="password" id="adminPassword" placeholder="Пароль админа">
             <button onclick="adminLogin()">Войти</button>
             <p class="error" id="loginError"></p>
-            <p style="color:#666;font-size:0.7rem;margin-top:10px;text-align:center;">Пароль по умолчанию: admin123</p>
         </div>
 
         <div id="adminPanel" style="display:none;">
@@ -138,31 +135,23 @@
         }
 
         async function adminLogin() {
-            const token = document.getElementById('githubToken').value.trim();
             const password = document.getElementById('adminPassword').value;
             const errorEl = document.getElementById('loginError');
 
-            if (!token || !password) { errorEl.textContent = 'Введите токен и пароль'; return; }
+            if (!password) { errorEl.textContent = 'Введите пароль'; return; }
 
             const passwordHash = await sha256(password);
             const validHash = await sha256('admin123');
 
             if (passwordHash !== validHash) { errorEl.textContent = 'Неверный пароль'; return; }
 
-            try {
-                const response = await fetch('https://api.github.com/user', {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                });
-                if (!response.ok) { errorEl.textContent = 'Неверный GitHub токен'; return; }
-            } catch (e) { errorEl.textContent = 'Ошибка проверки токена'; return; }
-
-            localStorage.setItem('vds_github_token', token);
+            localStorage.setItem('vds_admin_logged_in', 'true');
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             loadAllData();
         }
 
-        function logout() { localStorage.removeItem('vds_github_token'); location.reload(); }
+        function logout() { localStorage.removeItem('vds_admin_logged_in'); location.reload(); }
 
         function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
         function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
@@ -183,54 +172,66 @@
         }
 
         async function loadStats() {
-            const users = await API.getAllUsers();
-            const online = await API.getOnlineStats();
-            const spent = await API.getSpentByMode();
-            const chats = await API.getSupportChats();
+            try {
+                const users = await API.getAllUsers();
+                const online = await API.getOnlineStats();
+                const spent = await API.getSpentByMode();
+                const chats = await API.getSupportChats();
 
-            document.getElementById('totalUsers').textContent = users.length;
-            document.getElementById('onlineNow').textContent = online.online_now;
-            document.getElementById('onlineToday').textContent = online.online_today;
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('onlineNow').textContent = online.online_now;
+                document.getElementById('onlineToday').textContent = online.online_today;
 
-            let unread = 0;
-            Object.values(chats).forEach(chat => {
-                if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
-            });
-            document.getElementById('unreadMessages').textContent = unread;
-            if (unread > 0) {
-                document.getElementById('unreadBadge').textContent = unread;
-                document.getElementById('unreadBadge').classList.remove('hidden');
-            } else {
-                document.getElementById('unreadBadge').classList.add('hidden');
+                let unread = 0;
+                Object.values(chats).forEach(chat => {
+                    if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
+                });
+                document.getElementById('unreadMessages').textContent = unread;
+                if (unread > 0) {
+                    document.getElementById('unreadBadge').textContent = unread;
+                    document.getElementById('unreadBadge').classList.remove('hidden');
+                } else {
+                    document.getElementById('unreadBadge').classList.add('hidden');
+                }
+
+                const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
+                const spentHTML = Object.entries(spent).map(([mode, total]) => 
+                    '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
+                ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
+                document.getElementById('spentTable').innerHTML = spentHTML;
+                document.getElementById('statsSpentTable').innerHTML = spentHTML;
+            } catch (e) {
+                console.error('Load stats error:', e);
             }
-
-            const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-            const spentHTML = Object.entries(spent).map(([mode, total]) => 
-                '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
-            ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
-            document.getElementById('spentTable').innerHTML = spentHTML;
-            document.getElementById('statsSpentTable').innerHTML = spentHTML;
         }
 
         async function loadStatsTab() { await loadStats(); }
 
         async function loadAllUsers() {
-            const users = await API.getAllUsers();
-            renderUsers(users);
+            try {
+                const users = await API.getAllUsers();
+                renderUsers(users);
+            } catch (e) {
+                console.error('Load users error:', e);
+            }
         }
 
         async function searchUsers() {
             const query = document.getElementById('searchQuery').value.trim();
             if (!query) { loadAllUsers(); return; }
-            const users = await API.searchUsers(query);
-            renderUsers(users);
+            try {
+                const users = await API.searchUsers(query);
+                renderUsers(users);
+            } catch (e) {
+                console.error('Search users error:', e);
+            }
         }
 
         function renderUsers(users) {
             const html = users.map(u => 
                 '<tr>' +
                 '<td><strong>' + u.user_uid + '</strong></td>' +
-                '<td>' + (u.nickname || u.name || '-') + '</td>' +
+                '<td>' + (u.nickname || '-') + '</td>' +
                 '<td>' + (u.email || '-') + '</td>' +
                 '<td>' + (u.diamonds || 0) + ' 💎</td>' +
                 '<td>' + (u.treasure_progress || 0) + '%</td>' +
@@ -262,8 +263,7 @@
 
         async function loadSupportChats() {
             try {
-                const chats = await API.getSupportChats();
-                supportChats = chats || {};
+                supportChats = await API.getSupportChats();
             } catch (e) {
                 supportChats = {};
             }
@@ -285,7 +285,7 @@
                     '<td>' + preview + '</td><td>' + (hasUnread ? '🔴 Новое' : '✅ Прочитано') + '</td></tr>';
             }
             html += '</tbody></table>';
-            usersList.innerHTML = html || '<p style="color:#888;">Нет обращений</p>';
+            usersList.innerHTML = html;
         }
 
         function openChat(uid) {
@@ -328,29 +328,37 @@
         }
 
         async function loadJackpots() {
-            const jackpots = await API.getAllJackpots();
-            const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-            const html = jackpots.slice(0, 100).map(j =>
-                '<tr><td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
-                '<td>' + j.user_uid + '</td><td>' + (j.nickname || '-') + '</td>' +
-                '<td>' + (modeNames[j.mode_key] || j.mode_key) + '</td>' +
-                '<td>' + (j.wish || '').substring(0, 30) + '...</td><td>' + j.diamonds_won + ' 💎</td></tr>'
-            ).join('') || '<tr><td colspan="6">Нет джекпотов</td></tr>';
-            document.getElementById('jackpotsTable').innerHTML = html;
+            try {
+                const jackpots = await API.getAllJackpots();
+                const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
+                const html = jackpots.slice(0, 100).map(j =>
+                    '<tr><td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
+                    '<td>' + j.user_uid + '</td><td>' + (j.nickname || '-') + '</td>' +
+                    '<td>' + (modeNames[j.mode_key] || j.mode_key) + '</td>' +
+                    '<td>' + (j.wish || '').substring(0, 30) + '...</td><td>' + j.diamonds_won + ' 💎</td></tr>'
+                ).join('') || '<tr><td colspan="6">Нет джекпотов</td></tr>';
+                document.getElementById('jackpotsTable').innerHTML = html;
+            } catch (e) {
+                console.error('Load jackpots error:', e);
+            }
         }
 
         async function loadTransactions() {
-            const transactions = await API.getTransactions();
-            const html = transactions.slice(0, 100).map(t =>
-                '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
-                '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
-                '<td>' + t.amount + ' 💎</td><td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td>' +
-                '<td>' + (t.reason || '') + '</td></tr>'
-            ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
-            document.getElementById('transactionsTable').innerHTML = html;
+            try {
+                const transactions = await API.getTransactions();
+                const html = transactions.slice(0, 100).map(t =>
+                    '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
+                    '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
+                    '<td>' + t.amount + ' 💎</td><td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td>' +
+                    '<td>' + (t.reason || '') + '</td></tr>'
+                ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
+                document.getElementById('transactionsTable').innerHTML = html;
+            } catch (e) {
+                console.error('Load transactions error:', e);
+            }
         }
 
-        if (localStorage.getItem('vds_github_token')) {
+        if (localStorage.getItem('vds_admin_logged_in') === 'true') {
             document.getElementById('loginBlock').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             loadAllData();
