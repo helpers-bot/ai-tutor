@@ -1,385 +1,11 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height">
-  <title>VDS | Vibe Dare Smile - Wheel of Desires</title>
-  <meta name="description" content="VDS - Vibe Dare Smile: Luxury casino-style game of desires. Spin the wheel, win diamonds, and send romantic wishes to your partner.">
-  <meta name="keywords" content="VDS, Vibe Dare Smile, wheel of desires, casino game, romantic wishes, slot machine, diamonds">
-  <meta name="author" content="VDS Games">
-  <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#1a0530">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="VDS Game">
-  <meta property="og:title" content="VDS | Vibe Dare Smile - Wheel of Desires">
-  <meta property="og:description" content="Luxury casino-style game of desires. Spin, win, and share romantic wishes!">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://vds-game.ink">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='8' fill='%231a0530'/%3E%3Ctext x='16' y='22' font-size='16' fill='%23ffd700' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a0530'/%3E%3Ctext x='90' y='110' font-size='90' font-weight='bold' fill='%23ffd700' text-anchor='middle' font-family='serif'%3EVDS%3C/text%3E%3C/svg%3E">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
-    body { font-family: 'Cormorant Garamond', 'Segoe UI', 'Times New Roman', serif; background: radial-gradient(circle at 20% 30%, #1a0530, #050010 90%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 8px; margin: 0; touch-action: manipulation; position: relative; color: #f0e6d0; }
-    body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 30% 40%, rgba(255,215,0,0.1) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(180,100,255,0.12) 0%, transparent 70%); pointer-events: none; z-index: 0; }
-    .outer-header { position: fixed; top: 6px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; pointer-events: none; }
-    .outer-header > * { pointer-events: auto; }
-    .outer-site-title { font-size: clamp(1rem, 4vw, 1.5rem); font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 15px #ffb700); line-height: 1; }
-    .outer-site-subtitle { font-size: clamp(0.45rem, 1.8vw, 0.65rem); color: #d4af37; letter-spacing: 2px; text-shadow: 0 0 6px black; }
-    .user-id-display { font-size: 0.6rem; color: #b8945f; letter-spacing: 1px; margin-top: 2px; }
-    .outer-right-group { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
-    .lang-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 7px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); letter-spacing: 1px; }
-    .lang-btn.active { background: #d4af37; color: #150a1f; border-color: #fff; }
-    .logout-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); }
-    #app { width: 100%; max-width: 650px; background: rgba(8,3,18,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 30px 50px rgba(0,0,0,0.9), 0 0 45px rgba(180,130,50,0.5); border-radius: 48px; padding: 18px 18px 22px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; margin-top: 35px; margin-bottom: 20px; }
-    .user-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(20,5,35,0.6); border: 2px solid #d4af37; border-radius: 40px; padding: 8px 14px; margin: 0 2px; box-shadow: 0 0 18px rgba(255,215,0,0.3); gap: 8px; flex-wrap: wrap; }
-    .user-bar.hidden-bar { display: none; }
-    .user-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .nickname { font-weight: 900; font-size: 1rem; color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; animation: nickGlow 2s ease-in-out infinite alternate; letter-spacing: 1px; }
-    @keyframes nickGlow { 0% { text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b; } 100% { text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00; } }
-    .profile-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ffd966; padding: 4px 12px; border-radius: 30px; font-weight: bold; font-size: 0.7rem; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-    .profile-btn:hover { background: #d4af37; color: #150a1f; }
-    .balance-display { font-weight: 900; font-size: 1rem; color: #ffd966; text-shadow: 0 0 10px #ffd700; display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
-    .top-up-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
-    .spin-win-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 3rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; z-index: 300; pointer-events: none; opacity: 0; animation: none; }
-    .spin-win-display.show { animation: winPopup 2s ease-out forwards; }
-    @keyframes winPopup { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%,-50%) scale(1.2); } 40% { opacity: 1; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 0; transform: translate(-50%,-120%) scale(0.8); } }
-    .jackpot-banner { position: fixed; top: 0; left: 50%; transform: translateX(-50%); font-size: 4rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff4500; z-index: 350; pointer-events: none; opacity: 0; animation: jackpotBannerIn 0.5s ease-out forwards, jackpotBannerOut 0.5s ease-in 4.5s forwards; letter-spacing: 8px; }
-    @keyframes jackpotBannerIn { 0% { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-10deg); } 100% { opacity: 1; transform: translateX(-50%) scale(1) rotate(0deg); } }
-    @keyframes jackpotBannerOut { 0% { opacity: 1; transform: translateX(-50%) scale(1); } 100% { opacity: 0; transform: translateX(-50%) scale(1.5); } }
-    .falling-gift { position: fixed; top: -60px; z-index: 340; pointer-events: none; animation: giftFall linear forwards; font-size: 2rem; }
-    @keyframes giftFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
-    .gift-container { display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; }
-    .gift-icon { transition: all 0.5s ease; filter: drop-shadow(0 0 8px gold); animation: giftPulse 2s ease-in-out infinite; position: relative; }
-    @keyframes giftPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 8px gold); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 15px gold); } }
-    .gift-shake { animation: giftShake 0.15s ease-in-out infinite !important; }
-    @keyframes giftShake { 0%,100% { transform: translateX(0) rotate(0deg); } 15% { transform: translateX(-4px) rotate(-3deg); } 30% { transform: translateX(3px) rotate(2deg); } 45% { transform: translateX(-3px) rotate(-2deg); } 60% { transform: translateX(3px) rotate(1deg); } 75% { transform: translateX(-2px) rotate(-1deg); } 90% { transform: translateX(2px) rotate(1deg); } }
-    .gift-explosion { animation: giftExplode 0.6s ease-out forwards !important; }
-    @keyframes giftExplode { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
-    .gift-reappear { animation: giftReappear 0.6s ease-in forwards; }
-    @keyframes giftReappear { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .particle { position: absolute; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; z-index: 360; animation: particleFly 1.5s ease-out forwards; }
-    @keyframes particleFly { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--px),var(--py)) scale(0); opacity: 0; } }
-    .auto-spin-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #2d1840, #150920); border: 2px solid #c9a13b; color: #f7e9c3; font-weight: 900; font-size: 0.7rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 10px rgba(255,200,0,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
-    .auto-spin-btn.active { background: linear-gradient(135deg, #ff8c00, #ff4500); border-color: #ffd700; box-shadow: 0 0 25px rgba(255,140,0,0.7); animation: autoSpinPulse 1s ease-in-out infinite; }
-    @keyframes autoSpinPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,140,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,200,0,0.9); } }
-    .auto-spin-btn:active { transform: scale(0.9); }
-    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 4px 0; padding: 0 4px; }
-    .menu-grid .thread-btn { font-size: 0.95rem; padding: 14px 10px; }
-    .thread-btn { background: linear-gradient(180deg, #2d1840 0%, #150920 100%); border: 2px solid #c9a13b; border-radius: 50px; padding: 14px 14px; font-weight: 700; color: #f7e9c3; letter-spacing: 1px; box-shadow: 0 8px 14px rgba(0,0,0,0.6), 0 0 12px rgba(255,200,0,0.4); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; backdrop-filter: blur(8px); animation: waveFloat 4s ease-in-out infinite; white-space: nowrap; text-align: center; }
-    .thread-btn:nth-child(1) { animation-delay: 0s; } .thread-btn:nth-child(2) { animation-delay: 0.1s; } .thread-btn:nth-child(3) { animation-delay: 0.2s; } .thread-btn:nth-child(4) { animation-delay: 0.3s; } .thread-btn:nth-child(5) { animation-delay: 0.4s; } .thread-btn:nth-child(6) { animation-delay: 0.5s; } .thread-btn:nth-child(7) { animation-delay: 0.6s; } .thread-btn:nth-child(8) { animation-delay: 0.7s; }
-    @keyframes waveFloat { 0%,100% { transform: translateX(0); } 25% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
-    .thread-btn:active { transform: scale(0.96); box-shadow: 0 5px 12px black, 0 0 28px gold; animation: none; }
-    .full-width-btn { grid-column: 1 / -1; }
-    .gold-text-btn { color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; font-weight: 900; letter-spacing: 2px; }
-    .slot-machine { background: rgba(0,0,0,0.4); border: 2px solid #b49450; border-radius: 38px; padding: 10px 10px; backdrop-filter: blur(14px); box-shadow: inset 0 0 25px rgba(0,0,0,0.8), 0 12px 22px black; }
-    .slot-top-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
-    .treasure-section { display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(20,5,35,0.6); border-radius: 35px; padding: 5px 10px; border: 1px solid #d4af37; flex: 1; min-width: 0; min-height: 70px; position: relative; overflow: hidden; }
-    .treasure-box { display: flex; align-items: center; justify-content: center; }
-    .progress-container { flex: 1; max-width: 130px; }
-    .progress-text { color: #ffd966; font-weight: bold; font-size: 0.65rem; margin-bottom: 1px; text-align: center; }
-    .progress-bar { width: 100%; height: 8px; background: #1f0b2e; border-radius: 8px; overflow: hidden; border: 1px solid #c9a13b; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #ffd700, #ffaa00); transition: width 0.4s ease; width: 0%; border-radius: 6px; }
-    .balance-row { display: flex; justify-content: space-between; align-items: center; color: #e5d9b0; font-weight: bold; margin: 3px 3px; font-size: 0.8rem; gap: 6px; flex-wrap: wrap; }
-    .free-spins-badge { color: #ffd966; font-weight: bold; font-size: 0.75rem; text-align: center; margin: 2px 0; text-shadow: 0 0 8px gold; }
-    .jackpot-prizes-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
-    .winnings-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
-    .machine { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 6px; }
-    .reel { height: 200px; background: #160c24; border-radius: 14px; overflow: hidden; border: 2px solid #e4b429; position: relative; box-shadow: inset 0 0 16px black, 0 0 8px rgba(255,215,0,0.3); }
-    @media (max-width: 480px) { .reel { height: 150px; } }
-    .strip { position: absolute; width: 100%; top: -40px; }
-    .symbol { height: 40px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: #ffd966; }
-    @media (max-width: 480px) { .symbol { height: 30px; font-size: 17px; } }
-    .win-lines { position: relative; pointer-events: none; z-index: 40; }
-    .win-line { position: absolute; height: 2px; background: linear-gradient(90deg, #fff, #ffd700, #fff); border-radius: 8px; transform-origin: left center; box-shadow: 0 0 10px white, 0 0 16px gold; animation: linePulse 1.2s infinite alternate; }
-    @keyframes linePulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
-    .controls-row { display: flex; gap: 6px; align-items: stretch; margin-top: 3px; }
-    .left-buttons { display: flex; flex-direction: column; gap: 5px; flex: 0 0 auto; width: 45%; }
-    .left-buttons .thread-btn { animation: none; font-size: 0.7rem; padding: 9px 9px; }
-    .middle-buttons { display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-    .spin-btn { background: radial-gradient(circle at 30% 30%, #ffea80, #b5891a); border: none; color: #1f0a2e; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; box-shadow: 0 0 25px #ffaa33; flex: 1; padding: 8px; animation: spinPulse 1.5s ease-in-out infinite; border-radius: 16px; }
-    @keyframes spinPulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px #ffaa33; } 50% { transform: scale(1.03); box-shadow: 0 0 35px #ffcc00; } }
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; z-index: 200; }
-    .overlay-auth { position: fixed !important; inset: 0 !important; width: 100% !important; height: 100% !important; background: transparent; display: flex !important; align-items: center !important; justify-content: center !important; z-index: 200; margin: 0 !important; padding: 0 !important; }
-    .win-card { background: #1f1233; border: 3px solid #e4b429; border-radius: 44px; padding: 24px 18px; max-width: 420px; width: 90vw; text-align: center; box-shadow: 0 0 60px gold; max-height: 80vh; overflow-y: auto; animation: winCardAppear 0.5s ease-out; margin: auto; color: #f0dbb0; }
-    @keyframes winCardAppear { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .win-card.wide { max-width: 580px; }
-    .hidden { display: none !important; }
-    .social-btn { background: #4b2c6e; border: 1px solid #cfaa4a; color: #ffd966; padding: 12px 16px; border-radius: 35px; font-weight: bold; margin-top: 12px; width: 100%; cursor: pointer; }
-    .history-list { max-height: 280px; overflow-y: auto; margin: 12px 0; text-align: left; color: #f0dbb0; }
-    .history-item { background: rgba(255,215,0,0.1); border: 1px solid #d4af37; border-radius: 16px; padding: 8px; margin: 6px 0; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 4px; color: #f0dbb0; }
-    .history-item button { background: #d4af37; color: #150a1f; border: none; border-radius: 16px; padding: 5px 10px; font-weight: bold; cursor: pointer; }
-    .view-btn { background: #4b2c6e; border: 1px solid #cfaa4a; color: #ffd966; padding: 5px 10px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
-    .form-input { width: 100%; padding: 10px; margin: 6px 0; border-radius: 25px; border: 2px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.9rem; text-align: center; outline: none; }
-    .form-input::placeholder { color: #b8945f; }
-    .diamond-option { background: #2a1540; border: 1px solid #d4af37; color: #ffd966; padding: 8px; margin: 5px 0; border-radius: 16px; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
-    .diamond-option:hover { background: #3d2058; }
-    .auth-title { color: #ffd700; font-size: 1.3rem; margin-bottom: 12px; text-shadow: 0 0 12px gold; }
-    .custom-reward-input { width: 100%; padding: 8px; margin: 3px 0; border-radius: 16px; border: 1px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.85rem; text-align: center; outline: none; }
-    .footer { text-align: center; color: #d4c49a; font-size: 0.8rem; margin-top: auto; z-index: 1; position: relative; max-width: 650px; width: 100%; padding: 12px 8px; background: rgba(0,0,0,0.3); border-radius: 30px; backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; gap: 15px; flex-wrap: wrap; }
-    .footer a { color: #ffd966; text-decoration: underline; cursor: pointer; margin: 0 6px; }
-    .footer a:hover { color: #ffd700; }
-    .footer .support-btn { display: inline-flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 40px; color: #1a0530; font-weight: bold; font-size: 0.85rem; padding: 6px 14px; cursor: pointer; gap: 6px; transition: 0.2s; box-shadow: 0 0 10px rgba(255,215,0,0.5); white-space: nowrap; }
-    .footer .support-btn:hover { transform: scale(1.05); background: #ffaa33; }
-    .policy-text { text-align: left; color: #f0dbb0; font-size: 0.8rem; line-height: 1.4; max-height: 280px; overflow-y: auto; padding: 8px; }
-    .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
-    .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
-    .chat-messages { max-height: 280px; overflow-y: auto; text-align: left; color: #f0dbb0; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 16px; }
-    .chat-message { margin: 5px 0; padding: 7px 10px; border-radius: 14px; font-size: 0.8rem; }
-    .chat-message.admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; text-align: left; margin-right: 16px; }
-    .chat-message.user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; text-align: right; margin-left: 16px; }
-    .chat-input-row { display: flex; gap: 6px; }
-    .chat-input { flex: 1; padding: 8px; border-radius: 22px; border: 2px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.8rem; outline: none; }
-    .custom-rewards-buttons { display: flex; gap: 6px; margin-top: 6px; }
-    .custom-rewards-buttons .thread-btn { flex: 1; animation: none; font-size: 0.75rem; padding: 10px; }
-    .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; background: #fff; color: #333; border: none; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin: 8px 0; transition: all 0.2s; }
-    .google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
-    .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
-    .auth-card-wide { max-width: 700px !important; display: flex; flex-direction: column; align-items: center; }
-    .auth-popup-container { display: flex; gap: 12px; align-items: center; margin: 12px 0; width: 100%; flex-wrap: wrap; justify-content: center; }
-    .auth-popup-side { flex: 1 1 150px; color: #ffd700; font-weight: bold; font-size: 0.9rem; text-align: center; min-height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(255,215,0,0.1); border: 1px solid #d4af37; border-radius: 16px; padding: 8px; transition: all 0.5s; opacity: 0; transform: translateY(10px); }
-    .auth-popup-side.visible { opacity: 1; transform: translateY(0); }
-    .google-btn-wrapper { flex: 0 0 auto; min-width: 200px; }
-    .notification-popup { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #1a0530, #2a1540); border: 2px solid #ffd700; color: #ffd700; padding: 12px 24px; border-radius: 30px; font-weight: bold; box-shadow: 0 0 30px rgba(255,215,0,0.5); z-index: 400; animation: fadeInUp 0.4s ease-out, fadeOut 0.4s 4.6s ease-in forwards; max-width: 90vw; text-align: center; font-size: 0.9rem; }
-    @keyframes fadeInUp { from { opacity: 0; transform: translate(-50%, 20px); } to { opacity: 1; transform: translate(-50%, 0); } }
-    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-    .profile-info { text-align: left; margin-bottom: 16px; }
-    .profile-info p { margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
-    .copy-btn { background: #4b2c6e; border: 1px solid #d4af37; color: #ffd966; padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 0.7rem; white-space: nowrap; }
-    .copy-btn:hover { background: #d4af37; color: #150a1f; }
-    @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
-  </style>
-</head>
-<body>
-  <div class="outer-header">
-    <div>
-      <div class="outer-site-title">VDS</div>
-      <div class="outer-site-subtitle">VIBE DARE SMILE</div>
-      <div class="user-id-display" id="userIdDisplay"></div>
-    </div>
-    <div class="outer-right-group">
-      <button id="langRuOuter" class="lang-btn active">RU</button>
-      <button id="langUaOuter" class="lang-btn">UA</button>
-      <button id="langEnOuter" class="lang-btn">EN</button>
-      <button class="logout-btn" id="logoutBtn">🚪 Выйти</button>
-    </div>
-  </div>
-
-  <div id="app">
-    <div id="authOverlay" class="overlay-auth">
-      <div class="win-card auth-card-wide" id="authCard">
-        <h3 class="auth-title">🔐 ВХОД</h3>
-        <p style="color:#ddd;font-size:0.8rem;margin-bottom:8px;">Войдите через Google аккаунт</p>
-        <div class="auth-popup-container">
-          <div class="auth-popup-side" id="authPopupLeft"></div>
-          <div class="google-btn-wrapper">
-            <button class="google-btn" onclick="handleGoogleLogin()">
-              <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-              Войти через Google
-            </button>
-          </div>
-          <div class="auth-popup-side" id="authPopupRight"></div>
-        </div>
-        <p id="authError" style="color:#ff4444;font-size:0.8rem;margin-top:6px;"></p>
-      </div>
-    </div>
-
-    <div class="user-bar hidden-bar" id="userBar">
-      <div class="user-left">
-        <img class="user-avatar hidden" id="userAvatar" src="" alt="">
-        <span class="nickname" id="nicknameDisplay">Игрок</span>
-        <button class="profile-btn" id="profileBtn">👤 Профиль</button>
-      </div>
-      <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
-    </div>
-
-    <div id="mainMenu" class="menu-grid">
-      <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn" style="background:#3d2058;">Мои желания</button>
-      <button class="thread-btn" data-mode="18+">🔞 18+</button>
-      <button class="thread-btn" data-mode="home">🏠 Для Дома</button>
-      <button class="thread-btn" data-mode="party">🎉 Для Вечеринки</button>
-      <button class="thread-btn" data-mode="young">💑 Молодая Пара</button>
-      <button class="thread-btn" data-mode="family">👨‍👩‍👧 Семейная Пара</button>
-      <button class="thread-btn" data-mode="friends">👫 Для Друзей</button>
-      <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
-    </div>
-
-    <div id="slotUI" class="slot-machine hidden">
-      <div class="slot-top-row">
-        <div class="treasure-section" id="treasureSection">
-          <div class="treasure-box" id="treasureBox">
-            <div class="gift-container" id="giftContainer">
-              <span class="gift-icon" id="giftIcon">🎁</span>
-            </div>
-          </div>
-          <div class="progress-container">
-            <div class="progress-text" id="progressText">Бонус: 0/100%</div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-          </div>
-        </div>
-        <div class="balance-row" style="margin:0; flex-shrink:0; gap: 6px;">
-          <span id="diamondsLabel">💎 Алмазы:</span>
-          <span id="diamondsCount">100</span>
-          <button class="winnings-btn" id="winningsBtn">🏆 Выигрыши</button>
-          <button class="jackpot-prizes-btn" id="jackpotPrizesBtn">🎁 Призы</button>
-        </div>
-      </div>
-      <div class="free-spins-badge hidden" id="freeSpinsBadge">🎁 Бесплатные спины: 0 (Шанс джекпота +50%)</div>
-      <div class="machine" id="machine"></div>
-      <div class="win-lines" id="winLines"></div>
-      <div style="color:#ffd966; text-align:center; min-height:20px; font-weight:bold; font-size:0.8rem;" id="messageDisplay"></div>
-      <div class="controls-row">
-        <div class="left-buttons">
-          <button id="donateButton" class="thread-btn">💎 Пополнить</button>
-          <button id="backToMenu" class="thread-btn" style="background:#2a1738;">↩️ МЕНЮ</button>
-        </div>
-        <div class="middle-buttons">
-          <button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button>
-        </div>
-        <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">
-    <a id="privacyPolicyLink">Политика конфиденциальности</a>
-    <a id="termsOfUseLink">Условия использования</a>
-    <button class="support-btn" id="supportBtn">💬 Чат поддержки</button>
-    <p style="width:100%; margin-top:5px;">© 2024 VDS - Vibe Dare Smile. Все права защищены.</p>
-  </div>
-
-  <div class="spin-win-display" id="spinWinDisplay"></div>
-
-  <!-- Все модальные окна -->
-  <div id="winOverlay" class="overlay hidden">
-    <div class="win-card">
-      <h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2>
-      <p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p>
-      <div style="font-size:2.8rem;" id="winIcons"></div>
-      <button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button>
-      <button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="nameFormModal" class="overlay hidden">
-    <div class="win-card">
-      <h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3>
-      <input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя">
-      <input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра">
-      <button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button>
-      <button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button>
-    </div>
-  </div>
-
-  <div id="paymentModal" class="overlay hidden">
-    <div class="win-card" style="max-width:400px;">
-      <h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3>
-      <div id="cryptoTopupArea">
-        <label style="display:block; margin:8px 0;">Выберите количество алмазов:</label>
-        <select id="diamondAmountSelect" style="width:100%; padding:8px; border-radius:16px; background:#2a1540; color:#ffd966; border:2px solid #d4af37; margin-bottom:12px;">
-          <option value="100">100 алмазов</option>
-          <option value="500">500 алмазов</option>
-          <option value="1000">1000 алмазов</option>
-          <option value="5000">5000 алмазов</option>
-          <option value="10000">10000 алмазов</option>
-        </select>
-        <div id="walletInfo" style="background:#1f1233; border-radius:16px; padding:12px; margin:12px 0;">
-          <p style="color:#ffd966; font-size:0.8rem;">✨ Случайный кошелёк для пополнения:</p>
-          <p id="randomWalletAddress" style="font-family:monospace; word-break:break-all; background:#0a0512; padding:6px; border-radius:8px;">Загрузка...</p>
-          <button id="copyWalletBtn" class="copy-btn" style="margin-top:8px;">📋 Скопировать адрес</button>
-          <p style="font-size:0.7rem; margin-top:10px;">⚠️ Отправьте точную сумму в выбранной криптовалюте (эквивалент USD). После проверки админом алмазы будут начислены.</p>
-        </div>
-        <button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="profileModal" class="overlay hidden">
-    <div class="win-card" style="max-width:450px;">
-      <h3 style="color:#ffd966;">👤 Мой профиль</h3>
-      <div class="profile-info">
-        <p><strong>🆔 ID:</strong> <span id="profileUID"></span> <button class="copy-btn" id="copyUIDBtn">Копировать</button></p>
-        <p><strong>📛 Имя:</strong> <input type="text" id="profileNicknameInput" class="form-input" style="margin:0; width:auto; display:inline-block; width:70%;"> <button id="saveNicknameBtn" class="copy-btn">Сохранить</button></p>
-        <p><strong>📧 Email:</strong> <span id="profileEmail"></span></p>
-        <p><strong>💎 Алмазы:</strong> <span id="profileDiamonds"></span></p>
-        <p><strong>🏆 Потрачено:</strong> <span id="profileSpent"></span></p>
-        <p><strong>🎁 Джекпотов:</strong> <span id="profileJackpotCount">0</span></p>
-      </div>
-      <button id="closeProfileBtn" class="thread-btn" style="animation:none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="historyModal" class="overlay hidden">
-    <div class="win-card wide">
-      <h3 style="color:#ffd966;" id="historyTitle">📜 История Джекпотов</h3>
-      <div id="historyList" class="history-list"></div>
-      <button id="closeHistoryBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="winningsModal" class="overlay hidden">
-    <div class="win-card" style="max-width:500px;">
-      <h3 style="color:#ffd966;" id="winningsTitle">🏆 Последние джекпоты</h3>
-      <div id="winningsList" class="history-list"></div>
-      <button id="closeWinningsBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="winDetailModal" class="overlay hidden">
-    <div class="win-card">
-      <h3 style="color:#ffd966;" id="winDetailTitle">📋 Детали выигрыша</h3>
-      <div class="win-detail-text" id="winDetailContent"></div>
-      <button id="closeWinDetailBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="customRewardsModal" class="overlay hidden">
-    <div class="win-card wide">
-      <h3 style="color:#ffd966;" id="customRewardsTitle">🎁 Мои желания (3-10)</h3>
-      <p style="color:#ddd; font-size:0.75rem;" id="customRewardsDesc">Введите свои желания для джекпота</p>
-      <div id="customRewardsList"></div>
-      <button id="addCustomRewardBtn" class="thread-btn" style="animation:none; margin-top:6px;">+ Добавить</button>
-      <div class="custom-rewards-buttons">
-        <button id="saveAndPlayBtn" class="thread-btn" style="background:#d4af37; color:#150a1f;">💾 Сохранить и играть</button>
-        <button id="closeCustomRewardsBtn" class="thread-btn">ЗАКРЫТЬ</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="jackpotPrizesModal" class="overlay hidden">
-    <div class="win-card" style="max-width:400px;">
-      <h3 style="color:#ffd966;" id="jackpotPrizesTitle">🎁 Призы джекпота</h3>
-      <div class="prizes-list" id="jackpotPrizesList"></div>
-      <button id="closeJackpotPrizesBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="supportModal" class="overlay hidden">
-    <div class="win-card" style="max-width:400px;">
-      <h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3>
-      <div class="chat-messages" id="chatMessages"></div>
-      <div class="chat-input-row">
-        <input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение...">
-        <button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button>
-      </div>
-      <button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <div id="policyModal" class="overlay hidden">
-    <div class="win-card" style="max-width:500px;">
-      <h3 style="color:#ffd966;" id="policyTitle">Политика конфиденциальности</h3>
-      <div class="policy-text" id="policyContent"></div>
-      <button id="closePolicyBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
-  </div>
-
-  <script src="api.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        const swCode = `self.addEventListener('install', (event) => { self.skipWaiting(); }); self.addEventListener('activate', (event) => { event.waitUntil(clients.claim()); }); self.addEventListener('fetch', (event) => { event.respondWith(fetch(event.request)); });`;
+        const swCode = `
+          self.addEventListener('install', (event) => { self.skipWaiting(); });
+          self.addEventListener('activate', (event) => { event.waitUntil(clients.claim()); });
+          self.addEventListener('fetch', (event) => { event.respondWith(fetch(event.request)); });
+        `;
         const blob = new Blob([swCode], { type: 'application/javascript' });
         const swUrl = URL.createObjectURL(blob);
         navigator.serviceWorker.register(swUrl).catch(() => {});
@@ -430,12 +56,36 @@
       };
 
       const MODE_PRIZES = {
-        '18+': { ru: ['Исполни моё романтическое желание', 'Надень наручники и повинуйся', 'Устрой незабываемую ночь', 'Подари мне особенный сюрприз', 'Закажи мою любимую пиццу'], ua: ['Виконай моє романтичне бажання', 'Надягни наручники й підкорись', 'Влаштуй незабутню ніч', 'Подаруй мені особливий сюрприз', 'Замов мою улюблену піцу'], en: ['Fulfill my romantic wish', 'Put on handcuffs and obey', 'Create an unforgettable night', 'Give me a special surprise', 'Order my favorite pizza'] },
-        'home': { ru: ['Приготовь ужин', 'Убери в комнате', 'Помой посуду', 'Пропылесось квартиру', 'Сделай мне чай'], ua: ['Приготуй вечерю', 'Прибери в кімнаті', 'Помий посуд', 'Пропилосось квартиру', 'Зроби мені чай'], en: ['Cook dinner', 'Clean the room', 'Wash dishes', 'Vacuum the apartment', 'Make me tea'] },
-        'party': { ru: ['Танцуй со мной', 'Спой караоке', 'Приготовь коктейль', 'Сделай смешное фото', 'Расскажи анекдот'], ua: ['Танцюй зі мною', 'Заспівай караоке', 'Приготуй коктейль', 'Зроби смішне фото', 'Розкажи анекдот'], en: ['Dance with me', 'Sing karaoke', 'Make a cocktail', 'Take a funny photo', 'Tell a joke'] },
-        'young': { ru: ['Устрой романтический ужин', 'Напиши любовное письмо', 'Подари цветы', 'Сделай массаж', 'Посмотри фильм вместе'], ua: ['Влаштуй романтичну вечерю', 'Напиши любовний лист', 'Подаруй квіти', 'Зроби масаж', 'Подивись фільм разом'], en: ['Have a romantic dinner', 'Write a love letter', 'Give flowers', 'Give a massage', 'Watch a movie together'] },
-        'family': { ru: ['Поиграй с детьми', 'Приготовь семейный ужин', 'Помоги с домашним заданием', 'Устрой семейную игру', 'Почитай сказку'], ua: ['Пограй з дітьми', 'Приготуй сімейну вечерю', 'Допоможи з домашнім завданням', 'Влаштуй сімейну гру', 'Почитай казку'], en: ['Play with kids', 'Cook family dinner', 'Help with homework', 'Have a family game', 'Read a story'] },
-        'friends': { ru: ['Устрой вечеринку', 'Поиграй в настолки', 'Посмотри фильм вместе', 'Сходи в кафе', 'Поделись секретом'], ua: ['Влаштуй вечірку', 'Пограй у настолки', 'Подивись фільм разом', 'Сходи в кафе', 'Поділись секретом'], en: ['Throw a party', 'Play board games', 'Watch a movie together', 'Go to a cafe', 'Share a secret'] }
+        '18+': {
+          ru: ['Исполни моё романтическое желание', 'Надень наручники и повинуйся', 'Устрой незабываемую ночь', 'Подари мне особенный сюрприз', 'Закажи мою любимую пиццу'],
+          ua: ['Виконай моє романтичне бажання', 'Надягни наручники й підкорись', 'Влаштуй незабутню ніч', 'Подаруй мені особливий сюрприз', 'Замов мою улюблену піцу'],
+          en: ['Fulfill my romantic wish', 'Put on handcuffs and obey', 'Create an unforgettable night', 'Give me a special surprise', 'Order my favorite pizza']
+        },
+        'home': {
+          ru: ['Приготовь ужин', 'Убери в комнате', 'Помой посуду', 'Пропылесось квартиру', 'Сделай мне чай'],
+          ua: ['Приготуй вечерю', 'Прибери в кімнаті', 'Помий посуд', 'Пропилосось квартиру', 'Зроби мені чай'],
+          en: ['Cook dinner', 'Clean the room', 'Wash dishes', 'Vacuum the apartment', 'Make me tea']
+        },
+        'party': {
+          ru: ['Танцуй со мной', 'Спой караоке', 'Приготовь коктейль', 'Сделай смешное фото', 'Расскажи анекдот'],
+          ua: ['Танцюй зі мною', 'Заспівай караоке', 'Приготуй коктейль', 'Зроби смішне фото', 'Розкажи анекдот'],
+          en: ['Dance with me', 'Sing karaoke', 'Make a cocktail', 'Take a funny photo', 'Tell a joke']
+        },
+        'young': {
+          ru: ['Устрой романтический ужин', 'Напиши любовное письмо', 'Подари цветы', 'Сделай массаж', 'Посмотри фильм вместе'],
+          ua: ['Влаштуй романтичну вечерю', 'Напиши любовний лист', 'Подаруй квіти', 'Зроби масаж', 'Подивись фільм разом'],
+          en: ['Have a romantic dinner', 'Write a love letter', 'Give flowers', 'Give a massage', 'Watch a movie together']
+        },
+        'family': {
+          ru: ['Поиграй с детьми', 'Приготовь семейный ужин', 'Помоги с домашним заданием', 'Устрой семейную игру', 'Почитай сказку'],
+          ua: ['Пограй з дітьми', 'Приготуй сімейну вечерю', 'Допоможи з домашнім завданням', 'Влаштуй сімейну гру', 'Почитай казку'],
+          en: ['Play with kids', 'Cook family dinner', 'Help with homework', 'Have a family game', 'Read a story']
+        },
+        'friends': {
+          ru: ['Устрой вечеринку', 'Поиграй в настолки', 'Посмотри фильм вместе', 'Сходи в кафе', 'Поделись секретом'],
+          ua: ['Влаштуй вечірку', 'Пограй у настолки', 'Подивись фільм разом', 'Сходи в кафе', 'Поділись секретом'],
+          en: ['Throw a party', 'Play board games', 'Watch a movie together', 'Go to a cafe', 'Share a secret']
+        }
       };
 
       const CERTIFICATE_TEXTS = {
@@ -451,7 +101,7 @@
           diamondsLabel: '💎 Алмазы:', donateButton: '💎 Пополнить', backToMenu: '↩️ МЕНЮ', spinBtn: '🚀 ЗАПУСК',
           jackpotTitle: '🎉 ДЖЕКПОТ!', sendToPartner: '💌 Отправить Партнёру', closeBtn: 'ЗАКРЫТЬ',
           nameFormTitle: '📝 Введите имена', userNamePlaceholder: 'Ваше имя', partnerNamePlaceholder: 'Имя партнёра', downloadBtn: '📥 Скачать', cancelBtn: 'Отмена',
-          paymentTitle: '💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment: 'ЗАКРЫТЬ',
+          paymentTitle: '💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment: 'ОТМЕНА',
           historyTitle: '📜 История Джекпотов', noJackpots: 'Нет джекпотов',
           customRewardsTitle: '🎁 Мои желания (3-10)', customRewardsDesc: 'Введите свои желания для джекпота', addBtn: '+ Добавить', saveAndPlay: '💾 Сохранить и играть', closeCustom: 'ЗАКРЫТЬ',
           jackpotPrizesTitle: '🎁 Призы джекпота', jackpotPrizesBtn: '🎁 Призы',
@@ -461,8 +111,7 @@
           mainTopUpBtn: '💎 Пополнить', viewBtn: '👁 Смотреть', winDetailTitle: '📋 Детали выигрыша',
           supportTitle: '💬 Онлайн поддержка', supportPlaceholder: 'Введите сообщение...', sendBtn: '📤',
           winningsBtn: '🏆 Выигрыши', winningsTitle: '🏆 Последние джекпоты', noWinnings: 'Пока нет джекпотов',
-          supportGreeting: '👋 Здравствуйте! Чем могу помочь?',
-          registrationMessages: [ 'Выиграй Джекпот и твоя половинка исполнит любое желание', 'Прокрути 20 раз бесплатно и закажи себе подарок', 'Хочешь что-то от любимого? Крути, Выигрывай, Отправляй', 'Исполни мечту вместе с VDS!', 'Бонус за 5 совпадений — получи бесплатные спины', 'Собери все желания и получи суперприз!', 'Играй вдвоём — желания сбываются!', 'Стань джекпот-легендой VDS' ]
+          supportGreeting: '👋 Здравствуйте! Чем могу помочь?'
         },
         ua: {
           loginTitle: '🔐 ВХІД', customRewardsBtn: 'Мої бажання', historyBtn: 'Історія',
@@ -480,8 +129,7 @@
           mainTopUpBtn: '💎 Поповнити', viewBtn: '👁 Дивитись', winDetailTitle: '📋 Деталі виграшу',
           supportTitle: '💬 Онлайн підтримка', supportPlaceholder: 'Введіть повідомлення...', sendBtn: '📤',
           winningsBtn: '🏆 Виграші', winningsTitle: '🏆 Останні джекпоти', noWinnings: 'Поки немає джекпотів',
-          supportGreeting: '👋 Здравствуйте! Чим можу допомогти?',
-          registrationMessages: [ 'Виграй Джекпот і твоя половинка виконає будь-яке бажання', 'Прокрути 20 разів безкоштовно і замови собі подарунок', 'Хочеш щось від коханого? Крути, Вигравай, Відправляй', 'Виконай мрію разом з VDS!', 'Бонус за 5 збігів — отримай безкоштовні спини', 'Збери всі бажання і отримай суперприз!', 'Грайте вдвох — бажання збуваються!', 'Стань джекпот-легендою VDS' ]
+          supportGreeting: '👋 Здравствуйте! Чим можу допомогти?'
         },
         en: {
           loginTitle: '🔐 LOGIN', customRewardsBtn: 'My Wishes', historyBtn: 'History',
@@ -499,8 +147,7 @@
           mainTopUpBtn: '💎 Top Up', viewBtn: '👁 View', winDetailTitle: '📋 Win Details',
           supportTitle: '💬 Online Support', supportPlaceholder: 'Enter message...', sendBtn: '📤',
           winningsBtn: '🏆 Winnings', winningsTitle: '🏆 Latest Jackpots', noWinnings: 'No jackpots yet',
-          supportGreeting: '👋 Hello! How can I help you?',
-          registrationMessages: [ 'Win the Jackpot and your significant other will grant your wish', 'Spin 20 times for free and order yourself a gift', 'Want something from your significant other? Spin, Win, Send', 'Fulfill a dream together with VDS!', 'Bonus for 5 matches – get free spins', 'Collect all wishes and get the super prize!', 'Play together – wishes come true!', 'Become a VDS jackpot legend' ]
+          supportGreeting: '👋 Hello! How can I help you?'
         }
       };
 
@@ -514,7 +161,6 @@
       let userData = null;
       let nickname = '';
       let diamonds = 100;
-      let diamondsSpent = 0;
       let treasureProgress = 0;
       let freeSpins = 0;
       let jackpotBoost = false;
@@ -534,10 +180,6 @@
       let jackpotFeedData = [];
       let saveTimeout = null;
       let supportMessages = [];
-      let unreadSupportCount = 0;
-      let authMessageInterval = null;
-      let currentAuthMsgIndex = 0;
-      let supportPollInterval = null;
 
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
       function $(id) { return document.getElementById(id); }
@@ -551,107 +193,11 @@
       function playJackpotSound() { [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.3, 'sine', 0.07); }, i * 100); }); }
       function playGiftShakeSound() { playTone(250 + Math.random() * 50, 0.05, 'square', 0.03); }
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
-      function playNotificationSound() { playTone(800, 0.15, 'sine', 0.05); setTimeout(function() { playTone(1000, 0.15, 'sine', 0.05); }, 150); }
 
-      function showNotification(text) {
-        const popup = document.createElement('div');
-        popup.className = 'notification-popup';
-        popup.textContent = text;
-        document.body.appendChild(popup);
-        setTimeout(() => { if (popup.parentNode) popup.remove(); }, 5000);
-      }
-
-      function generateRandomWallet() {
-        const wallets = [
-          { currency: 'BTC', addr: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa' },
-          { currency: 'ETH', addr: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb7' },
-          { currency: 'USDT (TRC20)', addr: 'TQYp3eZVcw6hF8pXjPqRQx6FqjJ3sDxNkL' },
-          { currency: 'LTC', addr: 'LhK2GzZtQmX8jQ9zKmQn5Z5Y8j3kZJm8G' },
-          { currency: 'DOGE', addr: 'D9KZ5Z5Y8j3kZJm8GLhK2GzZtQmX8jQ9zK' }
-        ];
-        const random = wallets[Math.floor(Math.random() * wallets.length)];
-        return `${random.currency}: ${random.addr}`;
-      }
-
-      function showTopUpModal() {
-        const walletAddr = generateRandomWallet();
-        $('randomWalletAddress').innerText = walletAddr;
-        $('paymentModal').classList.remove('hidden');
-      }
-
-      function copyWalletAddress() {
-        const addr = $('randomWalletAddress').innerText;
-        if (addr) {
-          navigator.clipboard.writeText(addr);
-          showNotification('Адрес скопирован!');
-        }
-      }
-
-      function openProfileModal() {
-        if (!userData) return;
-        $('profileUID').innerText = userData.user_uid;
-        $('profileNicknameInput').value = nickname;
-        $('profileEmail').innerText = userData.email || '—';
-        $('profileDiamonds').innerText = diamonds;
-        $('profileSpent').innerText = diamondsSpent;
-        const userJackpots = jackpotHistory.length;
-        $('profileJackpotCount').innerText = userJackpots;
-        $('profileModal').classList.remove('hidden');
-      }
-
-      async function saveProfileName() {
-        const newName = $('profileNicknameInput').value.trim();
-        if (!newName || newName === nickname) return;
-        const success = await API.updateNickname(userData.user_uid, newName);
-        if (success) {
-          nickname = newName;
-          userData.nickname = newName;
-          $('nicknameDisplay').textContent = nickname;
-          showNotification('Имя изменено!');
-          $('profileModal').classList.add('hidden');
-        } else {
-          showNotification('Ошибка сохранения имени');
-        }
-      }
-
-      function copyUID() {
-        if (userData && userData.user_uid) {
-          navigator.clipboard.writeText(userData.user_uid);
-          showNotification('ID скопирован!');
-        }
-      }
-
-      function startAuthMessageRotation() {
-        if (authMessageInterval) clearInterval(authMessageInterval);
-        const messages = TRANSLATIONS[currentLanguage]?.registrationMessages || TRANSLATIONS.ru.registrationMessages;
-        let left = $('authPopupLeft');
-        let right = $('authPopupRight');
-        left.classList.remove('visible');
-        right.classList.remove('visible');
-
-        function showNext() {
-          left.classList.remove('visible');
-          right.classList.remove('visible');
-          const side = currentAuthMsgIndex % 2 === 0 ? left : right;
-          side.textContent = messages[currentAuthMsgIndex % messages.length];
-          side.classList.add('visible');
-          currentAuthMsgIndex++;
-          setTimeout(() => side.classList.remove('visible'), 3800);
-        }
-        showNext();
-        authMessageInterval = setInterval(showNext, 4000);
-      }
-
-      function stopAuthMessageRotation() {
-        if (authMessageInterval) clearInterval(authMessageInterval);
-        authMessageInterval = null;
-      }
-
-      async function onLoginSuccess(data) {
+      function onLoginSuccess(data) {
         userData = data;
         nickname = data.nickname;
         diamonds = data.diamonds;
-        diamondsSpent = data.diamonds_spent || 0;
         treasureProgress = data.treasure_progress;
         freeSpins = data.free_spins;
         jackpotBoost = data.jackpot_boost;
@@ -665,39 +211,20 @@
         updateDiamondsDisplay();
         updateFreeSpinsBadge();
         updateTreasureProgress(0);
-        await loadJackpotHistory();
-        await loadJackpotFeed();
+        loadJackpotHistory();
+        loadJackpotFeed();
         loadCustomRewards();
-        await loadSupportHistory();
-        stopAuthMessageRotation();
-        startSupportPolling();
+        loadJackpotFeedData();
+        loadSupportHistory();
       }
 
       async function logout() {
         if (userData) await API.logOut(userData.user_uid, nickname);
-        userData = null; nickname = ''; diamonds = 100; diamondsSpent = 0; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
-        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; unreadSupportCount = 0;
+        userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
+        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = [];
         $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
         $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
-        stopSupportPolling();
-        startAuthMessageRotation();
-      }
-
-      function startSupportPolling() {
-        if (supportPollInterval) clearInterval(supportPollInterval);
-        supportPollInterval = setInterval(async () => {
-          if (!userData) return;
-          await loadSupportHistory();
-          if ($('supportModal') && !$('supportModal').classList.contains('hidden')) {
-            renderSupportMessages();
-          }
-        }, 10000);
-      }
-
-      function stopSupportPolling() {
-        if (supportPollInterval) clearInterval(supportPollInterval);
-        supportPollInterval = null;
       }
 
       function updateGiftSize(progress) {
@@ -780,8 +307,6 @@
         var now = new Date();
         jackpotFeedData.unshift({ nickname: nick, mode: mode, amount: amount, date: now.toLocaleDateString(), time: now.toLocaleTimeString() });
         if (jackpotFeedData.length > 50) jackpotFeedData.pop();
-        // Больше не сохраняем в localStorage
-        updateWinningsList();
       }
 
       function showWinDetail(item) {
@@ -838,6 +363,7 @@
         $('winningsBtn').textContent = t('winningsBtn');
         $('privacyPolicyLink').textContent = t('privacyLink');
         $('termsOfUseLink').textContent = t('termsLink');
+        document.querySelector('.footer p').textContent = t('copyright');
         $('supportTitle').textContent = t('supportTitle');
         $('chatInput').placeholder = t('supportPlaceholder');
         $('sendChatBtn').textContent = t('sendBtn');
@@ -846,41 +372,31 @@
       }
 
       function loadUserData() {
-        // Старая локальная загрузка больше не используется, оставлена для совместимости
-        nickname = '';
-        $('authOverlay').classList.remove('hidden');
-        $('mainMenu').classList.add('hidden');
-        $('slotUI').classList.add('hidden');
+        nickname = localStorage.getItem('wdVdsNickname') || '';
+        if (!nickname) { $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden'); }
+        else { $('authOverlay').classList.add('hidden'); $('mainMenu').classList.remove('hidden'); $('nicknameDisplay').textContent = nickname; }
+        loadDiamonds(); loadHistory(); loadCustomRewards(); loadJackpotFeedData(); updateMainBalance();
       }
+
+      function loadJackpotFeedData() { var k = 'wdVdsJackpotFeed'; jackpotFeedData = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; }
+      function saveJackpotFeedData() { localStorage.setItem('wdVdsJackpotFeed', JSON.stringify(jackpotFeedData)); updateWinningsList(); }
+      function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
+      function saveDiamonds() { localStorage.setItem('wdVdsDiamonds_' + nickname, diamonds); updateDiamondsDisplay(); updateMainBalance(); }
+      function updateDiamondsDisplay() { if ($('diamondsCount')) $('diamondsCount').textContent = diamonds; }
+      function updateMainBalance() { if ($('mainBalanceDisplay')) $('mainBalanceDisplay').textContent = diamonds; }
 
       async function loadJackpotHistory() {
         if (!userData) return;
-        try {
-          var data = await API.getJackpotsByUser(userData.user_uid);
-          jackpotHistory = data.map(function(j) { return { icon: j.icon, wish: j.wish, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; });
-          renderHistory();
-        } catch (e) {
-          console.error('loadJackpotHistory error', e);
-          jackpotHistory = [];
-        }
+        try { var data = await API.getJackpotsByUser(userData.user_uid); jackpotHistory = data.map(function(j) { return { icon: j.icon, wish: j.wish, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; }); renderHistory(); } catch (e) { loadHistory(); }
       }
 
       async function loadJackpotFeed() {
-        try {
-          var data = await API.getAllJackpots();
-          jackpotFeedData = data.slice(0, 50).map(function(j) { return { nickname: j.nickname, mode: j.mode_key, amount: j.diamonds_won, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; });
-          updateWinningsList();
-        } catch (e) {
-          console.error('loadJackpotFeed error', e);
-        }
+        try { var data = await API.getAllJackpots(); jackpotFeedData = data.slice(0, 10).map(function(j) { return { nickname: j.nickname, mode: j.mode_key, amount: j.diamonds_won, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; }); updateWinningsList(); } catch (e) { loadJackpotFeedData(); }
       }
 
-      function addJackpotToHistory(icon, wish) {
-        jackpotHistory.unshift({ icon: icon, wish: wish, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() });
-        if (jackpotHistory.length > 50) jackpotHistory.pop();
-        renderHistory();
-        // сохранение в БД делается отдельно через API.saveJackpot в finishSpin
-      }
+      function loadHistory() { var k = 'wdVdsHistory_' + nickname; jackpotHistory = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; renderHistory(); }
+      function saveHistory() { localStorage.setItem('wdVdsHistory_' + nickname, JSON.stringify(jackpotHistory)); renderHistory(); }
+      function addJackpotToHistory(icon, wish) { jackpotHistory.unshift({ icon: icon, wish: wish, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() }); if (jackpotHistory.length > 50) jackpotHistory.pop(); saveHistory(); }
 
       function renderHistory() {
         if (!$('historyList')) return;
@@ -904,63 +420,60 @@
       async function loadSupportHistory() {
         if (!userData) { supportMessages = []; return; }
         try {
-          const chats = await API.getSupportChats();
-          const uid = userData.user_uid;
-          if (chats[uid] && chats[uid].messages) {
-            supportMessages = chats[uid].messages;
-          } else {
-            supportMessages = [];
-          }
-          // Если нет приветственного сообщения, добавляем
-          if (supportMessages.length === 0) {
-            const greeting = t('supportGreeting');
-            supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true });
-            await saveSupportMessage();
-          }
-        } catch (e) {
-          console.error('loadSupportHistory error', e);
-          supportMessages = [];
-        }
+          var chats = await API.getSupportChats();
+          var uid = userData.user_uid;
+          if (chats[uid] && chats[uid].messages) supportMessages = chats[uid].messages;
+          else supportMessages = [];
+        } catch (e) { supportMessages = []; }
       }
 
       async function saveSupportMessage() {
         if (!userData) return;
         try {
-          let chats = await API.getSupportChats();
-          const uid = userData.user_uid;
+          var chats = await API.getSupportChats();
+          var uid = userData.user_uid;
           if (!chats[uid]) chats[uid] = { messages: [], userName: nickname };
           chats[uid].messages = supportMessages;
           chats[uid].userName = nickname;
           await API.saveSupportChats(chats);
-        } catch (e) {
-          console.error('saveSupportMessage error', e);
-          showNotification('Ошибка сохранения сообщения, повторите позже');
-        }
+        } catch (e) { console.error('Save support error:', e); }
       }
 
       function renderSupportMessages() {
-        const container = $('chatMessages');
+        var container = $('chatMessages');
         if (!container) return;
         container.innerHTML = '';
-        supportMessages.forEach(msg => {
-          if (msg.deleted) return;
-          const div = document.createElement('div');
-          div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
-          div.textContent = msg.text;
+        var greeting = t('supportGreeting');
+        if (supportMessages.length === 0) {
+          var div = document.createElement('div');
+          div.className = 'chat-message admin';
+          div.textContent = greeting;
           container.appendChild(div);
-        });
+          supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true });
+          saveSupportMessage();
+        } else {
+          supportMessages.forEach(function(msg) {
+            var div = document.createElement('div');
+            div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
+            div.textContent = msg.text;
+            container.appendChild(div);
+          });
+        }
         container.scrollTop = container.scrollHeight;
       }
 
-      async function handleChatSend() {
-        const text = $('chatInput').value.trim();
-        if (!text || !userData) return;
-        const newMsg = { from: 'user', text: text, time: new Date().toISOString(), read: false };
-        supportMessages.push(newMsg);
-        await saveSupportMessage();
-        renderSupportMessages();
+      function handleChatSend() {
+        var text = $('chatInput').value.trim();
+        if (!text) return;
+        var msg = { from: 'user', text: text, time: new Date().toISOString(), read: false };
+        supportMessages.push(msg);
+        var div = document.createElement('div');
+        div.className = 'chat-message user';
+        div.textContent = text;
+        $('chatMessages').appendChild(div);
+        $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
         $('chatInput').value = '';
-        showNotification('Сообщение отправлено администратору');
+        saveSupportMessage();
       }
 
       function showPolicy(type) {
@@ -977,7 +490,6 @@
         else if (lang === 'ua') $('langUaOuter').classList.add('active');
         else $('langEnOuter').classList.add('active');
         updateAllTexts(); updateFreeSpinsBadge();
-        if ($('authOverlay') && !$('authOverlay').classList.contains('hidden')) startAuthMessageRotation();
       }
 
       function updateFreeSpinsBadge() {
@@ -1068,7 +580,7 @@
         if (spinning) return;
         if (gamePaused) return;
         if (freeSpins > 0) { freeSpins--; updateFreeSpinsBadge(); if (freeSpins === 0) jackpotBoost = false; debouncedSave(); }
-        else { if (diamonds < 5) { if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } showMessage(t('notEnoughDiamonds')); return; } diamonds -= 5; diamondsSpent += 5; updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); }
+        else { if (diamonds < 5) { if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } showMessage(t('notEnoughDiamonds')); return; } diamonds -= 5; updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); }
         spinning = true; clearLines(); $('spinButton').disabled = true; playSpinClickSound(); buildGrid();
         if (jackpotBoost && Math.random() < 0.03) { var sym = ICONS[Math.floor(Math.random() * ICONS.length)]; var row = Math.floor(Math.random() * GRID); for (var c = 0; c < GRID; c++) visibleGrid[row][c] = sym; }
         else if (Math.random() < 0.005) { var sym = ICONS[Math.floor(Math.random() * ICONS.length)]; var row = Math.floor(Math.random() * GRID); for (var c = 0; c < GRID; c++) visibleGrid[row][c] = sym; }
@@ -1088,6 +600,7 @@
           addJackpotToHistory(icon, wish);
           if (userData) API.saveJackpot(userData.user_uid, nickname, currentMode, icon, wish, 20);
           addToJackpotFeed(nickname, currentMode, 20);
+          saveJackpotFeedData();
           playJackpotSound();
           if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
           showJackpotBanner();
@@ -1142,29 +655,24 @@
         $('winOverlay').classList.add('hidden'); $('paymentModal').classList.add('hidden'); $('historyModal').classList.add('hidden');
         $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
         $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden'); $('winningsModal').classList.add('hidden');
-        $('profileModal').classList.add('hidden');
         useCustomRewards = false; updateMainBalance(); debouncedSave();
       }
 
-      async function debouncedSave() { if (!userData) return; if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, diamonds_spent: diamondsSpent, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
+      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
 
       // Event listeners
       $('logoutBtn').addEventListener('click', logout);
-      $('mainTopUpBtn').addEventListener('click', showTopUpModal);
-      $('donateButton').addEventListener('click', showTopUpModal);
-      $('copyWalletBtn').addEventListener('click', copyWalletAddress);
-      $('profileBtn').addEventListener('click', openProfileModal);
-      $('copyUIDBtn').addEventListener('click', copyUID);
-      $('saveNicknameBtn').addEventListener('click', saveProfileName);
-      $('closeProfileBtn').addEventListener('click', () => $('profileModal').classList.add('hidden'));
+      $('mainTopUpBtn').addEventListener('click', function() { $('paymentModal').classList.remove('hidden'); });
       document.querySelectorAll('.thread-btn[data-mode]').forEach(function(b) { b.addEventListener('click', function() { useCustomRewards = false; currentMode = this.dataset.mode; enterSlot(); }); });
       $('spinButton').addEventListener('click', spin);
       $('backToMenu').addEventListener('click', backToMenu);
+      $('donateButton').addEventListener('click', function() { $('paymentModal').classList.remove('hidden'); });
       $('closeWinBtn').addEventListener('click', function() { $('winOverlay').classList.add('hidden'); });
       $('closePaymentBtn').addEventListener('click', function() { $('paymentModal').classList.add('hidden'); });
-      $('historyBtn').addEventListener('click', async function() { await loadJackpotHistory(); $('historyModal').classList.remove('hidden'); });
+      document.querySelectorAll('.diamond-option').forEach(function(o) { o.addEventListener('click', function() { diamonds += parseInt(this.dataset.diamonds); updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); $('paymentModal').classList.add('hidden'); showMessage('✨ +' + this.dataset.diamonds + '💎'); }); });
+      $('historyBtn').addEventListener('click', function() { if (userData) loadJackpotHistory(); else { loadHistory(); renderHistory(); } $('historyModal').classList.remove('hidden'); });
       $('closeHistoryBtn').addEventListener('click', function() { $('historyModal').classList.add('hidden'); });
-      $('winningsBtn').addEventListener('click', async function() { await loadJackpotFeed(); $('winningsModal').classList.remove('hidden'); });
+      $('winningsBtn').addEventListener('click', function() { if (userData) loadJackpotFeed(); else loadJackpotFeedData(); $('winningsModal').classList.remove('hidden'); });
       $('closeWinningsBtn').addEventListener('click', function() { $('winningsModal').classList.add('hidden'); });
       $('autoSpinBtn').addEventListener('click', function() { if (gamePaused) return; autoSpinning = !autoSpinning; if (autoSpinning) { $('autoSpinBtn').classList.add('active'); $('autoSpinBtn').innerHTML = '🔄<br>STOP'; if (!spinning) spin(); } else { $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } });
       $('sendToPartnerBtn').addEventListener('click', openNameForm);
@@ -1177,30 +685,23 @@
       $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', async function() {
-        await loadSupportHistory();
-        renderSupportMessages();
-        $('supportModal').classList.remove('hidden');
-      });
+      $('supportBtn').addEventListener('click', function() { loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); }); });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
-      $('closeSupportBtn').addEventListener('click', function() {
-        $('supportModal').classList.add('hidden');
-      });
+      $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
       $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
       $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
       $('closePolicyBtn').addEventListener('click', function() { $('policyModal').classList.add('hidden'); });
       $('langRuOuter').addEventListener('click', function() { setLanguage('ru'); });
       $('langUaOuter').addEventListener('click', function() { setLanguage('ua'); });
       $('langEnOuter').addEventListener('click', function() { setLanguage('en'); });
-      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal'), $('profileModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
+      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('supportModal'), $('policyModal'), $('winningsModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
       setLanguage('ru');
       updateAllTexts();
       $('mainMenu').classList.add('hidden');
       $('slotUI').classList.add('hidden');
       $('authOverlay').classList.remove('hidden');
-      startAuthMessageRotation();
     })();
   </script>
 </body>
