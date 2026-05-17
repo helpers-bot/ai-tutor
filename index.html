@@ -126,6 +126,7 @@
     .support-btn:hover { transform: scale(1.1); }
     .support-btn:active { transform: scale(0.95); }
     @keyframes supportPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.9), 0 10px 25px rgba(0,0,0,0.7); } }
+    .support-badge { position: absolute; top: -4px; right: -4px; background: #ff4444; color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .chat-messages { max-height: 280px; overflow-y: auto; text-align: left; color: #f0dbb0; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 16px; }
     .chat-message { margin: 5px 0; padding: 7px 10px; border-radius: 14px; font-size: 0.8rem; }
     .chat-message.admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; text-align: left; margin-right: 16px; }
@@ -245,7 +246,7 @@
     </div>
   </div>
 
-  <div class="support-btn" id="supportBtn">💬</div>
+  <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
   <div class="spin-win-display" id="spinWinDisplay"></div>
 
   <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
@@ -394,6 +395,57 @@
       let jackpotFeedData = [];
       let saveTimeout = null;
       let supportMessages = [];
+      let supportUnreadCount = 0;
+      let supportPollingInterval = null;
+
+      // ===== NOTIFICATION SOUND =====
+      function playNotificationSound() {
+        try {
+          if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(800, audioCtx.currentTime);
+          o.frequency.setValueAtTime(1000, audioCtx.currentTime + 0.1);
+          g.gain.setValueAtTime(0.08, audioCtx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          o.connect(g); g.connect(audioCtx.destination);
+          o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.3);
+        } catch (e) {}
+      }
+
+      // ===== SUPPORT BADGE =====
+      function updateSupportBadge() {
+        const badge = $('supportBadge');
+        if (!badge) return;
+        if (supportUnreadCount > 0) {
+          badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+
+      function startSupportPolling() {
+        if (supportPollingInterval) clearInterval(supportPollingInterval);
+        supportPollingInterval = setInterval(async () => {
+          if (!userData) return;
+          try {
+            const chats = await API.getSupportChats();
+            const uid = userData.user_uid;
+            if (chats[uid] && chats[uid].messages) {
+              const oldCount = supportMessages.length;
+              supportMessages = chats[uid].messages;
+              const newAdminMessages = supportMessages.filter((m, i) => m.from === 'admin' && i >= oldCount && !m.read);
+              if (newAdminMessages.length > 0) {
+                supportUnreadCount += newAdminMessages.length;
+                updateSupportBadge();
+                playNotificationSound();
+              }
+            }
+          } catch (e) {}
+        }, 10000);
+      }
 
       // ===== CRYPTO PAYMENT =====
       const WALLETS = {
@@ -492,6 +544,7 @@
         $('profileMsg').textContent = '';
         $('profileModal').classList.remove('hidden');
       }
+      window.openProfile = openProfile;
 
       function copyUID() {
         if (!userData) return;
@@ -500,6 +553,7 @@
           setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
         }).catch(() => { $('profileMsg').textContent = 'Ошибка копирования'; });
       }
+      window.copyUID = copyUID;
 
       async function changeNickname() {
         if (!userData) return;
@@ -519,6 +573,7 @@
           $('profileMsg').textContent = 'Ошибка изменения';
         }
       }
+      window.changeNickname = changeNickname;
 
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
       function $(id) { return document.getElementById(id); }
@@ -555,16 +610,19 @@
         loadCustomRewards();
         loadJackpotFeedData();
         loadSupportHistory();
+        startSupportPolling();
       }
 
       async function logout() {
         if (userData) await API.logOut(userData.user_uid, nickname);
         userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
-        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = [];
+        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; supportUnreadCount = 0;
         $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
         $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
         if (rateInterval) clearInterval(rateInterval);
+        if (supportPollingInterval) clearInterval(supportPollingInterval);
+        updateSupportBadge();
       }
 
       function updateGiftSize(progress) {
@@ -1027,7 +1085,7 @@
       $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', function() { loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); }); });
+      $('supportBtn').addEventListener('click', function() { supportUnreadCount = 0; updateSupportBadge(); loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); }); });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
       $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
