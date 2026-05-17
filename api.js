@@ -130,7 +130,11 @@ class GameAPI {
             free_spins: 0,
             jackpot_boost: 0,
             created_at: new Date().toISOString(),
-            last_login: new Date().toISOString()
+            last_login: new Date().toISOString(),
+            history: [],
+            support_messages: [],
+            provider: 'google',
+            role: 'user'
         };
 
         data.users.push(newUser);
@@ -298,6 +302,30 @@ class GameAPI {
         }
         user.nickname = newNickname;
         return await this._saveJSON('users.json', data, await this._getSHA('users.json'));
+    }
+
+    // ===== SUPPORT CHATS =====
+    async getSupportChats() {
+        const data = await this._fetchJSON('support_chats.json');
+        if (!data || !data.chats) return {};
+        return data.chats;
+    }
+
+    async saveSupportChats(chats) {
+        const data = { chats: chats };
+        return await this._saveJSON('support_chats.json', data, await this._getSHA('support_chats.json'));
+    }
+
+    async getSupportChatByUID(uid) {
+        const chats = await this.getSupportChats();
+        return chats[uid] || null;
+    }
+
+    async addSupportMessage(uid, message) {
+        const chats = await this.getSupportChats();
+        if (!chats[uid]) chats[uid] = { messages: [], userName: '' };
+        chats[uid].messages.push(message);
+        return await this.saveSupportChats(chats);
     }
 }
 
