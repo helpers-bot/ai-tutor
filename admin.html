@@ -200,7 +200,9 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
             event.target.classList.add('active');
-            if (name === 'support') loadSupportChats();
+            if (name === 'support') {
+                loadSupportChats(); // принудительно загружаем список чатов при переключении
+            }
             if (name === 'transactions') loadTransactions();
             if (name === 'stats') loadStatsTab();
         }
@@ -225,12 +227,11 @@
                     }
                     previousUnreadCount = unread;
                     if (document.getElementById('tab-support').classList.contains('active')) {
-                        loadSupportChats();
-                    }
-                    // Если открыт чат с пользователем, обновить его сообщения
-                    if (currentChatUID && document.getElementById('chatArea').style.display !== 'none') {
-                        await loadSupportChats(); // перезагружаем поддержку
-                        openChat(currentChatUID, false); // открыть чат без повторной пометки прочтения (false)
+                        await loadSupportChats(); // обновляем список чатов, если вкладка активна
+                        // Если открыт чат с пользователем, обновляем его содержимое
+                        if (currentChatUID && document.getElementById('chatArea').style.display !== 'none') {
+                            await openChat(currentChatUID, false);
+                        }
                     }
                 } catch (e) { console.error('Polling error', e); }
             }, 10000);
@@ -406,7 +407,7 @@
             if (!confirm('Удалить сообщение?')) return;
             await API.deleteSupportMessage(uid, index);
             supportChats = await API.getSupportChats();
-            openChat(uid);
+            await openChat(uid);
             showSuccess('Сообщение удалено');
         }
 
@@ -422,7 +423,7 @@
             await API.saveSupportChats(supportChats);
             
             document.getElementById('replyInput').value = '';
-            // Переоткрываем чат без повторной пометки прочтения (чтобы не сбросить только что добавленное)
+            // Переоткрываем чат без повторной пометки прочтения
             await openChat(currentChatUID, false);
             showSuccess('Ответ отправлен');
         }
