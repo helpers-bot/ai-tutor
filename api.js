@@ -1,4 +1,4 @@
-// api.js – Supabase REST API wrapper
+// api.js - База данных через Supabase
 const SUPABASE_URL = 'https://kmkgqegtulbmdjlmllka.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
 
@@ -14,11 +14,6 @@ class GameAPI {
             'Authorization': `Bearer ${SUPABASE_KEY}`,
             'Content-Type': 'application/json'
         };
-
-        // ВАЖНОЕ ИСПРАВЛЕНИЕ: просим Supabase возвращать созданную/обновлённую запись
-        if (options.method && options.method !== 'GET') {
-            headers['Prefer'] = 'return=representation';
-        }
 
         const config = {
             method: options.method || 'GET',
@@ -45,7 +40,6 @@ class GameAPI {
         }
     }
 
-    // ---------- далее ваш оригинальный код без изменений ----------
     generateUID() {
         let uid;
         do {
@@ -278,10 +272,6 @@ class GameAPI {
         return { success: true, new_balance: newBalance };
     }
 
-    async recordTopUp(user_uid, nickname, amount, payment_method) {
-        return await this._saveTransaction(user_uid, nickname, amount, 'topup', `Пополнение ${payment_method}`, 'user');
-    }
-
     async _saveTransaction(user_uid, nickname, amount, type, reason, admin_username) {
         return await this._fetch('transactions', {
             method: 'POST',
@@ -376,15 +366,6 @@ class GameAPI {
         if (!chats[uid]) chats[uid] = { messages: [], userName: '', deleted: [] };
         chats[uid].messages.push(message);
         return await this.saveSupportChats(chats);
-    }
-
-    // ===== ДОБАВЛЕННЫЙ МЕТОД ДЛЯ СМЕНЫ НИКНЕЙМА =====
-    async updateNickname(user_uid, newNickname) {
-        const result = await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
-            method: 'PATCH',
-            body: JSON.stringify({ nickname: newNickname })
-        });
-        return !!result;
     }
 }
 
