@@ -34,7 +34,6 @@
     .logout-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); }
     #app { width: 100%; max-width: 650px; background: rgba(8,3,18,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 30px 50px rgba(0,0,0,0.9), 0 0 45px rgba(180,130,50,0.5); border-radius: 48px; padding: 18px 18px 22px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; margin-top: 35px; }
     .user-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(20,5,35,0.6); border: 2px solid #d4af37; border-radius: 40px; padding: 8px 14px; margin: 0 2px; box-shadow: 0 0 18px rgba(255,215,0,0.3); gap: 8px; }
-    .user-bar.hidden-bar { display: none; }
     .nickname { font-weight: 900; font-size: 1rem; color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; animation: nickGlow 2s ease-in-out infinite alternate; letter-spacing: 1px; flex-shrink: 0; }
     @keyframes nickGlow { 0% { text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b; } 100% { text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00; } }
     .balance-display { font-weight: 900; font-size: 1rem; color: #ffd966; text-shadow: 0 0 10px #ffd700; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
@@ -166,7 +165,7 @@
       </div>
     </div>
 
-    <div class="user-bar hidden-bar" id="userBar">
+    <div class="user-bar">
       <span style="display:flex;align-items:center;gap:8px;">
         <img class="user-avatar hidden" id="userAvatar" src="" alt="">
         <span class="nickname" id="nicknameDisplay">Игрок</span>
@@ -219,12 +218,6 @@
         </div>
         <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
       </div>
-    </div>
-
-    <div class="footer">
-      <a id="privacyPolicyLink">Политика конфиденциальности</a> |
-      <a id="termsOfUseLink">Условия использования</a>
-      <p style="margin-top:3px;">© 2024 VDS - Vibe Dare Smile. Все права защищены.</p>
     </div>
   </div>
 
@@ -330,6 +323,12 @@
       <div class="policy-text" id="policyContent"></div>
       <button id="closePolicyBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
     </div>
+  </div>
+
+  <div class="footer">
+    <a id="privacyPolicyLink">Политика конфиденциальности</a> |
+    <a id="termsOfUseLink">Условия использования</a>
+    <p style="margin-top:3px;">© 2024 VDS - Vibe Dare Smile. Все права защищены.</p>
   </div>
 
   <script src="api.js"></script>
@@ -487,7 +486,7 @@
       };
 
       const POLICIES = {
-        ru: { privacy: '<h4>Политика конфиденциальности</h4><p>1. Мы используем Google аккаунт для входа.</p><p>2. Игровые данные хранятся в Supabase.</p><p>3. Мы не передаем данные третьим лицам.</p>', terms: '<h4>Условия использования</h4><p>1. Игра предназначена для развлекательных целей.</p><p>2. Администрация оставляет за собой право изменять правила.</p>' },
+        ru: { privacy: '<h4>Политика конфиденциальности</h4><p>1. Мы используем Google аккаунт для входа.</p><p>2. Игровые данные хранятся в JSON файлах на GitHub.</p><p>3. Мы не передаем данные третьим лицам.</p>', terms: '<h4>Условия использования</h4><p>1. Игра предназначена для развлекательных целей.</p><p>2. Администрация оставляет за собой право изменять правила.</p>' },
         ua: { privacy: '<h4>Політика конфіденційності</h4><p>1. Використовуємо Google для входу.</p>', terms: '<h4>Умови використання</h4><p>1. Гра для розваг.</p>' },
         en: { privacy: '<h4>Privacy Policy</h4><p>1. We use Google for login.</p>', terms: '<h4>Terms of Use</h4><p>1. Game for entertainment.</p>' }
       };
@@ -538,7 +537,6 @@
         jackpotBoost = data.jackpot_boost;
         $('authOverlay').classList.add('hidden');
         $('mainMenu').classList.remove('hidden');
-        $('userBar').classList.remove('hidden-bar');
         $('nicknameDisplay').textContent = nickname;
         $('userIdDisplay').textContent = 'ID: ' + data.user_uid;
         if (data.picture) { $('userAvatar').src = data.picture; $('userAvatar').classList.remove('hidden'); }
@@ -558,7 +556,6 @@
         userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
         jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = [];
         $('authOverlay').classList.remove('hidden'); $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
-        $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
       }
 
