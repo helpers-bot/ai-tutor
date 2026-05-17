@@ -1,452 +1,443 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>Админ-панель VDS Game</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        h1 { color: #ffd700; text-align: center; margin: 20px 0; font-size: clamp(1.5rem, 4vw, 2rem); text-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        h2 { color: #d4af37; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 8px; font-size: clamp(1rem, 2.5vw, 1.3rem); }
-        .login-form { max-width: 400px; margin: 100px auto; background: #1a1a2e; padding: 30px; border-radius: 16px; border: 2px solid #d4af37; }
-        .login-form input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 1rem; }
-        .login-form button { width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; }
-        .error { color: #ff4444; margin: 8px 0; }
-        .success { color: #44ff44; margin: 8px 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 16px 0; }
-        .stat-card { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .stat-card .value { font-size: 2rem; color: #ffd700; font-weight: bold; }
-        .stat-card .label { color: #888; font-size: 0.9rem; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; overflow: hidden; }
-        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #333; font-size: 0.85rem; word-break: break-word; }
-        th { background: #2a2a3e; color: #ffd700; }
-        tr:hover { background: #222236; }
-        .btn-logout { background: #dc3545; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; margin: 10px 0; display: inline-block; }
-        .btn-refresh { background: #28a745; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; margin: 10px 0; display: inline-block; }
-        .search-form { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
-        .search-form input { flex: 1 1 auto; min-width: 150px; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.9rem; }
-        .search-form button { padding: 10px 20px; background: #d4af37; border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-        .actions input { width: 70px; padding: 6px; border-radius: 6px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.8rem; }
-        .actions button { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; white-space: nowrap; }
-        .btn-add { background: #28a745; color: #fff; }
-        .btn-remove { background: #dc3545; color: #fff; }
-        .btn-delete { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 4px; border: none; cursor: pointer; font-size: 0.65rem; margin-left: 8px; }
-        .tabs { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 20px; background: #1a1a2e; border: 1px solid #444; color: #888; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
-        .tab-btn.active { background: #2a2a3e; color: #ffd700; border-color: #d4af37; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .chat-message { padding: 10px; margin: 5px 0; border-radius: 12px; font-size: 0.85rem; position: relative; word-break: break-word; }
-        .chat-message.from-user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; }
-        .chat-message.from-admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; }
-        .reply-box { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-        .reply-box input { flex: 1 1 auto; min-width: 150px; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.85rem; }
-        .reply-box button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; white-space: nowrap; }
-        .unread-badge { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 6px; }
-        .notification-sound-toggle { display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; cursor: pointer; color: #888; font-size: 0.8rem; white-space: nowrap; }
-        .notification-sound-toggle.enabled { color: #44ff44; }
-        @media (max-width: 600px) {
-            .stats-grid { grid-template-columns: 1fr 1fr; }
-            th, td { padding: 8px 6px; font-size: 0.75rem; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div id="loginBlock" class="login-form">
-            <h1>🔐 Админ-панель VDS</h1>
-            <p style="color:#888;font-size:0.8rem;text-align:center;">Админ панель</p>
-            <input type="password" id="adminPassword" placeholder="Пароль админа">
-            <button onclick="adminLogin()">Войти</button>
-            <p class="error" id="loginError"></p>
-        </div>
+// api.js – Supabase REST API wrapper (исправленный)
+const SUPABASE_URL = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
 
-        <div id="adminPanel" style="display:none;">
-            <h1>🎮 Админ-панель VDS Game</h1>
-            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
-            <button class="btn-refresh" onclick="loadAllData()">🔄 Обновить</button>
-            <span class="notification-sound-toggle enabled" id="soundToggle" onclick="toggleSound()">🔔 Звук уведомлений</span>
-            <p class="success" id="successMsg"></p>
-            <p class="error" id="errorMsg"></p>
+class GameAPI {
+    constructor() {
+        this.cache = {};
+    }
 
-            <div class="stats-grid">
-                <div class="stat-card"><div class="value" id="totalUsers">0</div><div class="label">Всего пользователей</div></div>
-                <div class="stat-card"><div class="value" id="onlineNow">0</div><div class="label">Онлайн (15 мин)</div></div>
-                <div class="stat-card"><div class="value" id="onlineToday">0</div><div class="label">За сегодня</div></div>
-                <div class="stat-card"><div class="value" id="unreadMessages">0</div><div class="label">Новых сообщений</div></div>
-            </div>
+    async _fetch(endpoint, options = {}) {
+        const url = `${SUPABASE_URL}/rest/v1/${endpoint}`;
+        const headers = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
 
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('users')">👥 Пользователи</button>
-                <button class="tab-btn" onclick="switchTab('support')">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
-                <button class="tab-btn" onclick="switchTab('transactions')">💳 Транзакции</button>
-                <button class="tab-btn" onclick="switchTab('stats')">📊 Статистика</button>
-            </div>
+        const config = {
+            method: options.method || 'GET',
+            headers: headers
+        };
 
-            <div id="tab-users" class="tab-content active">
-                <h2>🔍 Поиск пользователя</h2>
-                <div class="search-form">
-                    <input type="text" id="searchQuery" placeholder="ID, email или имя...">
-                    <button onclick="searchUsers()">Найти</button>
-                    <button onclick="loadAllUsers()" style="background:#555;">Все</button>
-                </div>
-                <table>
-                    <thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>💎 Потрачено</th><th>Регистрация</th><th>Действия</th></tr></thead>
-                    <tbody id="usersTable"></tbody>
-                </table>
-            </div>
-
-            <div id="tab-support" class="tab-content">
-                <h2>💬 Обращения в поддержку</h2>
-                <p style="color:#888;font-size:0.8rem;">Выберите пользователя для просмотра переписки</p>
-                <div id="supportUsersList"></div>
-                <div id="chatArea" style="display:none; margin-top:16px;">
-                    <h3>Переписка с <span id="chatUserName"></span></h3>
-                    <div id="chatMessages" style="max-height:400px;overflow-y:auto;padding:10px;background:#111;border-radius:8px;margin:8px 0;"></div>
-                    <div class="reply-box">
-                        <input type="text" id="replyInput" placeholder="Введите ответ...">
-                        <button onclick="sendReply()">📤 Отправить</button>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-transactions" class="tab-content">
-                <h2>💳 Последние транзакции</h2>
-                <table>
-                    <thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead>
-                    <tbody id="transactionsTable"></tbody>
-                </table>
-            </div>
-
-            <div id="tab-stats" class="tab-content">
-                <h2>📊 Статистика по категориям</h2>
-                <table>
-                    <thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead>
-                    <tbody id="statsSpentTable"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script src="api.js"></script>
-    <script>
-        let currentChatUID = null;
-        let supportChats = {};
-        let notificationSound = true;
-        let previousUnreadCount = 0;
-        let audioCtx = null;
-
-        function playNotificationSound() {
-            if (!notificationSound) return;
-            try {
-                if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-                const o = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                o.type = 'sine';
-                o.frequency.setValueAtTime(800, audioCtx.currentTime);
-                o.frequency.setValueAtTime(1000, audioCtx.currentTime + 0.1);
-                g.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
-                o.connect(g);
-                g.connect(audioCtx.destination);
-                o.start(audioCtx.currentTime);
-                o.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {}
+        if (options.body) {
+            config.body = options.body;
         }
 
-        function toggleSound() {
-            notificationSound = !notificationSound;
-            const el = document.getElementById('soundToggle');
-            if (notificationSound) {
-                el.classList.add('enabled');
-                el.textContent = '🔔 Звук уведомлений';
-            } else {
-                el.classList.remove('enabled');
-                el.textContent = '🔕 Звук выключен';
+        try {
+            const res = await fetch(url, config);
+            if (!res.ok) {
+                const err = await res.text();
+                console.error('API error:', res.status, err);
+                return null;
             }
+            const text = await res.text();
+            if (!text) return [];
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('Fetch error:', e);
+            return null;
         }
+    }
 
-        async function sha256(message) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+    generateUID() {
+        let uid;
+        do {
+            uid = String(Math.floor(10000000 + Math.random() * 90000000));
+        } while (this._usedUIDs && this._usedUIDs.has(uid));
+        return uid;
+    }
 
-        async function adminLogin() {
-            const password = document.getElementById('adminPassword').value;
-            const errorEl = document.getElementById('loginError');
-            if (!password) { errorEl.textContent = 'Введите пароль'; return; }
-            const passwordHash = await sha256(password);
-            const validHash = await sha256('admin123');
-            if (passwordHash !== validHash) { errorEl.textContent = 'Неверный пароль'; return; }
-            localStorage.setItem('vds_admin_logged_in', 'true');
-            document.getElementById('loginBlock').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadAllData();
-            startMessagePolling();
-        }
+    async findUserByGoogleId(googleId) {
+        try {
+            const data = await this._fetch(`users?google_id=eq.${encodeURIComponent(googleId)}&limit=1`);
+            return (data && data.length > 0) ? data[0] : null;
+        } catch (e) { return null; }
+    }
 
-        function logout() { localStorage.removeItem('vds_admin_logged_in'); location.reload(); }
+    async findUserByUID(uid) {
+        try {
+            const data = await this._fetch(`users?user_uid=eq.${encodeURIComponent(uid)}&limit=1`);
+            return (data && data.length > 0) ? data[0] : null;
+        } catch (e) { return null; }
+    }
 
-        function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
-        function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
-
-        function switchTab(name) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + name).classList.add('active');
-            event.target.classList.add('active');
-            if (name === 'support') {
-                loadSupportChats(); // принудительно загружаем список чатов при переключении
+    async registerOrLogin(googleProfile) {
+        try {
+            const { googleId, email, name, picture } = googleProfile;
+            
+            let user = await this.findUserByGoogleId(googleId);
+            
+            if (user) {
+                await this._fetch(`users?user_uid=eq.${encodeURIComponent(user.user_uid)}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        last_login: new Date().toISOString(),
+                        email: email,
+                        nickname: user.nickname || name,
+                        picture: picture
+                    })
+                });
+                
+                await this.logOnline(user.user_uid, user.nickname || name, 'login');
+                
+                return {
+                    success: true,
+                    user_uid: user.user_uid,
+                    nickname: user.nickname || name,
+                    email: user.email || email,
+                    picture: user.picture || picture,
+                    diamonds: user.diamonds || 100,
+                    diamonds_spent: user.diamonds_spent || 0,
+                    treasure_progress: parseFloat(user.treasure_progress) || 0,
+                    free_spins: user.free_spins || 0,
+                    jackpot_boost: !!(user.jackpot_boost),
+                    is_new: false
+                };
             }
-            if (name === 'transactions') loadTransactions();
-            if (name === 'stats') loadStatsTab();
-        }
 
-        function startMessagePolling() {
-            setInterval(async () => {
-                try {
-                    const chats = await API.getSupportChats();
-                    let unread = 0;
-                    Object.values(chats).forEach(chat => {
-                        if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
-                    });
-                    document.getElementById('unreadMessages').textContent = unread;
-                    if (unread > 0) {
-                        document.getElementById('unreadBadge').textContent = unread;
-                        document.getElementById('unreadBadge').classList.remove('hidden');
-                    } else {
-                        document.getElementById('unreadBadge').classList.add('hidden');
-                    }
-                    if (unread > previousUnreadCount) {
-                        playNotificationSound();
-                    }
-                    previousUnreadCount = unread;
-                    if (document.getElementById('tab-support').classList.contains('active')) {
-                        await loadSupportChats(); // обновляем список чатов, если вкладка активна
-                        // Если открыт чат с пользователем, обновляем его содержимое
-                        if (currentChatUID && document.getElementById('chatArea').style.display !== 'none') {
-                            await openChat(currentChatUID, false);
-                        }
-                    }
-                } catch (e) { console.error('Polling error', e); }
-            }, 10000);
-        }
+            let uid;
+            let existing;
+            do {
+                uid = this.generateUID();
+                existing = await this.findUserByUID(uid);
+            } while (existing);
 
-        async function loadAllData() {
-            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadTransactions()]);
-        }
+            const newUser = {
+                user_uid: uid,
+                google_id: googleId,
+                nickname: name,
+                email: email,
+                picture: picture,
+                diamonds: 100,
+                diamonds_spent: 0,
+                treasure_progress: 0,
+                free_spins: 0,
+                jackpot_boost: 0,
+                created_at: new Date().toISOString(),
+                last_login: new Date().toISOString(),
+                provider: 'google',
+                role: 'user',
+                history: [],
+                support_messages: []
+            };
 
-        async function loadStats() {
-            const users = await API.getAllUsers();
-            const online = await API.getOnlineStats();
-            const spent = await API.getSpentByMode();
-            const chats = await API.getSupportChats();
-
-            document.getElementById('totalUsers').textContent = users.length;
-            document.getElementById('onlineNow').textContent = online.online_now;
-            document.getElementById('onlineToday').textContent = online.online_today;
-
-            let unread = 0;
-            Object.values(chats).forEach(chat => {
-                if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
+            const result = await this._fetch('users', {
+                method: 'POST',
+                body: JSON.stringify(newUser)
             });
-            document.getElementById('unreadMessages').textContent = unread;
-            if (unread > 0) {
-                document.getElementById('unreadBadge').textContent = unread;
-                document.getElementById('unreadBadge').classList.remove('hidden');
-            } else {
-                document.getElementById('unreadBadge').classList.add('hidden');
+
+            if (!result) {
+                return { success: false, error: 'Ошибка создания пользователя' };
             }
 
-            const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-            const spentHTML = Object.entries(spent).map(([mode, total]) => 
-                '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>'
-            ).join('') || '<tr><td colspan="2">Нет данных</td></tr>';
-            document.getElementById('statsSpentTable').innerHTML = spentHTML;
+            await this.logOnline(uid, name, 'login');
+
+            return {
+                success: true,
+                user_uid: uid,
+                nickname: name,
+                email: email,
+                picture: picture,
+                diamonds: 100,
+                diamonds_spent: 0,
+                treasure_progress: 0,
+                free_spins: 0,
+                jackpot_boost: false,
+                is_new: true
+            };
+        } catch (e) {
+            console.error('registerOrLogin error', e);
+            return { success: false, error: 'Ошибка регистрации' };
         }
+    }
 
-        async function loadStatsTab() { await loadStats(); }
+    async saveUserData(user_uid, gameData) {
+        try {
+            const result = await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    diamonds: gameData.diamonds,
+                    diamonds_spent: gameData.diamonds_spent || 0,
+                    treasure_progress: gameData.treasure_progress,
+                    free_spins: gameData.free_spins,
+                    jackpot_boost: gameData.jackpot_boost ? 1 : 0,
+                    last_save: new Date().toISOString()
+                })
+            });
+            return !!result;
+        } catch (e) { return false; }
+    }
 
-        async function loadAllUsers() {
-            const users = await API.getAllUsers();
-            renderUsers(users);
+    async loadUserData(user_uid) {
+        try {
+            const user = await this.findUserByUID(user_uid);
+            if (!user) return null;
+            return {
+                user_uid: user.user_uid,
+                nickname: user.nickname,
+                email: user.email,
+                picture: user.picture,
+                diamonds: user.diamonds,
+                diamonds_spent: user.diamonds_spent || 0,
+                treasure_progress: parseFloat(user.treasure_progress) || 0,
+                free_spins: user.free_spins || 0,
+                jackpot_boost: !!(user.jackpot_boost)
+            };
+        } catch (e) { return null; }
+    }
+
+    async saveJackpot(user_uid, nickname, mode_key, icon, wish, diamonds_won) {
+        try {
+            return await this._fetch('jackpots', {
+                method: 'POST',
+                body: JSON.stringify({
+                    user_uid: user_uid,
+                    nickname: nickname,
+                    mode_key: mode_key,
+                    icon: icon,
+                    wish: wish,
+                    diamonds_won: diamonds_won,
+                    created_at: new Date().toISOString()
+                })
+            });
+        } catch (e) { return null; }
+    }
+
+    async getJackpotsByUser(user_uid) {
+        try {
+            const data = await this._fetch(`jackpots?user_uid=eq.${encodeURIComponent(user_uid)}&order=created_at.desc&limit=50`);
+            return data || [];
+        } catch (e) { return []; }
+    }
+
+    async getAllJackpots() {
+        try {
+            const data = await this._fetch('jackpots?order=created_at.desc&limit=100');
+            return data || [];
+        } catch (e) { return []; }
+    }
+
+    async logOnline(user_uid, nickname, action) {
+        try {
+            return await this._fetch('online_logs', {
+                method: 'POST',
+                body: JSON.stringify({
+                    user_uid: user_uid,
+                    nickname: nickname,
+                    action: action,
+                    created_at: new Date().toISOString()
+                })
+            });
+        } catch (e) { return null; }
+    }
+
+    async logOut(user_uid, nickname) {
+        return await this.logOnline(user_uid, nickname, 'logout');
+    }
+
+    async getOnlineStats() {
+        try {
+            const now = new Date();
+            const fifteenMinAgo = new Date(now - 15 * 60 * 1000).toISOString();
+            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+
+            const [recentLogs, todayLogs] = await Promise.all([
+                this._fetch(`online_logs?created_at=gte.${encodeURIComponent(fifteenMinAgo)}&action=eq.login&select=user_uid`),
+                this._fetch(`online_logs?created_at=gte.${encodeURIComponent(todayStart)}&action=eq.login&select=user_uid`)
+            ]);
+
+            const onlineNow = new Set((recentLogs || []).map(l => l.user_uid));
+            const onlineToday = new Set((todayLogs || []).map(l => l.user_uid));
+
+            return {
+                online_now: onlineNow.size,
+                online_today: onlineToday.size
+            };
+        } catch (e) {
+            return { online_now: 0, online_today: 0 };
         }
+    }
 
-        async function searchUsers() {
-            const query = document.getElementById('searchQuery').value.trim();
-            if (!query) { loadAllUsers(); return; }
-            const users = await API.searchUsers(query);
-            renderUsers(users);
-        }
+    async getAllUsers() {
+        try {
+            const data = await this._fetch('users?order=created_at.desc&limit=100');
+            return data || [];
+        } catch (e) { return []; }
+    }
 
-        function renderUsers(users) {
-            const html = users.map(u => 
-                '<tr>' +
-                '<td><strong>' + u.user_uid + '</strong></td>' +
-                '<td>' + (u.nickname || '-') + '</td>' +
-                '<td>' + (u.email || '-') + '</td>' +
-                '<td>' + (u.diamonds || 0) + ' 💎</td>' +
-                '<td>' + (u.diamonds_spent || 0) + ' 💎</td>' +
-                '<td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '-') + '</td>' +
-                '<td class="actions"><input type="number" id="amt_' + u.user_uid + '" placeholder="Сумма" value="100" min="1" style="width:60px;">' +
-                '<button class="btn-add" onclick="addDiamonds(\'' + u.user_uid + '\')">+</button>' +
-                '<button class="btn-remove" onclick="removeDiamonds(\'' + u.user_uid + '\')">-</button></td>' +
-                '</tr>'
-            ).join('') || '<tr><td colspan="7">Нет пользователей</td></tr>';
-            document.getElementById('usersTable').innerHTML = html;
-        }
+    async searchUsers(query) {
+        try {
+            const data = await this._fetch(`users?or=(user_uid.ilike.*${encodeURIComponent(query)}*,nickname.ilike.*${encodeURIComponent(query)}*,email.ilike.*${encodeURIComponent(query)}*)&limit=50`);
+            return data || [];
+        } catch (e) { return []; }
+    }
 
-        async function addDiamonds(uid) {
-            const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
-            if (!amount || amount <= 0) { showError('Введите сумму'); return; }
-            const result = await API.addDiamonds(uid, amount, 'admin');
-            if (result.success) {
-                showSuccess('+' + amount + '💎 → ' + uid);
-                loadAllData();
-                await API.addSupportMessage(uid, {
-                    from: 'admin',
-                    text: `Администратор начислил вам ${amount}💎`,
-                    time: new Date().toISOString(),
-                    read: true
-                });
-            } else showError(result.error);
-        }
-
-        async function removeDiamonds(uid) {
-            const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
-            if (!amount || amount <= 0) { showError('Введите сумму'); return; }
-            const result = await API.removeDiamonds(uid, amount, 'admin');
-            if (result.success) {
-                showSuccess('-' + amount + '💎 → ' + uid);
-                loadAllData();
-                await API.addSupportMessage(uid, {
-                    from: 'admin',
-                    text: `Администратор списал ${amount}💎 с вашего счета`,
-                    time: new Date().toISOString(),
-                    read: true
-                });
-            } else showError(result.error);
-        }
-
-        async function loadSupportChats() {
-            try {
-                supportChats = await API.getSupportChats();
-            } catch (e) {
-                console.error('loadSupportChats error', e);
-                supportChats = {};
-            }
-            const usersList = document.getElementById('supportUsersList');
+    async addDiamonds(user_uid, amount, adminName) {
+        try {
+            const user = await this.findUserByUID(user_uid);
+            if (!user) return { success: false, error: 'Пользователь не найден' };
             
-            if (Object.keys(supportChats).length === 0) {
-                usersList.innerHTML = '<p style="color:#888;">Нет обращений</p>';
-                return;
-            }
-
-            let html = '<table><thead><tr><th>ID</th><th>Имя</th><th>Последнее сообщение</th><th>Статус</th></tr></thead><tbody>';
-            for (const [uid, chat] of Object.entries(supportChats)) {
-                if (!chat || !chat.messages || chat.messages.length === 0) continue;
-                const visibleMessages = chat.messages.filter(m => !m.deleted);
-                if (visibleMessages.length === 0) continue;
-                const lastMsg = visibleMessages[visibleMessages.length - 1];
-                const hasUnread = chat.messages.some(m => !m.read && m.from === 'user' && !m.deleted);
-                const preview = lastMsg ? lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '...' : '') : 'Нет сообщений';
-                html += '<tr onclick="openChat(\'' + uid + '\')" style="cursor:pointer;' + (hasUnread ? 'background:rgba(255,215,0,0.1);' : '') + '">' +
-                    '<td>' + uid + '</td><td>' + (chat.userName || '-') + '</td>' +
-                    '<td>' + preview + '</td><td>' + (hasUnread ? '🔴 Новое' : '✅ Прочитано') + '</td></tr>';
-            }
-            html += '</tbody></table>';
-            usersList.innerHTML = html;
-        }
-
-        async function openChat(uid, markAsRead = true) {
-            currentChatUID = uid;
-            // Перезагружаем чаты, чтобы получить свежие данные
-            supportChats = await API.getSupportChats();
-            const chat = supportChats[uid];
-            if (!chat) return;
-            document.getElementById('chatArea').style.display = 'block';
-            document.getElementById('chatUserName').textContent = chat.userName || uid;
+            const newBalance = (user.diamonds || 0) + amount;
+            await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ diamonds: newBalance })
+            });
             
-            const messagesDiv = document.getElementById('chatMessages');
-            messagesDiv.innerHTML = '';
-            if (chat.messages) {
-                chat.messages.forEach((msg, index) => {
-                    if (msg.deleted) return;
-                    const div = document.createElement('div');
-                    div.className = 'chat-message ' + (msg.from === 'user' ? 'from-user' : 'from-admin');
-                    div.innerHTML = '<strong>' + (msg.from === 'user' ? (chat.userName || 'Пользователь') : 'Админ') + ':</strong> ' + msg.text +
-                        '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>' +
-                        '<button class="btn-delete" onclick="deleteMessage(\'' + uid + '\', ' + index + ')">🗑</button>';
-                    messagesDiv.appendChild(div);
-                });
-                // Помечаем сообщения от пользователя как прочитанные, если нужно
-                if (markAsRead) {
-                    let changed = false;
-                    chat.messages.forEach(m => {
-                        if (!m.deleted && m.from === 'user' && !m.read) {
-                            m.read = true;
-                            changed = true;
-                        }
+            await this._saveTransaction(user_uid, user.nickname || user.email, amount, 'add', 'Начисление админом', adminName);
+            return { success: true, new_balance: newBalance };
+        } catch (e) {
+            return { success: false, error: 'Ошибка начисления' };
+        }
+    }
+
+    async removeDiamonds(user_uid, amount, adminName) {
+        try {
+            const user = await this.findUserByUID(user_uid);
+            if (!user) return { success: false, error: 'Пользователь не найден' };
+            
+            const newBalance = Math.max(0, (user.diamonds || 0) - amount);
+            await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ diamonds: newBalance })
+            });
+            
+            await this._saveTransaction(user_uid, user.nickname || user.email, amount, 'remove', 'Списание админом', adminName);
+            return { success: true, new_balance: newBalance };
+        } catch (e) {
+            return { success: false, error: 'Ошибка списания' };
+        }
+    }
+
+    async recordTopUp(user_uid, nickname, amount, payment_method) {
+        try {
+            return await this._saveTransaction(user_uid, nickname, amount, 'topup', `Пополнение ${payment_method}`, 'user');
+        } catch (e) { return null; }
+    }
+
+    async _saveTransaction(user_uid, nickname, amount, type, reason, admin_username) {
+        try {
+            return await this._fetch('transactions', {
+                method: 'POST',
+                body: JSON.stringify({
+                    user_uid: user_uid,
+                    nickname: nickname,
+                    amount: amount,
+                    type: type,
+                    reason: reason,
+                    admin_username: admin_username,
+                    created_at: new Date().toISOString()
+                })
+            });
+        } catch (e) { return null; }
+    }
+
+    async getTransactions() {
+        try {
+            const data = await this._fetch('transactions?order=created_at.desc&limit=100');
+            return data || [];
+        } catch (e) { return []; }
+    }
+
+    async getSpentByMode() {
+        try {
+            const data = await this._fetch('jackpots?select=mode_key,diamonds_won');
+            if (!data) return {};
+            const spent = {};
+            data.forEach(j => {
+                if (!spent[j.mode_key]) spent[j.mode_key] = 0;
+                spent[j.mode_key] += (j.diamonds_won || 0);
+            });
+            return spent;
+        } catch (e) { return {}; }
+    }
+
+    // ===== ЧАТЫ ПОДДЕРЖКИ =====
+    async getSupportChats() {
+        try {
+            const data = await this._fetch('support_chats?order=updated_at.desc&limit=50');
+            if (!data) return {};
+            const chats = {};
+            data.forEach(chat => {
+                chats[chat.user_uid] = {
+                    messages: chat.messages || [],
+                    userName: chat.user_name || '',
+                    deleted: chat.deleted || []
+                };
+            });
+            return chats;
+        } catch (e) { return {}; }
+    }
+
+    async saveSupportChats(chats) {
+        try {
+            for (const [uid, chat] of Object.entries(chats)) {
+                const existing = await this._fetch(`support_chats?user_uid=eq.${encodeURIComponent(uid)}&limit=1`);
+                
+                if (existing && existing.length > 0) {
+                    await this._fetch(`support_chats?user_uid=eq.${encodeURIComponent(uid)}`, {
+                        method: 'PATCH',
+                        body: JSON.stringify({
+                            messages: chat.messages || [],
+                            deleted: chat.deleted || [],
+                            user_name: chat.userName,
+                            updated_at: new Date().toISOString()
+                        })
                     });
-                    if (changed) {
-                        await API.saveSupportChats(supportChats);
-                    }
+                } else {
+                    await this._fetch('support_chats', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            user_uid: uid,
+                            user_name: chat.userName,
+                            messages: chat.messages || [],
+                            deleted: [],
+                            created_at: new Date().toISOString(),
+                            updated_at: new Date().toISOString()
+                        })
+                    });
                 }
             }
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            // Обновляем список чатов, чтобы убрать метку "Новое"
-            if (markAsRead) await loadSupportChats();
+            return true;
+        } catch (e) {
+            console.error('saveSupportChats error', e);
+            return false;
         }
+    }
 
-        async function deleteMessage(uid, index) {
-            if (!confirm('Удалить сообщение?')) return;
-            await API.deleteSupportMessage(uid, index);
-            supportChats = await API.getSupportChats();
-            await openChat(uid);
-            showSuccess('Сообщение удалено');
-        }
+    async deleteSupportMessage(uid, messageIndex) {
+        try {
+            const chats = await this.getSupportChats();
+            if (chats[uid] && chats[uid].messages && chats[uid].messages[messageIndex]) {
+                if (!chats[uid].deleted) chats[uid].deleted = [];
+                chats[uid].deleted.push(messageIndex);
+                chats[uid].messages[messageIndex].deleted = true;
+                await this.saveSupportChats(chats);
+                return true;
+            }
+            return false;
+        } catch (e) { return false; }
+    }
 
-        async function sendReply() {
-            if (!currentChatUID) return;
-            const text = document.getElementById('replyInput').value.trim();
-            if (!text) return;
+    async addSupportMessage(uid, message) {
+        try {
+            const chats = await this.getSupportChats();
+            if (!chats[uid]) chats[uid] = { messages: [], userName: '', deleted: [] };
+            chats[uid].messages.push(message);
+            return await this.saveSupportChats(chats);
+        } catch (e) { return false; }
+    }
 
-            // Загружаем свежие данные чата
-            supportChats = await API.getSupportChats();
-            if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь', deleted: [] };
-            supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
-            await API.saveSupportChats(supportChats);
-            
-            document.getElementById('replyInput').value = '';
-            // Переоткрываем чат без повторной пометки прочтения
-            await openChat(currentChatUID, false);
-            showSuccess('Ответ отправлен');
-        }
+    // ===== ДОБАВЛЕННЫЙ МЕТОД ДЛЯ СМЕНЫ НИКНЕЙМА =====
+    async updateNickname(user_uid, newNickname) {
+        try {
+            const result = await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ nickname: newNickname })
+            });
+            return !!result;
+        } catch (e) { return false; }
+    }
+}
 
-        async function loadTransactions() {
-            const transactions = await API.getTransactions();
-            const html = transactions.slice(0, 100).map(t =>
-                '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
-                '<td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td>' +
-                '<td>' + t.amount + ' 💎</td><td>' + 
-                (t.type === 'add' ? '✅ Начислено' : t.type === 'remove' ? '❌ Списано' : '💱 Пополнение') + '</td>' +
-                '<td>' + (t.reason || '') + '</td></tr>'
-            ).join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
-            document.getElementById('transactionsTable').innerHTML = html;
-        }
-
-        // Проверка сохранённой сессии
-        if (localStorage.getItem('vds_admin_logged_in') === 'true') {
-            document.getElementById('loginBlock').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadAllData();
-            startMessagePolling();
-        }
-    </script>
-</body>
-</html>
+const API = new GameAPI();
