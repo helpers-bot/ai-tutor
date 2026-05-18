@@ -117,9 +117,6 @@
     .diamond-option:hover { background: #3d2058; }
     .auth-title { color: #ffd700; font-size: 1.3rem; margin-bottom: 12px; text-shadow: 0 0 12px gold; }
     .custom-reward-input { width: 100%; padding: 8px; margin: 3px 0; border-radius: 16px; border: 1px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.85rem; text-align: center; outline: none; }
-    .footer { text-align: center; color: #b8945f; font-size: 0.65rem; margin-top: 8px; z-index: 1; position: relative; max-width: 650px; width: 100%; padding-bottom: 10px; }
-    .footer a { color: #d4af37; text-decoration: underline; cursor: pointer; margin: 0 6px; }
-    .footer a:hover { color: #ffd700; }
     .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
     .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
     .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: transform 0.2s; }
@@ -183,7 +180,6 @@
       animation: winCardAppear 0.3s ease-out;
     }
     #supportModal:not(.hidden) { display: block; }
-    /* Анимированные сообщения на экране регистрации */
     .floating-message {
       position: fixed;
       z-index: 190;
@@ -276,11 +272,6 @@
         <div class="middle-buttons"><button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button></div>
         <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
       </div>
-    </div>
-
-    <div class="footer">
-      <a id="privacyPolicyLink">Политика конфиденциальности</a> |
-      <a id="termsOfUseLink">Условия использования</a>
     </div>
   </div>
 
@@ -401,15 +392,9 @@
       };
 
       const TRANSLATIONS = {
-        ru: { loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История', menu18:'🔞 18+', menuHome:'🏠 Для Дома', menuParty:'🎉 Для Вечеринки', menuYoung:'💑 Молодая Пара', menuFamily:'👨‍👩‍👧 Семейная Пара', menuFriends:'👫 Для Друзей', diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ', nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена', paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов', customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ', jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', privacyLink:'Политика конфиденциальности', termsLink:'Условия использования', notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎', logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша', supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов', supportGreeting:'👋 Здравствуйте! Чем могу помочь?' },
-        ua: { loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія', menu18:'🔞 18+', menuHome:'🏠 Для Дому', menuParty:'🎉 Для Вечірки', menuYoung:'💑 Молода Пара', menuFamily:'👨‍👩‍👧 Сімейна Пара', menuFriends:'👫 Для Друзів', diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ', nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати', paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів', customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ', jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', privacyLink:'Політика конфіденційності', termsLink:'Умови використання', notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎', logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу', supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів', supportGreeting:'👋 Здравствуйте! Чим можу допомогти?' },
-        en: { loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History', menu18:'🔞 18+', menuHome:'🏠 For Home', menuParty:'🎉 For Party', menuYoung:'💑 Young Couple', menuFamily:'👨‍👩‍👧 Family Couple', menuFriends:'👫 For Friends', diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE', nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel', paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet', customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE', jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', privacyLink:'Privacy Policy', termsLink:'Terms of Use', notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎', logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details', supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet', supportGreeting:'👋 Hello! How can I help you?' }
-      };
-
-      const POLICIES = {
-        ru: { privacy: 'Политика конфиденциальности: 1. Мы используем Google аккаунт для входа. 2. Игровые данные хранятся в Supabase. 3. Мы не передаем данные третьим лицам.', terms: 'Условия использования: 1. Игра предназначена для развлекательных целей. 2. Администрация оставляет за собой право изменять правила.' },
-        ua: { privacy: 'Політика конфіденційності: 1. Використовуємо Google для входу. 2. Дані зберігаються в Supabase.', terms: 'Умови використання: 1. Гра для розваг. 2. Адміністрація може змінювати правила.' },
-        en: { privacy: 'Privacy Policy: 1. We use Google for login. 2. Game data is stored in Supabase. 3. We do not share data with third parties.', terms: 'Terms of Use: 1. Game is for entertainment purposes. 2. Administration reserves the right to change the rules.' }
+        ru: { loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История', menu18:'🔞 18+', menuHome:'🏠 Для Дома', menuParty:'🎉 Для Вечеринки', menuYoung:'💑 Молодая Пара', menuFamily:'👨‍👩‍👧 Семейная Пара', menuFriends:'👫 Для Друзей', diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ', nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена', paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов', customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ', jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎', logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша', supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов', supportGreeting:'👋 Здравствуйте! Чем могу помочь?' },
+        ua: { loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія', menu18:'🔞 18+', menuHome:'🏠 Для Дому', menuParty:'🎉 Для Вечірки', menuYoung:'💑 Молода Пара', menuFamily:'👨‍👩‍👧 Сімейна Пара', menuFriends:'👫 Для Друзів', diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ', nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати', paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів', customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ', jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎', logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу', supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів', supportGreeting:'👋 Здравствуйте! Чим можу допомогти?' },
+        en: { loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History', menu18:'🔞 18+', menuHome:'🏠 For Home', menuParty:'🎉 For Party', menuYoung:'💑 Young Couple', menuFamily:'👨‍👩‍👧 Family Couple', menuFriends:'👫 For Friends', diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE', nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel', paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet', customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE', jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎', logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details', supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet', supportGreeting:'👋 Hello! How can I help you?' }
       };
 
       let currentLanguage = 'ru';
@@ -896,8 +881,6 @@
         $('closeJackpotPrizesBtn').textContent = t('closeBtn');
         $('closeWinDetailBtn').textContent = t('closeBtn');
         $('winningsBtn').textContent = t('winningsBtn');
-        $('privacyPolicyLink').textContent = t('privacyLink');
-        $('termsOfUseLink').textContent = t('termsLink');
         $('supportTitle').textContent = t('supportTitle');
         $('chatInput').placeholder = t('supportPlaceholder');
         $('sendChatBtn').textContent = t('sendBtn');
@@ -1006,11 +989,6 @@
         $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
         $('chatInput').value = '';
         saveSupportMessage();
-      }
-
-      function showPolicy(type) {
-        var policies = POLICIES[currentLanguage] || POLICIES.ru;
-        alert(type === 'privacy' ? policies.privacy : policies.terms);
       }
 
       function setLanguage(lang) {
@@ -1228,8 +1206,6 @@
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
       $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
-      $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
-      $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
       $('langRuOuter').addEventListener('click', function() { setLanguage('ru'); });
       $('langUaOuter').addEventListener('click', function() { setLanguage('ua'); });
       $('langEnOuter').addEventListener('click', function() { setLanguage('en'); });
