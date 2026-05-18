@@ -56,24 +56,46 @@ class GameAPI {
         return (data && data.length > 0) ? data[0] : null;
     }
 
+    // ✅ НОВАЯ ФУНКЦИЯ: обновление никнейма
+    async updateNickname(uid, newNickname) {
+        // Проверяем, не занят ли никнейм другим пользователем
+        const { data: existing } = await this._fetch(
+            `users?nickname=eq.${encodeURIComponent(newNickname)}&user_uid=neq.${encodeURIComponent(uid)}&limit=1`
+        );
+        const existingCheck = Array.isArray(existing) ? existing : (existing ? [existing] : []);
+        if (existingCheck.length > 0) return 'taken';
+
+        // Обновляем никнейм в базе данных
+        const result = await this._fetch(`users?user_uid=eq.${encodeURIComponent(uid)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                nickname: newNickname
+            })
+        });
+
+        if (!result) return false;
+        return true;
+    }
+
     async registerOrLogin(googleProfile) {
         const { googleId, email, name, picture } = googleProfile;
         
         let user = await this.findUserByGoogleId(googleId);
         
         if (user) {
+            // Обновляем время входа, email, аватар. НЕ трогаем никнейм — он уже есть в базе.
             await this._fetch(`users?user_uid=eq.${user.user_uid}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
                     last_login: new Date().toISOString(),
                     email: email,
-                    nickname: user.nickname || name,
                     picture: picture
                 })
             });
             
             await this.logOnline(user.user_uid, user.nickname || name, 'login');
             
+            // ✅ ВОЗВРАЩАЕМ НИКНЕЙМ ИЗ БАЗЫ (user.nickname), а не из Google
             return {
                 success: true,
                 user_uid: user.user_uid,
@@ -88,6 +110,7 @@ class GameAPI {
             };
         }
 
+        // Создаём нового пользователя
         let uid;
         let existing;
         do {
