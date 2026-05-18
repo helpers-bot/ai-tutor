@@ -125,7 +125,6 @@
     .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: transform 0.2s; }
     .support-btn:hover { transform: scale(1.1); }
     .support-btn:active { transform: scale(0.95); }
-    /* убираем постоянную анимацию */
     .support-btn.unread { animation: supportPulse 2s ease-in-out infinite; }
     @keyframes supportPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,215,0,0.9), 0 10px 25px rgba(0,0,0,0.7); } }
     .support-badge { position: absolute; top: -4px; right: -4px; background: #ff4444; color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: bold; }
@@ -140,7 +139,6 @@
     .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; background: #fff; color: #333; border: none; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin: 8px 0; transition: all 0.2s; }
     .google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
     .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
-    /* Crypto Payment Styles */
     .crypto-payment-card { max-width: 550px; width: 95vw; padding: 20px; }
     .crypto-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; justify-content: center; }
     .crypto-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 10px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
@@ -158,7 +156,6 @@
     .copied-msg { color: #44ff44; font-size: 0.7rem; margin-top: 4px; }
     .wallet-address { background: #1a1030; border-radius: 12px; padding: 8px 12px; word-break: break-all; font-size: 0.75rem; color: #ddd; margin: 6px 0; }
     .pay-btn { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; color: #000; font-weight: bold; padding: 12px; border-radius: 30px; width: 100%; cursor: pointer; font-size: 1rem; margin-top: 8px; }
-    /* Profile Modal */
     .profile-modal-card { max-width: 450px; width: 90vw; animation: profileSlideIn 0.4s ease-out; }
     @keyframes profileSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     .profile-info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.2); color: #f0dbb0; font-size: 0.9rem; }
@@ -167,7 +164,6 @@
     .profile-nickname-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
     .profile-nickname-row input { flex: 1; }
     .profile-nickname-row button { padding: 8px 16px; background: #d4af37; color: #150a1f; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
-    /* support modal positioned above button */
     #supportModal {
       position: fixed;
       bottom: 80px;
@@ -175,7 +171,7 @@
       width: auto;
       max-width: 350px;
       z-index: 160;
-      display: none; /* скрыто по умолчанию, покажем через classList */
+      display: none;
       background: #1f1233;
       border: 3px solid #e4b429;
       border-radius: 44px;
@@ -287,7 +283,6 @@
   </div>
   <div id="policyModal" class="overlay hidden"><div class="win-card" style="max-width:500px;"><h3 style="color:#ffd966;" id="policyTitle">Политика конфиденциальности</h3><div class="policy-text" id="policyContent"></div><button id="closePolicyBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
 
-  <!-- CRYPTO PAYMENT MODAL -->
   <div id="cryptoPaymentModal" class="overlay hidden">
     <div class="win-card crypto-payment-card">
       <h3 style="color:#ffd700;margin-bottom:12px;">💎 Покупка алмазов</h3>
@@ -318,7 +313,6 @@
     </div>
   </div>
 
-  <!-- PROFILE MODAL -->
   <div id="profileModal" class="overlay hidden">
     <div class="win-card profile-modal-card">
       <h3 style="color:#ffd700;text-align:center;margin-bottom:16px;">👤 Профиль</h3>
@@ -424,8 +418,12 @@
       let supportMessages = [];
       let supportUnreadCount = 0;
       let supportPollingInterval = null;
+      let cryptoRates = {};
+      let selectedCrypto = 'USDT';
+      let selectedUSD = 1;
+      let selectedDiamonds = 100;
+      let rateInterval = null;
 
-      // ===== NOTIFICATION SOUND =====
       function playNotificationSound() {
         try {
           if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
@@ -441,7 +439,6 @@
         } catch (e) {}
       }
 
-      // ===== SUPPORT BADGE =====
       function updateSupportBadge() {
         const badge = $('supportBadge');
         const btn = $('supportBtn');
@@ -477,7 +474,6 @@
         }, 10000);
       }
 
-      // ===== CRYPTO PAYMENT =====
       const WALLETS = {
         USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
         TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
@@ -485,12 +481,6 @@
         ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
         BTC: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f'
       };
-
-      let cryptoRates = {};
-      let selectedCrypto = 'USDT';
-      let selectedUSD = 1;
-      let selectedDiamonds = 100;
-      let rateInterval = null;
 
       async function loadCryptoRates() {
         const rates = await API.getCryptoRates();
@@ -522,10 +512,10 @@
       async function openCryptoPayment() {
         if (!userData) return;
         $('cryptoPaymentModal').classList.remove('hidden');
-        loadCryptoRates();
+        updateRateDisplay();
+        updateQRAndAddress();
         if (rateInterval) clearInterval(rateInterval);
         rateInterval = setInterval(loadCryptoRates, 30000);
-        updateQRAndAddress();
       }
 
       function updateQRAndAddress() {
@@ -563,7 +553,6 @@
         if (rateInterval) clearInterval(rateInterval);
       }
 
-      // ===== PROFILE =====
       function openProfile() {
         if (!userData) return;
         $('profileUID').textContent = userData.user_uid;
@@ -595,7 +584,6 @@
           nickname = newNick;
           userData.nickname = newNick;
           $('nicknameDisplay').textContent = newNick;
-          // Сохраняем никнейм и в localStorage
           localStorage.setItem('wdVdsNickname', newNick);
           $('profileMsg').textContent = 'Никнейм изменён!';
           setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
@@ -643,6 +631,7 @@
         loadJackpotFeedData();
         loadSupportHistory();
         startSupportPolling();
+        loadCryptoRates();
       }
 
       async function logout() {
@@ -1090,7 +1079,6 @@
 
       async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
 
-      // Event listeners
       $('logoutBtn').addEventListener('click', logout);
       $('mainTopUpBtn').addEventListener('click', function() { openCryptoPayment(); });
       document.querySelectorAll('.thread-btn[data-mode]').forEach(function(b) { b.addEventListener('click', function() { useCustomRewards = false; currentMode = this.dataset.mode; enterSlot(); }); });
@@ -1133,7 +1121,6 @@
       $('langUaOuter').addEventListener('click', function() { setLanguage('ua'); });
       $('langEnOuter').addEventListener('click', function() { setLanguage('en'); });
 
-      // Crypto payment events
       $('diamondAmounts').addEventListener('click', function(e) { var opt = e.target.closest('.diamond-amount-option'); if (!opt) return; document.querySelectorAll('.diamond-amount-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedUSD = parseFloat(opt.dataset.usd); selectedDiamonds = parseInt(opt.dataset.diamonds); updateRateDisplay(); updateQRAndAddress(); });
       $('cryptoList').addEventListener('click', function(e) { var opt = e.target.closest('.crypto-option'); if (!opt) return; document.querySelectorAll('.crypto-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedCrypto = opt.dataset.currency; updateRateDisplay(); updateQRAndAddress(); });
       $('copyAddressBtn').addEventListener('click', function() { var addr = ($('walletAddress').textContent || '').replace(/.*:\s*/, '').trim(); navigator.clipboard.writeText(addr).then(function() { $('copiedMsg').classList.remove('hidden'); setTimeout(function() { $('copiedMsg').classList.add('hidden'); }, 2000); }); });
@@ -1141,11 +1128,9 @@
       $('closeCryptoPaymentBtn').addEventListener('click', function() { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); });
       $('cryptoPaymentModal').addEventListener('click', function(e) { if (e.target === $('cryptoPaymentModal')) { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); } });
 
-      // Profile events
       $('closeProfileBtn').addEventListener('click', function() { $('profileModal').classList.add('hidden'); });
       $('profileModal').addEventListener('click', function(e) { if (e.target === $('profileModal')) $('profileModal').classList.add('hidden'); });
 
-      // Overlay close для всех, кроме supportModal (теперь он без overlay)
       [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('policyModal'), $('winningsModal'), $('cryptoPaymentModal'), $('profileModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
       setLanguage('ru');
@@ -1153,7 +1138,6 @@
       $('mainMenu').classList.add('hidden');
       $('slotUI').classList.add('hidden');
       $('authOverlay').classList.remove('hidden');
-      // начальное состояние кнопки поддержки без мигания
       updateSupportBadge();
     })();
   </script>
