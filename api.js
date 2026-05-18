@@ -344,7 +344,7 @@ class GameAPI {
         return true;
     }
 
-    // ===== CRYPTO DONATIONS (BINANCE PAY) =====
+    // ===== CRYPTO DONATIONS =====
     async createCryptoDonation(donationData) {
         return await this._fetch('crypto_donations', {
             method: 'POST',
@@ -429,7 +429,13 @@ class GameAPI {
 
     // ===== ПРОМОКОДЫ =====
     async createPromoCode(promoData) {
-        return await this._fetch('promo_codes', {
+        // Сначала проверяем, существует ли уже такой код
+        const existing = await this._fetch(`promo_codes?code=eq.${encodeURIComponent(promoData.code)}&limit=1`);
+        if (existing && existing.length > 0) {
+            return { error: 'exists' };
+        }
+
+        const result = await this._fetch('promo_codes', {
             method: 'POST',
             body: JSON.stringify({
                 code: promoData.code,
@@ -442,6 +448,16 @@ class GameAPI {
                 expires_at: promoData.expires_at || null
             })
         });
+
+        return result;
+    }
+
+    async updatePromoCode(code, updateData) {
+        const result = await this._fetch(`promo_codes?code=eq.${encodeURIComponent(code)}`, {
+            method: 'PATCH',
+            body: JSON.stringify(updateData)
+        });
+        return !!result;
     }
 
     async getAllPromoCodes() {
@@ -515,11 +531,12 @@ class GameAPI {
         });
 
         // Увеличиваем счётчик использований
+        const newUses = promo.current_uses + 1;
         await this._fetch(`promo_codes?code=eq.${encodeURIComponent(code)}`, {
             method: 'PATCH',
             body: JSON.stringify({
-                current_uses: promo.current_uses + 1,
-                is_active: (promo.current_uses + 1) < promo.max_uses
+                current_uses: newUses,
+                is_active: newUses < promo.max_uses
             })
         });
 
@@ -539,7 +556,7 @@ class GameAPI {
         return true;
     }
 
-    // ===== КУРСЫ КРИПТОВАЛЮТ (BINANCE PUBLIC API) =====
+    // ===== КУРСЫ КРИПТОВАЛЮТ =====
     async getCryptoRates() {
         try {
             const response = await fetch('https://api.binance.com/api/v3/ticker/price');
