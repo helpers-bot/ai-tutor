@@ -484,7 +484,18 @@
 
       async function loadCryptoRates() {
         const rates = await API.getCryptoRates();
-        if (rates) { cryptoRates = rates; updateRateDisplay(); }
+        if (rates) { 
+          cryptoRates = rates; 
+          // ✅ ДОБАВЛЯЕМ ФИКСИРОВАННЫЙ КУРС USDT = 1
+          if (!cryptoRates['USDT']) {
+            cryptoRates['USDT'] = {
+              symbol: 'USDTUSDT',
+              price_usd: 1.00,
+              last_update: new Date().toISOString()
+            };
+          }
+          updateRateDisplay(); 
+        }
       }
 
       function updateRateDisplay() {
@@ -512,6 +523,8 @@
       async function openCryptoPayment() {
         if (!userData) return;
         $('cryptoPaymentModal').classList.remove('hidden');
+        // ✅ ЗАГРУЖАЕМ КУРСЫ ПРИ ОТКРЫТИИ ОКНА ОПЛАТЫ
+        loadCryptoRates();
         updateRateDisplay();
         updateQRAndAddress();
         if (rateInterval) clearInterval(rateInterval);
