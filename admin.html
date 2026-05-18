@@ -45,6 +45,10 @@
         .reply-box input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.85rem; }
         .reply-box button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .unread-badge { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 6px; }
+        .promo-form { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; margin: 12px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .promo-form label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 4px; }
+        .promo-form input, .promo-form select { padding: 10px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.9rem; }
+        .promo-form button { padding: 10px 20px; background: #d4af37; border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -76,6 +80,7 @@
                 <button class="tab-btn" onclick="switchTab('support')">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
                 <button class="tab-btn" onclick="switchTab('jackpots')">🎰 Джекпоты</button>
                 <button class="tab-btn" onclick="switchTab('transactions')">💳 Транзакции</button>
+                <button class="tab-btn" onclick="switchTab('promo')">🎫 Промокоды</button>
                 <button class="tab-btn" onclick="switchTab('stats')">📊 Статистика</button>
             </div>
 
@@ -113,6 +118,20 @@
             <div id="tab-transactions" class="tab-content">
                 <h2>💳 Последние транзакции</h2>
                 <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead><tbody id="transactionsTable"></tbody></table>
+            </div>
+
+            <div id="tab-promo" class="tab-content">
+                <h2>🎫 Создать промокод</h2>
+                <div class="promo-form">
+                    <div><label>Код (оставьте пустым для автогенерации)</label><input type="text" id="promoCode" placeholder="например: WELCOME20" maxlength="20"></div>
+                    <div><label>Тип</label><select id="promoType"><option value="spins">Фриспины</option><option value="diamonds">Алмазы</option></select></div>
+                    <div><label>Количество</label><input type="number" id="promoAmount" value="10" min="1"></div>
+                    <div><label>Макс. использований</label><input type="number" id="promoMaxUses" value="1" min="1"></div>
+                    <div><label>Действует до</label><input type="datetime-local" id="promoExpires"></div>
+                    <button onclick="createPromoCode()">🎫 Создать</button>
+                </div>
+                <h2>📋 Все промокоды</h2>
+                <table><thead><tr><th>Код</th><th>Тип</th><th>Количество</th><th>Использовано</th><th>Лимит</th><th>Активен</th><th>Создан</th><th>Действия</th></tr></thead><tbody id="promoTable"></tbody></table>
             </div>
 
             <div id="tab-stats" class="tab-content">
@@ -164,11 +183,12 @@
             if (name === 'support') loadSupportChats();
             if (name === 'jackpots') loadJackpots();
             if (name === 'transactions') loadTransactions();
+            if (name === 'promo') loadPromoCodes();
             if (name === 'stats') loadStatsTab();
         }
 
         async function loadAllData() {
-            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions()]);
+            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions(), loadPromoCodes()]);
         }
 
         async function loadStats() {
@@ -259,6 +279,72 @@
             const result = await API.removeDiamonds(uid, amount, 'admin');
             if (result.success) { showSuccess('-' + amount + '💎 → ' + uid); loadAllData(); }
             else showError(result.error);
+        }
+
+        // ===== ПРОМОКОДЫ =====
+        async function createPromoCode() {
+            let code = document.getElementById('promoCode').value.trim();
+            const type = document.getElementById('promoType').value;
+            const amount = parseInt(document.getElementById('promoAmount').value);
+            const maxUses = parseInt(document.getElementById('promoMaxUses').value);
+            const expires = document.getElementById('promoExpires').value;
+
+            if (!amount || amount <= 0) { showError('Введите количество'); return; }
+            if (!maxUses || maxUses < 1) { showError('Введите лимит использований'); return; }
+
+            // Автогенерация кода
+            if (!code) {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                code = '';
+                for (let i = 0; i < 10; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+
+            const result = await API.createPromoCode({
+                code: code.toUpperCase(),
+                type,
+                amount,
+                max_uses: maxUses,
+                expires_at: expires || null
+            });
+
+            if (result) {
+                showSuccess('Промокод ' + code + ' создан!');
+                document.getElementById('promoCode').value = '';
+                document.getElementById('promoAmount').value = '10';
+                document.getElementById('promoMaxUses').value = '1';
+                document.getElementById('promoExpires').value = '';
+                loadPromoCodes();
+            } else {
+                showError('Ошибка создания промокода (возможно, такой код уже существует)');
+            }
+        }
+
+        async function loadPromoCodes() {
+            try {
+                const promos = await API.getAllPromoCodes();
+                const html = promos.map(p =>
+                    '<tr>' +
+                    '<td><strong>' + p.code + '</strong></td>' +
+                    '<td>' + (p.type === 'spins' ? '🎰 Фриспины' : '💎 Алмазы') + '</td>' +
+                    '<td>' + p.amount + '</td>' +
+                    '<td>' + p.current_uses + '</td>' +
+                    '<td>' + p.max_uses + '</td>' +
+                    '<td>' + (p.is_active ? '✅' : '❌') + '</td>' +
+                    '<td>' + (p.created_at ? new Date(p.created_at).toLocaleString() : '-') + '</td>' +
+                    '<td><button class="btn-remove" onclick="deletePromoCode(\'' + p.code + '\')">🗑</button></td>' +
+                    '</tr>'
+                ).join('') || '<tr><td colspan="8">Нет промокодов</td></tr>';
+                document.getElementById('promoTable').innerHTML = html;
+            } catch (e) {
+                console.error('Load promos error:', e);
+            }
+        }
+
+        async function deletePromoCode(code) {
+            if (!confirm('Удалить промокод ' + code + '?')) return;
+            await API.deletePromoCode(code);
+            showSuccess('Промокод ' + code + ' удалён');
+            loadPromoCodes();
         }
 
         async function loadSupportChats() {
