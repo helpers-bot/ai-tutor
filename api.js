@@ -56,21 +56,15 @@ class GameAPI {
         return (data && data.length > 0) ? data[0] : null;
     }
 
-    // ✅ НОВАЯ ФУНКЦИЯ: обновление никнейма
     async updateNickname(uid, newNickname) {
-        // Проверяем, не занят ли никнейм другим пользователем
-        const { data: existing } = await this._fetch(
+        const existing = await this._fetch(
             `users?nickname=eq.${encodeURIComponent(newNickname)}&user_uid=neq.${encodeURIComponent(uid)}&limit=1`
         );
-        const existingCheck = Array.isArray(existing) ? existing : (existing ? [existing] : []);
-        if (existingCheck.length > 0) return 'taken';
+        if (existing && existing.length > 0) return 'taken';
 
-        // Обновляем никнейм в базе данных
         const result = await this._fetch(`users?user_uid=eq.${encodeURIComponent(uid)}`, {
             method: 'PATCH',
-            body: JSON.stringify({
-                nickname: newNickname
-            })
+            body: JSON.stringify({ nickname: newNickname })
         });
 
         if (!result) return false;
@@ -83,7 +77,6 @@ class GameAPI {
         let user = await this.findUserByGoogleId(googleId);
         
         if (user) {
-            // Обновляем время входа, email, аватар. НЕ трогаем никнейм — он уже есть в базе.
             await this._fetch(`users?user_uid=eq.${user.user_uid}`, {
                 method: 'PATCH',
                 body: JSON.stringify({
@@ -95,7 +88,6 @@ class GameAPI {
             
             await this.logOnline(user.user_uid, user.nickname || name, 'login');
             
-            // ✅ ВОЗВРАЩАЕМ НИКНЕЙМ ИЗ БАЗЫ (user.nickname), а не из Google
             return {
                 success: true,
                 user_uid: user.user_uid,
@@ -110,7 +102,6 @@ class GameAPI {
             };
         }
 
-        // Создаём нового пользователя
         let uid;
         let existing;
         do {
@@ -407,7 +398,6 @@ class GameAPI {
         const don = donation[0];
         if (don.status === 'completed') return { success: false, error: 'Уже выполнен' };
 
-        // Начисляем алмазы
         const user = await this.findUserByUID(don.user_uid);
         if (!user) return { success: false, error: 'Пользователь не найден' };
 
@@ -417,7 +407,6 @@ class GameAPI {
             body: JSON.stringify({ diamonds: newBalance })
         });
 
-        // Записываем транзакцию
         await this._saveTransaction(
             don.user_uid,
             don.nickname || user.nickname || user.email,
@@ -427,7 +416,6 @@ class GameAPI {
             'crypto'
         );
 
-        // Обновляем статус доната
         await this._fetch(`crypto_donations?binance_order_id=eq.${encodeURIComponent(orderId)}`, {
             method: 'PATCH',
             body: JSON.stringify({
@@ -439,6 +427,118 @@ class GameAPI {
         return { success: true, new_balance: newBalance, diamonds_added: don.diamonds };
     }
 
+    // ===== ПРОМОКОДЫ =====
+    async createPromoCode(promoData) {
+        return await this._fetch('promo_codes', {
+            method: 'POST',
+            body: JSON.stringify({
+                code: promoData.code,
+                type: promoData.type,
+                amount: promoData.amount,
+                max_uses: promoData.max_uses || 1,
+                current_uses: 0,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                expires_at: promoData.expires_at || null
+            })
+        });
+    }
+
+    async getAllPromoCodes() {
+        const data = await this._fetch('promo_codes?order=created_at.desc&limit=100');
+        return data || [];
+    }
+
+    async redeemPromoCode(user_uid, code) {
+        // Находим промокод
+        const promos = await this._fetch(`promo_codes?code=eq.${encodeURIComponent(code)}&limit=1`);
+        if (!promos || promos.length === 0) return { success: false, error: 'Промокод не найден' };
+
+        const promo = promos[0];
+        
+        // Проверяем активность
+        if (!promo.is_active) return { success: false, error: 'Промокод не активен' };
+        
+        // Проверяем срок действия
+        if (promo.expires_at && new Date(promo.expires_at) < new Date()) {
+            return { success: false, error: 'Срок действия промокода истёк' };
+        }
+        
+        // Проверяем количество использований
+        if (promo.current_uses >= promo.max_uses) {
+            return { success: false, error: 'Промокод больше не действителен' };
+        }
+        
+        // Проверяем, не использовал ли уже этот пользователь
+        const existingUses = await this._fetch(
+            `promo_code_uses?code=eq.${encodeURIComponent(code)}&user_uid=eq.${encodeURIComponent(user_uid)}&limit=1`
+        );
+        if (existingUses && existingUses.length > 0) {
+            return { success: false, error: 'Вы уже использовали этот промокод' };
+        }
+
+        const user = await this.findUserByUID(user_uid);
+        if (!user) return { success: false, error: 'Пользователь не найден' };
+
+        // Начисляем бонус
+        if (promo.type === 'spins') {
+            const newSpins = (user.free_spins || 0) + promo.amount;
+            await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ free_spins: newSpins })
+            });
+        } else if (promo.type === 'diamonds') {
+            const newBalance = (user.diamonds || 0) + promo.amount;
+            await this._fetch(`users?user_uid=eq.${encodeURIComponent(user_uid)}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ diamonds: newBalance })
+            });
+            
+            await this._saveTransaction(
+                user_uid,
+                user.nickname || user.email,
+                promo.amount,
+                'add',
+                `Промокод: ${code}`,
+                'promo'
+            );
+        }
+
+        // Записываем использование
+        await this._fetch('promo_code_uses', {
+            method: 'POST',
+            body: JSON.stringify({
+                code: code,
+                user_uid: user_uid,
+                used_at: new Date().toISOString()
+            })
+        });
+
+        // Увеличиваем счётчик использований
+        await this._fetch(`promo_codes?code=eq.${encodeURIComponent(code)}`, {
+            method: 'PATCH',
+            body: JSON.stringify({
+                current_uses: promo.current_uses + 1,
+                is_active: (promo.current_uses + 1) < promo.max_uses
+            })
+        });
+
+        return {
+            success: true,
+            type: promo.type,
+            amount: promo.amount,
+            message: promo.type === 'spins' 
+                ? `+${promo.amount} бесплатных вращений!` 
+                : `+${promo.amount} 💎 алмазов!`
+        };
+    }
+
+    async deletePromoCode(code) {
+        await this._fetch(`promo_code_uses?code=eq.${encodeURIComponent(code)}`, { method: 'DELETE' });
+        await this._fetch(`promo_codes?code=eq.${encodeURIComponent(code)}`, { method: 'DELETE' });
+        return true;
+    }
+
     // ===== КУРСЫ КРИПТОВАЛЮТ (BINANCE PUBLIC API) =====
     async getCryptoRates() {
         try {
@@ -446,7 +546,6 @@ class GameAPI {
             if (!response.ok) return null;
             const data = await response.json();
             
-            // Фильтруем только USDT пары
             const usdtPairs = data.filter(p => p.symbol.endsWith('USDT'));
             const rates = {};
             
