@@ -41,7 +41,6 @@
     @keyframes nickGlow { 0% { text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b; } 100% { text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00; } }
     .profile-btn { background: rgba(212,175,55,0.3); border: 1px solid #d4af37; color: #ffd700; padding: 3px 10px; border-radius: 16px; font-weight: bold; font-size: 0.7rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
     .profile-btn:hover { background: rgba(212,175,55,0.5); }
-    .promo-btn { background: rgba(255,140,0,0.3); border: 1px solid #ff8c00; color: #ffaa00; padding: 3px 10px; border-radius: 16px; font-weight: bold; font-size: 0.7rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; margin-left: 4px; }
     .balance-display { font-weight: 900; font-size: 1rem; color: #ffd966; text-shadow: 0 0 10px #ffd700; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
     .top-up-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
     .spin-win-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 3rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; z-index: 300; pointer-events: none; opacity: 0; animation: none; }
@@ -118,6 +117,9 @@
     .diamond-option:hover { background: #3d2058; }
     .auth-title { color: #ffd700; font-size: 1.3rem; margin-bottom: 12px; text-shadow: 0 0 12px gold; }
     .custom-reward-input { width: 100%; padding: 8px; margin: 3px 0; border-radius: 16px; border: 1px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.85rem; text-align: center; outline: none; }
+    .footer { text-align: center; color: #b8945f; font-size: 0.65rem; margin-top: 8px; z-index: 1; position: relative; max-width: 650px; width: 100%; padding-bottom: 10px; }
+    .footer a { color: #d4af37; text-decoration: underline; cursor: pointer; margin: 0 6px; }
+    .footer a:hover { color: #ffd700; }
     .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
     .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
     .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: transform 0.2s; }
@@ -163,19 +165,43 @@
     .profile-nickname-row input { flex: 1; }
     .profile-nickname-row button { padding: 8px 16px; background: #d4af37; color: #150a1f; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
     #supportModal {
-      position: fixed; bottom: 80px; right: 16px; width: auto; max-width: 350px; z-index: 160;
-      display: none; background: #1f1233; border: 3px solid #e4b429; border-radius: 44px;
-      padding: 24px 18px; text-align: center; box-shadow: 0 0 60px gold; max-height: 80vh;
-      overflow-y: auto; animation: winCardAppear 0.3s ease-out;
+      position: fixed;
+      bottom: 80px;
+      right: 16px;
+      width: auto;
+      max-width: 350px;
+      z-index: 160;
+      display: none;
+      background: #1f1233;
+      border: 3px solid #e4b429;
+      border-radius: 44px;
+      padding: 24px 18px;
+      text-align: center;
+      box-shadow: 0 0 60px gold;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: winCardAppear 0.3s ease-out;
     }
     #supportModal:not(.hidden) { display: block; }
+    /* Анимированные сообщения на экране регистрации */
     .floating-message {
-      position: fixed; z-index: 190; pointer-events: none;
-      background: rgba(10,5,30,0.85); border: 2px solid transparent; border-radius: 20px;
-      padding: 12px 20px; max-width: 300px; text-align: center; font-size: 0.85rem;
-      font-weight: bold; color: #ffd966; box-shadow: 0 0 20px rgba(255,215,0,0.3);
-      animation: gradientBorder 3s linear infinite; backdrop-filter: blur(8px);
-      opacity: 1; transition: opacity 0.4s ease;
+      position: fixed;
+      z-index: 190;
+      pointer-events: none;
+      background: rgba(10,5,30,0.85);
+      border: 2px solid transparent;
+      border-radius: 20px;
+      padding: 12px 20px;
+      max-width: 300px;
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #ffd966;
+      box-shadow: 0 0 20px rgba(255,215,0,0.3);
+      animation: gradientBorder 3s linear infinite;
+      backdrop-filter: blur(8px);
+      opacity: 1;
+      transition: opacity 0.4s ease;
     }
     .floating-message.fade-out { opacity: 0; }
     @keyframes gradientBorder {
@@ -185,25 +211,64 @@
       75% { border-color: #ff1493; box-shadow: 0 0 25px rgba(255,20,147,0.5); }
       100% { border-color: #ffd700; box-shadow: 0 0 20px rgba(255,215,0,0.5); }
     }
-    .welcome-banner {
-      width: 92vw; max-width: 600px; margin: 100px auto 100px auto;
-      background: rgba(8,3,18,0.85); backdrop-filter: blur(20px);
-      border: 2px solid #d4af37; border-radius: 40px; padding: 30px 20px;
-      text-align: center; position: relative; z-index: 50; overflow: hidden;
-      box-shadow: 0 0 50px rgba(255,215,0,0.3);
+    /* Registration mini-game window */
+    #registrationWindow {
+      width: 90%;
+      max-width: 800px;
+      margin: 100px auto;
+      background: rgba(8,3,18,0.9);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 2px solid rgba(212,175,55,0.4);
+      border-radius: 48px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      position: relative;
+      z-index: 2;
     }
-    .welcome-banner h2 { color: #ffd700; font-size: 1.5rem; margin-bottom: 16px; }
-    .countdown-timer { font-size: 4rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700; margin: 16px 0; }
-    .interactive-gift { 
-      position: absolute; font-size: 2.5rem; cursor: pointer; z-index: 55;
-      transition: all 0.3s ease; pointer-events: auto;
-      filter: drop-shadow(0 0 10px gold);
+    #regCountdown {
+      font-size: 3rem;
+      color: #ffd700;
+      font-weight: 900;
+      text-shadow: 0 0 20px gold;
+      margin-bottom: 16px;
     }
-    .interactive-gift:hover { transform: scale(1.3); filter: drop-shadow(0 0 20px gold); }
-    .interactive-gift.exploding { animation: giftExplode 0.6s ease-out forwards !important; }
-    .interactive-gift.chosen { 
-      animation: giftShake 0.15s ease-in-out infinite !important;
-      z-index: 60; 
+    #regGiftsContainer {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+      margin: 12px 0;
+      border-radius: 24px;
+      background: rgba(0,0,0,0.2);
+    }
+    .reg-falling-gift {
+      position: absolute;
+      font-size: 1.8rem;
+      cursor: pointer;
+      animation: regGiftFall 2s linear forwards;
+      user-select: none;
+      pointer-events: auto;
+    }
+    @keyframes regGiftFall {
+      0% { top: -30px; opacity: 1; }
+      100% { top: calc(100% + 20px); opacity: 0; }
+    }
+    .reg-gift-explode {
+      animation: regExplode 0.4s ease-out forwards !important;
+    }
+    @keyframes regExplode {
+      0% { transform: scale(1); opacity:1; }
+      100% { transform: scale(0); opacity:0; }
+    }
+    .reg-gift-grow-shake {
+      animation: giftShake 0.15s ease-in-out infinite;
+      transform: scale(2);
+      transition: transform 0.3s;
     }
     @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
   </style>
@@ -228,21 +293,20 @@
     </div>
   </div>
 
-  <div id="app">
-    <div id="welcomeBanner" class="welcome-banner">
-      <h2>🎉 Добро пожаловать в VDS!</h2>
-      <p style="color:#ddd;font-size:0.9rem;">Мини-игра: собери свой бонус!</p>
-      <div class="countdown-timer" id="countdownTimer">10</div>
-      <p style="color:#888;font-size:0.75rem;" id="countdownHint">Через 10 секунд появятся подарки!</p>
-      <div id="giftsContainer" style="position:relative; height:250px; margin-top:10px;"></div>
-    </div>
+  <!-- Registration mini-game window (visible when not logged in) -->
+  <div id="registrationWindow" class="hidden">
+    <div id="regCountdown">10</div>
+    <div id="regGiftsContainer"></div>
+    <p id="regMessage" style="color:#ffd966;font-size:1rem;text-align:center;margin-top:16px;"></p>
+  </div>
 
+  <div id="app">
     <div class="user-bar hidden-bar" id="userBar">
       <span style="display:flex;align-items:center;gap:8px;">
         <img class="user-avatar hidden" id="userAvatar" src="" alt="">
         <span class="nickname" id="nicknameDisplay">Игрок</span>
         <button class="profile-btn" id="profileBtn" onclick="openProfile()">👤 Профиль</button>
-        <button class="promo-btn" id="promoCodeBtn" onclick="openPromoCodeModal()">🎫 Промокод</button>
+        <button class="profile-btn" id="promoCodeBtn" onclick="openPromoCode()">🎟️ Промокод</button>
       </span>
       <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
     </div>
@@ -280,6 +344,11 @@
         <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
       </div>
     </div>
+
+    <div class="footer">
+      <a id="privacyPolicyLink">Политика конфиденциальности</a> |
+      <a id="termsOfUseLink">Условия использования</a>
+    </div>
   </div>
 
   <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
@@ -300,13 +369,14 @@
     <button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button>
   </div>
 
+  <!-- Promo code modal -->
   <div id="promoCodeModal" class="overlay hidden">
-    <div class="win-card" style="max-width:400px;">
-      <h3 style="color:#ffd700;margin-bottom:12px;">🎫 Ввести промокод</h3>
-      <input type="text" class="form-input" id="promoCodeInput" placeholder="Введите промокод" maxlength="20">
-      <button id="redeemPromoBtn" class="thread-btn" style="animation:none;margin-top:8px;width:100%;">🎁 Активировать</button>
+    <div class="win-card">
+      <h3 style="color:#ffd700;" id="promoCodeTitle">🎟️ Введите промокод</h3>
+      <input type="text" class="form-input" id="promoCodeInput" placeholder="WELCOME">
+      <button id="promoCodeSubmitBtn" class="thread-btn" style="margin-top:8px;">💾 Активировать</button>
       <p id="promoCodeMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;"></p>
-      <button id="closePromoCodeBtn" class="thread-btn" style="margin-top:8px;animation:none;width:100%;">ЗАКРЫТЬ</button>
+      <button id="closePromoCodeBtn" class="thread-btn" style="margin-top:6px;animation:none;">ЗАКРЫТЬ</button>
     </div>
   </div>
 
@@ -402,16 +472,6 @@
         'friends': { ru: ['Устрой вечеринку','Поиграй в настолки','Посмотри фильм вместе','Сходи в кафе','Поделись секретом'], ua: ['Влаштуй вечірку','Пограй у настолки','Подивись фільм разом','Сходи в кафе','Поділись секретом'], en: ['Throw a party','Play board games','Watch a movie together','Go to a cafe','Share a secret'] }
       };
 
-      const MODE_NAMES = {
-        'custom': { ru: 'Мои желания', ua: 'Мої бажання', en: 'My Wishes' },
-        '18+': { ru: '18+', ua: '18+', en: '18+' },
-        'home': { ru: 'Для Дома', ua: 'Для Дому', en: 'For Home' },
-        'party': { ru: 'Вечеринка', ua: 'Вечірка', en: 'Party' },
-        'young': { ru: 'Молодая Пара', ua: 'Молода Пара', en: 'Young Couple' },
-        'family': { ru: 'Семейная Пара', ua: 'Сімейна Пара', en: 'Family Couple' },
-        'friends': { ru: 'Для Друзей', ua: 'Для Друзів', en: 'For Friends' }
-      };
-
       const CERTIFICATE_TEXTS = {
         ru: { title: 'VDS СЕРТИФИКАТ ВЫИГРЫША', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' выиграл(а) для '+p+'!', official: 'ОФИЦИАЛЬНЫЙ ЧЕК • VDS' },
         ua: { title: 'VDS СЕРТИФІКАТ ВИГРАШУ', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' виграв(ла) для '+p+'!', official: 'ОФІЦІЙНИЙ ЧЕК • VDS' },
@@ -419,9 +479,15 @@
       };
 
       const TRANSLATIONS = {
-        ru: { loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История', menu18:'🔞 18+', menuHome:'🏠 Для Дома', menuParty:'🎉 Для Вечеринки', menuYoung:'💑 Молодая Пара', menuFamily:'👨‍👩‍👧 Семейная Пара', menuFriends:'👫 Для Друзей', diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ', nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена', paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов', customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ', jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎', logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша', supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов', supportGreeting:'👋 Здравствуйте! Чем могу помочь?' },
-        ua: { loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія', menu18:'🔞 18+', menuHome:'🏠 Для Дому', menuParty:'🎉 Для Вечірки', menuYoung:'💑 Молода Пара', menuFamily:'👨‍👩‍👧 Сімейна Пара', menuFriends:'👫 Для Друзів', diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ', nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати', paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів', customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ', jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎', logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу', supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів', supportGreeting:'👋 Здравствуйте! Чим можу допомогти?' },
-        en: { loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History', menu18:'🔞 18+', menuHome:'🏠 For Home', menuParty:'🎉 For Party', menuYoung:'💑 Young Couple', menuFamily:'👨‍👩‍👧 Family Couple', menuFriends:'👫 For Friends', diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE', nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel', paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet', customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE', jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎', logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details', supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet', supportGreeting:'👋 Hello! How can I help you?' }
+        ru: { loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История', menu18:'🔞 18+', menuHome:'🏠 Для Дома', menuParty:'🎉 Для Вечеринки', menuYoung:'💑 Молодая Пара', menuFamily:'👨‍👩‍👧 Семейная Пара', menuFriends:'👫 Для Друзей', diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ', nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена', paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов', customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ', jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', privacyLink:'Политика конфиденциальности', termsLink:'Условия использования', notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎', logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша', supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов', supportGreeting:'👋 Здравствуйте! Чем могу помочь?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введите промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активировать', promoCodeClose:'ЗАКРЫТЬ', promoCodeSuccess:'🎉 Промокод активирован! +20💎 и +5 бесплатных спинов', promoCodeAlready:'⏳ Этот промокод уже использован', promoCodeInvalid:'❌ Неверный промокод' },
+        ua: { loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія', menu18:'🔞 18+', menuHome:'🏠 Для Дому', menuParty:'🎉 Для Вечірки', menuYoung:'💑 Молода Пара', menuFamily:'👨‍👩‍👧 Сімейна Пара', menuFriends:'👫 Для Друзів', diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ', nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати', paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів', customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ', jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', privacyLink:'Політика конфіденційності', termsLink:'Умови використання', notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎', logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу', supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів', supportGreeting:'👋 Здравствуйте! Чим можу допомогти?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введіть промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активувати', promoCodeClose:'ЗАКРИТИ', promoCodeSuccess:'🎉 Промокод активовано! +20💎 та +5 безкоштовних спинів', promoCodeAlready:'⏳ Цей промокод вже використано', promoCodeInvalid:'❌ Невірний промокод' },
+        en: { loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History', menu18:'🔞 18+', menuHome:'🏠 For Home', menuParty:'🎉 For Party', menuYoung:'💑 Young Couple', menuFamily:'👨‍👩‍👧 Family Couple', menuFriends:'👫 For Friends', diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE', nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel', paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet', customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE', jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', privacyLink:'Privacy Policy', termsLink:'Terms of Use', notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎', logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details', supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet', supportGreeting:'👋 Hello! How can I help you?', promoCodeBtn:'🎟️ Promo Code', promoCodeTitle:'🎟️ Enter Promo Code', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Activate', promoCodeClose:'CLOSE', promoCodeSuccess:'🎉 Promo code activated! +20💎 and +5 free spins', promoCodeAlready:'⏳ This promo code has already been used', promoCodeInvalid:'❌ Invalid promo code' }
+      };
+
+      const POLICIES = {
+        ru: { privacy: 'Политика конфиденциальности: 1. Мы используем Google аккаунт для входа. 2. Игровые данные хранятся в Supabase. 3. Мы не передаем данные третьим лицам.', terms: 'Условия использования: 1. Игра предназначена для развлекательных целей. 2. Администрация оставляет за собой право изменять правила.' },
+        ua: { privacy: 'Політика конфіденційності: 1. Використовуємо Google для входу. 2. Дані зберігаються в Supabase.', terms: 'Умови використання: 1. Гра для розваг. 2. Адміністрація може змінювати правила.' },
+        en: { privacy: 'Privacy Policy: 1. We use Google for login. 2. Game data is stored in Supabase. 3. We do not share data with third parties.', terms: 'Terms of Use: 1. Game is for entertainment purposes. 2. Administration reserves the right to change the rules.' }
       };
 
       let currentLanguage = 'ru';
@@ -457,9 +523,10 @@
       let floatingMessageEl = null;
       let floatingTimeout = null;
       let currentMessageIndex = 0;
-      let countdownInterval = null;
-      let countdownSeconds = 10;
-      let giftGameActive = false;
+      let regGameActive = false;
+      let regGameOver = false;
+      let regCountdownInterval = null;
+      let regGiftCreationInterval = null;
 
       const PROMO_MESSAGES = [
         "20 БЕСПЛАТНЫХ прокрутов после регистрации",
@@ -469,78 +536,6 @@
         "Крути! Выигрывай! Получай сертификат на твою мечту",
         "Хочешь с второй половинкой в конкретное место пойти? Намекни выигрывая джек пот"
       ];
-
-      // ===== МИНИ-ИГРА С ПОДАРКАМИ =====
-      function startWelcomeGame() {
-        if (userData) return;
-        $('welcomeBanner').classList.remove('hidden');
-        $('countdownTimer').textContent = '10';
-        $('countdownHint').textContent = 'Через 10 секунд появятся подарки!';
-        $('giftsContainer').innerHTML = '';
-        countdownSeconds = 10;
-        giftGameActive = true;
-        
-        if (countdownInterval) clearInterval(countdownInterval);
-        countdownInterval = setInterval(() => {
-          countdownSeconds--;
-          $('countdownTimer').textContent = countdownSeconds;
-          if (countdownSeconds <= 3 && countdownSeconds > 0) {
-            $('countdownTimer').style.color = '#ff4444';
-          }
-          if (countdownSeconds <= 0) {
-            clearInterval(countdownInterval);
-            $('countdownTimer').textContent = '🎉';
-            $('countdownTimer').style.color = '#ffd700';
-            $('countdownHint').textContent = 'Нажми на один из подарков!';
-            spawnWelcomeGifts();
-          }
-        }, 1000);
-      }
-
-      function spawnWelcomeGifts() {
-        const container = $('giftsContainer');
-        const giftTypes = ['🎁', '🎀', '💝', '🎊', '🎉', '✨', '💎', '🌟', '🎈', '🎪', '🎁', '🎀', '💝', '🎊', '🎉', '✨', '💎', '🌟', '🎈', '🎪'];
-        
-        for (let i = 0; i < 20; i++) {
-          const gift = document.createElement('span');
-          gift.className = 'interactive-gift';
-          gift.textContent = giftTypes[i];
-          gift.style.left = (5 + Math.random() * 75) + '%';
-          gift.style.top = (5 + Math.random() * 60) + '%';
-          gift.addEventListener('click', function(e) { chooseGift(gift, container); });
-          container.appendChild(gift);
-        }
-      }
-
-      function chooseGift(chosenGift, container) {
-        if (!giftGameActive) return;
-        giftGameActive = false;
-        
-        const allGifts = container.querySelectorAll('.interactive-gift');
-        allGifts.forEach(g => {
-          if (g !== chosenGift) {
-            g.classList.add('exploding');
-            setTimeout(() => g.remove(), 600);
-          }
-        });
-        
-        chosenGift.classList.add('chosen');
-        chosenGift.style.fontSize = '5rem';
-        chosenGift.style.left = '50%';
-        chosenGift.style.top = '50%';
-        chosenGift.style.transform = 'translate(-50%, -50%)';
-        $('countdownHint').textContent = '🎉 Вы получили бонус-код: WELCOME';
-        
-        setTimeout(() => {
-          chosenGift.classList.add('gift-explosion');
-          chosenGift.classList.remove('chosen');
-          setTimeout(() => {
-            chosenGift.remove();
-            $('countdownHint').innerHTML = '🎫 Ваш бонус-код: <strong>WELCOME</strong><br>Введите его в поле "Промокод" в главном меню!';
-            $('countdownTimer').textContent = '✅';
-          }, 600);
-        }, 5000);
-      }
 
       function showNextFloatingMessage() {
         if (userData) return;
@@ -578,7 +573,9 @@
             charIndex++;
           } else {
             clearInterval(typeInterval);
-            floatingTimeout = setTimeout(() => { showNextFloatingMessage(); }, 5000);
+            floatingTimeout = setTimeout(() => {
+              showNextFloatingMessage();
+            }, 5000);
           }
         }, 40);
       }
@@ -594,7 +591,8 @@
       function stopFloatingMessages() {
         if (floatingTimeout) clearTimeout(floatingTimeout);
         document.querySelectorAll('.floating-message').forEach(el => {
-          el.style.opacity = '0'; el.style.transition = 'opacity 0.5s';
+          el.style.opacity = '0';
+          el.style.transition = 'opacity 0.5s';
           setTimeout(() => el.remove(), 500);
         });
         floatingMessageEl = null;
@@ -603,8 +601,10 @@
       function playNotificationSound() {
         try {
           if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-          const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-          o.type = 'sine'; o.frequency.setValueAtTime(800, audioCtx.currentTime);
+          const o = audioCtx.createOscillator();
+          const g = audioCtx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(800, audioCtx.currentTime);
           o.frequency.setValueAtTime(1000, audioCtx.currentTime + 0.1);
           g.gain.setValueAtTime(0.08, audioCtx.currentTime);
           g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
@@ -614,12 +614,17 @@
       }
 
       function updateSupportBadge() {
-        const badge = $('supportBadge'); const btn = $('supportBtn');
+        const badge = $('supportBadge');
+        const btn = $('supportBtn');
         if (!badge || !btn) return;
         if (supportUnreadCount > 0) {
           badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount;
-          badge.classList.remove('hidden'); btn.classList.add('unread');
-        } else { badge.classList.add('hidden'); btn.classList.remove('unread'); }
+          badge.classList.remove('hidden');
+          btn.classList.add('unread');
+        } else {
+          badge.classList.add('hidden');
+          btn.classList.remove('unread');
+        }
       }
 
       function startSupportPolling() {
@@ -627,46 +632,73 @@
         supportPollingInterval = setInterval(async () => {
           if (!userData) return;
           try {
-            const chats = await API.getSupportChats(); const uid = userData.user_uid;
+            const chats = await API.getSupportChats();
+            const uid = userData.user_uid;
             if (chats[uid] && chats[uid].messages) {
-              const oldCount = supportMessages.length; supportMessages = chats[uid].messages;
+              const oldCount = supportMessages.length;
+              supportMessages = chats[uid].messages;
               const newAdminMessages = supportMessages.filter((m, i) => m.from === 'admin' && i >= oldCount && !m.read);
-              if (newAdminMessages.length > 0) { supportUnreadCount += newAdminMessages.length; updateSupportBadge(); playNotificationSound(); }
+              if (newAdminMessages.length > 0) {
+                supportUnreadCount += newAdminMessages.length;
+                updateSupportBadge();
+                playNotificationSound();
+              }
             }
           } catch (e) {}
         }, 10000);
       }
 
       const WALLETS = {
-        USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam', TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
-        BNB: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f', ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
+        USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
+        TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
+        BNB: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
+        ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
         BTC: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f'
       };
 
       async function loadCryptoRates() {
         const rates = await API.getCryptoRates();
-        if (rates) { cryptoRates = rates; if (!cryptoRates['USDT']) { cryptoRates['USDT'] = { symbol: 'USDTUSDT', price_usd: 1.00, last_update: new Date().toISOString() }; } updateRateDisplay(); }
+        if (rates) { 
+          cryptoRates = rates; 
+          if (!cryptoRates['USDT']) {
+            cryptoRates['USDT'] = {
+              symbol: 'USDTUSDT',
+              price_usd: 1.00,
+              last_update: new Date().toISOString()
+            };
+          }
+          updateRateDisplay(); 
+        }
       }
 
       function updateRateDisplay() {
         const rate = cryptoRates[selectedCrypto];
-        if (rate) { const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8); $('rateDisplay').textContent = `1 ${selectedCrypto} ≈ $${rate.price_usd.toFixed(2)} | К отправке: ${cryptoAmount} ${selectedCrypto}`; }
-        else { $('rateDisplay').textContent = 'Курс загружается...'; }
+        if (rate) {
+          const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8);
+          $('rateDisplay').textContent = `1 ${selectedCrypto} ≈ $${rate.price_usd.toFixed(2)} | К отправке: ${cryptoAmount} ${selectedCrypto}`;
+        } else {
+          $('rateDisplay').textContent = 'Курс загружается...';
+        }
       }
 
       function generateQRCode(text) {
-        const container = $('qrContainer'); container.innerHTML = '';
+        const container = $('qrContainer');
+        container.innerHTML = '';
         if (!text) return;
         const img = document.createElement('img');
         img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}`;
-        img.style.borderRadius = '12px'; img.style.border = '2px solid #d4af37';
+        img.style.borderRadius = '12px';
+        img.style.border = '2px solid #d4af37';
         img.onload = () => { container.innerHTML = ''; container.appendChild(img); };
         img.onerror = () => { container.innerHTML = '<p style="color:#888;font-size:0.7rem;">QR-код недоступен</p>'; };
       }
 
       async function openCryptoPayment() {
-        if (!userData) return; $('cryptoPaymentModal').classList.remove('hidden');
-        loadCryptoRates(); updateRateDisplay(); updateQRAndAddress();
+        if (!userData) return;
+        $('cryptoPaymentModal').classList.remove('hidden');
+        loadCryptoRates();
+        updateRateDisplay();
+        updateQRAndAddress();
         if (rateInterval) clearInterval(rateInterval);
         rateInterval = setInterval(loadCryptoRates, 30000);
       }
@@ -676,46 +708,44 @@
         const cryptoAmount = rate ? (selectedUSD / rate.price_usd).toFixed(8) : '0';
         const address = WALLETS[selectedCrypto] || '';
         $('walletAddress').innerHTML = `<strong>Адрес ${selectedCrypto}:</strong><br>${address}`;
-        generateQRCode(`${selectedCrypto.toLowerCase()}:${address}?amount=${cryptoAmount}`);
+        const paymentText = `${selectedCrypto.toLowerCase()}:${address}?amount=${cryptoAmount}`;
+        generateQRCode(paymentText);
       }
 
       async function simulatePayment() {
         if (!userData) return;
-        $('simulatePaymentBtn').disabled = true; $('simulatePaymentBtn').textContent = '⏳ Проверяем платёж...';
+        $('simulatePaymentBtn').disabled = true;
+        $('simulatePaymentBtn').textContent = '⏳ Проверяем платёж...';
         await new Promise(r => setTimeout(r, 2000));
-        diamonds += selectedDiamonds; updateDiamondsDisplay(); updateMainBalance();
+        diamonds += selectedDiamonds;
+        updateDiamondsDisplay();
+        updateMainBalance();
         await API.saveUserData(userData.user_uid, { diamonds, treasure_progress, free_spins, jackpot_boost: jackpotBoost?1:0 });
-        await API.createCryptoDonation({ user_uid: userData.user_uid, nickname, email: userData.email, amount_usd: selectedUSD, diamonds: selectedDiamonds, crypto_currency: selectedCrypto, crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)), status: 'completed' });
+        await API.createCryptoDonation({
+          user_uid: userData.user_uid,
+          nickname: nickname,
+          email: userData.email,
+          amount_usd: selectedUSD,
+          diamonds: selectedDiamonds,
+          crypto_currency: selectedCrypto,
+          crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)),
+          status: 'completed'
+        });
         showMessage(`✨ +${selectedDiamonds}💎 зачислено!`);
-        $('cryptoPaymentModal').classList.add('hidden'); $('simulatePaymentBtn').disabled = false;
+        $('cryptoPaymentModal').classList.add('hidden');
+        $('simulatePaymentBtn').disabled = false;
         $('simulatePaymentBtn').textContent = '💰 Я оплатил — получить алмазы';
         if (rateInterval) clearInterval(rateInterval);
       }
 
-      // ===== ПРОМОКОД =====
-      function openPromoCodeModal() { $('promoCodeInput').value = ''; $('promoCodeMsg').textContent = ''; $('promoCodeModal').classList.remove('hidden'); }
-
-      async function redeemPromoCode() {
-        if (!userData) return;
-        const code = $('promoCodeInput').value.trim();
-        if (!code) { $('promoCodeMsg').textContent = 'Введите промокод'; $('promoCodeMsg').style.color = '#ff4444'; return; }
-        const result = await API.redeemPromoCode(userData.user_uid, code.toUpperCase());
-        if (result.success) {
-          $('promoCodeMsg').textContent = result.message;
-          $('promoCodeMsg').style.color = '#44ff44';
-          if (result.type === 'diamonds') { diamonds += result.amount; updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); }
-          if (result.type === 'spins') { freeSpins += result.amount; updateFreeSpinsBadge(); debouncedSave(); }
-        } else {
-          $('promoCodeMsg').textContent = result.error;
-          $('promoCodeMsg').style.color = '#ff4444';
-        }
-      }
-
       function openProfile() {
         if (!userData) return;
-        $('profileUID').textContent = userData.user_uid; $('profileEmail').textContent = userData.email || '-';
-        $('profileDiamonds').textContent = diamonds; $('profileJackpots').textContent = jackpotHistory.length;
-        $('profileNicknameInput').value = nickname; $('profileMsg').textContent = '';
+        $('profileUID').textContent = userData.user_uid;
+        $('profileEmail').textContent = userData.email || '-';
+        $('profileDiamonds').textContent = diamonds;
+        $('profileJackpots').textContent = jackpotHistory.length;
+        $('profileNicknameInput').value = nickname;
+        $('profileMsg').textContent = '';
         $('profileModal').classList.remove('hidden');
       }
       window.openProfile = openProfile;
@@ -723,7 +753,8 @@
       function copyUID() {
         if (!userData) return;
         navigator.clipboard.writeText(userData.user_uid).then(() => {
-          $('profileMsg').textContent = 'ID скопирован!'; setTimeout(() => $('profileMsg').textContent = '', 2000);
+          $('profileMsg').textContent = 'ID скопирован!';
+          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
         }).catch(() => { $('profileMsg').textContent = 'Ошибка копирования'; });
       }
       window.copyUID = copyUID;
@@ -735,11 +766,17 @@
         if (newNick === nickname) { $('profileMsg').textContent = 'Это ваш текущий никнейм'; return; }
         const result = await API.updateNickname(userData.user_uid, newNick);
         if (result === true) {
-          nickname = newNick; userData.nickname = newNick; $('nicknameDisplay').textContent = newNick;
-          localStorage.setItem('wdVdsNickname', newNick); $('profileMsg').textContent = 'Никнейм изменён!';
-          setTimeout(() => $('profileMsg').textContent = '', 2000);
-        } else if (result === 'taken') { $('profileMsg').textContent = 'Этот никнейм уже занят'; }
-        else { $('profileMsg').textContent = 'Ошибка изменения'; }
+          nickname = newNick;
+          userData.nickname = newNick;
+          $('nicknameDisplay').textContent = newNick;
+          localStorage.setItem('wdVdsNickname', newNick);
+          $('profileMsg').textContent = 'Никнейм изменён!';
+          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
+        } else if (result === 'taken') {
+          $('profileMsg').textContent = 'Этот никнейм уже занят';
+        } else {
+          $('profileMsg').textContent = 'Ошибка изменения';
+        }
       }
       window.changeNickname = changeNickname;
 
@@ -757,32 +794,64 @@
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
 
       function onLoginSuccess(data) {
-        userData = data; nickname = data.nickname; diamonds = data.diamonds;
-        treasureProgress = data.treasure_progress; freeSpins = data.free_spins; jackpotBoost = data.jackpot_boost;
-        $('welcomeBanner').classList.add('hidden'); if (countdownInterval) clearInterval(countdownInterval);
-        $('mainMenu').classList.remove('hidden'); $('userBar').classList.remove('hidden-bar');
-        $('nicknameDisplay').textContent = nickname; $('userIdDisplay').textContent = 'ID: ' + data.user_uid;
+        userData = data;
+        nickname = data.nickname;
+        diamonds = data.diamonds;
+        treasureProgress = data.treasure_progress;
+        freeSpins = data.free_spins;
+        jackpotBoost = data.jackpot_boost;
+        $('mainMenu').classList.remove('hidden');
+        $('userBar').classList.remove('hidden-bar');
+        $('nicknameDisplay').textContent = nickname;
+        $('userIdDisplay').textContent = 'ID: ' + data.user_uid;
         if (data.picture) { $('userAvatar').src = data.picture; $('userAvatar').classList.remove('hidden'); }
-        $('logoutBtn').style.display = 'inline-block'; $('googleLoginBtn').style.display = 'none'; $('authError').style.display = 'none';
-        stopFloatingMessages(); updateMainBalance(); updateDiamondsDisplay(); updateFreeSpinsBadge();
-        updateTreasureProgress(0); loadJackpotHistory(); loadJackpotFeed(); loadCustomRewards();
-        loadJackpotFeedData(); loadSupportHistory(); startSupportPolling(); loadCryptoRates();
+        $('logoutBtn').style.display = 'inline-block';
+        $('googleLoginBtn').style.display = 'none';
+        $('authError').style.display = 'none';
+        stopFloatingMessages();
+        stopRegistrationGame();
+        $('registrationWindow').classList.add('hidden');
+        updateMainBalance();
+        updateDiamondsDisplay();
+        updateFreeSpinsBadge();
+        updateTreasureProgress(0);
+        loadJackpotHistory();
+        loadJackpotFeed();
+        loadCustomRewards();
+        loadJackpotFeedData();
+        loadSupportHistory();
+        startSupportPolling();
+        loadCryptoRates();
       }
 
       async function logout() {
-        autoSpinning = false; spinning = false;
-        if ($('autoSpinBtn')) { $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
+        autoSpinning = false;
+        spinning = false;
+        if ($('autoSpinBtn')) {
+          $('autoSpinBtn').classList.remove('active');
+          $('autoSpinBtn').innerHTML = '🔄<br>AUTO';
+        }
         if (userData) await API.logOut(userData.user_uid, nickname);
         userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
         jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; supportUnreadCount = 0;
-        $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden'); $('userBar').classList.add('hidden-bar');
+        $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
+        $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
-        $('logoutBtn').style.display = 'none'; $('googleLoginBtn').style.display = 'flex'; $('authError').style.display = 'none';
-        if (rateInterval) clearInterval(rateInterval); if (supportPollingInterval) clearInterval(supportPollingInterval);
-        updateSupportBadge(); startFloatingMessages(); $('welcomeBanner').classList.remove('hidden'); startWelcomeGame();
+        $('logoutBtn').style.display = 'none';
+        $('googleLoginBtn').style.display = 'flex';
+        $('authError').style.display = 'none';
+        if (rateInterval) clearInterval(rateInterval);
+        if (supportPollingInterval) clearInterval(supportPollingInterval);
+        updateSupportBadge();
+        stopFloatingMessages();
+        showRegistrationPage();
       }
 
-      function updateGiftSize(progress) { if (!$('giftIcon')) return; if (progress >= 100) $('giftIcon').style.fontSize = '1.5rem'; else { var scale = 0.5 + (progress / 100) * 2.5; $('giftIcon').style.fontSize = (1.2 * scale) + 'rem'; } }
+      function updateGiftSize(progress) {
+        if (!$('giftIcon')) return;
+        if (progress >= 100) { $('giftIcon').style.fontSize = '1.5rem'; }
+        else { var scale = 0.5 + (progress / 100) * 2.5; $('giftIcon').style.fontSize = (1.2 * scale) + 'rem'; }
+      }
 
       function spawnParticles() {
         if (!$('treasureSection') || !$('giftIcon')) return;
@@ -793,12 +862,17 @@
         var centerY = giftRect.top + giftRect.height / 2 - containerRect.top;
         var colors = ['#ff3333', '#ff4444', '#cc0000', '#3333ff', '#4444ff', '#0000cc', '#ffdd00', '#ffcc00', '#ffaa00'];
         for (var i = 0; i < 30; i++) {
-          var particle = document.createElement('div'); particle.className = 'particle';
-          particle.style.position = 'absolute'; particle.style.left = centerX + 'px'; particle.style.top = centerY + 'px';
+          var particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.position = 'absolute';
+          particle.style.left = centerX + 'px';
+          particle.style.top = centerY + 'px';
           particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-          particle.style.width = (4 + Math.random() * 8) + 'px'; particle.style.height = (4 + Math.random() * 8) + 'px';
+          particle.style.width = (4 + Math.random() * 8) + 'px';
+          particle.style.height = (4 + Math.random() * 8) + 'px';
           particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-          var angle = Math.random() * Math.PI * 2; var distance = 30 + Math.random() * 80;
+          var angle = Math.random() * Math.PI * 2;
+          var distance = 30 + Math.random() * 80;
           particle.style.setProperty('--px', Math.cos(angle) * distance + 'px');
           particle.style.setProperty('--py', Math.sin(angle) * distance + 'px');
           particle.style.animationDuration = (0.8 + Math.random() * 1.5) + 's';
@@ -809,19 +883,35 @@
 
       function animateGiftShakeAndExplosion() {
         if (!$('giftIcon')) return;
-        $('giftIcon').style.fontSize = '1.5rem'; gamePaused = true; $('spinButton').disabled = true;
+        $('giftIcon').style.fontSize = '1.5rem';
+        gamePaused = true;
+        $('spinButton').disabled = true;
         $('giftIcon').classList.add('gift-shake');
         var shakeInterval = setInterval(function() { playGiftShakeSound(); }, 150);
         setTimeout(function() {
-          clearInterval(shakeInterval); $('giftIcon').classList.remove('gift-shake');
-          spawnParticles(); playGiftExplosionSound(); $('giftIcon').classList.add('gift-explosion');
+          clearInterval(shakeInterval);
+          $('giftIcon').classList.remove('gift-shake');
+          spawnParticles();
+          playGiftExplosionSound();
+          $('giftIcon').classList.add('gift-explosion');
           setTimeout(function() {
-            $('giftIcon').classList.remove('gift-explosion'); $('giftIcon').classList.add('gift-reappear');
-            $('giftIcon').style.fontSize = '1.2rem'; treasureProgress = 0; $('progressFill').style.width = '0%';
+            $('giftIcon').classList.remove('gift-explosion');
+            $('giftIcon').classList.add('gift-reappear');
+            $('giftIcon').style.fontSize = '1.2rem';
+            treasureProgress = 0;
+            $('progressFill').style.width = '0%';
             var bonusWord = currentLanguage === 'ru' ? 'Бонус' : currentLanguage === 'ua' ? 'Бонус' : 'Bonus';
             $('progressText').textContent = bonusWord + ': 0/100%';
-            freeSpins += 10; jackpotBoost = true; updateFreeSpinsBadge(); showMessage(t('bonusOpened')); debouncedSave();
-            setTimeout(function() { $('giftIcon').classList.remove('gift-reappear'); gamePaused = false; $('spinButton').disabled = false; }, 600);
+            freeSpins += 10;
+            jackpotBoost = true;
+            updateFreeSpinsBadge();
+            showMessage(t('bonusOpened'));
+            debouncedSave();
+            setTimeout(function() {
+              $('giftIcon').classList.remove('gift-reappear');
+              gamePaused = false;
+              $('spinButton').disabled = false;
+            }, 600);
           }, 600);
         }, 3000);
       }
@@ -831,14 +921,27 @@
         var recent = jackpotFeedData.slice(0, 10);
         if (recent.length === 0) { $('winningsList').innerHTML = '<p style="text-align:center;color:#b8945f;">' + t('noWinnings') + '</p>'; return; }
         $('winningsList').innerHTML = recent.map(function(item) {
-          var modeName = MODE_NAMES[item.mode]?.[currentLanguage] || item.mode;
-          return '<div class="history-item"><span>👤 ' + item.nickname + '</span><span>💰 +' + item.amount + '💎</span><span>📂 ' + modeName + '</span><span>🕐 ' + item.date + ' ' + item.time + '</span></div>';
+          var modeDisplay = item.isCustom ? t('customRewardsBtn') : getModeDisplayName(item.mode);
+          return '<div class="history-item"><span>👤 ' + item.nickname + '</span><span>💰 +' + item.amount + '💎</span><span>📂 ' + modeDisplay + '</span><span>🕐 ' + item.date + ' ' + item.time + '</span></div>';
         }).join('');
       }
 
-      function addToJackpotFeed(nick, mode, amount) {
+      function getModeDisplayName(mode) {
+        const modeMap = {
+          '18+': { ru: '18+', ua: '18+', en: '18+' },
+          'home': { ru: 'Для Дома', ua: 'Для Дому', en: 'For Home' },
+          'party': { ru: 'Для Вечеринки', ua: 'Для Вечірки', en: 'For Party' },
+          'young': { ru: 'Молодая Пара', ua: 'Молода Пара', en: 'Young Couple' },
+          'family': { ru: 'Семейная Пара', ua: 'Сімейна Пара', en: 'Family Couple' },
+          'friends': { ru: 'Для Друзей', ua: 'Для Друзів', en: 'For Friends' }
+        };
+        return (modeMap[mode] && modeMap[mode][currentLanguage]) || mode;
+      }
+
+      function addToJackpotFeed(nick, mode, amount, isCustom) {
+        isCustom = isCustom || false;
         var now = new Date();
-        jackpotFeedData.unshift({ nickname: nick, mode: mode, amount: amount, date: now.toLocaleDateString(), time: now.toLocaleTimeString() });
+        jackpotFeedData.unshift({ nickname: nick, mode: mode, amount: amount, date: now.toLocaleDateString(), time: now.toLocaleTimeString(), isCustom: isCustom });
         if (jackpotFeedData.length > 50) jackpotFeedData.pop();
       }
 
@@ -857,26 +960,55 @@
       }
 
       function updateAllTexts() {
-        $('customRewardsBtn').textContent = t('customRewardsBtn'); $('historyBtn').textContent = t('historyBtn');
-        var modeBtns = document.querySelectorAll('[data-mode]'); var modeKeys = ['18+', 'home', 'party', 'young', 'family', 'friends'];
-        modeBtns.forEach(function(b) { var idx = modeKeys.indexOf(b.dataset.mode); if (idx >= 0) { var keys = ['menu18', 'menuHome', 'menuParty', 'menuYoung', 'menuFamily', 'menuFriends']; b.innerHTML = t(keys[idx]); } });
-        $('diamondsLabel').textContent = t('diamondsLabel'); $('donateButton').innerHTML = t('donateButton');
-        $('backToMenu').innerHTML = t('backToMenu'); $('spinButton').innerHTML = t('spinBtn');
-        $('logoutBtn').textContent = t('logoutBtn'); $('mainTopUpBtn').textContent = t('mainTopUpBtn');
-        $('jackpotTitle').textContent = t('jackpotTitle'); $('sendToPartnerBtn').innerHTML = t('sendToPartner');
-        $('closeWinBtn').textContent = t('closeBtn'); $('nameFormTitle').textContent = t('nameFormTitle');
-        $('userNameInput').placeholder = t('userNamePlaceholder'); $('partnerNameInput').placeholder = t('partnerNamePlaceholder');
-        $('downloadWithNamesBtn').innerHTML = t('downloadBtn'); $('closeNameFormBtn').textContent = t('cancelBtn');
-        $('paymentTitle').textContent = t('paymentTitle'); $('closePaymentBtn').textContent = t('closePayment');
-        $('historyTitle').textContent = t('historyTitle'); $('winningsTitle').textContent = t('winningsTitle');
-        $('customRewardsTitle').textContent = t('customRewardsTitle'); $('customRewardsDesc').textContent = t('customRewardsDesc');
-        $('addCustomRewardBtn').textContent = t('addBtn'); $('saveAndPlayBtn').innerHTML = t('saveAndPlay');
-        $('closeCustomRewardsBtn').textContent = t('closeCustom'); $('closeHistoryBtn').textContent = t('closeBtn');
-        $('closeWinningsBtn').textContent = t('closeBtn'); $('jackpotPrizesBtn').textContent = t('jackpotPrizesBtn');
-        $('closeJackpotPrizesBtn').textContent = t('closeBtn'); $('closeWinDetailBtn').textContent = t('closeBtn');
-        $('winningsBtn').textContent = t('winningsBtn'); $('supportTitle').textContent = t('supportTitle');
-        $('chatInput').placeholder = t('supportPlaceholder'); $('sendChatBtn').textContent = t('sendBtn');
-        updateFreeSpinsBadge(); renderHistory();
+        $('customRewardsBtn').textContent = t('customRewardsBtn');
+        $('historyBtn').textContent = t('historyBtn');
+        var modeBtns = document.querySelectorAll('[data-mode]');
+        var modeKeys = ['18+', 'home', 'party', 'young', 'family', 'friends'];
+        modeBtns.forEach(function(b) {
+          var idx = modeKeys.indexOf(b.dataset.mode);
+          if (idx >= 0) { var keys = ['menu18', 'menuHome', 'menuParty', 'menuYoung', 'menuFamily', 'menuFriends']; b.innerHTML = t(keys[idx]); }
+        });
+        $('diamondsLabel').textContent = t('diamondsLabel');
+        $('donateButton').innerHTML = t('donateButton');
+        $('backToMenu').innerHTML = t('backToMenu');
+        $('spinButton').innerHTML = t('spinBtn');
+        $('logoutBtn').textContent = t('logoutBtn');
+        $('mainTopUpBtn').textContent = t('mainTopUpBtn');
+        $('jackpotTitle').textContent = t('jackpotTitle');
+        $('sendToPartnerBtn').innerHTML = t('sendToPartner');
+        $('closeWinBtn').textContent = t('closeBtn');
+        $('nameFormTitle').textContent = t('nameFormTitle');
+        $('userNameInput').placeholder = t('userNamePlaceholder');
+        $('partnerNameInput').placeholder = t('partnerNamePlaceholder');
+        $('downloadWithNamesBtn').innerHTML = t('downloadBtn');
+        $('closeNameFormBtn').textContent = t('cancelBtn');
+        $('paymentTitle').textContent = t('paymentTitle');
+        $('closePaymentBtn').textContent = t('closePayment');
+        $('historyTitle').textContent = t('historyTitle');
+        $('winningsTitle').textContent = t('winningsTitle');
+        $('customRewardsTitle').textContent = t('customRewardsTitle');
+        $('customRewardsDesc').textContent = t('customRewardsDesc');
+        $('addCustomRewardBtn').textContent = t('addBtn');
+        $('saveAndPlayBtn').innerHTML = t('saveAndPlay');
+        $('closeCustomRewardsBtn').textContent = t('closeCustom');
+        $('closeHistoryBtn').textContent = t('closeBtn');
+        $('closeWinningsBtn').textContent = t('closeBtn');
+        $('jackpotPrizesBtn').textContent = t('jackpotPrizesBtn');
+        $('closeJackpotPrizesBtn').textContent = t('closeBtn');
+        $('closeWinDetailBtn').textContent = t('closeBtn');
+        $('winningsBtn').textContent = t('winningsBtn');
+        $('privacyPolicyLink').textContent = t('privacyLink');
+        $('termsOfUseLink').textContent = t('termsLink');
+        $('supportTitle').textContent = t('supportTitle');
+        $('chatInput').placeholder = t('supportPlaceholder');
+        $('sendChatBtn').textContent = t('sendBtn');
+        $('promoCodeBtn').textContent = t('promoCodeBtn');
+        $('promoCodeTitle').textContent = t('promoCodeTitle');
+        $('promoCodeInput').placeholder = t('promoCodePlaceholder');
+        $('promoCodeSubmitBtn').textContent = t('promoCodeActivate');
+        $('closePromoCodeBtn').textContent = t('promoCodeClose');
+        updateFreeSpinsBadge();
+        renderHistory();
       }
 
       function loadUserData() {
@@ -899,7 +1031,7 @@
       }
 
       async function loadJackpotFeed() {
-        try { var data = await API.getAllJackpots(); jackpotFeedData = data.slice(0, 10).map(function(j) { return { nickname: j.nickname, mode: j.mode_key, amount: j.diamonds_won, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString() }; }); updateWinningsList(); } catch (e) { loadJackpotFeedData(); }
+        try { var data = await API.getAllJackpots(); jackpotFeedData = data.slice(0, 10).map(function(j) { return { nickname: j.nickname, mode: j.mode_key, amount: j.diamonds_won, date: new Date(j.created_at).toLocaleDateString(), time: new Date(j.created_at).toLocaleTimeString(), isCustom: j.is_custom || false }; }); updateWinningsList(); } catch (e) { loadJackpotFeedData(); }
       }
 
       function loadHistory() { var k = 'wdVdsHistory_' + nickname; jackpotHistory = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; renderHistory(); }
@@ -927,7 +1059,11 @@
 
       async function loadSupportHistory() {
         const uid = userData ? userData.user_uid : 'guest';
-        try { var chats = await API.getSupportChats(); if (chats[uid] && chats[uid].messages) supportMessages = chats[uid].messages; else supportMessages = []; } catch (e) { supportMessages = []; }
+        try {
+          var chats = await API.getSupportChats();
+          if (chats[uid] && chats[uid].messages) supportMessages = chats[uid].messages;
+          else supportMessages = [];
+        } catch (e) { supportMessages = []; }
       }
 
       async function saveSupportMessage() {
@@ -935,33 +1071,52 @@
         try {
           var chats = await API.getSupportChats();
           if (!chats[uid]) chats[uid] = { messages: [], userName: userData ? nickname : 'Гость' };
-          chats[uid].messages = supportMessages; chats[uid].userName = userData ? nickname : 'Гость';
+          chats[uid].messages = supportMessages;
+          chats[uid].userName = userData ? nickname : 'Гость';
           await API.saveSupportChats(chats);
         } catch (e) { console.error('Save support error:', e); }
       }
 
       function renderSupportMessages() {
-        var container = $('chatMessages'); if (!container) return; container.innerHTML = '';
+        var container = $('chatMessages');
+        if (!container) return;
+        container.innerHTML = '';
         var greeting = t('supportGreeting');
         if (supportMessages.length === 0) {
-          var div = document.createElement('div'); div.className = 'chat-message admin'; div.textContent = greeting;
-          container.appendChild(div); supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true }); saveSupportMessage();
+          var div = document.createElement('div');
+          div.className = 'chat-message admin';
+          div.textContent = greeting;
+          container.appendChild(div);
+          supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true });
+          saveSupportMessage();
         } else {
           supportMessages.forEach(function(msg) {
-            var div = document.createElement('div'); div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
-            div.textContent = msg.text; container.appendChild(div);
+            var div = document.createElement('div');
+            div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
+            div.textContent = msg.text;
+            container.appendChild(div);
           });
         }
         container.scrollTop = container.scrollHeight;
       }
 
       function handleChatSend() {
-        var text = $('chatInput').value.trim(); if (!text) return;
+        var text = $('chatInput').value.trim();
+        if (!text) return;
         var msg = { from: 'user', text: text, time: new Date().toISOString(), read: false };
         supportMessages.push(msg);
-        var div = document.createElement('div'); div.className = 'chat-message user'; div.textContent = text;
-        $('chatMessages').appendChild(div); $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-        $('chatInput').value = ''; saveSupportMessage();
+        var div = document.createElement('div');
+        div.className = 'chat-message user';
+        div.textContent = text;
+        $('chatMessages').appendChild(div);
+        $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+        $('chatInput').value = '';
+        saveSupportMessage();
+      }
+
+      function showPolicy(type) {
+        var policies = POLICIES[currentLanguage] || POLICIES.ru;
+        alert(type === 'privacy' ? policies.privacy : policies.terms);
       }
 
       function setLanguage(lang) {
@@ -991,7 +1146,9 @@
 
       function showSpinWin(amount) {
         $('spinWinDisplay').textContent = '+' + amount + '💎';
-        $('spinWinDisplay').classList.remove('show'); void $('spinWinDisplay').offsetWidth; $('spinWinDisplay').classList.add('show');
+        $('spinWinDisplay').classList.remove('show');
+        void $('spinWinDisplay').offsetWidth;
+        $('spinWinDisplay').classList.add('show');
         setTimeout(function() { $('spinWinDisplay').classList.remove('show'); }, 2000);
       }
 
@@ -999,18 +1156,24 @@
         var giftTypes = ['🎁', '🎀', '💝', '🎊', '🎉', '✨', '💎', '🌟', '🎈', '🎪'];
         for (var i = 0; i < 50; i++) {
           setTimeout(function() {
-            var gift = document.createElement('div'); gift.className = 'falling-gift';
+            var gift = document.createElement('div');
+            gift.className = 'falling-gift';
             gift.textContent = giftTypes[Math.floor(Math.random() * giftTypes.length)];
-            gift.style.left = Math.random() * 100 + '%'; gift.style.animationDuration = (2 + Math.random() * 3) + 's';
-            gift.style.fontSize = (1.5 + Math.random() * 2) + 'rem'; document.body.appendChild(gift);
+            gift.style.left = Math.random() * 100 + '%';
+            gift.style.animationDuration = (2 + Math.random() * 3) + 's';
+            gift.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
+            document.body.appendChild(gift);
             setTimeout(function() { if (gift.parentNode) gift.remove(); }, 5000);
           }, i * 100);
         }
       }
 
       function showJackpotBanner() {
-        var banner = document.createElement('div'); banner.className = 'jackpot-banner'; banner.textContent = '🎉 JACKPOT 🎉';
-        document.body.appendChild(banner); setTimeout(function() { if (banner.parentNode) banner.remove(); }, 5000);
+        var banner = document.createElement('div');
+        banner.className = 'jackpot-banner';
+        banner.textContent = '🎉 JACKPOT 🎉';
+        document.body.appendChild(banner);
+        setTimeout(function() { if (banner.parentNode) banner.remove(); }, 5000);
       }
 
       function getSymbolHeight() { var s = document.querySelector('.symbol'); return s ? parseFloat(getComputedStyle(s).height) || 40 : 40; }
@@ -1050,7 +1213,9 @@
       }
 
       function spin() {
-        if (spinning) return; if (gamePaused) return; if (!userData) return;
+        if (spinning) return;
+        if (gamePaused) return;
+        if (!userData) return;
         if (freeSpins > 0) { freeSpins--; updateFreeSpinsBadge(); if (freeSpins === 0) jackpotBoost = false; debouncedSave(); }
         else { if (diamonds < 5) { if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } showMessage(t('notEnoughDiamonds')); return; } diamonds -= 5; updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); }
         spinning = true; clearLines(); $('spinButton').disabled = true; playSpinClickSound(); buildGrid();
@@ -1070,12 +1235,13 @@
           var icon = visibleGrid[match[0].row][match[0].col];
           var wish = getRandomWish(icon);
           addJackpotToHistory(icon, wish);
-          var modeToSave = useCustomRewards ? 'custom' : currentMode;
-          if (userData) API.saveJackpot(userData.user_uid, nickname, modeToSave, icon, wish, 20);
-          addToJackpotFeed(nickname, modeToSave, 20);
-          saveJackpotFeedData(); playJackpotSound();
+          if (userData) API.saveJackpot(userData.user_uid, nickname, currentMode, icon, wish, 20);
+          addToJackpotFeed(nickname, currentMode, 20, useCustomRewards);
+          saveJackpotFeedData();
+          playJackpotSound();
           if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
-          showJackpotBanner(); startGiftRain();
+          showJackpotBanner();
+          startGiftRain();
           setTimeout(function() { triggerJackpot(icon, wish); }, 5000);
         } else if (totalWin > 0) { playWinSound(); showMessage(totalWin === 1 ? t('win3') : t('win4')); }
         else { playLoseSound(); showMessage(t('tryAgain')); }
@@ -1084,8 +1250,11 @@
       }
 
       function triggerJackpot(icon, wish) {
-        $('winIcons').textContent = icon + icon + icon; $('winMessage').textContent = wish;
-        $('winOverlay').classList.remove('hidden'); pendingJackpotIcon = icon; pendingJackpotWish = wish;
+        $('winIcons').textContent = icon + icon + icon;
+        $('winMessage').textContent = wish;
+        $('winOverlay').classList.remove('hidden');
+        pendingJackpotIcon = icon;
+        pendingJackpotWish = wish;
       }
 
       function generateLuxuryCertificate(icon, wish, userName, partnerName) {
@@ -1123,14 +1292,141 @@
         $('winOverlay').classList.add('hidden'); $('paymentModal').classList.add('hidden'); $('historyModal').classList.add('hidden');
         $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
         $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden'); $('winningsModal').classList.add('hidden');
-        $('cryptoPaymentModal').classList.add('hidden'); $('profileModal').classList.add('hidden');
+        $('cryptoPaymentModal').classList.add('hidden'); $('profileModal').classList.add('hidden'); $('promoCodeModal').classList.add('hidden');
         if (rateInterval) clearInterval(rateInterval);
         useCustomRewards = false; updateMainBalance(); debouncedSave();
       }
 
-      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
+      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: free_spins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
 
-      // Event listeners
+      // Registration mini-game
+      function showRegistrationPage() {
+        if (userData) return;
+        $('registrationWindow').classList.remove('hidden');
+        $('regMessage').textContent = '';
+        $('regCountdown').textContent = '10';
+        $('regGiftsContainer').innerHTML = '';
+        regGameOver = false;
+        // Check if already earned code
+        if (localStorage.getItem('wdVdsWelcomeEarned') === 'true') {
+          $('regMessage').textContent = '🎉 Вы уже получили бонус-код WELCOME. Войдите и используйте его в поле Промокод!';
+          $('regCountdown').textContent = '';
+          return;
+        }
+        startRegistrationGame();
+      }
+
+      function stopRegistrationGame() {
+        if (regCountdownInterval) { clearInterval(regCountdownInterval); regCountdownInterval = null; }
+        if (regGiftCreationInterval) { clearInterval(regGiftCreationInterval); regGiftCreationInterval = null; }
+        regGameActive = false;
+        // clear any remaining gifts
+        if ($('regGiftsContainer')) $('regGiftsContainer').innerHTML = '';
+      }
+
+      function startRegistrationGame() {
+        stopRegistrationGame();
+        regGameActive = true;
+        var seconds = 10;
+        $('regCountdown').textContent = seconds;
+        regCountdownInterval = setInterval(function() {
+          seconds--;
+          $('regCountdown').textContent = seconds > 0 ? seconds : 'GO!';
+          if (seconds <= 0) {
+            clearInterval(regCountdownInterval);
+            regCountdownInterval = null;
+            startRegGifts();
+          }
+        }, 1000);
+      }
+
+      function startRegGifts() {
+        if (regGameOver || !regGameActive) return;
+        var container = $('regGiftsContainer');
+        container.innerHTML = '';
+        var giftEmojis = ['🎁','🎀','💝','🎊','🎉','✨','💎','🌟','🎈','🎪'];
+        regGiftCreationInterval = setInterval(function() {
+          if (regGameOver || !regGameActive) { clearInterval(regGiftCreationInterval); return; }
+          var gift = document.createElement('span');
+          gift.className = 'reg-falling-gift';
+          gift.textContent = giftEmojis[Math.floor(Math.random() * giftEmojis.length)];
+          gift.style.left = Math.random() * 90 + '%';
+          gift.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (regGameOver) return;
+            regGameOver = true;
+            stopRegistrationGame();
+            handleRegGiftClick(gift);
+          });
+          container.appendChild(gift);
+          // auto-remove after animation
+          setTimeout(function() {
+            if (gift.parentNode) gift.remove();
+          }, 2100);
+        }, 300);
+      }
+
+      function handleRegGiftClick(selectedGift) {
+        var container = $('regGiftsContainer');
+        // explode all other gifts
+        var allGifts = container.querySelectorAll('.reg-falling-gift');
+        allGifts.forEach(function(g) {
+          if (g !== selectedGift) {
+            g.classList.add('reg-gift-explode');
+            setTimeout(function() { if (g.parentNode) g.remove(); }, 400);
+          }
+        });
+        // grow and shake the selected gift
+        selectedGift.classList.add('reg-gift-grow-shake');
+        // remove after 5 seconds
+        setTimeout(function() {
+          // explode the selected gift
+          selectedGift.classList.remove('reg-gift-grow-shake');
+          selectedGift.classList.add('reg-gift-explode');
+          setTimeout(function() { if (selectedGift.parentNode) selectedGift.remove(); }, 400);
+          // show message and save code
+          $('regMessage').textContent = '🎁 Поздравляем! Вы получили бонус-код: WELCOME. Войдите и введите его в поле Промокод для получения +20💎 и +5 бесплатных спинов!';
+          localStorage.setItem('wdVdsWelcomeEarned', 'true');
+        }, 5000);
+      }
+
+      // Promo code functionality
+      function openPromoCode() {
+        if (!userData) return;
+        $('promoCodeInput').value = '';
+        $('promoCodeMsg').textContent = '';
+        $('promoCodeModal').classList.remove('hidden');
+      }
+      window.openPromoCode = openPromoCode;
+
+      async function submitPromoCode() {
+        if (!userData) return;
+        var code = $('promoCodeInput').value.trim().toUpperCase();
+        if (!code) return;
+        // check local usage
+        var promoUsedKey = 'wdVdsPromo_' + userData.user_uid + '_' + code;
+        if (localStorage.getItem(promoUsedKey) === 'true') {
+          $('promoCodeMsg').textContent = t('promoCodeAlready');
+          return;
+        }
+        if (code === 'WELCOME') {
+          diamonds += 20;
+          freeSpins += 5;
+          updateDiamondsDisplay();
+          updateMainBalance();
+          updateFreeSpinsBadge();
+          localStorage.setItem(promoUsedKey, 'true');
+          debouncedSave();
+          if (typeof API.usePromoCode === 'function') {
+            try { await API.usePromoCode(userData.user_uid, code); } catch(e){}
+          }
+          $('promoCodeMsg').textContent = t('promoCodeSuccess');
+          setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2000);
+        } else {
+          $('promoCodeMsg').textContent = t('promoCodeInvalid');
+        }
+      }
+
       $('logoutBtn').addEventListener('click', logout);
       $('mainTopUpBtn').addEventListener('click', function() { openCryptoPayment(); });
       document.querySelectorAll('.thread-btn[data-mode]').forEach(function(b) { b.addEventListener('click', function() { useCustomRewards = false; currentMode = this.dataset.mode; enterSlot(); }); });
@@ -1155,15 +1451,25 @@
       $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', function() { supportUnreadCount = 0; updateSupportBadge(); loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); }); });
+      $('supportBtn').addEventListener('click', function() {
+        supportUnreadCount = 0;
+        updateSupportBadge();
+        loadSupportHistory().then(function() {
+          renderSupportMessages();
+          $('supportModal').classList.remove('hidden');
+        });
+      });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
       $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
+      $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
+      $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
       $('langRuOuter').addEventListener('click', function() { setLanguage('ru'); });
       $('langUaOuter').addEventListener('click', function() { setLanguage('ua'); });
       $('langEnOuter').addEventListener('click', function() { setLanguage('en'); });
-      $('redeemPromoBtn').addEventListener('click', redeemPromoCode);
+      $('promoCodeSubmitBtn').addEventListener('click', submitPromoCode);
       $('closePromoCodeBtn').addEventListener('click', function() { $('promoCodeModal').classList.add('hidden'); });
+      $('promoCodeModal').addEventListener('click', function(e) { if (e.target === $('promoCodeModal')) $('promoCodeModal').classList.add('hidden'); });
 
       $('diamondAmounts').addEventListener('click', function(e) { var opt = e.target.closest('.diamond-amount-option'); if (!opt) return; document.querySelectorAll('.diamond-amount-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedUSD = parseFloat(opt.dataset.usd); selectedDiamonds = parseInt(opt.dataset.diamonds); updateRateDisplay(); updateQRAndAddress(); });
       $('cryptoList').addEventListener('click', function(e) { var opt = e.target.closest('.crypto-option'); if (!opt) return; document.querySelectorAll('.crypto-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedCrypto = opt.dataset.currency; updateRateDisplay(); updateQRAndAddress(); });
@@ -1171,14 +1477,22 @@
       $('simulatePaymentBtn').addEventListener('click', simulatePayment);
       $('closeCryptoPaymentBtn').addEventListener('click', function() { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); });
       $('cryptoPaymentModal').addEventListener('click', function(e) { if (e.target === $('cryptoPaymentModal')) { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); } });
+
       $('closeProfileBtn').addEventListener('click', function() { $('profileModal').classList.add('hidden'); });
       $('profileModal').addEventListener('click', function(e) { if (e.target === $('profileModal')) $('profileModal').classList.add('hidden'); });
+
       [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('winningsModal'), $('cryptoPaymentModal'), $('profileModal'), $('promoCodeModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
-      setLanguage('ru'); updateAllTexts();
-      $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
-      $('logoutBtn').style.display = 'none'; $('googleLoginBtn').style.display = 'flex';
-      updateSupportBadge(); startFloatingMessages(); startWelcomeGame();
+      setLanguage('ru');
+      updateAllTexts();
+      $('mainMenu').classList.add('hidden');
+      $('slotUI').classList.add('hidden');
+      $('logoutBtn').style.display = 'none';
+      $('googleLoginBtn').style.display = 'flex';
+      updateSupportBadge();
+      // Show registration window instead of floating messages for initial state
+      stopFloatingMessages();
+      showRegistrationPage();
     })();
   </script>
 </body>
