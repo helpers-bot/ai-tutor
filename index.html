@@ -573,7 +573,7 @@
           logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша',
           supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов',
           supportGreeting:'👋 Здравствуйте! Чем могу помочь?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введите промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активировать',
-          promoCodeClose:'ЗАКРЫТЬ', promoCodeSuccess:'🎉 Промокод активирован! +20💎 и +5 бесплатных спинов', promoCodeAlready:'⏳ Этот промокод уже использован', promoCodeInvalid:'❌ Неверный промокод',
+          promoCodeClose:'ЗАКРЫТЬ', promoCodeSuccess:'🎉 Промокод активирован!', promoCodeAlready:'⏳ Этот промокод уже использован', promoCodeInvalid:'❌ Неверный промокод',
           regGlowText: 'Исполняет желания',
           wishPhrases: ['Следуй за мечтой', 'Загадай желание', 'Закажи счастье', 'Поймай удачу', 'Мечтай смело', 'Звезда желаний', 'Раскрой магию', 'Лови момент']
         },
@@ -588,7 +588,7 @@
           logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу',
           supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів',
           supportGreeting:'👋 Здравствуйте! Чим можу допомогти?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введіть промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активувати',
-          promoCodeClose:'ЗАКРИТИ', promoCodeSuccess:'🎉 Промокод активовано! +20💎 та +5 безкоштовних спинів', promoCodeAlready:'⏳ Цей промокод вже використано', promoCodeInvalid:'❌ Невірний промокод',
+          promoCodeClose:'ЗАКРИТИ', promoCodeSuccess:'🎉 Промокод активовано!', promoCodeAlready:'⏳ Цей промокод вже використано', promoCodeInvalid:'❌ Невірний промокод',
           regGlowText: 'Виконує бажання',
           wishPhrases: ['Йди за мрією', 'Загадай бажання', 'Замов щастя', 'Впіймай удачу', 'Мрій сміливо', 'Зірка бажань', 'Відкрий магію', 'Лови момент']
         },
@@ -603,7 +603,7 @@
           logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details',
           supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet',
           supportGreeting:'👋 Hello! How can I help you?', promoCodeBtn:'🎟️ Promo Code', promoCodeTitle:'🎟️ Enter Promo Code', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Activate',
-          promoCodeClose:'CLOSE', promoCodeSuccess:'🎉 Promo code activated! +20💎 and +5 free spins', promoCodeAlready:'⏳ This promo code has already been used', promoCodeInvalid:'❌ Invalid promo code',
+          promoCodeClose:'CLOSE', promoCodeSuccess:'🎉 Promo code activated!', promoCodeAlready:'⏳ This promo code has already been used', promoCodeInvalid:'❌ Invalid promo code',
           regGlowText: 'Fulfills wishes',
           wishPhrases: ['Follow your dream', 'Get a wish', 'Order happiness', 'Make a wish', 'Dream big', 'Wish upon a star', 'Unlock magic', 'Chase the magic']
         }
@@ -663,6 +663,7 @@
       function playJackpotSound() { [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.3, 'sine', 0.07); }, i * 100); }); }
       function playGiftShakeSound() { playTone(250 + Math.random() * 50, 0.05, 'square', 0.03); }
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
+      function playNotificationSound() { playTone(800, 0.1, 'square', 0.08); setTimeout(function() { playTone(1000, 0.1, 'square', 0.08); }, 100); }
 
       // ========== MAIN MENU FALLING GIFTS ==========
       function startMenuFallingGifts() {
@@ -1283,30 +1284,26 @@
         $('promoCodeModal').classList.remove('hidden');
       }
       window.openPromoCode = openPromoCode;
+
       async function submitPromoCode() {
         if (!userData) return;
         var code = $('promoCodeInput').value.trim().toUpperCase();
         if (!code) return;
-        var promoUsedKey = 'wdVdsPromo_' + userData.user_uid + '_' + code;
-        if (localStorage.getItem(promoUsedKey) === 'true') {
-          $('promoCodeMsg').textContent = t('promoCodeAlready');
-          return;
-        }
-        if (code === 'WELCOME') {
-          diamonds += 20;
-          freeSpins += 5;
-          updateDiamondsDisplay();
-          updateMainBalance();
-          updateFreeSpinsBadge();
-          localStorage.setItem(promoUsedKey, 'true');
-          debouncedSave();
-          if (typeof API.usePromoCode === 'function') {
-            try { await API.usePromoCode(userData.user_uid, code); } catch(e){}
-          }
-          $('promoCodeMsg').textContent = t('promoCodeSuccess');
-          setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2000);
+        const result = await API.redeemPromoCode(userData.user_uid, code);
+        if (result.success) {
+            if (result.type === 'diamonds') {
+                diamonds += result.amount;
+                updateDiamondsDisplay();
+                updateMainBalance();
+            } else if (result.type === 'spins') {
+                freeSpins += result.amount;
+                updateFreeSpinsBadge();
+            }
+            debouncedSave();
+            $('promoCodeMsg').textContent = result.message;
+            setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2000);
         } else {
-          $('promoCodeMsg').textContent = t('promoCodeInvalid');
+            $('promoCodeMsg').textContent = result.error || t('promoCodeInvalid');
         }
       }
 
