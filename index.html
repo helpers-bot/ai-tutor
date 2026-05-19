@@ -68,9 +68,8 @@
     .auto-spin-btn:active { transform: scale(0.9); }
     .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 4px 0; padding: 0 4px; }
     .menu-grid .thread-btn { font-size: 1rem; padding: 18px 12px; }
-    .thread-btn { background: linear-gradient(180deg, #2d1840 0%, #150920 100%); border: 2px solid #c9a13b; border-radius: 50px; padding: 14px 14px; font-weight: 700; color: #f7e9c3; letter-spacing: 1px; box-shadow: 0 8px 14px rgba(0,0,0,0.6), 0 0 12px rgba(255,200,0,0.4); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; backdrop-filter: blur(8px); animation: waveFloat 4s ease-in-out infinite; white-space: nowrap; text-align: center; }
-    @keyframes waveFloat { 0%,100% { transform: translateX(0); } 25% { transform: translateX(5px); } 75% { transform: translateX(-5px); } }
-    .thread-btn:active { transform: scale(0.96); box-shadow: 0 5px 12px black, 0 0 28px gold; animation: none; }
+    .thread-btn { background: linear-gradient(180deg, #2d1840 0%, #150920 100%); border: 2px solid #c9a13b; border-radius: 50px; padding: 14px 14px; font-weight: 700; color: #f7e9c3; letter-spacing: 1px; box-shadow: 0 8px 14px rgba(0,0,0,0.6), 0 0 12px rgba(255,200,0,0.4); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; backdrop-filter: blur(8px); white-space: nowrap; text-align: center; }
+    .thread-btn:active { transform: scale(0.96); box-shadow: 0 5px 12px black, 0 0 28px gold; }
     .full-width-btn { grid-column: 1 / -1; }
     .gold-text-btn { color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; font-weight: 900; letter-spacing: 2px; }
     .slot-machine { background: rgba(0,0,0,0.4); border: 2px solid #b49450; border-radius: 38px; padding: 10px 10px; backdrop-filter: blur(14px); box-shadow: inset 0 0 25px rgba(0,0,0,0.8), 0 12px 22px black; }
@@ -215,7 +214,7 @@
     .logo-letter {
       display: inline-block;
       opacity: 0;
-      animation-duration: 1.2s; /* slower */
+      animation-duration: 1.2s;
       animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
       animation-fill-mode: forwards;
     }
@@ -300,23 +299,60 @@
     #customRewardsBtn {
       font-size: 1.3rem;
       padding: 20px 16px;
-      background: linear-gradient(270deg, #3d2058, #a05bff, #3d2058);
-      background-size: 200% 200%;
-      animation: shimmerBg 3s ease infinite, waveFloat 4s ease-in-out infinite;
+      background-size: 400% 400%;
+      animation: colorShift 4s ease infinite;
       border-color: #ffd700;
       overflow: hidden;
+      position: relative;
     }
-    @keyframes shimmerBg {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes colorShift {
+      0% { background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2); background-size: 400% 400%; background-position: 0% 50%; }
+      25% { background: linear-gradient(135deg, #ff8c00, #40e0d0, #8a2be2, #ff0080); background-size: 400% 400%; background-position: 100% 0%; }
+      50% { background: linear-gradient(135deg, #40e0d0, #8a2be2, #ff0080, #ff8c00); background-size: 400% 400%; background-position: 100% 100%; }
+      75% { background: linear-gradient(135deg, #8a2be2, #ff0080, #ff8c00, #40e0d0); background-size: 400% 400%; background-position: 0% 100%; }
+      100% { background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2); background-size: 400% 400%; background-position: 0% 50%; }
+    }
+    #customRewardsBtn::after {
+      content: "";
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      border-radius: 52px;
+      background: inherit;
+      filter: blur(12px);
+      opacity: 0.5;
+      z-index: -1;
+      animation: colorShift 4s ease infinite;
+      background-size: 400% 400%;
     }
     .bracket-flash {
-      animation: bracketPulse 0.8s ease-in-out infinite alternate;
+      animation: bracketPulse 0.6s ease-in-out infinite alternate;
+      display: inline-block;
+      position: relative;
+      z-index: 2;
     }
     @keyframes bracketPulse {
-      0% { opacity: 0.4; text-shadow: 0 0 6px #ffd700; }
-      100% { opacity: 1; text-shadow: 0 0 16px #ffd700, 0 0 24px #ff8c00; }
+      0% { opacity: 0.3; text-shadow: 0 0 4px #ffffff, 0 0 8px #ffd700; transform: scale(0.95); }
+      100% { opacity: 1; text-shadow: 0 0 16px #ffffff, 0 0 28px #ffd700, 0 0 40px #ff8c00; transform: scale(1.08); }
+    }
+
+    /* ========== MAIN MENU FALLING GIFTS ========== */
+    #mainMenu {
+      position: relative;
+      overflow: hidden;
+    }
+    .menu-falling-gift {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.25;
+      animation: menuGiftSpinFall linear forwards;
+      font-size: 1.2rem;
+    }
+    @keyframes menuGiftSpinFall {
+      0% { transform: translateY(-40px) rotate(0deg); opacity: 0.35; }
+      10% { opacity: 0.35; }
+      90% { opacity: 0.35; }
+      100% { transform: translateY(calc(100% + 40px)) rotate(360deg); opacity: 0; }
     }
   </style>
 </head>
@@ -366,7 +402,7 @@
     </div>
 
     <div id="mainMenu" class="menu-grid">
-      <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn" style="background:#3d2058;">Мои желания</button>
+      <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn">Мои желания</button>
       <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
     </div>
 
@@ -526,47 +562,50 @@
       };
 
       const TRANSLATIONS = {
-        ru: { 
+        ru: {
           loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История',
-          diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ', 
-          nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена', 
-          paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов', 
-          customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ', 
-          jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', privacyLink:'Политика конфиденциальности', termsLink:'Условия использования', 
-          notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎', 
-          logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша', 
-          supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов', 
-          supportGreeting:'👋 Здравствуйте! Чем могу помочь?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введите промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активировать', 
+          diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ',
+          nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена',
+          paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов',
+          customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ',
+          jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', privacyLink:'Политика конфиденциальности', termsLink:'Условия использования',
+          notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎',
+          logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша',
+          supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов',
+          supportGreeting:'👋 Здравствуйте! Чем могу помочь?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введите промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активировать',
           promoCodeClose:'ЗАКРЫТЬ', promoCodeSuccess:'🎉 Промокод активирован! +20💎 и +5 бесплатных спинов', promoCodeAlready:'⏳ Этот промокод уже использован', promoCodeInvalid:'❌ Неверный промокод',
-          regGlowText: 'Исполняет желания'
+          regGlowText: 'Исполняет желания',
+          wishPhrases: ['Следуй за мечтой', 'Загадай желание', 'Закажи счастье', 'Поймай удачу', 'Мечтай смело', 'Звезда желаний', 'Раскрой магию', 'Лови момент']
         },
-        ua: { 
+        ua: {
           loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія',
-          diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ', 
-          nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати', 
-          paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів', 
-          customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ', 
-          jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', privacyLink:'Політика конфіденційності', termsLink:'Умови використання', 
-          notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎', 
-          logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу', 
-          supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів', 
-          supportGreeting:'👋 Здравствуйте! Чим можу допомогти?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введіть промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активувати', 
+          diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ',
+          nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати',
+          paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів',
+          customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ',
+          jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', privacyLink:'Політика конфіденційності', termsLink:'Умови використання',
+          notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎',
+          logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу',
+          supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів',
+          supportGreeting:'👋 Здравствуйте! Чим можу допомогти?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введіть промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активувати',
           promoCodeClose:'ЗАКРИТИ', promoCodeSuccess:'🎉 Промокод активовано! +20💎 та +5 безкоштовних спинів', promoCodeAlready:'⏳ Цей промокод вже використано', promoCodeInvalid:'❌ Невірний промокод',
-          regGlowText: 'Виконує бажання'
+          regGlowText: 'Виконує бажання',
+          wishPhrases: ['Йди за мрією', 'Загадай бажання', 'Замов щастя', 'Впіймай удачу', 'Мрій сміливо', 'Зірка бажань', 'Відкрий магію', 'Лови момент']
         },
-        en: { 
+        en: {
           loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History',
-          diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE', 
-          nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel', 
-          paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet', 
-          customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE', 
-          jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', privacyLink:'Privacy Policy', termsLink:'Terms of Use', 
-          notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎', 
-          logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details', 
-          supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet', 
-          supportGreeting:'👋 Hello! How can I help you?', promoCodeBtn:'🎟️ Promo Code', promoCodeTitle:'🎟️ Enter Promo Code', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Activate', 
+          diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE',
+          nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel',
+          paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet',
+          customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE',
+          jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', privacyLink:'Privacy Policy', termsLink:'Terms of Use',
+          notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎',
+          logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details',
+          supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet',
+          supportGreeting:'👋 Hello! How can I help you?', promoCodeBtn:'🎟️ Promo Code', promoCodeTitle:'🎟️ Enter Promo Code', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Activate',
           promoCodeClose:'CLOSE', promoCodeSuccess:'🎉 Promo code activated! +20💎 and +5 free spins', promoCodeAlready:'⏳ This promo code has already been used', promoCodeInvalid:'❌ Invalid promo code',
-          regGlowText: 'Fulfills wishes'
+          regGlowText: 'Fulfills wishes',
+          wishPhrases: ['Follow your dream', 'Get a wish', 'Order happiness', 'Make a wish', 'Dream big', 'Wish upon a star', 'Unlock magic', 'Chase the magic']
         }
       };
 
@@ -609,6 +648,7 @@
       let regBgGiftsInterval = null;
       let logoAnimationTimer = null;
       let typingInterval = null;
+      let menuGiftsInterval = null;
 
       // ========== UTILS ==========
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
@@ -623,6 +663,35 @@
       function playJackpotSound() { [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.3, 'sine', 0.07); }, i * 100); }); }
       function playGiftShakeSound() { playTone(250 + Math.random() * 50, 0.05, 'square', 0.03); }
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
+
+      // ========== MAIN MENU FALLING GIFTS ==========
+      function startMenuFallingGifts() {
+        const menu = $('mainMenu');
+        if (!menu) return;
+        stopMenuFallingGifts();
+        const gifts = ['🎁','🎀','💝','🎊','🎉','✨','💎','🌟','🎈','🎪','🦋','🌸','🍀','💫','⭐'];
+        menuGiftsInterval = setInterval(() => {
+          if (!menu.parentNode || menu.classList.contains('hidden')) { return; }
+          const gift = document.createElement('div');
+          gift.className = 'menu-falling-gift';
+          gift.textContent = gifts[Math.floor(Math.random() * gifts.length)];
+          gift.style.left = Math.random() * 90 + '%';
+          gift.style.top = '-40px';
+          gift.style.animationDuration = (6 + Math.random() * 8) + 's';
+          gift.style.fontSize = (0.8 + Math.random() * 1.8) + 'rem';
+          menu.appendChild(gift);
+          setTimeout(() => { if (gift.parentNode) gift.remove(); }, 15000);
+        }, 1800);
+      }
+
+      function stopMenuFallingGifts() {
+        if (menuGiftsInterval) { clearInterval(menuGiftsInterval); menuGiftsInterval = null; }
+        const menu = $('mainMenu');
+        if (menu) {
+          const allGifts = menu.querySelectorAll('.menu-falling-gift');
+          allGifts.forEach(g => g.remove());
+        }
+      }
 
       // ========== BACKGROUND GIFTS ==========
       function startRegBgGifts() {
@@ -701,32 +770,27 @@
       }
 
       // ========== TYPING ANIMATION FOR WISH BUTTON ==========
-      const wishPhrases = [
-        "Follow your dream",
-        "Get a wish",
-        "Order happiness",
-        "Make a wish",
-        "Dream big",
-        "Wish upon a star",
-        "Unlock magic",
-        "Chase the magic"
-      ];
+      function getWishPhrases() {
+        return TRANSLATIONS[currentLanguage]?.wishPhrases || TRANSLATIONS.ru.wishPhrases;
+      }
 
       function startTypingAnimation() {
         const btn = $('customRewardsBtn');
         if (!btn) return;
         stopTypingAnimation();
-        let currentPhraseIndex = Math.floor(Math.random() * wishPhrases.length);
+        const phrases = getWishPhrases();
+        let currentPhraseIndex = Math.floor(Math.random() * phrases.length);
         let charIndex = 0;
         let typingForward = true;
-        const typingSpeed = 100; // ms per character
-        const pauseBetween = 5000; // 5 seconds pause after full phrase
+        const typingSpeed = 100;
+        const pauseBetween = 5000;
 
         function typeNext() {
           if (!btn) { stopTypingAnimation(); return; }
+          const phrases = getWishPhrases();
           if (typingForward) {
-            if (charIndex <= wishPhrases[currentPhraseIndex].length) {
-              const partial = wishPhrases[currentPhraseIndex].substring(0, charIndex);
+            if (charIndex <= phrases[currentPhraseIndex].length) {
+              const partial = phrases[currentPhraseIndex].substring(0, charIndex);
               btn.innerHTML = '<span class="bracket-flash">[</span>' + partial + '<span class="bracket-flash">]</span>';
               charIndex++;
               typingInterval = setTimeout(typeNext, typingSpeed);
@@ -735,12 +799,11 @@
               typingInterval = setTimeout(typeNext, pauseBetween);
             }
           } else {
-            // finished typing, wait 5 seconds then clear and start a new random phrase
-            currentPhraseIndex = Math.floor(Math.random() * wishPhrases.length);
+            currentPhraseIndex = Math.floor(Math.random() * phrases.length);
             charIndex = 0;
             typingForward = true;
             btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>';
-            typingInterval = setTimeout(typeNext, 200); // small delay before typing new
+            typingInterval = setTimeout(typeNext, 200);
           }
         }
         typingInterval = setTimeout(typeNext, 200);
@@ -781,6 +844,7 @@
         startSupportPolling();
         loadCryptoRates();
         startTypingAnimation();
+        startMenuFallingGifts();
       }
 
       async function logout() {
@@ -803,10 +867,11 @@
         if (supportPollingInterval) clearInterval(supportPollingInterval);
         updateSupportBadge();
         stopTypingAnimation();
+        stopMenuFallingGifts();
         showRegistrationPage();
       }
 
-      // ========== GAME FUNCTIONS (полностью) ==========
+      // ========== GAME FUNCTIONS ==========
       function updateGiftSize(progress) {
         if (!$('giftIcon')) return;
         if (progress >= 100) { $('giftIcon').style.fontSize = '1.5rem'; }
@@ -1053,6 +1118,10 @@
         else if (lang === 'ua') $('langUaOuter').classList.add('active');
         else $('langEnOuter').classList.add('active');
         updateAllTexts(); updateFreeSpinsBadge();
+        if (userData) {
+          stopTypingAnimation();
+          startTypingAnimation();
+        }
       }
       function updateFreeSpinsBadge() {
         if (freeSpins > 0) { $('freeSpinsBadge').classList.remove('hidden'); $('freeSpinsBadge').textContent = '🎁 ' + (currentLanguage === 'ru' ? 'Бесплатные спины' : currentLanguage === 'ua' ? 'Безкоштовні спини' : 'Free spins') + ': ' + freeSpins + ' (Шанс джекпота +50%)'; }
@@ -1192,7 +1261,7 @@
         canvas.toBlob(function(b) { var u = URL.createObjectURL(b); var a = document.createElement('a'); a.href = u; a.download = 'VDS_Wish_' + icon + '.png'; a.click(); URL.revokeObjectURL(u); });
       }
       function openNameForm() { $('nameFormModal').classList.remove('hidden'); $('userNameInput').value = ''; $('partnerNameInput').value = ''; }
-      function enterSlot() { $('mainMenu').classList.add('hidden'); $('slotUI').classList.remove('hidden'); createReels(); buildGrid(); applyGrid(); $('messageDisplay').textContent = ''; gamePaused = false; $('spinButton').disabled = false; updateGiftSize(treasureProgress); updateTreasureProgress(0); autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
+      function enterSlot() { $('mainMenu').classList.add('hidden'); $('slotUI').classList.remove('hidden'); createReels(); buildGrid(); applyGrid(); $('messageDisplay').textContent = ''; gamePaused = false; $('spinButton').disabled = false; updateGiftSize(treasureProgress); updateTreasureProgress(0); autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; stopMenuFallingGifts(); }
       function backToMenu() {
         autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; gamePaused = false;
         $('slotUI').classList.add('hidden'); $('mainMenu').classList.remove('hidden');
@@ -1202,6 +1271,7 @@
         $('cryptoPaymentModal').classList.add('hidden'); $('profileModal').classList.add('hidden'); $('promoCodeModal').classList.add('hidden');
         if (rateInterval) clearInterval(rateInterval);
         useCustomRewards = false; updateMainBalance(); debouncedSave();
+        startMenuFallingGifts();
       }
       async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: free_spins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
 
@@ -1250,8 +1320,8 @@
       };
       async function loadCryptoRates() {
         const rates = await API.getCryptoRates();
-        if (rates) { 
-          cryptoRates = rates; 
+        if (rates) {
+          cryptoRates = rates;
           if (!cryptoRates['USDT']) {
             cryptoRates['USDT'] = {
               symbol: 'USDTUSDT',
@@ -1259,7 +1329,7 @@
               last_update: new Date().toISOString()
             };
           }
-          updateRateDisplay(); 
+          updateRateDisplay();
         }
       }
       function updateRateDisplay() {
