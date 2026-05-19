@@ -795,12 +795,10 @@
       function handleRegGiftClick(e) {
         const gift = e.target.closest('.reg-bg-gift');
         if (!gift) return;
-        // Get the click position relative to the regBgGifts container
         const container = $('regBgGifts');
         const containerRect = container.getBoundingClientRect();
         const clickX = e.clientX - containerRect.left;
         const clickY = e.clientY - containerRect.top;
-        // Remove the gift (explosion)
         gift.remove();
         const phrases = currentLanguage === 'ua' ? REG_PHRASES_UA : currentLanguage === 'en' ? REG_PHRASES_EN : REG_PHRASES_RU;
         const phrase = phrases[Math.floor(Math.random() * phrases.length)];
@@ -1184,10 +1182,8 @@
       }
       function setLanguage(lang) {
         currentLanguage = lang;
-        // Remove active from all lang buttons
         document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
-        // Add active to all buttons with matching prefix
-        const langPrefix = lang.charAt(0).toUpperCase() + lang.slice(1); // 'Ru','Ua','En'
+        const langPrefix = lang.charAt(0).toUpperCase() + lang.slice(1);
         document.querySelectorAll('[id^="lang' + langPrefix + '"]').forEach(function(b) { b.classList.add('active'); });
         updateAllTexts(); updateFreeSpinsBadge();
         if (userData) {
@@ -1195,7 +1191,7 @@
           startTypingAnimation();
         }
       }
-      window.setLanguage = setLanguage; // make globally accessible for onclick
+      window.setLanguage = setLanguage;
       function updateFreeSpinsBadge() {
         if (freeSpins > 0) { $('freeSpinsBadge').classList.remove('hidden'); $('freeSpinsBadge').textContent = '🎁 ' + (currentLanguage === 'ru' ? 'Бесплатные спины' : currentLanguage === 'ua' ? 'Безкоштовні спини' : 'Free spins') + ': ' + freeSpins + ' (Шанс джекпота +50%)'; }
         else { $('freeSpinsBadge').classList.add('hidden'); jackpotBoost = false; }
@@ -1359,29 +1355,30 @@
         $('promoCodeModal').classList.remove('hidden');
       }
       window.openPromoCode = openPromoCode;
+
       async function submitPromoCode() {
         if (!userData) return;
         var code = $('promoCodeInput').value.trim().toUpperCase();
-        if (!code) return;
-        var promoUsedKey = 'wdVdsPromo_' + userData.user_uid + '_' + code;
-        if (localStorage.getItem(promoUsedKey) === 'true') {
-          $('promoCodeMsg').textContent = t('promoCodeAlready');
-          return;
-        }
-        if (code === 'WELCOME') {
-          diamonds += 20;
-          freeSpins += 5;
-          updateDiamondsDisplay();
-          updateMainBalance();
-          updateFreeSpinsBadge();
-          localStorage.setItem(promoUsedKey, 'true');
-          debouncedSave();
-          if (typeof API.usePromoCode === 'function') {
-            try { await API.usePromoCode(userData.user_uid, code); } catch(e){}
+        if (!code) { $('promoCodeMsg').textContent = t('promoCodeInvalid'); return; }
+        $('promoCodeMsg').textContent = '⏳ Проверка...';
+        try {
+          const result = await API.redeemPromoCode(userData.user_uid, code);
+          if (result.success) {
+            if (result.type === 'spins') {
+              freeSpins += result.amount;
+              updateFreeSpinsBadge();
+            } else if (result.type === 'diamonds') {
+              diamonds += result.amount;
+              updateDiamondsDisplay();
+              updateMainBalance();
+            }
+            debouncedSave();
+            $('promoCodeMsg').textContent = result.message || t('promoCodeSuccess');
+            setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2500);
+          } else {
+            $('promoCodeMsg').textContent = result.error || t('promoCodeInvalid');
           }
-          $('promoCodeMsg').textContent = t('promoCodeSuccess');
-          setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2000);
-        } else {
+        } catch (e) {
           $('promoCodeMsg').textContent = t('promoCodeInvalid');
         }
       }
@@ -1399,11 +1396,7 @@
         if (rates) {
           cryptoRates = rates;
           if (!cryptoRates['USDT']) {
-            cryptoRates['USDT'] = {
-              symbol: 'USDTUSDT',
-              price_usd: 1.00,
-              last_update: new Date().toISOString()
-            };
+            cryptoRates['USDT'] = { symbol: 'USDTUSDT', price_usd: 1.00, last_update: new Date().toISOString() };
           }
           updateRateDisplay();
         }
@@ -1455,11 +1448,8 @@
         updateMainBalance();
         await API.saveUserData(userData.user_uid, { diamonds, treasure_progress, free_spins, jackpot_boost: jackpotBoost?1:0 });
         await API.createCryptoDonation({
-          user_uid: userData.user_uid,
-          nickname: nickname,
-          email: userData.email,
-          amount_usd: selectedUSD,
-          diamonds: selectedDiamonds,
+          user_uid: userData.user_uid, nickname, email: userData.email,
+          amount_usd: selectedUSD, diamonds: selectedDiamonds,
           crypto_currency: selectedCrypto,
           crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)),
           status: 'completed'
@@ -1496,10 +1486,7 @@
       $('supportBtn').addEventListener('click', function() {
         supportUnreadCount = 0;
         updateSupportBadge();
-        loadSupportHistory().then(function() {
-          renderSupportMessages();
-          $('supportModal').classList.remove('hidden');
-        });
+        loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); });
       });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
@@ -1522,7 +1509,6 @@
 
       [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('cryptoPaymentModal'), $('profileModal'), $('promoCodeModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
-      // Add click listener for registration background gifts
       $('regBgGifts').addEventListener('click', handleRegGiftClick);
 
       function openProfile() {
@@ -1596,10 +1582,7 @@
                 supportUnreadCount += newAdminMessages.length;
                 updateSupportBadge();
                 playNotificationSound();
-                // If chat is open, immediately display new messages
-                if (!$('supportModal').classList.contains('hidden')) {
-                  renderSupportMessages();
-                }
+                if (!$('supportModal').classList.contains('hidden')) renderSupportMessages();
               }
             }
           } catch (e) {}
