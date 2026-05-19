@@ -635,6 +635,7 @@
       let customRewards = [];
       let useCustomRewards = false;
       let audioCtx = null;
+      var jackpotFeedData = [];
       let saveTimeout = null;
       let supportMessages = [];
       let supportUnreadCount = 0;
@@ -839,6 +840,7 @@
         loadJackpotHistory();
         loadCustomRewards();
         loadSupportHistory();
+        loadJackpotFeedData();
         startSupportPolling();
         loadCryptoRates();
         startTypingAnimation();
@@ -935,6 +937,14 @@
             }, 600);
           }, 600);
         }, 3000);
+      }
+      function loadJackpotFeedData() { var k = 'wdVdsJackpotFeed'; jackpotFeedData = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; }
+      function saveJackpotFeedData() { localStorage.setItem('wdVdsJackpotFeed', JSON.stringify(jackpotFeedData)); }
+      function addToJackpotFeed(nick, mode, amount, isCustom, icon, wish) {
+        isCustom = isCustom || false;
+        var now = new Date();
+        jackpotFeedData.unshift({ nickname: nick, mode: mode, amount: amount, date: now.toLocaleDateString(), time: now.toLocaleTimeString(), isCustom: isCustom, icon: icon, wish: wish });
+        if (jackpotFeedData.length > 50) jackpotFeedData.pop();
       }
 
       // ===== WINNINGS: show all jackpots from API =====
@@ -1206,6 +1216,8 @@
           var wish = getRandomWish(icon);
           addJackpotToHistory(icon, wish);
           if (userData) API.saveJackpot(userData.user_uid, nickname, currentMode, icon, wish, 20);
+          addToJackpotFeed(nickname, currentMode, 20, useCustomRewards, icon, wish);
+          saveJackpotFeedData();
           playJackpotSound();
           if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
           showJackpotBanner();
