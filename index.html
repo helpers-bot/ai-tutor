@@ -753,17 +753,20 @@
       function handleRegGiftClick(e) {
         const gift = e.target.closest('.reg-bg-gift');
         if (!gift) return;
-        // Remove the gift
+        // Get the click position relative to the regBgGifts container
+        const container = $('regBgGifts');
+        const containerRect = container.getBoundingClientRect();
+        const clickX = e.clientX - containerRect.left;
+        const clickY = e.clientY - containerRect.top;
+        // Remove the gift (explosion)
         gift.remove();
         const phrase = REG_PHRASES[Math.floor(Math.random() * REG_PHRASES.length)];
         const phraseEl = document.createElement('div');
         phraseEl.className = 'reg-phrase-glow';
         phraseEl.textContent = phrase;
-        const rect = gift.getBoundingClientRect();
-        const containerRect = $('regBgGifts').getBoundingClientRect();
-        phraseEl.style.left = (rect.left + rect.width/2 - containerRect.left) + 'px';
-        phraseEl.style.top = (rect.top + rect.height/2 - containerRect.top) + 'px';
-        $('regBgGifts').appendChild(phraseEl);
+        phraseEl.style.left = clickX + 'px';
+        phraseEl.style.top = clickY + 'px';
+        container.appendChild(phraseEl);
         setTimeout(() => { if (phraseEl.parentNode) phraseEl.remove(); }, 5000);
       }
 
