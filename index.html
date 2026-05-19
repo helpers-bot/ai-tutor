@@ -449,7 +449,7 @@
           <button class="jackpot-prizes-btn" id="jackpotPrizesBtn">🎁 Призы</button>
         </div>
       </div>
-      <div class="free-spins-badge hidden" id="freeSpinsBadge">💥 Бесплатные спины: 0 💥</div>
+      <div class="free-spins-badge hidden" id="freeSpinsBadge">🎁 Бесплатные спины: 0 (Шанс джекпота +50%)</div>
       <div class="machine" id="machine"></div>
       <div class="win-lines" id="winLines"></div>
       <div style="color:#ffd966; text-align:center; min-height:20px; font-weight:bold; font-size:0.8rem;" id="messageDisplay"></div>
@@ -567,23 +567,8 @@
         client.requestAccessToken();
       };
 
-      const ICONS = ['❤️', '🔒', '🍕', '🛏️', '🎁'];
-      const WISH_TEXTS = {
-        '❤️': { ru: 'Исполни моё романтическое желание', ua: 'Виконай моє романтичне бажання', en: 'Fulfill my romantic wish' },
-        '🔒': { ru: 'Надень наручники и повинуйся', ua: 'Надягни наручники й підкорись', en: 'Put on handcuffs and obey' },
-        '🍕': { ru: 'Закажи мою любимую пиццу', ua: 'Замов мою улюблену піцу', en: 'Order my favorite pizza' },
-        '🛏️': { ru: 'Устрой незабываемую ночь', ua: 'Влаштуй незабутню ніч', en: 'Create an unforgettable night' },
-        '🎁': { ru: 'Подари мне особенный сюрприз', ua: 'Подаруй мені особливий сюрприз', en: 'Give me a special surprise' }
-      };
-
-      const MODE_PRIZES = {
-        '18+': { ru: ['Исполни моё романтическое желание','Надень наручники и повинуйся','Устрой незабываемую ночь','Подари мне особенный сюрприз','Закажи мою любимую пиццу'], ua: ['Виконай моє романтичне бажання','Надягни наручники й підкорись','Влаштуй незабутню ніч','Подаруй мені особливий сюрприз','Замов мою улюблену піцу'], en: ['Fulfill my romantic wish','Put on handcuffs and obey','Create an unforgettable night','Give me a special surprise','Order my favorite pizza'] },
-        'home': { ru: ['Приготовь ужин','Убери в комнате','Помой посуду','Пропылесось квартиру','Сделай мне чай'], ua: ['Приготуй вечерю','Прибери в кімнаті','Помий посуд','Пропилосось квартиру','Зроби мені чай'], en: ['Cook dinner','Clean the room','Wash dishes','Vacuum the apartment','Make me tea'] },
-        'party': { ru: ['Танцуй со мной','Спой караоке','Приготовь коктейль','Сделай смешное фото','Расскажи анекдот'], ua: ['Танцюй зі мною','Заспівай караоке','Приготуй коктейль','Зроби смішне фото','Розкажи анекдот'], en: ['Dance with me','Sing karaoke','Make a cocktail','Take a funny photo','Tell a joke'] },
-        'young': { ru: ['Устрой романтический ужин','Напиши любовное письмо','Подари цветы','Сделай массаж','Посмотри фильм вместе'], ua: ['Влаштуй романтичну вечерю','Напиши любовний лист','Подаруй квіти','Зроби масаж','Подивись фільм разом'], en: ['Have a romantic dinner','Write a love letter','Give flowers','Give a massage','Watch a movie together'] },
-        'family': { ru: ['Поиграй с детьми','Приготовь семейный ужин','Помоги с домашним заданием','Устрой семейную игру','Почитай сказку'], ua: ['Пограй з дітьми','Приготуй сімейну вечерю','Допоможи з домашнім завданням','Влаштуй сімейну гру','Почитай казку'], en: ['Play with kids','Cook family dinner','Help with homework','Have a family game','Read a story'] },
-        'friends': { ru: ['Устрой вечеринку','Поиграй в настолки','Посмотри фильм вместе','Сходи в кафе','Поделись секретом'], ua: ['Влаштуй вечірку','Пограй у настолки','Подивись фільм разом','Сходи в кафе','Поділись секретом'], en: ['Throw a party','Play board games','Watch a movie together','Go to a cafe','Share a secret'] }
-      };
+      // Generic symbols for the slot machine
+      const ICONS = ['🍒', '🍋', '🍊', '🍇', '⭐'];
 
       const CERTIFICATE_TEXTS = {
         ru: { title: 'VDS СЕРТИФИКАТ ВЫИГРЫША', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' выиграл(а) для '+p+'!', official: 'ОФИЦИАЛЬНЫЙ ЧЕК • VDS' },
@@ -645,6 +630,13 @@
         en: { privacy: 'Privacy Policy: 1. We use Google for login. 2. Game data is stored in Supabase. 3. We do not share data with third parties.', terms: 'Terms of Use: 1. Game is for entertainment purposes. 2. Administration reserves the right to change the rules.' }
       };
 
+      // Generic prize phrases for jackpot (replaces old MODE_PRIZES)
+      const GENERIC_PRIZES = {
+        ru: ['Вы выиграли приз!', 'Поздравляем!', 'Удача улыбнулась!', 'Ваш приз ждёт!', 'Заберите подарок!', 'Сегодня ваш день!', 'Сюрприз!'],
+        ua: ['Ви виграли приз!', 'Вітаємо!', 'Удача посміхнулася!', 'Ваш приз чекає!', 'Заберіть подарунок!', 'Сьогодні ваш день!', 'Сюрприз!'],
+        en: ['You won a prize!', 'Congratulations!', 'Lucky day!', 'Your prize awaits!', 'Grab your gift!', 'It\'s your day!', 'Surprise!']
+      };
+
       // Registration emoji phrases by language
       const REG_PHRASES_RU = [
         "Мы можем исполнить твою мечту",
@@ -698,7 +690,7 @@
       let jackpotBoost = false;
       let spinning = false;
       let autoSpinning = false;
-      let currentMode = '18+';
+      let currentMode = 'generic';
       let gamePaused = false;
       const GRID = 5;
       let visibleGrid = [];
@@ -1030,21 +1022,11 @@
           }, 600);
         }, 3000);
       }
-      function getModeDisplayName(mode) {
-        const modeMap = {
-          '18+': { ru: '18+', ua: '18+', en: '18+' },
-          'home': { ru: 'Для Дома', ua: 'Для Дому', en: 'For Home' },
-          'party': { ru: 'Для Вечеринки', ua: 'Для Вечірки', en: 'For Party' },
-          'young': { ru: 'Молодая Пара', ua: 'Молода Пара', en: 'Young Couple' },
-          'family': { ru: 'Семейная Пара', ua: 'Сімейна Пара', en: 'Family Couple' },
-          'friends': { ru: 'Для Друзей', ua: 'Для Друзів', en: 'For Friends' }
-        };
-        return (modeMap[mode] && modeMap[mode][currentLanguage]) || mode;
-      }
+
       function showJackpotPrizes() {
         var prizes = [];
         if (useCustomRewards && customRewards.length >= 3) prizes = customRewards;
-        else prizes = MODE_PRIZES[currentMode]?.[currentLanguage] || MODE_PRIZES['18+'][currentLanguage] || [];
+        else prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
         $('jackpotPrizesList').innerHTML = prizes.map(function(p) { return '<div style="padding:6px 0;border-bottom:1px solid rgba(212,175,55,0.3);">🎁 ' + p + '</div>'; }).join('');
         $('jackpotPrizesModal').classList.remove('hidden');
       }
@@ -1260,8 +1242,8 @@
       }
       function getRandomWish(icon) {
         if (useCustomRewards && customRewards.length >= 3) return customRewards[Math.floor(Math.random() * customRewards.length)];
-        var modePrizes = MODE_PRIZES[currentMode]?.[currentLanguage] || MODE_PRIZES['18+'][currentLanguage] || [];
-        return modePrizes[Math.floor(Math.random() * modePrizes.length)] || WISH_TEXTS[icon]?.[currentLanguage] || 'желание';
+        var prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
+        return prizes[Math.floor(Math.random() * prizes.length)];
       }
       function spin() {
         if (spinning) return;
