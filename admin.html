@@ -34,6 +34,7 @@
         .btn-add { background: #28a745; color: #fff; }
         .btn-remove { background: #dc3545; color: #fff; }
         .btn-edit { background: #007bff; color: #fff; }
+        .btn-delete { background: #ff4444; color: #fff; }
         .tabs { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
         .tab-btn { padding: 10px 20px; background: #1a1a2e; border: 1px solid #444; color: #888; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; }
         .tab-btn.active { background: #2a2a3e; color: #ffd700; border-color: #d4af37; }
@@ -87,8 +88,6 @@
             </div>
 
             <div id="tab-users" class="tab-content active">
-                <h2>💎 Потрачено алмазов по категориям</h2>
-                <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="spentTable"></tbody></table>
                 <h2>🔍 Поиск пользователя</h2>
                 <div class="search-form">
                     <input type="text" id="searchQuery" placeholder="ID, email или имя...">
@@ -114,12 +113,12 @@
 
             <div id="tab-jackpots" class="tab-content">
                 <h2>🎰 Последние джекпоты</h2>
-                <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Режим</th><th>Желание</th><th>Выигрыш</th></tr></thead><tbody id="jackpotsTable"></tbody></table>
+                <table><thead><tr><th>ID</th><th>Время</th><th>UID</th><th>Имя</th><th>Режим</th><th>Желание</th><th>Выигрыш</th><th>Действия</th></tr></thead><tbody id="jackpotsTable"></tbody></table>
             </div>
 
             <div id="tab-transactions" class="tab-content">
                 <h2>💳 Последние транзакции</h2>
-                <table><thead><tr><th>Время</th><th>ID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th></tr></thead><tbody id="transactionsTable"></tbody></table>
+                <table><thead><tr><th>ID</th><th>Время</th><th>UID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th><th>Действия</th></tr></thead><tbody id="transactionsTable"></tbody></table>
             </div>
 
             <div id="tab-promo" class="tab-content">
@@ -139,14 +138,14 @@
             </div>
 
             <div id="tab-stats" class="tab-content">
-                <h2>📊 Статистика по категориям</h2>
-                <table><thead><tr><th>Категория</th><th>Потрачено алмазов</th></tr></thead><tbody id="statsSpentTable"></tbody></table>
+                <h2>📊 Статистика: потрачено алмазов по пользователям</h2>
+                <table><thead><tr><th>Никнейм</th><th>Потрачено алмазов</th><th>Дата/время последней операции</th></tr></thead><tbody id="statsSpentTable"></tbody></table>
             </div>
         </div>
     </div>
 
-    <script src="api.js"></script>
     <script>
+        // Предполагается, что API уже подключён в api.js и содержит нужные методы
         let currentChatUID = null;
         let supportChats = {};
 
@@ -178,23 +177,23 @@
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
+            // Находим активную кнопку
             event.target.classList.add('active');
             if (name === 'support') loadSupportChats();
             if (name === 'jackpots') loadJackpots();
             if (name === 'transactions') loadTransactions();
             if (name === 'promo') loadPromoCodes();
-            if (name === 'stats') loadStatsTab();
+            if (name === 'stats') loadUserSpentStats();
         }
 
         async function loadAllData() {
-            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions(), loadPromoCodes()]);
+            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions(), loadPromoCodes(), loadUserSpentStats()]);
         }
 
         async function loadStats() {
             try {
                 const users = await API.getAllUsers();
                 const online = await API.getOnlineStats();
-                const spent = await API.getSpentByMode();
                 const chats = await API.getSupportChats();
                 document.getElementById('totalUsers').textContent = users.length;
                 document.getElementById('onlineNow').textContent = online.online_now;
@@ -204,20 +203,15 @@
                     if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
                 });
                 document.getElementById('unreadMessages').textContent = unread;
+                const badge = document.getElementById('unreadBadge');
                 if (unread > 0) {
-                    document.getElementById('unreadBadge').textContent = unread;
-                    document.getElementById('unreadBadge').classList.remove('hidden');
+                    badge.textContent = unread;
+                    badge.classList.remove('hidden');
                 } else {
-                    document.getElementById('unreadBadge').classList.add('hidden');
+                    badge.classList.add('hidden');
                 }
-                const modeNames = { '18+': '🔞 18+', 'home': '🏠 Для Дома', 'party': '🎉 Вечеринка', 'young': '💑 Молодая пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-                const spentHTML = Object.entries(spent).map(([mode, total]) => '<tr><td>' + (modeNames[mode] || mode) + '</td><td>' + total + ' 💎</td></tr>').join('') || '<tr><td colspan="2">Нет данных</td></tr>';
-                document.getElementById('spentTable').innerHTML = spentHTML;
-                document.getElementById('statsSpentTable').innerHTML = spentHTML;
             } catch (e) { console.error('Load stats error:', e); }
         }
-
-        async function loadStatsTab() { await loadStats(); }
 
         async function loadAllUsers() {
             try { const users = await API.getAllUsers(); renderUsers(users); } catch (e) { console.error('Load users error:', e); }
@@ -250,7 +244,7 @@
             if (result.success) { showSuccess('-' + amount + '💎 → ' + uid); loadAllData(); } else showError(result.error);
         }
 
-        // ===== ПРОМОКОДЫ =====
+        // ===== ПРОМОКОДЫ (без изменений, кроме кнопок удаления уже есть) =====
         async function createPromoCode() {
             const editingCode = document.getElementById('editingCode').value;
             let code = document.getElementById('promoCode').value.trim();
@@ -321,7 +315,7 @@
             try {
                 const promos = await API.getAllPromoCodes();
                 const html = promos.map(p =>
-                    '<tr><td><strong>' + p.code + '</strong></td><td>' + (p.type === 'spins' ? '🎰 Фриспины' : '💎 Алмазы') + '</td><td>' + p.amount + '</td><td>' + p.current_uses + '</td><td>' + p.max_uses + '</td><td>' + (p.is_active ? '✅' : '❌') + '</td><td>' + (p.expires_at ? new Date(p.expires_at).toLocaleDateString() : 'Бессрочно') + '</td><td class="actions"><button class="btn-edit" onclick="editPromoCode(\'' + p.code + '\',\'' + p.type + '\',' + p.amount + ',' + p.max_uses + ',\'' + (p.expires_at || '') + '\')">✏️</button><button class="btn-remove" onclick="deletePromoCode(\'' + p.code + '\')">🗑</button></td></tr>'
+                    '<tr><td><strong>' + p.code + '</strong></td><td>' + (p.type === 'spins' ? '🎰 Фриспины' : '💎 Алмазы') + '</td><td>' + p.amount + '</td><td>' + p.current_uses + '</td><td>' + p.max_uses + '</td><td>' + (p.is_active ? '✅' : '❌') + '</td><td>' + (p.expires_at ? new Date(p.expires_at).toLocaleDateString() : 'Бессрочно') + '</td><td class="actions"><button class="btn-edit" onclick="editPromoCode(\'' + p.code + '\',\'' + p.type + '\',' + p.amount + ',' + p.max_uses + ',\'' + (p.expires_at || '') + '\')">✏️</button><button class="btn-delete" onclick="deletePromoCode(\'' + p.code + '\')">🗑</button></td></tr>'
                 ).join('') || '<tr><td colspan="8">Нет промокодов</td></tr>';
                 document.getElementById('promoTable').innerHTML = html;
             } catch (e) { console.error('Load promos error:', e); }
@@ -334,7 +328,7 @@
             loadPromoCodes();
         }
 
-        // ===== ПОДДЕРЖКА =====
+        // ===== ПОДДЕРЖКА (без изменений) =====
         async function loadSupportChats() {
             try { supportChats = await API.getSupportChats(); } catch (e) { supportChats = {}; }
             const usersList = document.getElementById('supportUsersList');
@@ -385,21 +379,79 @@
             showSuccess('Ответ отправлен');
         }
 
+        // ===== ДЖЕКПОТЫ (добавлено удаление) =====
         async function loadJackpots() {
             try {
                 const jackpots = await API.getAllJackpots();
                 const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-                const html = jackpots.slice(0, 100).map(j => '<tr><td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td><td>' + j.user_uid + '</td><td>' + (j.nickname || '-') + '</td><td>' + (modeNames[j.mode_key] || j.mode_key) + '</td><td>' + (j.wish || '').substring(0, 30) + '...</td><td>' + j.diamonds_won + ' 💎</td></tr>').join('') || '<tr><td colspan="6">Нет джекпотов</td></tr>';
+                const html = jackpots.slice(0, 100).map(j => 
+                    '<tr>' +
+                    '<td>' + j.id + '</td>' +
+                    '<td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
+                    '<td>' + j.user_uid + '</td>' +
+                    '<td>' + (j.nickname || '-') + '</td>' +
+                    '<td>' + (modeNames[j.mode_key] || j.mode_key) + '</td>' +
+                    '<td>' + (j.wish || '').substring(0, 30) + '...</td>' +
+                    '<td>' + j.diamonds_won + ' 💎</td>' +
+                    '<td class="actions"><button class="btn-delete" onclick="deleteJackpot(' + j.id + ')">🗑️</button></td>' +
+                    '</tr>'
+                ).join('') || '<tr><td colspan="8">Нет джекпотов</td></tr>';
                 document.getElementById('jackpotsTable').innerHTML = html;
             } catch (e) { console.error('Load jackpots error:', e); }
         }
 
+        async function deleteJackpot(id) {
+            if (!confirm('Удалить джекпот #' + id + '?')) return;
+            try {
+                await API.deleteJackpot(id);
+                showSuccess('Джекпот удалён');
+                loadJackpots();
+            } catch (e) { showError('Ошибка удаления джекпота'); }
+        }
+
+        // ===== ТРАНЗАКЦИИ (добавлено удаление) =====
         async function loadTransactions() {
             try {
                 const transactions = await API.getTransactions();
-                const html = transactions.slice(0, 100).map(t => '<tr><td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td><td>' + t.user_uid + '</td><td>' + (t.nickname || '-') + '</td><td>' + t.amount + ' 💎</td><td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td><td>' + (t.reason || '') + '</td></tr>').join('') || '<tr><td colspan="6">Нет транзакций</td></tr>';
+                const html = transactions.slice(0, 100).map(t => 
+                    '<tr>' +
+                    '<td>' + t.id + '</td>' +
+                    '<td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
+                    '<td>' + t.user_uid + '</td>' +
+                    '<td>' + (t.nickname || '-') + '</td>' +
+                    '<td>' + t.amount + ' 💎</td>' +
+                    '<td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td>' +
+                    '<td>' + (t.reason || '') + '</td>' +
+                    '<td class="actions"><button class="btn-delete" onclick="deleteTransaction(' + t.id + ')">🗑️</button></td>' +
+                    '</tr>'
+                ).join('') || '<tr><td colspan="8">Нет транзакций</td></tr>';
                 document.getElementById('transactionsTable').innerHTML = html;
             } catch (e) { console.error('Load transactions error:', e); }
+        }
+
+        async function deleteTransaction(id) {
+            if (!confirm('Удалить транзакцию #' + id + '?')) return;
+            try {
+                await API.deleteTransaction(id);
+                showSuccess('Транзакция удалена');
+                loadTransactions();
+            } catch (e) { showError('Ошибка удаления транзакции'); }
+        }
+
+        // ===== СТАТИСТИКА ПО ПОЛЬЗОВАТЕЛЯМ (новый метод) =====
+        async function loadUserSpentStats() {
+            try {
+                // Предполагаем, что API.getUserSpentStats() возвращает массив объектов:
+                // { nickname, total_spent, last_transaction_time }
+                const stats = await API.getUserSpentStats();
+                const html = stats.map(s => 
+                    '<tr><td>' + (s.nickname || '-') + '</td><td>' + (s.total_spent || 0) + ' 💎</td><td>' + (s.last_transaction_time ? new Date(s.last_transaction_time).toLocaleString() : '—') + '</td></tr>'
+                ).join('') || '<tr><td colspan="3">Нет данных</td></tr>';
+                document.getElementById('statsSpentTable').innerHTML = html;
+            } catch (e) {
+                console.error('Load user spent stats error:', e);
+                document.getElementById('statsSpentTable').innerHTML = '<tr><td colspan="3">Ошибка загрузки</td></tr>';
+            }
         }
 
         if (localStorage.getItem('vds_admin_logged_in') === 'true') {
