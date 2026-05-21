@@ -180,6 +180,11 @@ class GameAPI {
         return data || [];
     }
 
+    // ==== НОВОЕ: Удаление джекпота ====
+    async deleteJackpot(id) {
+        return await this._fetch(`jackpots?id=eq.${id}`, { method: 'DELETE' });
+    }
+
     // ===== ОНЛАЙН =====
     async logOnline(user_uid, nickname, action) {
         return await this._fetch('online_logs', {
@@ -268,6 +273,12 @@ class GameAPI {
         return data || [];
     }
 
+    // ==== НОВОЕ: Удаление транзакции ====
+    async deleteTransaction(id) {
+        return await this._fetch(`transactions?id=eq.${id}`, { method: 'DELETE' });
+    }
+
+    // (Метод getSpentByMode больше не используется в админке, но остаётся для совместимости)
     async getSpentByMode() {
         const data = await this._fetch('jackpots?select=mode_key,diamonds_won');
         if (!data) return {};
@@ -277,6 +288,46 @@ class GameAPI {
             spent[j.mode_key] += (j.diamonds_won || 0);
         });
         return spent;
+    }
+
+    // ==== НОВОЕ: Статистика потраченных алмазов по пользователям ====
+    async getUserSpentStats() {
+        // Берём все списания
+        const removals = await this._fetch('transactions?type=eq.remove');
+        if (!removals || removals.length === 0) return [];
+
+        // Группируем по user_uid
+        const userMap = new Map();
+        removals.forEach(tx => {
+            const uid = tx.user_uid;
+            if (!userMap.has(uid)) {
+                userMap.set(uid, { total_spent: 0, last_transaction_time: tx.created_at });
+            }
+            const entry = userMap.get(uid);
+            entry.total_spent += tx.amount;
+            if (tx.created_at > entry.last_transaction_time) {
+                entry.last_transaction_time = tx.created_at;
+            }
+        });
+
+        // Получаем всех пользователей для сопоставления никнеймов
+        const allUsers = await this.getAllUsers();
+        const userNicknames = {};
+        (allUsers || []).forEach(u => { userNicknames[u.user_uid] = u.nickname; });
+
+        // Формируем результат
+        const result = [];
+        for (const [uid, stats] of userMap.entries()) {
+            result.push({
+                nickname: userNicknames[uid] || uid,
+                total_spent: stats.total_spent,
+                last_transaction_time: stats.last_transaction_time
+            });
+        }
+
+        // Сортируем по убыванию потраченных алмазов
+        result.sort((a, b) => b.total_spent - a.total_spent);
+        return result;
     }
 
     // ===== ЧАТЫ ПОДДЕРЖКИ =====
