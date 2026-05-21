@@ -1,546 +1,1869 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height">
-  <title>VDS | Vibe Dare Smile - Wheel of Desires</title>
-  <meta name="description" content="VDS - Vibe Dare Smile: Luxury casino-style game of desires. Spin the wheel, win diamonds, and send romantic wishes to your partner.">
-  <meta name="keywords" content="VDS, Vibe Dare Smile, wheel of desires, casino game, romantic wishes, slot machine, diamonds">
-  <meta name="author" content="VDS Games">
-  <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#1a0530">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="VDS Game">
-  <meta property="og:title" content="VDS | Vibe Dare Smile - Wheel of Desires">
-  <meta property="og:description" content="Luxury casino-style game of desires. Spin, win, and share romantic wishes!">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://vds-game.ink">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='8' fill='%231a0530'/%3E%3Ctext x='16' y='22' font-size='16' fill='%23ffd700' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
-  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a0530'/%3E%3Ctext x='90' y='110' font-size='90' font-weight='bold' fill='%23ffd700' text-anchor='middle' font-family='serif'%3EVDS%3C/text%3E%3C/svg%3E">
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
-    body { font-family: 'Cormorant Garamond', 'Segoe UI', 'Times New Roman', serif; background: radial-gradient(circle at 20% 30%, #1a0530, #050010 90%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 8px; margin: 0; touch-action: manipulation; position: relative; overflow-x: hidden; }
-    body::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at 30% 40%, rgba(255,215,0,0.1) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(180,100,255,0.12) 0%, transparent 70%); pointer-events: none; z-index: 0; }
-    .outer-header { position: fixed; top: 6px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: flex-start; z-index: 10; pointer-events: none; }
-    .outer-header > * { pointer-events: auto; }
-    .outer-site-title { font-size: clamp(1rem, 4vw, 1.5rem); font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; filter: drop-shadow(0 0 15px #ffb700); line-height: 1; }
-    .outer-site-subtitle { font-size: clamp(0.45rem, 1.8vw, 0.65rem); color: #d4af37; letter-spacing: 2px; text-shadow: 0 0 6px black; }
-    .user-id-display { font-size: 0.6rem; color: #b8945f; letter-spacing: 1px; margin-top: 2px; }
-    .outer-right-group { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
-    .lang-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 7px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); letter-spacing: 1px; }
-    .lang-btn.active { background: #d4af37; color: #150a1f; border-color: #fff; }
-    .logout-btn { background: rgba(20,5,35,0.8); border: 1px solid #c9a13b; color: #ddc07a; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; backdrop-filter: blur(8px); }
-    .google-btn-outer { display: flex; align-items: center; justify-content: center; gap: 8px; width: 200px; padding: 10px 14px; background: #fff; color: #333; border: none; border-radius: 50px; font-weight: bold; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; }
-    .google-btn-outer:hover { background: #f1f1f1; transform: scale(1.02); }
-    #app { width: 100%; max-width: 650px; background: rgba(8,3,18,0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border: 2px solid rgba(212,175,55,0.4); box-shadow: 0 30px 50px rgba(0,0,0,0.9), 0 0 45px rgba(180,130,50,0.5); border-radius: 48px; padding: 18px 18px 22px; position: relative; z-index: 1; display: flex; flex-direction: column; gap: 14px; margin-top: 60px; }
-    .user-bar { display: flex; justify-content: space-between; align-items: center; background: rgba(20,5,35,0.6); border: 2px solid #d4af37; border-radius: 40px; padding: 8px 14px; margin: 0 2px; box-shadow: 0 0 18px rgba(255,215,0,0.3); gap: 8px; }
-    .user-bar.hidden-bar { display: none; }
-    .nickname { font-weight: 900; font-size: 1rem; color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; animation: nickGlow 2s ease-in-out infinite alternate; letter-spacing: 1px; flex-shrink: 0; }
-    @keyframes nickGlow { 0% { text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b; } 100% { text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00; } }
-    .profile-btn { background: rgba(212,175,55,0.3); border: 1px solid #d4af37; color: #ffd700; padding: 3px 10px; border-radius: 16px; font-weight: bold; font-size: 0.7rem; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
-    .profile-btn:hover { background: rgba(212,175,55,0.5); }
-    .balance-display { font-weight: 900; font-size: 1rem; color: #ffd966; text-shadow: 0 0 10px #ffd700; display: flex; align-items: center; gap: 5px; flex-shrink: 0; }
-    .top-up-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
-    .spin-win-display { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); font-size: 3rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; z-index: 300; pointer-events: none; opacity: 0; animation: none; }
-    .spin-win-display.show { animation: winPopup 2s ease-out forwards; }
-    @keyframes winPopup { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%,-50%) scale(1.2); } 40% { opacity: 1; transform: translate(-50%,-50%) scale(1); } 100% { opacity: 0; transform: translate(-50%,-120%) scale(0.8); } }
-    .jackpot-banner { position: fixed; top: 0; left: 50%; transform: translateX(-50%); font-size: 4rem; font-weight: 900; color: #ffd700; text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff4500; z-index: 350; pointer-events: none; opacity: 0; animation: jackpotBannerIn 0.5s ease-out forwards, jackpotBannerOut 0.5s ease-in 4.5s forwards; letter-spacing: 8px; }
-    @keyframes jackpotBannerIn { 0% { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-10deg); } 100% { opacity: 1; transform: translateX(-50%) scale(1) rotate(0deg); } }
-    @keyframes jackpotBannerOut { 0% { opacity: 1; transform: translateX(-50%) scale(1); } 100% { opacity: 0; transform: translateX(-50%) scale(1.5); } }
-    .falling-gift { position: fixed; top: -60px; z-index: 340; pointer-events: none; animation: giftFall linear forwards; font-size: 2rem; }
-    @keyframes giftFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
-    .gift-container { display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; position: relative; }
-    .gift-icon { transition: all 0.5s ease; filter: drop-shadow(0 0 8px gold); animation: giftPulse 2s ease-in-out infinite; position: relative; }
-    @keyframes giftPulse { 0%,100% { transform: scale(1); filter: drop-shadow(0 0 8px gold); } 50% { transform: scale(1.1); filter: drop-shadow(0 0 15px gold); } }
-    .gift-shake { animation: giftShake 0.15s ease-in-out infinite !important; }
-    @keyframes giftShake { 0%,100% { transform: translateX(0) rotate(0deg); } 15% { transform: translateX(-4px) rotate(-3deg); } 30% { transform: translateX(3px) rotate(2deg); } 45% { transform: translateX(-3px) rotate(-2deg); } 60% { transform: translateX(3px) rotate(1deg); } 75% { transform: translateX(-2px) rotate(-1deg); } 90% { transform: translateX(2px) rotate(1deg); } }
-    .gift-explosion { animation: giftExplode 0.6s ease-out forwards !important; }
-    @keyframes giftExplode { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(0); opacity: 0; } }
-    .gift-reappear { animation: giftReappear 0.6s ease-in forwards; }
-    @keyframes giftReappear { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .particle { position: absolute; width: 8px; height: 8px; border-radius: 2px; pointer-events: none; z-index: 360; animation: particleFly 1.5s ease-out forwards; }
-    @keyframes particleFly { 0% { transform: translate(0,0) scale(1); opacity: 1; } 100% { transform: translate(var(--px),var(--py)) scale(0); opacity: 0; } }
-    .auto-spin-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #2d1840, #150920); border: 2px solid #c9a13b; color: #f7e9c3; font-weight: 900; font-size: 0.7rem; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.6), 0 0 10px rgba(255,200,0,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
-    .auto-spin-btn.active { background: linear-gradient(135deg, #ff8c00, #ff4500); border-color: #ffd700; box-shadow: 0 0 25px rgba(255,140,0,0.7); animation: autoSpinPulse 1s ease-in-out infinite; }
-    @keyframes autoSpinPulse { 0%,100% { box-shadow: 0 0 20px rgba(255,140,0,0.5); } 50% { box-shadow: 0 0 40px rgba(255,200,0,0.9); } }
-    .auto-spin-btn:active { transform: scale(0.9); }
-    .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin: 4px 0; padding: 0 4px; }
-    .menu-grid .thread-btn { font-size: 1rem; padding: 18px 12px; }
-    .menu-lang-row { display: flex; justify-content: center; gap: 10px; margin-top: 8px; z-index: 2; }
-    .reg-lang-row { display: flex; justify-content: center; gap: 10px; margin-top: 18px; z-index: 2; }
-    .reg-lang-row .lang-btn { font-size: 0.75rem; padding: 4px 10px; }
-    .menu-lang-row .lang-btn { font-size: 0.75rem; padding: 5px 12px; }
-    .thread-btn { background: linear-gradient(180deg, #2d1840 0%, #150920 100%); border: 2px solid #c9a13b; border-radius: 50px; padding: 14px 14px; font-weight: 700; color: #f7e9c3; letter-spacing: 1px; box-shadow: 0 8px 14px rgba(0,0,0,0.6), 0 0 12px rgba(255,200,0,0.4); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 6px; backdrop-filter: blur(8px); white-space: nowrap; text-align: center; }
-    .thread-btn:active { transform: scale(0.96); box-shadow: 0 5px 12px black, 0 0 28px gold; }
-    .full-width-btn { grid-column: 1 / -1; }
-    .gold-text-btn { color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b; font-weight: 900; letter-spacing: 2px; }
-    .slot-machine { background: rgba(0,0,0,0.4); border: 2px solid #b49450; border-radius: 38px; padding: 10px 10px; backdrop-filter: blur(14px); box-shadow: inset 0 0 25px rgba(0,0,0,0.8), 0 12px 22px black; }
-    .slot-top-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
-    .treasure-section { display: flex; align-items: center; justify-content: center; gap: 6px; background: rgba(20,5,35,0.6); border-radius: 35px; padding: 5px 10px; border: 1px solid #d4af37; flex: 1; min-width: 0; min-height: 70px; position: relative; overflow: hidden; }
-    .treasure-box { display: flex; align-items: center; justify-content: center; }
-    .progress-container { flex: 1; max-width: 130px; }
-    .progress-text { color: #ffd966; font-weight: bold; font-size: 0.65rem; margin-bottom: 1px; text-align: center; }
-    .progress-bar { width: 100%; height: 8px; background: #1f0b2e; border-radius: 8px; overflow: hidden; border: 1px solid #c9a13b; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, #ffd700, #ffaa00); transition: width 0.4s ease; width: 0%; border-radius: 6px; }
-    .balance-row { display: flex; justify-content: space-between; align-items: center; color: #e5d9b0; font-weight: bold; margin: 3px 3px; font-size: 0.8rem; gap: 6px; flex-wrap: wrap; }
-    .free-spins-badge { color: #ffd966; font-weight: bold; font-size: 0.75rem; text-align: center; margin: 2px 0; text-shadow: 0 0 8px gold; }
-    .jackpot-prizes-btn { background: rgba(20,5,35,0.6); border: 1px solid #d4af37; color: #ffd966; padding: 3px 8px; border-radius: 16px; font-weight: bold; font-size: 0.65rem; cursor: pointer; white-space: nowrap; }
-    .machine { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 6px; }
-    .reel { height: 200px; background: #160c24; border-radius: 14px; overflow: hidden; border: 2px solid #e4b429; position: relative; box-shadow: inset 0 0 16px black, 0 0 8px rgba(255,215,0,0.3); }
-    @media (max-width: 480px) { .reel { height: 150px; } }
-    .strip { position: absolute; width: 100%; top: -40px; }
-    .symbol { height: 40px; display: flex; justify-content: center; align-items: center; font-size: 22px; color: #ffd966; }
-    @media (max-width: 480px) { .symbol { height: 30px; font-size: 17px; } }
-    .win-lines { position: relative; pointer-events: none; z-index: 40; }
-    .win-line { position: absolute; height: 2px; background: linear-gradient(90deg, #fff, #ffd700, #fff); border-radius: 8px; transform-origin: left center; box-shadow: 0 0 10px white, 0 0 16px gold; animation: linePulse 1.2s infinite alternate; }
-    @keyframes linePulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
-    .controls-row { display: flex; gap: 6px; align-items: stretch; margin-top: 3px; }
-    .left-buttons { display: flex; flex-direction: column; gap: 5px; flex: 0 0 auto; width: 45%; }
-    .left-buttons .thread-btn { animation: none; font-size: 0.7rem; padding: 9px 9px; }
-    .middle-buttons { display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
-    .spin-btn { background: radial-gradient(circle at 30% 30%, #ffea80, #b5891a); border: none; color: #1f0a2e; font-weight: 900; font-size: 1.4rem; letter-spacing: 2px; box-shadow: 0 0 25px #ffaa33; flex: 1; padding: 8px; animation: spinPulse 1.5s ease-in-out infinite; border-radius: 16px; }
-    @keyframes spinPulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px #ffaa33; } 50% { transform: scale(1.03); box-shadow: 0 0 35px #ffcc00; } }
-    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(18px); display: flex; align-items: center; justify-content: center; z-index: 200; }
-    .win-card { background: #1f1233; border: 3px solid #e4b429; border-radius: 44px; padding: 24px 18px; max-width: 420px; width: 90vw; text-align: center; box-shadow: 0 0 60px gold; max-height: 80vh; overflow-y: auto; animation: winCardAppear 0.5s ease-out; }
-    @keyframes winCardAppear { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .win-card.wide { max-width: 580px; }
-    .hidden { display: none !important; }
-    .social-btn { background: #4b2c6e; border: 1px solid #cfaa4a; color: #ffd966; padding: 12px 16px; border-radius: 35px; font-weight: bold; margin-top: 12px; width: 100%; cursor: pointer; }
-    .history-list { max-height: 280px; overflow-y: auto; margin: 12px 0; text-align: left; color: #f0dbb0; }
-    .history-item { background: rgba(255,215,0,0.1); border: 1px solid #d4af37; border-radius: 16px; padding: 8px; margin: 6px 0; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; flex-wrap: wrap; gap: 4px; }
-    .history-item button { background: #d4af37; color: #150a1f; border: none; border-radius: 16px; padding: 5px 10px; font-weight: bold; cursor: pointer; }
-    .view-btn { background: #4b2c6e; border: 1px solid #cfaa4a; color: #ffd966; padding: 5px 10px; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 0.7rem; }
-    .form-input { width: 100%; padding: 10px; margin: 6px 0; border-radius: 25px; border: 2px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.9rem; text-align: center; outline: none; }
-    .form-input::placeholder { color: #b8945f; }
-    .diamond-option { background: #2a1540; border: 1px solid #d4af37; color: #ffd966; padding: 8px; margin: 5px 0; border-radius: 16px; cursor: pointer; transition: 0.2s; font-size: 0.8rem; }
-    .diamond-option:hover { background: #3d2058; }
-    .auth-title { color: #ffd700; font-size: 1.3rem; margin-bottom: 12px; text-shadow: 0 0 12px gold; }
-    .custom-reward-input { width: 100%; padding: 8px; margin: 3px 0; border-radius: 16px; border: 1px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.85rem; text-align: center; outline: none; }
-    .footer { text-align: center; color: #b8945f; font-size: 0.65rem; margin-top: 8px; z-index: 1; position: relative; max-width: 650px; width: 100%; padding-bottom: 10px; }
-    .footer a { color: #d4af37; text-decoration: underline; cursor: pointer; margin: 0 6px; }
-    .footer a:hover { color: #ffd700; }
-    .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
-    .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
-    .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: transform 0.2s; }
-    .support-btn:hover { transform: scale(1.1); }
-    .support-btn:active { transform: scale(0.95); }
-    .support-btn.unread { background: linear-gradient(45deg, #0000ff, #ff0000, #ffff00, #0000ff); background-size: 400% 400%; animation: supportGradientGlow 2s ease infinite; box-shadow: 0 0 25px #0000ff, 0 0 35px #ff0000, 0 0 50px #ffff00; }
-    @keyframes supportGradientGlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .support-badge { position: absolute; top: -4px; right: -4px; background: #ff4444; color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-    .chat-messages { max-height: 280px; overflow-y: auto; text-align: left; color: #f0dbb0; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 16px; }
-    .chat-message { margin: 5px 0; padding: 7px 10px; border-radius: 14px; font-size: 0.8rem; }
-    .chat-message.admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; text-align: left; margin-right: 16px; }
-    .chat-message.user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; text-align: right; margin-left: 16px; }
-    .chat-input-row { display: flex; gap: 6px; }
-    .chat-input { flex: 1; padding: 8px; border-radius: 22px; border: 2px solid #d4af37; background: #2a1540; color: #ffd966; font-size: 0.8rem; outline: none; }
-    .custom-rewards-buttons { display: flex; gap: 6px; margin-top: 6px; }
-    .custom-rewards-buttons .thread-btn { flex: 1; animation: none; font-size: 0.75rem; padding: 10px; }
-    .google-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; background: #fff; color: #333; border: none; border-radius: 50px; font-weight: bold; font-size: 0.95rem; cursor: pointer; margin: 8px 0; transition: all 0.2s; }
-    .google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
-    .user-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #d4af37; object-fit: cover; }
-    .crypto-payment-card { max-width: 550px; width: 95vw; padding: 20px; }
-    .crypto-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; justify-content: center; }
-    .crypto-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 10px 14px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; font-weight: bold; transition: all 0.2s; }
-    .crypto-option:hover { border-color: #d4af37; }
-    .crypto-option.selected { border-color: #ffd700; background: #3d2058; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
-    .rate-display { color: #ffd966; font-size: 0.75rem; margin: 8px 0; text-align: center; }
-    .qr-container { display: flex; justify-content: center; margin: 12px 0; }
-    .qr-container img { border-radius: 12px; border: 2px solid #d4af37; }
-    .diamond-amount-select { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0; }
-    .diamond-amount-option { background: #2a1540; border: 2px solid #444; color: #ffd966; padding: 12px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; font-weight: bold; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .diamond-amount-option .amount { font-size: 1.2rem; }
-    .diamond-amount-option .price { font-size: 0.7rem; color: #b8945f; }
-    .diamond-amount-option:hover { border-color: #d4af37; }
-    .diamond-amount-option.selected { border-color: #ffd700; background: #3d2058; box-shadow: 0 0 15px rgba(255,215,0,0.4); }
-    .copied-msg { color: #44ff44; font-size: 0.7rem; margin-top: 4px; }
-    .wallet-address { background: #1a1030; border-radius: 12px; padding: 8px 12px; word-break: break-all; font-size: 0.75rem; color: #ddd; margin: 6px 0; }
-    .pay-btn { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; color: #000; font-weight: bold; padding: 12px; border-radius: 30px; width: 100%; cursor: pointer; font-size: 1rem; margin-top: 8px; }
-    .profile-modal-card { max-width: 450px; width: 90vw; animation: profileSlideIn 0.4s ease-out; }
-    @keyframes profileSlideIn { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-    .profile-info-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(212,175,55,0.2); color: #f0dbb0; font-size: 0.9rem; }
-    .profile-info-row strong { color: #ffd700; }
-    .copy-btn { background: #4b2c6e; border: 1px solid #cfaa4a; color: #ffd966; padding: 4px 12px; border-radius: 12px; cursor: pointer; font-size: 0.7rem; }
-    .profile-nickname-row { display: flex; gap: 8px; align-items: center; margin-top: 12px; }
-    .profile-nickname-row input { flex: 1; }
-    .profile-nickname-row button { padding: 8px 16px; background: #d4af37; color: #150a1f; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; }
-    #supportModal {
-      position: fixed;
-      bottom: 80px;
-      right: 16px;
-      width: auto;
-      max-width: 350px;
-      z-index: 160;
-      display: none;
-      background: #1f1233;
-      border: 3px solid #e4b429;
-      border-radius: 44px;
-      padding: 24px 18px;
-      text-align: center;
-      box-shadow: 0 0 60px gold;
-      max-height: 80vh;
-      overflow-y: auto;
-      animation: winCardAppear 0.3s ease-out;
-    }
-    #supportModal:not(.hidden) { display: block; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height">
+    <title>VDS | Vibe Dare Smile - Wheel of Desires</title>
+    <meta name="description" content="VDS - Vibe Dare Smile: Luxury casino-style game of desires. Spin the wheel, win diamonds, and send romantic wishes to your partner.">
+    <meta name="keywords" content="VDS, Vibe Dare Smile, wheel of desires, casino game, romantic wishes, slot machine, diamonds">
+    <meta name="author" content="VDS Games">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#1a0530">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VDS Game">
+    <meta property="og:title" content="VDS | Vibe Dare Smile - Wheel of Desires">
+    <meta property="og:description" content="Luxury casino-style game of desires. Spin, win, and share romantic wishes!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vds-game.ink">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='8' fill='%231a0530'/%3E%3Ctext x='16' y='22' font-size='16' fill='%23ffd700' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a0530'/%3E%3Ctext x='90' y='110' font-size='90' font-weight='bold' fill='%23ffd700' text-anchor='middle' font-family='serif'%3EVDS%3C/text%3E%3C/svg%3E">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            user-select: none;
+        }
 
-    /* ========== NEW ANIMATED LOGO REGISTRATION ========== */
-    #registrationWindow {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      width: 100vw; height: 100vh; height: 100dvh;
-      background: radial-gradient(circle at 30% 40%, rgba(20,5,35,0.95), #050010 100%);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      overflow: hidden;
-      padding: 20px;
-    }
-    .logo-assemble {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.1em;
-      font-size: clamp(5rem, 20vw, 10rem);
-      font-weight: 900;
-      color: #ffd700;
-      text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
-      margin-bottom: 1.5rem;
-      position: relative;
-      z-index: 1;
-    }
-    .logo-letter {
-      display: inline-block;
-      opacity: 0;
-      animation-duration: 1.2s;
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-      animation-fill-mode: forwards;
-    }
-    .logo-letter:nth-child(1) { animation-name: flyFromLeft; }
-    .logo-letter:nth-child(2) { animation-name: flyFromBottom; animation-delay: 0.2s; }
-    .logo-letter:nth-child(3) { animation-name: flyFromRight; animation-delay: 0.4s; }
-    @keyframes flyFromLeft {
-      0% { transform: translateX(-100vw) rotate(-30deg); opacity: 0; }
-      100% { transform: translateX(0) rotate(0deg); opacity: 1; }
-    }
-    @keyframes flyFromBottom {
-      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-      100% { transform: translateY(0) scale(1); opacity: 1; }
-    }
-    @keyframes flyFromRight {
-      0% { transform: translateX(100vw) rotate(30deg); opacity: 0; }
-      100% { transform: translateX(0) rotate(0deg); opacity: 1; }
-    }
-    .logo-glow {
-      margin-top: 0.5rem;
-      font-size: clamp(0.9rem, 4vw, 1.8rem);
-      color: #ffd966;
-      text-align: center;
-      letter-spacing: 2px;
-      text-shadow: 0 0 20px #ffd700;
-      opacity: 0;
-      animation: fadeInUp 1.2s ease-out 1.2s forwards;
-      z-index: 1;
-    }
-    .reg-google-btn {
-      margin-top: 2rem;
-      opacity: 0;
-      animation: fadeInUp 1.2s ease-out 1.8s forwards;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 12px 24px;
-      background: #fff;
-      color: #333;
-      border: none;
-      border-radius: 50px;
-      font-weight: bold;
-      font-size: clamp(0.85rem, 3vw, 1.1rem);
-      cursor: pointer;
-      transition: all 0.2s;
-      max-width: 280px;
-      width: 100%;
-      z-index: 1;
-    }
-    .reg-google-btn:hover { background: #f1f1f1; transform: scale(1.02); }
-    @keyframes fadeInUp {
-      0% { transform: translateY(20px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
-    }
-    /* Animated background gifts - now falling top to bottom */
-    .reg-bg-gifts {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: auto;
-      overflow: hidden;
-      z-index: 0;
-    }
-    .reg-bg-gift {
-      position: absolute;
-      font-size: 1.5rem;
-      opacity: 0.6;
-      pointer-events: auto;
-      cursor: pointer;
-      animation: regGiftFloat linear infinite;
-      transition: transform 0.1s;
-    }
-    @keyframes regGiftFloat {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.6; }
-      90% { opacity: 0.6; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-    }
-    .reg-phrase-glow {
-      position: absolute;
-      color: #ffd700;
-      font-size: 1.5rem;
-      font-weight: bold;
-      text-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00, 0 0 40px #ff4500;
-      pointer-events: none;
-      animation: regPhraseFade 5s forwards;
-      white-space: nowrap;
-      z-index: 10;
-    }
-    @keyframes regPhraseFade {
-      0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-      80% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3); }
-    }
-    @media (max-width: 600px) {
-      .logo-assemble { font-size: clamp(4rem, 18vw, 6rem); }
-    }
-    @media (display-mode: standalone) { body { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); } }
+        body {
+            font-family: 'Cormorant Garamond', 'Segoe UI', 'Times New Roman', serif;
+            background: radial-gradient(circle at 20% 30%, #1a0530, #050010 90%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 8px;
+            margin: 0;
+            touch-action: manipulation;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    /* ========== SHIMMER & BRACKET ANIMATIONS ========== */
-    #customRewardsBtn {
-      font-size: 1.3rem;
-      padding: 20px 16px;
-      background-size: 400% 400%;
-      animation: colorShift 4s ease infinite;
-      border-color: #ffd700;
-      overflow: hidden;
-      position: relative;
-    }
-    @keyframes colorShift {
-      0% { background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2); background-size: 400% 400%; background-position: 0% 50%; }
-      25% { background: linear-gradient(135deg, #ff8c00, #40e0d0, #8a2be2, #ff0080); background-size: 400% 400%; background-position: 100% 0%; }
-      50% { background: linear-gradient(135deg, #40e0d0, #8a2be2, #ff0080, #ff8c00); background-size: 400% 400%; background-position: 100% 100%; }
-      75% { background: linear-gradient(135deg, #8a2be2, #ff0080, #ff8c00, #40e0d0); background-size: 400% 400%; background-position: 0% 100%; }
-      100% { background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2); background-size: 400% 400%; background-position: 0% 50%; }
-    }
-    #customRewardsBtn::after {
-      content: "";
-      position: absolute;
-      top: -2px; left: -2px; right: -2px; bottom: -2px;
-      border-radius: 52px;
-      background: inherit;
-      filter: blur(12px);
-      opacity: 0.5;
-      z-index: -1;
-      animation: colorShift 4s ease infinite;
-      background-size: 400% 400%;
-    }
-    .bracket-flash {
-      animation: bracketPulse 0.6s ease-in-out infinite alternate;
-      display: inline-block;
-      position: relative;
-      z-index: 2;
-    }
-    @keyframes bracketPulse {
-      0% { opacity: 0.3; text-shadow: 0 0 4px #ffffff, 0 0 8px #ffd700; transform: scale(0.95); }
-      100% { opacity: 1; text-shadow: 0 0 16px #ffffff, 0 0 28px #ffd700, 0 0 40px #ff8c00; transform: scale(1.08); }
-    }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 20%, rgba(180, 100, 255, 0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
 
-    /* ========== MAIN MENU FALLING GIFTS ========== */
-    #mainMenu {
-      position: relative;
-      overflow: hidden;
-    }
-    .menu-falling-gift {
-      position: absolute;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.25;
-      animation: menuGiftSpinFall linear forwards;
-      font-size: 1.2rem;
-    }
-    @keyframes menuGiftSpinFall {
-      0% { transform: translateY(-40px) rotate(0deg); opacity: 0.35; }
-      10% { opacity: 0.35; }
-      90% { opacity: 0.35; }
-      100% { transform: translateY(calc(100% + 40px)) rotate(360deg); opacity: 0; }
-    }
-  </style>
+        .outer-header {
+            position: fixed;
+            top: 6px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .outer-header>* {
+            pointer-events: auto;
+        }
+
+        .outer-site-title {
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 15px #ffb700);
+            line-height: 1;
+        }
+
+        .outer-site-subtitle {
+            font-size: clamp(0.45rem, 1.8vw, 0.65rem);
+            color: #d4af37;
+            letter-spacing: 2px;
+            text-shadow: 0 0 6px black;
+        }
+
+        .user-id-display {
+            font-size: 0.6rem;
+            color: #b8945f;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        .outer-right-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .lang-btn {
+            background: rgba(20, 5, 35, 0.8);
+            border: 1px solid #c9a13b;
+            color: #ddc07a;
+            padding: 2px 5px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            letter-spacing: 1px;
+        }
+
+        .lang-btn.active {
+            background: #d4af37;
+            color: #150a1f;
+            border-color: #fff;
+        }
+
+        .logout-btn {
+            background: rgba(20, 5, 35, 0.8);
+            border: 1px solid #c9a13b;
+            color: #ddc07a;
+            padding: 2px 6px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+
+        .google-btn-outer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: auto;
+            max-width: 180px;
+            padding: 8px 10px;
+            background: #fff;
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: clamp(0.6rem, 2vw, 0.85rem);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .google-btn-outer:hover {
+            background: #f1f1f1;
+            transform: scale(1.02);
+        }
+
+        #app {
+            width: 100%;
+            max-width: 650px;
+            background: rgba(8, 3, 18, 0.7);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 2px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.9), 0 0 45px rgba(180, 130, 50, 0.5);
+            border-radius: clamp(24px, 5vw, 48px);
+            padding: clamp(10px, 3vw, 18px) clamp(10px, 3vw, 18px) clamp(12px, 3vw, 22px);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(8px, 2vw, 14px);
+            margin-top: 80px;
+        }
+
+        @media (min-width: 481px) {
+            #app {
+                margin-top: 60px;
+            }
+        }
+
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(20, 5, 35, 0.6);
+            border: 2px solid #d4af37;
+            border-radius: 40px;
+            padding: 6px 10px;
+            margin: 0 2px;
+            box-shadow: 0 0 18px rgba(255, 215, 0, 0.3);
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .user-bar.hidden-bar {
+            display: none;
+        }
+
+        .nickname {
+            font-weight: 900;
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b;
+            animation: nickGlow 2s ease-in-out infinite alternate;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+
+        @keyframes nickGlow {
+            0% {
+                text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b;
+            }
+            100% {
+                text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00;
+            }
+        }
+
+        .profile-btn {
+            background: rgba(212, 175, 55, 0.3);
+            border: 1px solid #d4af37;
+            color: #ffd700;
+            padding: 2px 8px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: clamp(0.55rem, 1.8vw, 0.7rem);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .profile-btn:hover {
+            background: rgba(212, 175, 55, 0.5);
+        }
+
+        .balance-display {
+            font-weight: 900;
+            font-size: clamp(0.8rem, 3vw, 1rem);
+            color: #ffd966;
+            text-shadow: 0 0 10px #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .top-up-btn {
+            background: rgba(20, 5, 35, 0.6);
+            border: 1px solid #d4af37;
+            color: #ffd966;
+            padding: 2px 6px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .spin-win-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
+            z-index: 300;
+            pointer-events: none;
+            opacity: 0;
+            animation: none;
+        }
+
+        .spin-win-display.show {
+            animation: winPopup 2s ease-out forwards;
+        }
+
+        @keyframes winPopup {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            20% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+            40% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -120%) scale(0.8);
+            }
+        }
+
+        .jackpot-banner {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(2rem, 8vw, 4rem);
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff4500;
+            z-index: 350;
+            pointer-events: none;
+            opacity: 0;
+            animation: jackpotBannerIn 0.5s ease-out forwards, jackpotBannerOut 0.5s ease-in 4.5s forwards;
+            letter-spacing: 8px;
+        }
+
+        @keyframes jackpotBannerIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) scale(0.3) rotate(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes jackpotBannerOut {
+            0% {
+                opacity: 1;
+                transform: translateX(-50%) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) scale(1.5);
+            }
+        }
+
+        .falling-gift {
+            position: fixed;
+            top: -60px;
+            z-index: 340;
+            pointer-events: none;
+            animation: giftFall linear forwards;
+            font-size: 2rem;
+        }
+
+        @keyframes giftFall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .gift-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .gift-icon {
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 0 8px gold);
+            animation: giftPulse 2s ease-in-out infinite;
+            position: relative;
+            font-size: clamp(1rem, 5vw, 1.5rem);
+        }
+
+        @keyframes giftPulse {
+            0%,
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px gold);
+            }
+            50% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 15px gold);
+            }
+        }
+
+        .gift-shake {
+            animation: giftShake 0.15s ease-in-out infinite !important;
+        }
+
+        @keyframes giftShake {
+            0%,
+            100% {
+                transform: translateX(0) rotate(0deg);
+            }
+            15% {
+                transform: translateX(-4px) rotate(-3deg);
+            }
+            30% {
+                transform: translateX(3px) rotate(2deg);
+            }
+            45% {
+                transform: translateX(-3px) rotate(-2deg);
+            }
+            60% {
+                transform: translateX(3px) rotate(1deg);
+            }
+            75% {
+                transform: translateX(-2px) rotate(-1deg);
+            }
+            90% {
+                transform: translateX(2px) rotate(1deg);
+            }
+        }
+
+        .gift-explosion {
+            animation: giftExplode 0.6s ease-out forwards !important;
+        }
+
+        @keyframes giftExplode {
+            0% {
+                transform: scale(0.5);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        .gift-reappear {
+            animation: giftReappear 0.6s ease-in forwards;
+        }
+
+        @keyframes giftReappear {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .particle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 360;
+            animation: particleFly 1.5s ease-out forwards;
+        }
+
+        @keyframes particleFly {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--px), var(--py)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        .auto-spin-btn {
+            width: clamp(40px, 15vw, 60px);
+            height: clamp(40px, 15vw, 60px);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2d1840, #150920);
+            border: 2px solid #c9a13b;
+            color: #f7e9c3;
+            font-weight: 900;
+            font-size: clamp(0.5rem, 2vw, 0.7rem);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 200, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            line-height: 1.1;
+            text-align: center;
+            padding: 2px;
+        }
+
+        .auto-spin-btn.active {
+            background: linear-gradient(135deg, #ff8c00, #ff4500);
+            border-color: #ffd700;
+            box-shadow: 0 0 25px rgba(255, 140, 0, 0.7);
+            animation: autoSpinPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes autoSpinPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 200, 0, 0.9);
+            }
+        }
+
+        .auto-spin-btn:active {
+            transform: scale(0.9);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(8px, 2vw, 12px);
+            margin: 4px 0;
+            padding: 0 4px;
+        }
+
+        .menu-grid .thread-btn {
+            font-size: clamp(0.9rem, 3vw, 1rem);
+            padding: clamp(12px, 3vw, 18px) clamp(8px, 2vw, 12px);
+        }
+
+        .menu-lang-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+            z-index: 2;
+        }
+
+        .reg-lang-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 18px;
+            z-index: 2;
+        }
+
+        .reg-lang-row .lang-btn {
+            font-size: clamp(0.6rem, 2vw, 0.75rem);
+            padding: 3px 8px;
+        }
+
+        .menu-lang-row .lang-btn {
+            font-size: clamp(0.6rem, 2vw, 0.75rem);
+            padding: 4px 10px;
+        }
+
+        .thread-btn {
+            background: linear-gradient(180deg, #2d1840 0%, #150920 100%);
+            border: 2px solid #c9a13b;
+            border-radius: 50px;
+            padding: clamp(8px, 2vw, 14px) clamp(8px, 2vw, 14px);
+            font-weight: 700;
+            color: #f7e9c3;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 200, 0, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            text-align: center;
+            line-height: 1.2;
+        }
+
+        .thread-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 5px 12px black, 0 0 28px gold;
+        }
+
+        .full-width-btn {
+            grid-column: 1 / -1;
+        }
+
+        .gold-text-btn {
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .slot-machine {
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid #b49450;
+            border-radius: 38px;
+            padding: 8px 8px;
+            backdrop-filter: blur(14px);
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8), 0 12px 22px black;
+        }
+
+        .slot-top-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 3px;
+            flex-wrap: wrap;
+        }
+
+        .treasure-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: rgba(20, 5, 35, 0.6);
+            border-radius: 35px;
+            padding: 4px 8px;
+            border: 1px solid #d4af37;
+            flex: 1 1 auto;
+            min-width: 0;
+            min-height: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .treasure-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .progress-container {
+            flex: 1;
+            max-width: 130px;
+        }
+
+        .progress-text {
+            color: #ffd966;
+            font-weight: bold;
+            font-size: clamp(0.5rem, 1.8vw, 0.65rem);
+            margin-bottom: 1px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: clamp(6px, 1.5vw, 8px);
+            background: #1f0b2e;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #c9a13b;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            transition: width 0.4s ease;
+            width: 0%;
+            border-radius: 6px;
+        }
+
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #e5d9b0;
+            font-weight: bold;
+            margin: 3px 3px;
+            font-size: clamp(0.6rem, 2vw, 0.8rem);
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .free-spins-badge {
+            color: #ffd966;
+            font-weight: bold;
+            font-size: clamp(0.6rem, 2vw, 0.75rem);
+            text-align: center;
+            margin: 2px 0;
+            text-shadow: 0 0 8px gold;
+        }
+
+        .jackpot-prizes-btn {
+            background: rgba(20, 5, 35, 0.6);
+            border: 1px solid #d4af37;
+            color: #ffd966;
+            padding: 2px 6px;
+            border-radius: 16px;
+            font-weight: bold;
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .machine {
+            --reel-height: clamp(120px, 25vw, 200px);
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
+        }
+
+        .reel {
+            height: var(--reel-height);
+            background: #160c24;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid #e4b429;
+            position: relative;
+            box-shadow: inset 0 0 16px black, 0 0 8px rgba(255, 215, 0, 0.3);
+        }
+
+        .strip {
+            position: absolute;
+            width: 100%;
+            top: -40px;
+        }
+
+        .symbol {
+            height: calc(var(--reel-height) / 5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: calc(var(--reel-height) / 7);
+            color: #ffd966;
+        }
+
+        @media (max-width: 480px) {
+            .machine {
+                --reel-height: clamp(100px, 35vw, 150px);
+            }
+        }
+
+        .win-lines {
+            position: relative;
+            pointer-events: none;
+            z-index: 40;
+        }
+
+        .win-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #fff, #ffd700, #fff);
+            border-radius: 8px;
+            transform-origin: left center;
+            box-shadow: 0 0 10px white, 0 0 16px gold;
+            animation: linePulse 1.2s infinite alternate;
+        }
+
+        @keyframes linePulse {
+            0% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 6px;
+            align-items: stretch;
+            margin-top: 3px;
+        }
+
+        .left-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 0 0 auto;
+            width: 45%;
+        }
+
+        .left-buttons .thread-btn {
+            animation: none;
+            font-size: clamp(0.6rem, 2vw, 0.7rem);
+            padding: clamp(6px, 1.5vw, 9px) clamp(6px, 1.5vw, 9px);
+        }
+
+        .middle-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+
+        .spin-btn {
+            background: radial-gradient(circle at 30% 30%, #ffea80, #b5891a);
+            border: none;
+            color: #1f0a2e;
+            font-weight: 900;
+            font-size: clamp(1rem, 4vw, 1.4rem);
+            letter-spacing: 2px;
+            box-shadow: 0 0 25px #ffaa33;
+            flex: 1;
+            padding: 8px;
+            animation: spinPulse 1.5s ease-in-out infinite;
+            border-radius: 16px;
+        }
+
+        @keyframes spinPulse {
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px #ffaa33;
+            }
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 0 35px #ffcc00;
+            }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(18px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .win-card {
+            background: #1f1233;
+            border: 3px solid #e4b429;
+            border-radius: clamp(24px, 5vw, 44px);
+            padding: clamp(16px, 3vw, 24px) clamp(12px, 3vw, 18px);
+            max-width: 90vw;
+            width: 90vw;
+            text-align: center;
+            box-shadow: 0 0 60px gold;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: winCardAppear 0.5s ease-out;
+        }
+
+        @keyframes winCardAppear {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .win-card.wide {
+            max-width: 95vw;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .social-btn {
+            background: #4b2c6e;
+            border: 1px solid #cfaa4a;
+            color: #ffd966;
+            padding: clamp(8px, 2vw, 12px) clamp(10px, 2vw, 16px);
+            border-radius: 35px;
+            font-weight: bold;
+            margin-top: 12px;
+            width: 100%;
+            cursor: pointer;
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
+        }
+
+        .history-list {
+            max-height: 280px;
+            overflow-y: auto;
+            margin: 12px 0;
+            text-align: left;
+            color: #f0dbb0;
+        }
+
+        .history-item {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid #d4af37;
+            border-radius: 16px;
+            padding: 8px;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .history-item button {
+            background: #d4af37;
+            color: #150a1f;
+            border: none;
+            border-radius: 16px;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .view-btn {
+            background: #4b2c6e;
+            border: 1px solid #cfaa4a;
+            color: #ffd966;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: clamp(6px, 2vw, 10px);
+            margin: 6px 0;
+            border-radius: 25px;
+            border: 2px solid #d4af37;
+            background: #2a1540;
+            color: #ffd966;
+            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+            text-align: center;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #b8945f;
+        }
+
+        .diamond-option {
+            background: #2a1540;
+            border: 1px solid #d4af37;
+            color: #ffd966;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .diamond-option:hover {
+            background: #3d2058;
+        }
+
+        .auth-title {
+            color: #ffd700;
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            text-shadow: 0 0 12px gold;
+        }
+
+        .custom-reward-input {
+            width: 100%;
+            padding: 6px;
+            margin: 3px 0;
+            border-radius: 16px;
+            border: 1px solid #d4af37;
+            background: #2a1540;
+            color: #ffd966;
+            font-size: 0.85rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .footer {
+            text-align: center;
+            color: #b8945f;
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            margin-top: 8px;
+            z-index: 1;
+            position: relative;
+            max-width: 650px;
+            width: 100%;
+            padding-bottom: 10px;
+        }
+
+        .footer a {
+            color: #d4af37;
+            text-decoration: underline;
+            cursor: pointer;
+            margin: 0 4px;
+        }
+
+        .footer a:hover {
+            color: #ffd700;
+        }
+
+        .prizes-list {
+            text-align: left;
+            color: #f0dbb0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        .win-detail-text {
+            text-align: left;
+            color: #f0dbb0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .support-btn {
+            position: fixed;
+            bottom: calc(16px + env(safe-area-inset-bottom));
+            right: calc(16px + env(safe-area-inset-right));
+            width: clamp(40px, 10vw, 52px);
+            height: clamp(40px, 10vw, 52px);
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 6px 16px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+            transition: transform 0.2s;
+        }
+
+        .support-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .support-btn:active {
+            transform: scale(0.95);
+        }
+
+        .support-btn.unread {
+            background: linear-gradient(45deg, #0000ff, #ff0000, #ffff00, #0000ff);
+            background-size: 400% 400%;
+            animation: supportGradientGlow 2s ease infinite;
+            box-shadow: 0 0 25px #0000ff, 0 0 35px #ff0000, 0 0 50px #ffff00;
+        }
+
+        @keyframes supportGradientGlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .support-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #ff4444;
+            color: #fff;
+            border-radius: 50%;
+            width: clamp(16px, 4vw, 20px);
+            height: clamp(16px, 4vw, 20px);
+            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .chat-messages {
+            max-height: 280px;
+            overflow-y: auto;
+            text-align: left;
+            color: #f0dbb0;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+        }
+
+        .chat-message {
+            margin: 5px 0;
+            padding: 7px 10px;
+            border-radius: 14px;
+            font-size: 0.8rem;
+        }
+
+        .chat-message.admin {
+            background: rgba(212, 175, 55, 0.2);
+            border: 1px solid #d4af37;
+            text-align: left;
+            margin-right: 16px;
+        }
+
+        .chat-message.user {
+            background: rgba(75, 44, 110, 0.4);
+            border: 1px solid #cfaa4a;
+            text-align: right;
+            margin-left: 16px;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 6px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 8px;
+            border-radius: 22px;
+            border: 2px solid #d4af37;
+            background: #2a1540;
+            color: #ffd966;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .custom-rewards-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .custom-rewards-buttons .thread-btn {
+            flex: 1;
+            animation: none;
+            font-size: 0.75rem;
+            padding: 10px;
+        }
+
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 12px;
+            background: #fff;
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            margin: 8px 0;
+            transition: all 0.2s;
+        }
+
+        .google-btn:hover {
+            background: #f1f1f1;
+            transform: scale(1.02);
+        }
+
+        .user-avatar {
+            width: clamp(24px, 6vw, 28px);
+            height: clamp(24px, 6vw, 28px);
+            border-radius: 50%;
+            border: 2px solid #d4af37;
+            object-fit: cover;
+        }
+
+        .crypto-payment-card {
+            max-width: 95vw;
+            width: 95vw;
+            padding: clamp(12px, 3vw, 20px);
+        }
+
+        .crypto-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 10px 0;
+            justify-content: center;
+        }
+
+        .crypto-option {
+            background: #2a1540;
+            border: 2px solid #444;
+            color: #ffd966;
+            padding: 8px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            font-weight: bold;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .crypto-option:hover {
+            border-color: #d4af37;
+        }
+
+        .crypto-option.selected {
+            border-color: #ffd700;
+            background: #3d2058;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .rate-display {
+            color: #ffd966;
+            font-size: 0.75rem;
+            margin: 8px 0;
+            text-align: center;
+        }
+
+        .qr-container {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0;
+        }
+
+        .qr-container img {
+            border-radius: 12px;
+            border: 2px solid #d4af37;
+            max-width: 100%;
+            height: auto;
+        }
+
+        .diamond-amount-select {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .diamond-amount-option {
+            background: #2a1540;
+            border: 2px solid #444;
+            color: #ffd966;
+            padding: 10px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .diamond-amount-option .amount {
+            font-size: 1.2rem;
+        }
+
+        .diamond-amount-option .price {
+            font-size: 0.7rem;
+            color: #b8945f;
+        }
+
+        .diamond-amount-option:hover {
+            border-color: #d4af37;
+        }
+
+        .diamond-amount-option.selected {
+            border-color: #ffd700;
+            background: #3d2058;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .copied-msg {
+            color: #44ff44;
+            font-size: 0.7rem;
+            margin-top: 4px;
+        }
+
+        .wallet-address {
+            background: #1a1030;
+            border-radius: 12px;
+            padding: 8px 12px;
+            word-break: break-all;
+            font-size: 0.75rem;
+            color: #ddd;
+            margin: 6px 0;
+        }
+
+        .pay-btn {
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 12px;
+            border-radius: 30px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 8px;
+        }
+
+        .profile-modal-card {
+            max-width: 95vw;
+            width: 95vw;
+            animation: profileSlideIn 0.4s ease-out;
+        }
+
+        @keyframes profileSlideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .profile-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+            color: #f0dbb0;
+            font-size: 0.9rem;
+        }
+
+        .profile-info-row strong {
+            color: #ffd700;
+        }
+
+        .copy-btn {
+            background: #4b2c6e;
+            border: 1px solid #cfaa4a;
+            color: #ffd966;
+            padding: 4px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        .profile-nickname-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .profile-nickname-row input {
+            flex: 1;
+        }
+
+        .profile-nickname-row button {
+            padding: 8px 16px;
+            background: #d4af37;
+            color: #150a1f;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #supportModal {
+            position: fixed;
+            bottom: calc(80px + env(safe-area-inset-bottom));
+            right: calc(2vw + env(safe-area-inset-right));
+            width: auto;
+            max-width: 90vw;
+            z-index: 160;
+            display: none;
+            background: #1f1233;
+            border: 3px solid #e4b429;
+            border-radius: clamp(24px, 5vw, 44px);
+            padding: clamp(16px, 3vw, 24px) clamp(12px, 3vw, 18px);
+            text-align: center;
+            box-shadow: 0 0 60px gold;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: winCardAppear 0.3s ease-out;
+        }
+
+        #supportModal:not(.hidden) {
+            display: block;
+        }
+
+        /* ========== NEW ANIMATED LOGO REGISTRATION ========== */
+        #registrationWindow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            background: radial-gradient(circle at 30% 40%, rgba(20, 5, 35, 0.95), #050010 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .logo-assemble {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.1em;
+            font-size: clamp(5rem, 20vw, 10rem);
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-letter {
+            display: inline-block;
+            opacity: 0;
+            animation-duration: 1.2s;
+            animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+            animation-fill-mode: forwards;
+        }
+
+        .logo-letter:nth-child(1) {
+            animation-name: flyFromLeft;
+        }
+
+        .logo-letter:nth-child(2) {
+            animation-name: flyFromBottom;
+            animation-delay: 0.2s;
+        }
+
+        .logo-letter:nth-child(3) {
+            animation-name: flyFromRight;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes flyFromLeft {
+            0% {
+                transform: translateX(-100vw) rotate(-30deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flyFromBottom {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flyFromRight {
+            0% {
+                transform: translateX(100vw) rotate(30deg);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(0) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .logo-glow {
+            margin-top: 0.5rem;
+            font-size: clamp(0.7rem, 3vw, 1.8rem);
+            color: #ffd966;
+            text-align: center;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px #ffd700;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease-out 1.2s forwards;
+            z-index: 1;
+        }
+
+        .reg-google-btn {
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1.2s ease-out 1.8s forwards;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: #fff;
+            color: #333;
+            border: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: clamp(0.85rem, 3vw, 1.1rem);
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 280px;
+            width: 100%;
+            z-index: 1;
+        }
+
+        .reg-google-btn:hover {
+            background: #f1f1f1;
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Animated background gifts */
+        .reg-bg-gifts {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: auto;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .reg-bg-gift {
+            position: absolute;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            opacity: 0.6;
+            pointer-events: auto;
+            cursor: pointer;
+            animation: regGiftFloat linear infinite;
+            transition: transform 0.1s;
+        }
+
+        @keyframes regGiftFloat {
+            0% {
+                transform: translateY(-10vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .reg-phrase-glow {
+            position: absolute;
+            color: #ffd700;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            font-weight: bold;
+            text-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00, 0 0 40px #ff4500;
+            pointer-events: none;
+            animation: regPhraseFade 5s forwards;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        @keyframes regPhraseFade {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            80% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.3);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .logo-assemble {
+                font-size: clamp(4rem, 18vw, 6rem);
+            }
+        }
+
+        @media (display-mode: standalone) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+                padding-left: env(safe-area-inset-left);
+                padding-right: env(safe-area-inset-right);
+            }
+        }
+
+        /* ========== SHIMMER & BRACKET ANIMATIONS ========== */
+        #customRewardsBtn {
+            font-size: clamp(1rem, 5vw, 1.3rem);
+            padding: clamp(12px, 3vw, 20px) clamp(10px, 2vw, 16px);
+            background-size: 400% 400%;
+            animation: colorShift 4s ease infinite;
+            border-color: #ffd700;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes colorShift {
+            0% {
+                background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+                background-size: 400% 400%;
+                background-position: 0% 50%;
+            }
+            25% {
+                background: linear-gradient(135deg, #ff8c00, #40e0d0, #8a2be2, #ff0080);
+                background-size: 400% 400%;
+                background-position: 100% 0%;
+            }
+            50% {
+                background: linear-gradient(135deg, #40e0d0, #8a2be2, #ff0080, #ff8c00);
+                background-size: 400% 400%;
+                background-position: 100% 100%;
+            }
+            75% {
+                background: linear-gradient(135deg, #8a2be2, #ff0080, #ff8c00, #40e0d0);
+                background-size: 400% 400%;
+                background-position: 0% 100%;
+            }
+            100% {
+                background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
+                background-size: 400% 400%;
+                background-position: 0% 50%;
+            }
+        }
+
+        #customRewardsBtn::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 52px;
+            background: inherit;
+            filter: blur(12px);
+            opacity: 0.5;
+            z-index: -1;
+            animation: colorShift 4s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        .bracket-flash {
+            animation: bracketPulse 0.6s ease-in-out infinite alternate;
+            display: inline-block;
+            position: relative;
+            z-index: 2;
+        }
+
+        @keyframes bracketPulse {
+            0% {
+                opacity: 0.3;
+                text-shadow: 0 0 4px #ffffff, 0 0 8px #ffd700;
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 16px #ffffff, 0 0 28px #ffd700, 0 0 40px #ff8c00;
+                transform: scale(1.08);
+            }
+        }
+
+        /* ========== MAIN MENU FALLING GIFTS ========== */
+        #mainMenu {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-falling-gift {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.25;
+            animation: menuGiftSpinFall linear forwards;
+            font-size: clamp(0.8rem, 3vw, 1.2rem);
+        }
+
+        @keyframes menuGiftSpinFall {
+            0% {
+                transform: translateY(-40px) rotate(0deg);
+                opacity: 0.35;
+            }
+            10% {
+                opacity: 0.35;
+            }
+            90% {
+                opacity: 0.35;
+            }
+            100% {
+                transform: translateY(calc(100% + 40px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="outer-header">
-    <div>
-      <div class="outer-site-title">VDS</div>
-      <div class="outer-site-subtitle">VIBE DARE SMILE</div>
-      <div class="user-id-display" id="userIdDisplay"></div>
+    <div class="outer-header">
+        <div>
+            <div class="outer-site-title">VDS</div>
+            <div class="outer-site-subtitle">VIBE DARE SMILE</div>
+            <div class="user-id-display" id="userIdDisplay"></div>
+        </div>
+        <div class="outer-right-group">
+            <button id="langRuOuter" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+            <button id="langUaOuter" class="lang-btn" onclick="setLanguage('ua')">UA</button>
+            <button id="langEnOuter" class="lang-btn" onclick="setLanguage('en')">EN</button>
+            <button class="logout-btn" id="logoutBtn" style="display:none;">🚪 Выйти</button>
+            <button class="google-btn-outer" id="googleLoginBtn" onclick="handleGoogleLogin()">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Войти через Google
+            </button>
+            <p id="authError" style="color:#ff4444;font-size:0.6rem;margin-top:0;display:none;"></p>
+        </div>
     </div>
-    <div class="outer-right-group">
-      <button id="langRuOuter" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
-      <button id="langUaOuter" class="lang-btn" onclick="setLanguage('ua')">UA</button>
-      <button id="langEnOuter" class="lang-btn" onclick="setLanguage('en')">EN</button>
-      <button class="logout-btn" id="logoutBtn" style="display:none;">🚪 Выйти</button>
-      <button class="google-btn-outer" id="googleLoginBtn" onclick="handleGoogleLogin()">
-        <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Войти через Google
-      </button>
-      <p id="authError" style="color:#ff4444;font-size:0.6rem;margin-top:0;display:none;"></p>
-    </div>
-  </div>
 
-  <!-- Registration window with animated background gifts and slower logo -->
-  <div id="registrationWindow" class="hidden">
-    <div class="reg-bg-gifts" id="regBgGifts"></div>
-    <div class="logo-assemble">
-      <span class="logo-letter">V</span>
-      <span class="logo-letter">D</span>
-      <span class="logo-letter">S</span>
+    <!-- Registration window with animated background gifts -->
+    <div id="registrationWindow" class="hidden">
+        <div class="reg-bg-gifts" id="regBgGifts"></div>
+        <div class="logo-assemble">
+            <span class="logo-letter">V</span>
+            <span class="logo-letter">D</span>
+            <span class="logo-letter">S</span>
+        </div>
+        <div class="logo-glow" id="regGlowText">Исполняет желания</div>
+        <button class="reg-google-btn" onclick="handleGoogleLogin()">
+            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Войти через Google
+        </button>
+        <div class="reg-lang-row">
+            <button id="langRuReg" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+            <button id="langUaReg" class="lang-btn" onclick="setLanguage('ua')">UA</button>
+            <button id="langEnReg" class="lang-btn" onclick="setLanguage('en')">EN</button>
+        </div>
     </div>
-    <div class="logo-glow" id="regGlowText">Исполняет желания</div>
-    <button class="reg-google-btn" onclick="handleGoogleLogin()">
-      <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-      Войти через Google
-    </button>
-    <div class="reg-lang-row">
-      <button id="langRuReg" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
-      <button id="langUaReg" class="lang-btn" onclick="setLanguage('ua')">UA</button>
-      <button id="langEnReg" class="lang-btn" onclick="setLanguage('en')">EN</button>
-    </div>
-  </div>
+
     <div id="app">
-    <div class="user-bar hidden-bar" id="userBar">
-      <span style="display:flex;align-items:center;gap:8px;">
-        <img class="user-avatar hidden" id="userAvatar" src="" alt="">
-        <span class="nickname" id="nicknameDisplay">Игрок</span>
-        <button class="profile-btn" id="profileBtn" onclick="openProfile()">📂</button>
-        <button class="profile-btn" id="promoCodeBtn" onclick="openPromoCode()">🎟️ Промокод</button>
-      </span>
-      <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
-    </div>
-
-    <div id="mainMenu" class="menu-grid">
-      <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn">Мои желания</button>
-      <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
-      <div class="menu-lang-row">
-        <button id="langRuMenu" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
-        <button id="langUaMenu" class="lang-btn" onclick="setLanguage('ua')">UA</button>
-        <button id="langEnMenu" class="lang-btn" onclick="setLanguage('en')">EN</button>
-      </div>
-    </div>
-
-    <div id="slotUI" class="slot-machine hidden">
-      <div class="slot-top-row">
-        <div class="treasure-section" id="treasureSection">
-          <div class="treasure-box" id="treasureBox"><div class="gift-container" id="giftContainer"><span class="gift-icon" id="giftIcon">🎁</span></div></div>
-          <div class="progress-container"><div class="progress-text" id="progressText">Бонус: 0/100%</div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
+        <div class="user-bar hidden-bar" id="userBar">
+            <span style="display:flex;align-items:center;gap:8px;">
+                <img class="user-avatar hidden" id="userAvatar" src="" alt="">
+                <span class="nickname" id="nicknameDisplay">Игрок</span>
+                <button class="profile-btn" id="profileBtn" onclick="openProfile()">📂</button>
+                <button class="profile-btn" id="promoCodeBtn" onclick="openPromoCode()">🎟️ Промокод</button>
+            </span>
+            <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
         </div>
-        <div class="balance-row" style="margin:0; flex-shrink:0; gap: 6px;">
-          <span id="diamondsLabel">💎 Алмазы:</span><span id="diamondsCount">100</span>
-          <button class="jackpot-prizes-btn" id="jackpotPrizesBtn">🎁 Призы</button>
+
+        <div id="mainMenu" class="menu-grid">
+            <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn">Мои желания</button>
+            <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
+            <div class="menu-lang-row">
+                <button id="langRuMenu" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
+                <button id="langUaMenu" class="lang-btn" onclick="setLanguage('ua')">UA</button>
+                <button id="langEnMenu" class="lang-btn" onclick="setLanguage('en')">EN</button>
+            </div>
         </div>
-      </div>
-      <div class="free-spins-badge hidden" id="freeSpinsBadge">🎁 Бесплатные спины: 0 (Шанс джекпота +50%)</div>
-      <div class="machine" id="machine"></div>
-      <div class="win-lines" id="winLines"></div>
-      <div style="color:#ffd966; text-align:center; min-height:20px; font-weight:bold; font-size:0.8rem;" id="messageDisplay"></div>
-      <div class="controls-row">
-        <div class="left-buttons"><button id="donateButton" class="thread-btn">💎 Пополнить</button><button id="backToMenu" class="thread-btn" style="background:#2a1738;">↩️ МЕНЮ</button></div>
-        <div class="middle-buttons"><button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button></div>
-        <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
-      </div>
+
+        <div id="slotUI" class="slot-machine hidden">
+            <div class="slot-top-row">
+                <div class="treasure-section" id="treasureSection">
+                    <div class="treasure-box" id="treasureBox"><div class="gift-container" id="giftContainer"><span class="gift-icon" id="giftIcon">🎁</span></div></div>
+                    <div class="progress-container"><div class="progress-text" id="progressText">Бонус: 0/100%</div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
+                </div>
+                <div class="balance-row" style="margin:0; flex-shrink:0; gap: 6px;">
+                    <span id="diamondsLabel">💎 Алмазы:</span><span id="diamondsCount">100</span>
+                    <button class="jackpot-prizes-btn" id="jackpotPrizesBtn">🎁 Призы</button>
+                </div>
+            </div>
+            <div class="free-spins-badge hidden" id="freeSpinsBadge">🎁 Бесплатные спины: 0 (Шанс джекпота +50%)</div>
+            <div class="machine" id="machine"></div>
+            <div class="win-lines" id="winLines"></div>
+            <div style="color:#ffd966; text-align:center; min-height:20px; font-weight:bold; font-size:0.8rem;" id="messageDisplay"></div>
+            <div class="controls-row">
+                <div class="left-buttons"><button id="donateButton" class="thread-btn">💎 Пополнить</button><button id="backToMenu" class="thread-btn" style="background:#2a1738;">↩️ МЕНЮ</button></div>
+                <div class="middle-buttons"><button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button></div>
+                <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <a id="privacyPolicyLink">Политика конфиденциальности</a> |
+            <a id="termsOfUseLink">Условия использования</a>
+        </div>
     </div>
 
-    <div class="footer">
-      <a id="privacyPolicyLink">Политика конфиденциальности</a> |
-      <a id="termsOfUseLink">Условия использования</a>
+    <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
+    <div class="spin-win-display" id="spinWinDisplay"></div>
+
+    <!-- Modals (unchanged) -->
+    <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
+    <div id="nameFormModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3><input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя"><input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра"><button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button><button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button></div></div>
+    <div id="paymentModal" class="overlay hidden"><div class="win-card" style="max-width:340px;"><h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3><div id="diamondOptions"><div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div><div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div><div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div><div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div><div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div></div><button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button></div></div>
+    <div id="historyModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="historyTitle">📜 История Джекпотов</h3><div id="historyList" class="history-list"></div><button id="closeHistoryBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+    <div id="winDetailModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="winDetailTitle">📋 Детали выигрыша</h3><div class="win-detail-text" id="winDetailContent"></div><button id="closeWinDetailBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+    <div id="customRewardsModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="customRewardsTitle">🎁 Мои желания (3-10)</h3><p style="color:#ddd; font-size:0.75rem;" id="customRewardsDesc">Введите свои желания для джекпота</p><div id="customRewardsList"></div><button id="addCustomRewardBtn" class="thread-btn" style="animation:none; margin-top:6px;">+ Добавить</button><div class="custom-rewards-buttons"><button id="saveAndPlayBtn" class="thread-btn" style="background:#d4af37; color:#150a1f;">💾 Сохранить и играть</button><button id="closeCustomRewardsBtn" class="thread-btn">ЗАКРЫТЬ</button></div></div></div>
+    <div id="jackpotPrizesModal" class="overlay hidden"><div class="win-card" style="max-width:400px;"><h3 style="color:#ffd966;" id="jackpotPrizesTitle">🎁 Призы джекпота</h3><div class="prizes-list" id="jackpotPrizesList"></div><button id="closeJackpotPrizesBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
+    <div id="supportModal" class="hidden">
+        <h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3>
+        <div class="chat-messages" id="chatMessages"><div class="chat-message admin">👋 Здравствуйте! Чем могу помочь?</div></div>
+        <div class="chat-input-row"><input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение..."><button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button></div>
+        <button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button>
     </div>
-  </div>
 
-  <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
-  <div class="spin-win-display" id="spinWinDisplay"></div>
-
-  <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
-  <div id="nameFormModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3><input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя"><input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра"><button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button><button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button></div></div>
-  <div id="paymentModal" class="overlay hidden"><div class="win-card" style="max-width:340px;"><h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3><div id="diamondOptions"><div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div><div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div><div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div><div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div><div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div></div><button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button></div></div>
-  <div id="historyModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="historyTitle">📜 История Джекпотов</h3><div id="historyList" class="history-list"></div><button id="closeHistoryBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
-  <div id="winDetailModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="winDetailTitle">📋 Детали выигрыша</h3><div class="win-detail-text" id="winDetailContent"></div><button id="closeWinDetailBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
-  <div id="customRewardsModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="customRewardsTitle">🎁 Мои желания (3-10)</h3><p style="color:#ddd; font-size:0.75rem;" id="customRewardsDesc">Введите свои желания для джекпота</p><div id="customRewardsList"></div><button id="addCustomRewardBtn" class="thread-btn" style="animation:none; margin-top:6px;">+ Добавить</button><div class="custom-rewards-buttons"><button id="saveAndPlayBtn" class="thread-btn" style="background:#d4af37; color:#150a1f;">💾 Сохранить и играть</button><button id="closeCustomRewardsBtn" class="thread-btn">ЗАКРЫТЬ</button></div></div></div>
-  <div id="jackpotPrizesModal" class="overlay hidden"><div class="win-card" style="max-width:400px;"><h3 style="color:#ffd966;" id="jackpotPrizesTitle">🎁 Призы джекпота</h3><div class="prizes-list" id="jackpotPrizesList"></div><button id="closeJackpotPrizesBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
-  <div id="supportModal" class="hidden">
-    <h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3>
-    <div class="chat-messages" id="chatMessages"><div class="chat-message admin">👋 Здравствуйте! Чем могу помочь?</div></div>
-    <div class="chat-input-row"><input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение..."><button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button></div>
-    <button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button>
-  </div>
-
-  <div id="promoCodeModal" class="overlay hidden">
-    <div class="win-card">
-      <h3 style="color:#ffd700;" id="promoCodeTitle">🎟️ Введите промокод</h3>
-      <input type="text" class="form-input" id="promoCodeInput" placeholder="WELCOME">
-      <button id="promoCodeSubmitBtn" class="thread-btn" style="margin-top:8px;">💾 Активировать</button>
-      <p id="promoCodeMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;"></p>
-      <button id="closePromoCodeBtn" class="thread-btn" style="margin-top:6px;animation:none;">ЗАКРЫТЬ</button>
+    <div id="promoCodeModal" class="overlay hidden">
+        <div class="win-card">
+            <h3 style="color:#ffd700;" id="promoCodeTitle">🎟️ Введите промокод</h3>
+            <input type="text" class="form-input" id="promoCodeInput" placeholder="WELCOME">
+            <button id="promoCodeSubmitBtn" class="thread-btn" style="margin-top:8px;">💾 Активировать</button>
+            <p id="promoCodeMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;"></p>
+            <button id="closePromoCodeBtn" class="thread-btn" style="margin-top:6px;animation:none;">ЗАКРЫТЬ</button>
+        </div>
     </div>
-  </div>
 
-  <div id="cryptoPaymentModal" class="overlay hidden">
-    <div class="win-card crypto-payment-card">
-      <h3 style="color:#ffd700;margin-bottom:12px;">💎 Покупка алмазов</h3>
-      <p style="color:#ddd;font-size:0.8rem;margin-bottom:6px;">Выберите сумму:</p>
-      <div class="diamond-amount-select" id="diamondAmounts">
-        <div class="diamond-amount-option selected" data-usd="1" data-diamonds="100"><span class="amount">100 💎</span><span class="price">$1.00</span></div>
-        <div class="diamond-amount-option" data-usd="5" data-diamonds="500"><span class="amount">500 💎</span><span class="price">$5.00</span></div>
-        <div class="diamond-amount-option" data-usd="10" data-diamonds="1000"><span class="amount">1000 💎</span><span class="price">$10.00</span></div>
-        <div class="diamond-amount-option" data-usd="50" data-diamonds="5000"><span class="amount">5000 💎</span><span class="price">$50.00</span></div>
-        <div class="diamond-amount-option" data-usd="100" data-diamonds="10000"><span class="amount">10000 💎</span><span class="price">$100.00</span></div>
-      </div>
-      <p style="color:#ddd;font-size:0.8rem;margin:8px 0;">Выберите криптовалюту:</p>
-      <div class="crypto-list" id="cryptoList">
-        <div class="crypto-option selected" data-currency="USDT">USDT (TRC20)</div>
-        <div class="crypto-option" data-currency="TRX">TRX (TRC20)</div>
-        <div class="crypto-option" data-currency="BNB">BNB (BEP20)</div>
-        <div class="crypto-option" data-currency="ETH">ETH (ERC20)</div>
-        <div class="crypto-option" data-currency="BTC">BTC (BEP20)</div>
-      </div>
-      <div class="rate-display" id="rateDisplay">Загрузка курса...</div>
-      <div class="qr-container" id="qrContainer"></div>
-      <div class="wallet-address" id="walletAddress"></div>
-      <button id="copyAddressBtn" class="thread-btn" style="animation:none;font-size:0.7rem;padding:8px;margin:6px 0;width:100%;">📋 Копировать адрес</button>
-      <p class="copied-msg hidden" id="copiedMsg">Адрес скопирован!</p>
-      <button id="simulatePaymentBtn" class="pay-btn">💰 Я оплатил — получить алмазы</button>
-      <p style="color:#888;font-size:0.65rem;text-align:center;margin:8px 0;">После нажатия алмазы начислятся мгновенно (демо)</p>
-      <button id="closeCryptoPaymentBtn" class="thread-btn" style="margin-top:4px;animation:none;">ЗАКРЫТЬ</button>
+    <div id="cryptoPaymentModal" class="overlay hidden">
+        <div class="win-card crypto-payment-card">
+            <h3 style="color:#ffd700;margin-bottom:12px;">💎 Покупка алмазов</h3>
+            <p style="color:#ddd;font-size:0.8rem;margin-bottom:6px;">Выберите сумму:</p>
+            <div class="diamond-amount-select" id="diamondAmounts">
+                <div class="diamond-amount-option selected" data-usd="1" data-diamonds="100"><span class="amount">100 💎</span><span class="price">$1.00</span></div>
+                <div class="diamond-amount-option" data-usd="5" data-diamonds="500"><span class="amount">500 💎</span><span class="price">$5.00</span></div>
+                <div class="diamond-amount-option" data-usd="10" data-diamonds="1000"><span class="amount">1000 💎</span><span class="price">$10.00</span></div>
+                <div class="diamond-amount-option" data-usd="50" data-diamonds="5000"><span class="amount">5000 💎</span><span class="price">$50.00</span></div>
+                <div class="diamond-amount-option" data-usd="100" data-diamonds="10000"><span class="amount">10000 💎</span><span class="price">$100.00</span></div>
+            </div>
+            <p style="color:#ddd;font-size:0.8rem;margin:8px 0;">Выберите криптовалюту:</p>
+            <div class="crypto-list" id="cryptoList">
+                <div class="crypto-option selected" data-currency="USDT">USDT (TRC20)</div>
+                <div class="crypto-option" data-currency="TRX">TRX (TRC20)</div>
+                <div class="crypto-option" data-currency="BNB">BNB (BEP20)</div>
+                <div class="crypto-option" data-currency="ETH">ETH (ERC20)</div>
+                <div class="crypto-option" data-currency="BTC">BTC (BEP20)</div>
+            </div>
+            <div class="rate-display" id="rateDisplay">Загрузка курса...</div>
+            <div class="qr-container" id="qrContainer"></div>
+            <div class="wallet-address" id="walletAddress"></div>
+            <button id="copyAddressBtn" class="thread-btn" style="animation:none;font-size:0.7rem;padding:8px;margin:6px 0;width:100%;">📋 Копировать адрес</button>
+            <p class="copied-msg hidden" id="copiedMsg">Адрес скопирован!</p>
+            <button id="simulatePaymentBtn" class="pay-btn">💰 Я оплатил — получить алмазы</button>
+            <p style="color:#888;font-size:0.65rem;text-align:center;margin:8px 0;">После нажатия алмазы начислятся мгновенно (демо)</p>
+            <button id="closeCryptoPaymentBtn" class="thread-btn" style="margin-top:4px;animation:none;">ЗАКРЫТЬ</button>
+        </div>
     </div>
-  </div>
 
-  <div id="profileModal" class="overlay hidden">
-    <div class="win-card profile-modal-card">
-      <h3 style="color:#ffd700;text-align:center;margin-bottom:16px;">👤 Профиль</h3>
-      <div class="profile-info-row"><strong>ID:</strong> <span id="profileUID">-</span> <button class="copy-btn" onclick="copyUID()">📋 Копировать</button></div>
-      <div class="profile-info-row"><strong>Email:</strong> <span id="profileEmail">-</span></div>
-      <div class="profile-info-row"><strong>💎 Баланс:</strong> <span id="profileDiamonds">0</span></div>
-      <div class="profile-info-row"><strong>🎰 Всего джекпотов:</strong> <span id="profileJackpots">0</span></div>
-      <div class="profile-nickname-row">
-        <input type="text" class="form-input" id="profileNicknameInput" placeholder="Новый никнейм">
-        <button onclick="changeNickname()">💾 Сохранить</button>
-      </div>
-      <p id="profileMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;text-align:center;"></p>
-      <button id="closeProfileBtn" class="thread-btn" style="margin-top:12px;animation:none;width:100%;">ЗАКРЫТЬ</button>
+    <div id="profileModal" class="overlay hidden">
+        <div class="win-card profile-modal-card">
+            <h3 style="color:#ffd700;text-align:center;margin-bottom:16px;">👤 Профиль</h3>
+            <div class="profile-info-row"><strong>ID:</strong> <span id="profileUID">-</span> <button class="copy-btn" onclick="copyUID()">📋 Копировать</button></div>
+            <div class="profile-info-row"><strong>Email:</strong> <span id="profileEmail">-</span></div>
+            <div class="profile-info-row"><strong>💎 Баланс:</strong> <span id="profileDiamonds">0</span></div>
+            <div class="profile-info-row"><strong>🎰 Всего джекпотов:</strong> <span id="profileJackpots">0</span></div>
+            <div class="profile-nickname-row">
+                <input type="text" class="form-input" id="profileNicknameInput" placeholder="Новый никнейм">
+                <button onclick="changeNickname()">💾 Сохранить</button>
+            </div>
+            <p id="profileMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;text-align:center;"></p>
+            <button id="closeProfileBtn" class="thread-btn" style="margin-top:12px;animation:none;width:100%;">ЗАКРЫТЬ</button>
+        </div>
     </div>
-  </div>
 
-  <script src="api.js"></script>
-  <script>
+    <script src="api.js"></script>
+    <script>
+    // ========== ORIGINAL SCRIPT – FULLY PRESERVED ==========
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `self.addEventListener('install',(e)=>{e.waitUntil(self.skipWaiting())});self.addEventListener('activate',(e)=>{e.waitUntil(self.clients.claim())});self.addEventListener('fetch',(e)=>{e.respondWith(fetch(e.request))});`;
@@ -1581,6 +2904,6 @@
       updateSupportBadge();
       showRegistrationPage();
     })();
-  </script>
+</script>
 </body>
 </html>
