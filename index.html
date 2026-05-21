@@ -123,12 +123,11 @@
     .footer a:hover { color: #ffd700; }
     .prizes-list { text-align: left; color: #f0dbb0; font-size: 0.85rem; line-height: 1.5; }
     .win-detail-text { text-align: left; color: #f0dbb0; font-size: 0.95rem; line-height: 1.7; }
-    .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: background 0.3s, box-shadow 0.3s; }
+    .support-btn { position: fixed; bottom: 16px; right: 16px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ff8c00); border: 3px solid #fff; box-shadow: 0 0 20px rgba(255,215,0,0.6), 0 6px 16px rgba(0,0,0,0.5); cursor: pointer; z-index: 150; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; transition: transform 0.2s; }
     .support-btn:hover { transform: scale(1.1); }
     .support-btn:active { transform: scale(0.95); }
-    .support-btn.unread { background: linear-gradient(45deg, #ff0000, #cc0000, #ff0000); background-size: 400% 400%; animation: supportRedPulse 1.5s ease-in-out infinite; box-shadow: 0 0 25px rgba(255,0,0,0.7); }
-    @keyframes supportRedPulse { 0%, 100% { background-position: 0% 50%; box-shadow: 0 0 25px rgba(255,0,0,0.7); } 50% { background-position: 100% 50%; box-shadow: 0 0 45px rgba(255,0,0,1); } }
-    .support-btn.chat-open { background: #28a745; box-shadow: 0 0 20px rgba(40,167,69,0.7); animation: none; }
+    .support-btn.unread { background: linear-gradient(45deg, #0000ff, #ff0000, #ffff00, #0000ff); background-size: 400% 400%; animation: supportGradientGlow 2s ease infinite; box-shadow: 0 0 25px #0000ff, 0 0 35px #ff0000, 0 0 50px #ffff00; }
+    @keyframes supportGradientGlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .support-badge { position: absolute; top: -4px; right: -4px; background: #ff4444; color: #fff; border-radius: 50%; width: 20px; height: 20px; font-size: 0.65rem; display: flex; align-items: center; justify-content: center; font-weight: bold; }
     .chat-messages { max-height: 280px; overflow-y: auto; text-align: left; color: #f0dbb0; margin-bottom: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 16px; }
     .chat-message { margin: 5px 0; padding: 7px 10px; border-radius: 14px; font-size: 0.8rem; }
@@ -185,40 +184,6 @@
       animation: winCardAppear 0.3s ease-out;
     }
     #supportModal:not(.hidden) { display: block; }
-
-    /* ========== TOAST УВЕДОМЛЕНИЯ ========== */
-    .toast-container {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 400;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-    }
-    .toast {
-      background: #1f1233;
-      border: 2px solid #d4af37;
-      color: #ffd966;
-      padding: 10px 20px;
-      border-radius: 30px;
-      font-size: 0.85rem;
-      box-shadow: 0 0 20px rgba(255,215,0,0.5);
-      animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 3.7s forwards;
-      pointer-events: auto;
-      max-width: 90vw;
-      text-align: center;
-    }
-    @keyframes toastIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes toastOut {
-      from { opacity: 1; }
-      to { opacity: 0; transform: translateY(-20px); }
-    }
 
     /* ========== NEW ANIMATED LOGO REGISTRATION ========== */
     #registrationWindow {
@@ -308,6 +273,7 @@
       0% { transform: translateY(20px); opacity: 0; }
       100% { transform: translateY(0); opacity: 1; }
     }
+    /* Animated background gifts - now falling top to bottom */
     .reg-bg-gifts {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -573,9 +539,6 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
-  <div class="toast-container" id="toastContainer"></div>
-
   <script src="api.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
@@ -667,12 +630,14 @@
         en: { privacy: 'Privacy Policy: 1. We use Google for login. 2. Game data is stored in Supabase. 3. We do not share data with third parties.', terms: 'Terms of Use: 1. Game is for entertainment purposes. 2. Administration reserves the right to change the rules.' }
       };
 
+      // Generic prize phrases for jackpot (replaces old MODE_PRIZES)
       const GENERIC_PRIZES = {
         ru: ['Вы выиграли приз!', 'Поздравляем!', 'Удача улыбнулась!', 'Ваш приз ждёт!', 'Заберите подарок!', 'Сегодня ваш день!', 'Сюрприз!'],
         ua: ['Ви виграли приз!', 'Вітаємо!', 'Удача посміхнулася!', 'Ваш приз чекає!', 'Заберіть подарунок!', 'Сьогодні ваш день!', 'Сюрприз!'],
         en: ['You won a prize!', 'Congratulations!', 'Lucky day!', 'Your prize awaits!', 'Grab your gift!', 'It\'s your day!', 'Surprise!']
       };
 
+      // Registration emoji phrases by language
       const REG_PHRASES_RU = [
         "Мы можем исполнить твою мечту",
         "Крути, выигрывай, наслаждайся!",
@@ -794,7 +759,7 @@
         }
       }
 
-      // ========== REGISTRATION BACKGROUND GIFTS ==========
+      // ========== REGISTRATION BACKGROUND GIFTS (top to bottom, clickable) ==========
       function startRegBgGifts() {
         const container = $('regBgGifts');
         if (!container) return;
@@ -890,7 +855,7 @@
         logoAnimationTimer = null;
       }
 
-      // ========== TYPING ANIMATION ==========
+      // ========== TYPING ANIMATION FOR WISH BUTTON ==========
       function getWishPhrases() {
         return TRANSLATIONS[currentLanguage]?.wishPhrases || TRANSLATIONS.ru.wishPhrases;
       }
@@ -1065,7 +1030,6 @@
         $('jackpotPrizesList').innerHTML = prizes.map(function(p) { return '<div style="padding:6px 0;border-bottom:1px solid rgba(212,175,55,0.3);">🎁 ' + p + '</div>'; }).join('');
         $('jackpotPrizesModal').classList.remove('hidden');
       }
-
       function updateAllTexts() {
         $('customRewardsBtn').innerHTML = '<span class="bracket-flash">[</span>' + t('customRewardsBtn') + '<span class="bracket-flash">]</span>';
         $('historyBtn').textContent = t('historyBtn');
@@ -1110,14 +1074,14 @@
         renderHistory();
       }
 
-      function loadUserData() {}
+      function loadUserData() { /* ... unchanged ... */ }
       function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
       function saveDiamonds() { localStorage.setItem('wdVdsDiamonds_' + nickname, diamonds); updateDiamondsDisplay(); updateMainBalance(); }
       function updateDiamondsDisplay() { if ($('diamondsCount')) $('diamondsCount').textContent = diamonds; }
       function updateMainBalance() { if ($('mainBalanceDisplay')) $('mainBalanceDisplay').textContent = diamonds; }
       async function loadJackpotHistory() {
         if (userData) {
-          const data = await API.getJackpotsByUser(userData.user_uid);
+          const data = await API.getJackpotHistory(userData.user_uid);
           if (data && data.length > 0) {
             jackpotHistory = data.map(item => ({ icon: item.icon, wish: item.wish, date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '', time: item.created_at ? new Date(item.created_at).toLocaleTimeString() : '' }));
           } else jackpotHistory = [];
@@ -1479,61 +1443,6 @@
         if (rateInterval) clearInterval(rateInterval);
       }
 
-      // ========== TOAST (NEW) ==========
-      function showToast(text) {
-        const container = $('toastContainer');
-        if (!container) return;
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = text;
-        container.appendChild(toast);
-        setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
-      }
-
-      // ========== SUPPORT BADGE (UPDATED) ==========
-      function updateSupportBadge() {
-        const badge = $('supportBadge');
-        const btn = $('supportBtn');
-        if (!badge || !btn) return;
-        if (supportUnreadCount > 0) {
-          badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount;
-          badge.classList.remove('hidden');
-          btn.classList.add('unread');
-          btn.classList.remove('chat-open');
-        } else {
-          badge.classList.add('hidden');
-          btn.classList.remove('unread');
-          if (!$('supportModal').classList.contains('hidden')) {
-            btn.classList.add('chat-open');
-          } else {
-            btn.classList.remove('chat-open');
-          }
-        }
-      }
-
-      function startSupportPolling() {
-        if (supportPollingInterval) clearInterval(supportPollingInterval);
-        supportPollingInterval = setInterval(async () => {
-          if (!userData) return;
-          try {
-            const chats = await API.getSupportChats();
-            const uid = userData.user_uid;
-            if (chats[uid] && chats[uid].messages) {
-              const oldCount = supportMessages.length;
-              supportMessages = chats[uid].messages;
-              const newAdminMessages = supportMessages.filter((m, i) => m.from === 'admin' && i >= oldCount && !m.read);
-              if (newAdminMessages.length > 0) {
-                supportUnreadCount += newAdminMessages.length;
-                updateSupportBadge();
-                playNotificationSound();
-                showToast(newAdminMessages[newAdminMessages.length-1].text.substring(0, 100));
-                if (!$('supportModal').classList.contains('hidden')) renderSupportMessages();
-              }
-            }
-          } catch (e) {}
-        }, 10000);
-      }
-
       // Event listeners
       $('logoutBtn').addEventListener('click', logout);
       $('mainTopUpBtn').addEventListener('click', function() { openCryptoPayment(); });
@@ -1557,28 +1466,13 @@
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
       $('supportBtn').addEventListener('click', function() {
-        if ($('supportModal').classList.contains('hidden')) {
-          supportUnreadCount = 0;
-          updateSupportBadge();
-          loadSupportHistory().then(() => {
-            renderSupportMessages();
-            $('supportModal').classList.remove('hidden');
-            $('supportBtn').classList.add('chat-open');
-            $('supportBtn').classList.remove('unread');
-          });
-        } else {
-          $('supportModal').classList.add('hidden');
-          $('supportBtn').classList.remove('chat-open');
-          updateSupportBadge();
-        }
+        supportUnreadCount = 0;
+        updateSupportBadge();
+        loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); });
       });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
-      $('closeSupportBtn').addEventListener('click', function() {
-        $('supportModal').classList.add('hidden');
-        $('supportBtn').classList.remove('chat-open');
-        updateSupportBadge();
-      });
+      $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
       $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
       $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
       $('promoCodeSubmitBtn').addEventListener('click', submitPromoCode);
@@ -1640,6 +1534,42 @@
         }
       }
       window.changeNickname = changeNickname;
+
+      function updateSupportBadge() {
+        const badge = $('supportBadge');
+        const btn = $('supportBtn');
+        if (!badge || !btn) return;
+        if (supportUnreadCount > 0) {
+          badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount;
+          badge.classList.remove('hidden');
+          btn.classList.add('unread');
+        } else {
+          badge.classList.add('hidden');
+          btn.classList.remove('unread');
+        }
+      }
+
+      function startSupportPolling() {
+        if (supportPollingInterval) clearInterval(supportPollingInterval);
+        supportPollingInterval = setInterval(async () => {
+          if (!userData) return;
+          try {
+            const chats = await API.getSupportChats();
+            const uid = userData.user_uid;
+            if (chats[uid] && chats[uid].messages) {
+              const oldCount = supportMessages.length;
+              supportMessages = chats[uid].messages;
+              const newAdminMessages = supportMessages.filter((m, i) => m.from === 'admin' && i >= oldCount && !m.read);
+              if (newAdminMessages.length > 0) {
+                supportUnreadCount += newAdminMessages.length;
+                updateSupportBadge();
+                playNotificationSound();
+                if (!$('supportModal').classList.contains('hidden')) renderSupportMessages();
+              }
+            }
+          } catch (e) {}
+        }, 10000);
+      }
 
       // ========== INITIALIZATION ==========
       setLanguage('ru');
