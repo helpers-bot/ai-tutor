@@ -79,12 +79,12 @@
             </div>
 
             <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('users')">👥 Пользователи</button>
-                <button class="tab-btn" onclick="switchTab('support')">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
-                <button class="tab-btn" onclick="switchTab('jackpots')">🎰 Джекпоты</button>
-                <button class="tab-btn" onclick="switchTab('transactions')">💳 Транзакции</button>
-                <button class="tab-btn" onclick="switchTab('promo')">🎫 Промокоды</button>
-                <button class="tab-btn" onclick="switchTab('stats')">📊 Статистика</button>
+                <button class="tab-btn active" onclick="switchTab('users', event)">👥 Пользователи</button>
+                <button class="tab-btn" onclick="switchTab('support', event)">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
+                <button class="tab-btn" onclick="switchTab('jackpots', event)">🎰 Джекпоты</button>
+                <button class="tab-btn" onclick="switchTab('transactions', event)">💳 Транзакции</button>
+                <button class="tab-btn" onclick="switchTab('promo', event)">🎫 Промокоды</button>
+                <button class="tab-btn" onclick="switchTab('stats', event)">📊 Статистика</button>
             </div>
 
             <div id="tab-users" class="tab-content active">
@@ -144,8 +144,8 @@
         </div>
     </div>
 
+    <script src="api.js"></script>
     <script>
-        // Предполагается, что API уже подключён в api.js и содержит нужные методы
         let currentChatUID = null;
         let supportChats = {};
 
@@ -173,12 +173,11 @@
         function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
         function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
 
-        function switchTab(name) {
+        function switchTab(name, evt) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('tab-' + name).classList.add('active');
-            // Находим активную кнопку
-            event.target.classList.add('active');
+            if (evt && evt.target) evt.target.classList.add('active');
             if (name === 'support') loadSupportChats();
             if (name === 'jackpots') loadJackpots();
             if (name === 'transactions') loadTransactions();
@@ -244,7 +243,7 @@
             if (result.success) { showSuccess('-' + amount + '💎 → ' + uid); loadAllData(); } else showError(result.error);
         }
 
-        // ===== ПРОМОКОДЫ (без изменений, кроме кнопок удаления уже есть) =====
+        // ===== ПРОМОКОДЫ =====
         async function createPromoCode() {
             const editingCode = document.getElementById('editingCode').value;
             let code = document.getElementById('promoCode').value.trim();
@@ -328,7 +327,7 @@
             loadPromoCodes();
         }
 
-        // ===== ПОДДЕРЖКА (без изменений) =====
+        // ===== ПОДДЕРЖКА =====
         async function loadSupportChats() {
             try { supportChats = await API.getSupportChats(); } catch (e) { supportChats = {}; }
             const usersList = document.getElementById('supportUsersList');
@@ -379,12 +378,12 @@
             showSuccess('Ответ отправлен');
         }
 
-        // ===== ДЖЕКПОТЫ (добавлено удаление) =====
+        // ===== ДЖЕКПОТЫ =====
         async function loadJackpots() {
             try {
                 const jackpots = await API.getAllJackpots();
                 const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-                const html = jackpots.slice(0, 100).map(j => 
+                const html = (jackpots || []).slice(0, 100).map(j => 
                     '<tr>' +
                     '<td>' + j.id + '</td>' +
                     '<td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
@@ -409,11 +408,11 @@
             } catch (e) { showError('Ошибка удаления джекпота'); }
         }
 
-        // ===== ТРАНЗАКЦИИ (добавлено удаление) =====
+        // ===== ТРАНЗАКЦИИ =====
         async function loadTransactions() {
             try {
                 const transactions = await API.getTransactions();
-                const html = transactions.slice(0, 100).map(t => 
+                const html = (transactions || []).slice(0, 100).map(t => 
                     '<tr>' +
                     '<td>' + t.id + '</td>' +
                     '<td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
@@ -438,13 +437,11 @@
             } catch (e) { showError('Ошибка удаления транзакции'); }
         }
 
-        // ===== СТАТИСТИКА ПО ПОЛЬЗОВАТЕЛЯМ (новый метод) =====
+        // ===== СТАТИСТИКА ПОЛЬЗОВАТЕЛЕЙ =====
         async function loadUserSpentStats() {
             try {
-                // Предполагаем, что API.getUserSpentStats() возвращает массив объектов:
-                // { nickname, total_spent, last_transaction_time }
                 const stats = await API.getUserSpentStats();
-                const html = stats.map(s => 
+                const html = (stats || []).map(s => 
                     '<tr><td>' + (s.nickname || '-') + '</td><td>' + (s.total_spent || 0) + ' 💎</td><td>' + (s.last_transaction_time ? new Date(s.last_transaction_time).toLocaleString() : '—') + '</td></tr>'
                 ).join('') || '<tr><td colspan="3">Нет данных</td></tr>';
                 document.getElementById('statsSpentTable').innerHTML = html;
