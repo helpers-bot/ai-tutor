@@ -161,7 +161,7 @@
             const errorEl = document.getElementById('loginError');
             if (!password) { errorEl.textContent = 'Введите пароль'; return; }
             const passwordHash = await sha256(password);
-            const validHash = await sha256('admin123');
+            const validHash = await sha256('a135710Aa!в');
             if (passwordHash !== validHash) { errorEl.textContent = 'Неверный пароль'; return; }
             localStorage.setItem('vds_admin_logged_in', 'true');
             document.getElementById('loginBlock').style.display = 'none';
