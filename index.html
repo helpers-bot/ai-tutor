@@ -1822,6 +1822,7 @@
         <div id="mainMenu" class="menu-grid">
             <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn">Мои желания</button>
             <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
+            <!-- НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ -->
             <button class="free-diamonds-btn full-width-btn" id="freeDiamondsBtn">✨Получи 1000 алмазов бесплатно✨</button>
             <div class="menu-lang-row">
                 <button id="langRuMenu" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
@@ -1861,6 +1862,7 @@
     <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
     <div class="spin-win-display" id="spinWinDisplay"></div>
 
+    <!-- Modals -->
     <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
     <div id="nameFormModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3><input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя"><input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра"><button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button><button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button></div></div>
     <div id="paymentModal" class="overlay hidden"><div class="win-card" style="max-width:340px;"><h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3><div id="diamondOptions"><div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div><div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div><div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div><div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div><div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div></div><button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button></div></div>
@@ -1931,6 +1933,7 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ БЕСПЛАТНЫХ АЛМАЗОВ -->
     <div id="freeDiamondsModal" class="overlay hidden">
         <div class="win-card">
             <h3 style="color:#ffd700; margin-bottom:16px;" id="freeDiamondsTitle">✨ Получи 1000 алмазов бесплатно ✨</h3>
@@ -1950,6 +1953,7 @@
 
     <script src="api.js"></script>
     <script>
+    // ========== ORIGINAL SCRIPT – FULLY PRESERVED ==========
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         const swCode = `self.addEventListener('install',(e)=>{e.waitUntil(self.skipWaiting())});self.addEventListener('activate',(e)=>{e.waitUntil(self.clients.claim())});self.addEventListener('fetch',(e)=>{e.respondWith(fetch(e.request))});`;
@@ -1976,6 +1980,7 @@
         client.requestAccessToken();
       };
 
+      // Generic symbols for the slot machine
       const ICONS = ['🍒', '🍋', '🍊', '🍇', '⭐'];
 
       const CERTIFICATE_TEXTS = {
@@ -2068,26 +2073,55 @@
         en: { privacy: 'Privacy Policy: 1. We use Google for login. 2. Game data is stored in Supabase. 3. We do not share data with third parties.', terms: 'Terms of Use: 1. Game is for entertainment purposes. 2. Administration reserves the right to change the rules.' }
       };
 
+      // Generic prize phrases for jackpot (replaces old MODE_PRIZES)
       const GENERIC_PRIZES = {
         ru: ['Вы выиграли приз!', 'Поздравляем!', 'Удача улыбнулась!', 'Ваш приз ждёт!', 'Заберите подарок!', 'Сегодня ваш день!', 'Сюрприз!'],
         ua: ['Ви виграли приз!', 'Вітаємо!', 'Удача посміхнулася!', 'Ваш приз чекає!', 'Заберіть подарунок!', 'Сьогодні ваш день!', 'Сюрприз!'],
         en: ['You won a prize!', 'Congratulations!', 'Lucky day!', 'Your prize awaits!', 'Grab your gift!', 'It\'s your day!', 'Surprise!']
       };
 
+      // Registration emoji phrases by language
       const REG_PHRASES_RU = [
-        "Мы можем исполнить твою мечту", "Крути, выигрывай, наслаждайся!", "Удача улыбается тебе", "Осмелься мечтать по-крупному",
-        "Твое желание — мой приказ", "Высвободи магию", "Звезды сошлись для тебя", "Поймай искру",
-        "Пусть приключение начнется", "Прими невозможное", "Сияй как бриллиант", "Загадай смелое желание"
+        "Мы можем исполнить твою мечту",
+        "Крути, выигрывай, наслаждайся!",
+        "Удача улыбается тебе",
+        "Осмелься мечтать по-крупному",
+        "Твое желание — мой приказ",
+        "Высвободи магию",
+        "Звезды сошлись для тебя",
+        "Поймай искру",
+        "Пусть приключение начнется",
+        "Прими невозможное",
+        "Сияй как бриллиант",
+        "Загадай смелое желание"
       ];
       const REG_PHRASES_UA = [
-        "Ми можемо здійснити твою мрію", "Крути, вигравай, насолоджуйся!", "Удача посміхається тобі", "Наважся мріяти про велике",
-        "Твоє бажання — мій наказ", "Вивільни магію", "Зірки зійшлися для тебе", "Лови іскру",
-        "Нехай пригода почнеться", "Прийми неможливе", "Сяй як діамант", "Загадай сміливе бажання"
+        "Ми можемо здійснити твою мрію",
+        "Крути, вигравай, насолоджуйся!",
+        "Удача посміхається тобі",
+        "Наважся мріяти про велике",
+        "Твоє бажання — мій наказ",
+        "Вивільни магію",
+        "Зірки зійшлися для тебе",
+        "Лови іскру",
+        "Нехай пригода почнеться",
+        "Прийми неможливе",
+        "Сяй як діамант",
+        "Загадай сміливе бажання"
       ];
       const REG_PHRASES_EN = [
-        "We can make your dream come true", "Spin, Win, Enjoy!", "Fortune smiles on you", "Dare to dream big",
-        "Your wish is my command", "Unleash the magic", "Stars align for you", "Chase the sparkle",
-        "Let the adventure begin", "Embrace the impossible", "Shine like a diamond", "Make a bold wish"
+        "We can make your dream come true",
+        "Spin, Win, Enjoy!",
+        "Fortune smiles on you",
+        "Dare to dream big",
+        "Your wish is my command",
+        "Unleash the magic",
+        "Stars align for you",
+        "Chase the sparkle",
+        "Let the adventure begin",
+        "Embrace the impossible",
+        "Shine like a diamond",
+        "Make a bold wish"
       ];
 
       let currentLanguage = 'ru';
@@ -2124,6 +2158,7 @@
       let typingInterval = null;
       let menuGiftsInterval = null;
 
+      // ========== UTILS ==========
       function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
       function $(id) { return document.getElementById(id); }
       function initAudio() { if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
@@ -2138,6 +2173,7 @@
       function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
       function playNotificationSound() { playTone(800, 0.15, 'sine', 0.07); setTimeout(() => playTone(1000, 0.15, 'sine', 0.07), 150); }
 
+      // ========== MAIN MENU FALLING GIFTS ==========
       function startMenuFallingGifts() {
         const menu = $('mainMenu');
         if (!menu) return;
@@ -2160,9 +2196,13 @@
       function stopMenuFallingGifts() {
         if (menuGiftsInterval) { clearInterval(menuGiftsInterval); menuGiftsInterval = null; }
         const menu = $('mainMenu');
-        if (menu) { const allGifts = menu.querySelectorAll('.menu-falling-gift'); allGifts.forEach(g => g.remove()); }
+        if (menu) {
+          const allGifts = menu.querySelectorAll('.menu-falling-gift');
+          allGifts.forEach(g => g.remove());
+        }
       }
 
+      // ========== REGISTRATION BACKGROUND GIFTS (top to bottom, clickable) ==========
       function startRegBgGifts() {
         const container = $('regBgGifts');
         if (!container) return;
@@ -2206,6 +2246,7 @@
         setTimeout(() => { if (phraseEl.parentNode) phraseEl.remove(); }, 5000);
       }
 
+      // ========== REGISTRATION WINDOW ==========
       function showRegistrationPage() {
         if (userData) return;
         const win = $('registrationWindow');
@@ -2224,19 +2265,43 @@
       function runLogoAnimation() {
         const letters = document.querySelectorAll('.logo-letter');
         if (!letters.length) return;
-        letters.forEach(letter => { letter.style.animation = 'none'; letter.offsetHeight; letter.style.animation = ''; });
-        letters.forEach(letter => { letter.classList.remove('logo-letter'); void letter.offsetWidth; letter.classList.add('logo-letter'); });
+        letters.forEach(letter => {
+          letter.style.animation = 'none';
+          letter.offsetHeight;
+          letter.style.animation = '';
+        });
+        letters.forEach(letter => {
+          letter.classList.remove('logo-letter');
+          void letter.offsetWidth;
+          letter.classList.add('logo-letter');
+        });
         const glow = document.querySelector('.logo-glow');
         const btn = document.querySelector('.reg-google-btn');
-        if (glow) { glow.style.animation = 'none'; glow.offsetHeight; glow.style.animation = 'fadeInUp 1.2s ease-out 1.2s forwards'; }
-        if (btn) { btn.style.animation = 'none'; btn.offsetHeight; btn.style.animation = 'fadeInUp 1.2s ease-out 1.8s forwards'; }
+        if (glow) {
+          glow.style.animation = 'none';
+          glow.offsetHeight;
+          glow.style.animation = 'fadeInUp 1.2s ease-out 1.2s forwards';
+        }
+        if (btn) {
+          btn.style.animation = 'none';
+          btn.offsetHeight;
+          btn.style.animation = 'fadeInUp 1.2s ease-out 1.8s forwards';
+        }
         clearTimeout(logoAnimationTimer);
-        logoAnimationTimer = setTimeout(() => { if (!userData) runLogoAnimation(); }, 10000);
+        logoAnimationTimer = setTimeout(() => {
+          if (!userData) runLogoAnimation();
+        }, 10000);
       }
 
-      function stopLogoAnimation() { clearTimeout(logoAnimationTimer); logoAnimationTimer = null; }
+      function stopLogoAnimation() {
+        clearTimeout(logoAnimationTimer);
+        logoAnimationTimer = null;
+      }
 
-      function getWishPhrases() { return TRANSLATIONS[currentLanguage]?.wishPhrases || TRANSLATIONS.ru.wishPhrases; }
+      // ========== TYPING ANIMATION FOR WISH BUTTON ==========
+      function getWishPhrases() {
+        return TRANSLATIONS[currentLanguage]?.wishPhrases || TRANSLATIONS.ru.wishPhrases;
+      }
 
       function startTypingAnimation() {
         const btn = $('customRewardsBtn');
@@ -2258,10 +2323,14 @@
               btn.innerHTML = '<span class="bracket-flash">[</span>' + partial + '<span class="bracket-flash">]</span>';
               charIndex++;
               typingInterval = setTimeout(typeNext, typingSpeed);
-            } else { typingForward = false; typingInterval = setTimeout(typeNext, pauseBetween); }
+            } else {
+              typingForward = false;
+              typingInterval = setTimeout(typeNext, pauseBetween);
+            }
           } else {
             currentPhraseIndex = Math.floor(Math.random() * phrases.length);
-            charIndex = 0; typingForward = true;
+            charIndex = 0;
+            typingForward = true;
             btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>';
             typingInterval = setTimeout(typeNext, 200);
           }
@@ -2269,47 +2338,95 @@
         typingInterval = setTimeout(typeNext, 200);
       }
 
-      function stopTypingAnimation() { if (typingInterval) { clearInterval(typingInterval); typingInterval = null; } const btn = $('customRewardsBtn'); if (btn) btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>'; }
+      function stopTypingAnimation() {
+        if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
+        const btn = $('customRewardsBtn');
+        if (btn) btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>';
+      }
 
+      // ========== AUTH ==========
       function onLoginSuccess(data) {
         hideRegistrationPage();
-        userData = data; nickname = data.nickname; diamonds = data.diamonds; treasureProgress = data.treasure_progress; freeSpins = data.free_spins; jackpotBoost = data.jackpot_boost;
-        $('mainMenu').classList.remove('hidden'); $('userBar').classList.remove('hidden-bar');
-        $('nicknameDisplay').textContent = nickname; $('userIdDisplay').textContent = 'ID: ' + data.user_uid;
+        userData = data;
+        nickname = data.nickname;
+        diamonds = data.diamonds;
+        treasureProgress = data.treasure_progress;
+        freeSpins = data.free_spins;
+        jackpotBoost = data.jackpot_boost;
+        $('mainMenu').classList.remove('hidden');
+        $('userBar').classList.remove('hidden-bar');
+        $('nicknameDisplay').textContent = nickname;
+        $('userIdDisplay').textContent = 'ID: ' + data.user_uid;
         if (data.picture) { $('userAvatar').src = data.picture; $('userAvatar').classList.remove('hidden'); }
-        $('logoutBtn').style.display = 'inline-block'; $('googleLoginBtn').style.display = 'none'; $('authError').style.display = 'none';
-        updateMainBalance(); updateDiamondsDisplay(); updateFreeSpinsBadge(); updateTreasureProgress(0);
-        loadJackpotHistory(); loadCustomRewards(); loadSupportHistory(); startSupportPolling(); loadCryptoRates();
-        startTypingAnimation(); startMenuFallingGifts(); updateAllTexts();
+        $('logoutBtn').style.display = 'inline-block';
+        $('googleLoginBtn').style.display = 'none';
+        $('authError').style.display = 'none';
+        updateMainBalance();
+        updateDiamondsDisplay();
+        updateFreeSpinsBadge();
+        updateTreasureProgress(0);
+        loadJackpotHistory();
+        loadCustomRewards();
+        loadSupportHistory();
+        startSupportPolling();
+        loadCryptoRates();
+        startTypingAnimation();
+        startMenuFallingGifts();
+        updateAllTexts();
       }
 
       async function logout() {
-        autoSpinning = false; spinning = false;
-        if ($('autoSpinBtn')) { $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
+        autoSpinning = false;
+        spinning = false;
+        if ($('autoSpinBtn')) {
+          $('autoSpinBtn').classList.remove('active');
+          $('autoSpinBtn').innerHTML = '🔄<br>AUTO';
+        }
         if (userData) await API.logOut(userData.user_uid, nickname);
         userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
         jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; supportUnreadCount = 0;
-        $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden'); $('userBar').classList.add('hidden-bar');
+        $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
+        $('userBar').classList.add('hidden-bar');
         $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
-        $('logoutBtn').style.display = 'none'; $('googleLoginBtn').style.display = 'flex'; $('authError').style.display = 'none';
-        if (rateInterval) clearInterval(rateInterval); if (supportPollingInterval) clearInterval(supportPollingInterval);
-        updateSupportBadge(); stopTypingAnimation(); stopMenuFallingGifts(); showRegistrationPage();
+        $('logoutBtn').style.display = 'none';
+        $('googleLoginBtn').style.display = 'flex';
+        $('authError').style.display = 'none';
+        if (rateInterval) clearInterval(rateInterval);
+        if (supportPollingInterval) clearInterval(supportPollingInterval);
+        updateSupportBadge();
+        stopTypingAnimation();
+        stopMenuFallingGifts();
+        showRegistrationPage();
       }
 
-      function updateGiftSize(progress) { if (!$('giftIcon')) return; if (progress >= 100) { $('giftIcon').style.fontSize = '1.5rem'; } else { var scale = 0.5 + (progress / 100) * 2.5; $('giftIcon').style.fontSize = (1.2 * scale) + 'rem'; } }
+      // ========== GAME FUNCTIONS ==========
+      function updateGiftSize(progress) {
+        if (!$('giftIcon')) return;
+        if (progress >= 100) { $('giftIcon').style.fontSize = '1.5rem'; }
+        else { var scale = 0.5 + (progress / 100) * 2.5; $('giftIcon').style.fontSize = (1.2 * scale) + 'rem'; }
+      }
       function spawnParticles() {
         if (!$('treasureSection') || !$('giftIcon')) return;
-        var container = $('treasureSection'); var giftRect = $('giftIcon').getBoundingClientRect(); var containerRect = container.getBoundingClientRect();
-        var centerX = giftRect.left + giftRect.width / 2 - containerRect.left; var centerY = giftRect.top + giftRect.height / 2 - containerRect.top;
+        var container = $('treasureSection');
+        var giftRect = $('giftIcon').getBoundingClientRect();
+        var containerRect = container.getBoundingClientRect();
+        var centerX = giftRect.left + giftRect.width / 2 - containerRect.left;
+        var centerY = giftRect.top + giftRect.height / 2 - containerRect.top;
         var colors = ['#ff3333', '#ff4444', '#cc0000', '#3333ff', '#4444ff', '#0000cc', '#ffdd00', '#ffcc00', '#ffaa00'];
         for (var i = 0; i < 30; i++) {
-          var particle = document.createElement('div'); particle.className = 'particle'; particle.style.position = 'absolute';
-          particle.style.left = centerX + 'px'; particle.style.top = centerY + 'px';
+          var particle = document.createElement('div');
+          particle.className = 'particle';
+          particle.style.position = 'absolute';
+          particle.style.left = centerX + 'px';
+          particle.style.top = centerY + 'px';
           particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-          particle.style.width = (4 + Math.random() * 8) + 'px'; particle.style.height = (4 + Math.random() * 8) + 'px';
+          particle.style.width = (4 + Math.random() * 8) + 'px';
+          particle.style.height = (4 + Math.random() * 8) + 'px';
           particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-          var angle = Math.random() * Math.PI * 2; var distance = 30 + Math.random() * 80;
-          particle.style.setProperty('--px', Math.cos(angle) * distance + 'px'); particle.style.setProperty('--py', Math.sin(angle) * distance + 'px');
+          var angle = Math.random() * Math.PI * 2;
+          var distance = 30 + Math.random() * 80;
+          particle.style.setProperty('--px', Math.cos(angle) * distance + 'px');
+          particle.style.setProperty('--py', Math.sin(angle) * distance + 'px');
           particle.style.animationDuration = (0.8 + Math.random() * 1.5) + 's';
           container.appendChild(particle);
           setTimeout(function() { if (particle.parentNode) particle.remove(); }, 2000);
@@ -2317,42 +2434,87 @@
       }
       function animateGiftShakeAndExplosion() {
         if (!$('giftIcon')) return;
-        $('giftIcon').style.fontSize = '1.5rem'; gamePaused = true; $('spinButton').disabled = true;
-        $('giftIcon').classList.add('gift-shake'); var shakeInterval = setInterval(function() { playGiftShakeSound(); }, 150);
+        $('giftIcon').style.fontSize = '1.5rem';
+        gamePaused = true;
+        $('spinButton').disabled = true;
+        $('giftIcon').classList.add('gift-shake');
+        var shakeInterval = setInterval(function() { playGiftShakeSound(); }, 150);
         setTimeout(function() {
-          clearInterval(shakeInterval); $('giftIcon').classList.remove('gift-shake'); spawnParticles(); playGiftExplosionSound();
+          clearInterval(shakeInterval);
+          $('giftIcon').classList.remove('gift-shake');
+          spawnParticles();
+          playGiftExplosionSound();
           $('giftIcon').classList.add('gift-explosion');
           setTimeout(function() {
-            $('giftIcon').classList.remove('gift-explosion'); $('giftIcon').classList.add('gift-reappear'); $('giftIcon').style.fontSize = '1.2rem';
-            treasureProgress = 0; $('progressFill').style.width = '0%';
+            $('giftIcon').classList.remove('gift-explosion');
+            $('giftIcon').classList.add('gift-reappear');
+            $('giftIcon').style.fontSize = '1.2rem';
+            treasureProgress = 0;
+            $('progressFill').style.width = '0%';
             var bonusWord = currentLanguage === 'ru' ? 'Бонус' : currentLanguage === 'ua' ? 'Бонус' : 'Bonus';
             $('progressText').textContent = bonusWord + ': 0/100%';
-            freeSpins += 10; jackpotBoost = true; updateFreeSpinsBadge(); showMessage(t('bonusOpened')); debouncedSave();
-            setTimeout(function() { $('giftIcon').classList.remove('gift-reappear'); gamePaused = false; $('spinButton').disabled = false; }, 600);
+            freeSpins += 10;
+            jackpotBoost = true;
+            updateFreeSpinsBadge();
+            showMessage(t('bonusOpened'));
+            debouncedSave();
+            setTimeout(function() {
+              $('giftIcon').classList.remove('gift-reappear');
+              gamePaused = false;
+              $('spinButton').disabled = false;
+            }, 600);
           }, 600);
         }, 3000);
       }
 
       function showJackpotPrizes() {
-        var prizes = []; if (useCustomRewards && customRewards.length >= 3) prizes = customRewards; else prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
+        var prizes = [];
+        if (useCustomRewards && customRewards.length >= 3) prizes = customRewards;
+        else prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
         $('jackpotPrizesList').innerHTML = prizes.map(function(p) { return '<div style="padding:6px 0;border-bottom:1px solid rgba(212,175,55,0.3);">🎁 ' + p + '</div>'; }).join('');
         $('jackpotPrizesModal').classList.remove('hidden');
       }
       function updateAllTexts() {
         $('customRewardsBtn').innerHTML = '<span class="bracket-flash">[</span>' + t('customRewardsBtn') + '<span class="bracket-flash">]</span>';
-        $('historyBtn').textContent = t('historyBtn'); $('diamondsLabel').textContent = t('diamondsLabel'); $('donateButton').innerHTML = t('donateButton');
-        $('backToMenu').innerHTML = t('backToMenu'); $('spinButton').innerHTML = t('spinBtn'); $('logoutBtn').textContent = t('logoutBtn');
-        $('mainTopUpBtn').textContent = t('mainTopUpBtn'); $('jackpotTitle').textContent = t('jackpotTitle'); $('sendToPartnerBtn').innerHTML = t('sendToPartner');
-        $('closeWinBtn').textContent = t('closeBtn'); $('nameFormTitle').textContent = t('nameFormTitle'); $('userNameInput').placeholder = t('userNamePlaceholder');
-        $('partnerNameInput').placeholder = t('partnerNamePlaceholder'); $('downloadWithNamesBtn').innerHTML = t('downloadBtn'); $('closeNameFormBtn').textContent = t('cancelBtn');
-        $('paymentTitle').textContent = t('paymentTitle'); $('closePaymentBtn').textContent = t('closePayment'); $('historyTitle').textContent = t('historyTitle');
-        $('customRewardsTitle').textContent = t('customRewardsTitle'); $('customRewardsDesc').textContent = t('customRewardsDesc'); $('addCustomRewardBtn').textContent = t('addBtn');
-        $('saveAndPlayBtn').innerHTML = t('saveAndPlay'); $('closeCustomRewardsBtn').textContent = t('closeCustom'); $('closeHistoryBtn').textContent = t('closeBtn');
-        $('jackpotPrizesBtn').textContent = t('jackpotPrizesBtn'); $('closeJackpotPrizesBtn').textContent = t('closeBtn'); $('closeWinDetailBtn').textContent = t('closeBtn');
-        $('privacyPolicyLink').textContent = t('privacyLink'); $('termsOfUseLink').textContent = t('termsLink'); $('supportTitle').textContent = t('supportTitle');
-        $('chatInput').placeholder = t('supportPlaceholder'); $('sendChatBtn').textContent = t('sendBtn'); $('promoCodeBtn').textContent = t('promoCodeBtn');
-        $('promoCodeTitle').textContent = t('promoCodeTitle'); $('promoCodeInput').placeholder = t('promoCodePlaceholder'); $('promoCodeSubmitBtn').textContent = t('promoCodeActivate');
-        $('closePromoCodeBtn').textContent = t('promoCodeClose'); if ($('regGlowText')) $('regGlowText').textContent = t('regGlowText');
+        $('historyBtn').textContent = t('historyBtn');
+        $('diamondsLabel').textContent = t('diamondsLabel');
+        $('donateButton').innerHTML = t('donateButton');
+        $('backToMenu').innerHTML = t('backToMenu');
+        $('spinButton').innerHTML = t('spinBtn');
+        $('logoutBtn').textContent = t('logoutBtn');
+        $('mainTopUpBtn').textContent = t('mainTopUpBtn');
+        $('jackpotTitle').textContent = t('jackpotTitle');
+        $('sendToPartnerBtn').innerHTML = t('sendToPartner');
+        $('closeWinBtn').textContent = t('closeBtn');
+        $('nameFormTitle').textContent = t('nameFormTitle');
+        $('userNameInput').placeholder = t('userNamePlaceholder');
+        $('partnerNameInput').placeholder = t('partnerNamePlaceholder');
+        $('downloadWithNamesBtn').innerHTML = t('downloadBtn');
+        $('closeNameFormBtn').textContent = t('cancelBtn');
+        $('paymentTitle').textContent = t('paymentTitle');
+        $('closePaymentBtn').textContent = t('closePayment');
+        $('historyTitle').textContent = t('historyTitle');
+        $('customRewardsTitle').textContent = t('customRewardsTitle');
+        $('customRewardsDesc').textContent = t('customRewardsDesc');
+        $('addCustomRewardBtn').textContent = t('addBtn');
+        $('saveAndPlayBtn').innerHTML = t('saveAndPlay');
+        $('closeCustomRewardsBtn').textContent = t('closeCustom');
+        $('closeHistoryBtn').textContent = t('closeBtn');
+        $('jackpotPrizesBtn').textContent = t('jackpotPrizesBtn');
+        $('closeJackpotPrizesBtn').textContent = t('closeBtn');
+        $('closeWinDetailBtn').textContent = t('closeBtn');
+        $('privacyPolicyLink').textContent = t('privacyLink');
+        $('termsOfUseLink').textContent = t('termsLink');
+        $('supportTitle').textContent = t('supportTitle');
+        $('chatInput').placeholder = t('supportPlaceholder');
+        $('sendChatBtn').textContent = t('sendBtn');
+        $('promoCodeBtn').textContent = t('promoCodeBtn');
+        $('promoCodeTitle').textContent = t('promoCodeTitle');
+        $('promoCodeInput').placeholder = t('promoCodePlaceholder');
+        $('promoCodeSubmitBtn').textContent = t('promoCodeActivate');
+        $('closePromoCodeBtn').textContent = t('promoCodeClose');
+        if ($('regGlowText')) $('regGlowText').textContent = t('regGlowText');
+        // Free diamonds button and modal
         if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
         if ($('freeDiamondsTitle')) $('freeDiamondsTitle').textContent = t('freeDiamondsTitle');
         if ($('freeDiamondsIntro')) $('freeDiamondsIntro').innerHTML = t('freeDiamondsIntro');
@@ -2361,9 +2523,11 @@
         if ($('freeDiamondsStep3')) $('freeDiamondsStep3').innerHTML = t('freeDiamondsStep3');
         if ($('freeDiamondsTelegramBtn')) $('freeDiamondsTelegramBtn').textContent = t('freeDiamondsTelegramBtn');
         if ($('freeDiamondsLink')) $('freeDiamondsLink').textContent = t('freeDiamondsLink');
+        // Google login button text
         if ($('googleLoginBtnText')) $('googleLoginBtnText').textContent = t('googleLoginBtnText');
         if ($('regGoogleBtnText')) $('regGoogleBtnText').textContent = t('regGoogleBtnText');
-        updateFreeSpinsBadge(); renderHistory();
+        updateFreeSpinsBadge();
+        renderHistory();
       }
               function loadUserData() { /* ... unchanged ... */ }
       function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
@@ -2460,11 +2624,16 @@
         document.querySelectorAll('[id^="lang' + langPrefix + '"]').forEach(function(b) { b.classList.add('active'); });
         updateAllTexts();
         updateFreeSpinsBadge();
+        // Принудительно обновляем текст кнопки и модального окна
         if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
         updateFreeDiamondsModalTexts();
+        // Принудительно обновляем текст кнопок Google
         if ($('googleLoginBtnText')) $('googleLoginBtnText').textContent = t('googleLoginBtnText');
         if ($('regGoogleBtnText')) $('regGoogleBtnText').textContent = t('regGoogleBtnText');
-        if (userData) { stopTypingAnimation(); startTypingAnimation(); }
+        if (userData) {
+          stopTypingAnimation();
+          startTypingAnimation();
+        }
       }
       window.setLanguage = setLanguage;
       function updateFreeSpinsBadge() {
@@ -2628,8 +2797,15 @@
       }
       async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: free_spins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
 
-      function openPromoCode() { if (!userData) return; $('promoCodeInput').value = ''; $('promoCodeMsg').textContent = ''; $('promoCodeModal').classList.remove('hidden'); }
+      // Promo code
+      function openPromoCode() {
+        if (!userData) return;
+        $('promoCodeInput').value = '';
+        $('promoCodeMsg').textContent = '';
+        $('promoCodeModal').classList.remove('hidden');
+      }
       window.openPromoCode = openPromoCode;
+
       async function submitPromoCode() {
         if (!userData) return;
         var code = $('promoCodeInput').value.trim().toUpperCase();
@@ -2638,29 +2814,104 @@
         try {
           const result = await API.redeemPromoCode(userData.user_uid, code);
           if (result.success) {
-            if (result.type === 'spins') { freeSpins += result.amount; updateFreeSpinsBadge(); }
-            else if (result.type === 'diamonds') { diamonds += result.amount; updateDiamondsDisplay(); updateMainBalance(); }
+            if (result.type === 'spins') {
+              freeSpins += result.amount;
+              updateFreeSpinsBadge();
+            } else if (result.type === 'diamonds') {
+              diamonds += result.amount;
+              updateDiamondsDisplay();
+              updateMainBalance();
+            }
             debouncedSave();
             $('promoCodeMsg').textContent = result.message || t('promoCodeSuccess');
             setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2500);
-          } else { $('promoCodeMsg').textContent = result.error || t('promoCodeInvalid'); }
-        } catch (e) { $('promoCodeMsg').textContent = t('promoCodeInvalid'); }
+          } else {
+            $('promoCodeMsg').textContent = result.error || t('promoCodeInvalid');
+          }
+        } catch (e) {
+          $('promoCodeMsg').textContent = t('promoCodeInvalid');
+        }
       }
 
-      const WALLETS = { USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam', TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam', BNB: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f', ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f', BTC: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f' };
-      async function loadCryptoRates() { const rates = await API.getCryptoRates(); if (rates) { cryptoRates = rates; if (!cryptoRates['USDT']) { cryptoRates['USDT'] = { symbol: 'USDTUSDT', price_usd: 1.00, last_update: new Date().toISOString() }; } updateRateDisplay(); } }
-      function updateRateDisplay() { const rate = cryptoRates[selectedCrypto]; if (rate) { const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8); $('rateDisplay').textContent = `1 ${selectedCrypto} ≈ $${rate.price_usd.toFixed(2)} | К отправке: ${cryptoAmount} ${selectedCrypto}`; } else { $('rateDisplay').textContent = 'Курс загружается...'; } }
-      function generateQRCode(text) { const container = $('qrContainer'); container.innerHTML = ''; if (!text) return; const img = document.createElement('img'); img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}`; img.style.borderRadius = '12px'; img.style.border = '2px solid #d4af37'; img.onload = () => { container.innerHTML = ''; container.appendChild(img); }; img.onerror = () => { container.innerHTML = '<p style="color:#888;font-size:0.7rem;">QR-код недоступен</p>'; }; }
-      async function openCryptoPayment() { if (!userData) return; $('cryptoPaymentModal').classList.remove('hidden'); loadCryptoRates(); updateRateDisplay(); updateQRAndAddress(); if (rateInterval) clearInterval(rateInterval); rateInterval = setInterval(loadCryptoRates, 30000); }
-      function updateQRAndAddress() { const rate = cryptoRates[selectedCrypto]; const cryptoAmount = rate ? (selectedUSD / rate.price_usd).toFixed(8) : '0'; const address = WALLETS[selectedCrypto] || ''; $('walletAddress').innerHTML = `<strong>Адрес ${selectedCrypto}:</strong><br>${address}`; const paymentText = `${selectedCrypto.toLowerCase()}:${address}?amount=${cryptoAmount}`; generateQRCode(paymentText); }
+      // Crypto payment
+      const WALLETS = {
+        USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
+        TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
+        BNB: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
+        ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
+        BTC: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f'
+      };
+      async function loadCryptoRates() {
+        const rates = await API.getCryptoRates();
+        if (rates) {
+          cryptoRates = rates;
+          if (!cryptoRates['USDT']) {
+            cryptoRates['USDT'] = { symbol: 'USDTUSDT', price_usd: 1.00, last_update: new Date().toISOString() };
+          }
+          updateRateDisplay();
+        }
+      }
+      function updateRateDisplay() {
+        const rate = cryptoRates[selectedCrypto];
+        if (rate) {
+          const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8);
+          $('rateDisplay').textContent = `1 ${selectedCrypto} ≈ $${rate.price_usd.toFixed(2)} | К отправке: ${cryptoAmount} ${selectedCrypto}`;
+        } else {
+          $('rateDisplay').textContent = 'Курс загружается...';
+        }
+      }
+      function generateQRCode(text) {
+        const container = $('qrContainer');
+        container.innerHTML = '';
+        if (!text) return;
+        const img = document.createElement('img');
+        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}`;
+        img.style.borderRadius = '12px';
+        img.style.border = '2px solid #d4af37';
+        img.onload = () => { container.innerHTML = ''; container.appendChild(img); };
+        img.onerror = () => { container.innerHTML = '<p style="color:#888;font-size:0.7rem;">QR-код недоступен</p>'; };
+      }
+      async function openCryptoPayment() {
+        if (!userData) return;
+        $('cryptoPaymentModal').classList.remove('hidden');
+        loadCryptoRates();
+        updateRateDisplay();
+        updateQRAndAddress();
+        if (rateInterval) clearInterval(rateInterval);
+        rateInterval = setInterval(loadCryptoRates, 30000);
+      }
+      function updateQRAndAddress() {
+        const rate = cryptoRates[selectedCrypto];
+        const cryptoAmount = rate ? (selectedUSD / rate.price_usd).toFixed(8) : '0';
+        const address = WALLETS[selectedCrypto] || '';
+        $('walletAddress').innerHTML = `<strong>Адрес ${selectedCrypto}:</strong><br>${address}`;
+        const paymentText = `${selectedCrypto.toLowerCase()}:${address}?amount=${cryptoAmount}`;
+        generateQRCode(paymentText);
+      }
       async function simulatePayment() {
-        if (!userData) return; $('simulatePaymentBtn').disabled = true; $('simulatePaymentBtn').textContent = '⏳ Проверяем платёж...';
-        await new Promise(r => setTimeout(r, 2000)); diamonds += selectedDiamonds; updateDiamondsDisplay(); updateMainBalance();
+        if (!userData) return;
+        $('simulatePaymentBtn').disabled = true;
+        $('simulatePaymentBtn').textContent = '⏳ Проверяем платёж...';
+        await new Promise(r => setTimeout(r, 2000));
+        diamonds += selectedDiamonds;
+        updateDiamondsDisplay();
+        updateMainBalance();
         await API.saveUserData(userData.user_uid, { diamonds, treasure_progress, free_spins, jackpot_boost: jackpotBoost?1:0 });
-        await API.createCryptoDonation({ user_uid: userData.user_uid, nickname, email: userData.email, amount_usd: selectedUSD, diamonds: selectedDiamonds, crypto_currency: selectedCrypto, crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)), status: 'completed' });
-        showMessage(`✨ +${selectedDiamonds}💎 зачислено!`); $('cryptoPaymentModal').classList.add('hidden'); $('simulatePaymentBtn').disabled = false; $('simulatePaymentBtn').textContent = '💰 Я оплатил — получить алмазы'; if (rateInterval) clearInterval(rateInterval);
+        await API.createCryptoDonation({
+          user_uid: userData.user_uid, nickname, email: userData.email,
+          amount_usd: selectedUSD, diamonds: selectedDiamonds,
+          crypto_currency: selectedCrypto,
+          crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)),
+          status: 'completed'
+        });
+        showMessage(`✨ +${selectedDiamonds}💎 зачислено!`);
+        $('cryptoPaymentModal').classList.add('hidden');
+        $('simulatePaymentBtn').disabled = false;
+        $('simulatePaymentBtn').textContent = '💰 Я оплатил — получить алмазы';
+        if (rateInterval) clearInterval(rateInterval);
       }
 
+      // Event listeners
       $('logoutBtn').addEventListener('click', logout);
       $('mainTopUpBtn').addEventListener('click', function() { openCryptoPayment(); });
       $('spinButton').addEventListener('click', spin);
@@ -2682,7 +2933,11 @@
       $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
       $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
       $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', function() { supportUnreadCount = 0; updateSupportBadge(); loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); }); });
+      $('supportBtn').addEventListener('click', function() {
+        supportUnreadCount = 0;
+        updateSupportBadge();
+        loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); });
+      });
       $('sendChatBtn').addEventListener('click', handleChatSend);
       $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
       $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
@@ -2691,19 +2946,32 @@
       $('promoCodeSubmitBtn').addEventListener('click', submitPromoCode);
       $('closePromoCodeBtn').addEventListener('click', function() { $('promoCodeModal').classList.add('hidden'); });
       $('promoCodeModal').addEventListener('click', function(e) { if (e.target === $('promoCodeModal')) $('promoCodeModal').classList.add('hidden'); });
+
       $('diamondAmounts').addEventListener('click', function(e) { var opt = e.target.closest('.diamond-amount-option'); if (!opt) return; document.querySelectorAll('.diamond-amount-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedUSD = parseFloat(opt.dataset.usd); selectedDiamonds = parseInt(opt.dataset.diamonds); updateRateDisplay(); updateQRAndAddress(); });
       $('cryptoList').addEventListener('click', function(e) { var opt = e.target.closest('.crypto-option'); if (!opt) return; document.querySelectorAll('.crypto-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedCrypto = opt.dataset.currency; updateRateDisplay(); updateQRAndAddress(); });
       $('copyAddressBtn').addEventListener('click', function() { var addr = ($('walletAddress').textContent || '').replace(/.*:\s*/, '').trim(); navigator.clipboard.writeText(addr).then(function() { $('copiedMsg').classList.remove('hidden'); setTimeout(function() { $('copiedMsg').classList.add('hidden'); }, 2000); }); });
       $('simulatePaymentBtn').addEventListener('click', simulatePayment);
       $('closeCryptoPaymentBtn').addEventListener('click', function() { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); });
       $('cryptoPaymentModal').addEventListener('click', function(e) { if (e.target === $('cryptoPaymentModal')) { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); } });
+
       $('closeProfileBtn').addEventListener('click', function() { $('profileModal').classList.add('hidden'); });
       $('profileModal').addEventListener('click', function(e) { if (e.target === $('profileModal')) $('profileModal').classList.add('hidden'); });
+
       [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('cryptoPaymentModal'), $('profileModal'), $('promoCodeModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
+
       $('regBgGifts').addEventListener('click', handleRegGiftClick);
-      $('freeDiamondsBtn').addEventListener('click', function() { updateFreeDiamondsModalTexts(); $('freeDiamondsModal').classList.remove('hidden'); });
-      $('closeFreeDiamondsBtn').addEventListener('click', function() { $('freeDiamondsModal').classList.add('hidden'); });
-      $('freeDiamondsModal').addEventListener('click', function(e) { if (e.target === $('freeDiamondsModal')) $('freeDiamondsModal').classList.add('hidden'); });
+
+      // ========== НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ ==========
+      $('freeDiamondsBtn').addEventListener('click', function() {
+        updateFreeDiamondsModalTexts();
+        $('freeDiamondsModal').classList.remove('hidden');
+      });
+      $('closeFreeDiamondsBtn').addEventListener('click', function() {
+        $('freeDiamondsModal').classList.add('hidden');
+      });
+      $('freeDiamondsModal').addEventListener('click', function(e) {
+        if (e.target === $('freeDiamondsModal')) $('freeDiamondsModal').classList.add('hidden');
+      });
 
       function updateFreeDiamondsModalTexts() {
         if ($('freeDiamondsTitle')) $('freeDiamondsTitle').textContent = t('freeDiamondsTitle');
@@ -2717,50 +2985,89 @@
 
       function openProfile() {
         if (!userData) return;
-        $('profileUID').textContent = userData.user_uid; $('profileEmail').textContent = userData.email || '-';
-        $('profileDiamonds').textContent = diamonds; $('profileJackpots').textContent = jackpotHistory.length;
-        $('profileNicknameInput').value = nickname; $('profileMsg').textContent = ''; $('profileModal').classList.remove('hidden');
+        $('profileUID').textContent = userData.user_uid;
+        $('profileEmail').textContent = userData.email || '-';
+        $('profileDiamonds').textContent = diamonds;
+        $('profileJackpots').textContent = jackpotHistory.length;
+        $('profileNicknameInput').value = nickname;
+        $('profileMsg').textContent = '';
+        $('profileModal').classList.remove('hidden');
       }
       window.openProfile = openProfile;
-      function copyUID() { if (!userData) return; navigator.clipboard.writeText(userData.user_uid).then(() => { $('profileMsg').textContent = 'ID скопирован!'; setTimeout(() => { $('profileMsg').textContent = ''; }, 2000); }).catch(() => { $('profileMsg').textContent = 'Ошибка копирования'; }); }
+
+      function copyUID() {
+        if (!userData) return;
+        navigator.clipboard.writeText(userData.user_uid).then(() => {
+          $('profileMsg').textContent = 'ID скопирован!';
+          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
+        }).catch(() => { $('profileMsg').textContent = 'Ошибка копирования'; });
+      }
       window.copyUID = copyUID;
+
       async function changeNickname() {
         if (!userData) return;
         const newNick = $('profileNicknameInput').value.trim();
         if (!newNick || newNick.length < 2) { $('profileMsg').textContent = 'Никнейм должен быть от 2 символов'; return; }
         if (newNick === nickname) { $('profileMsg').textContent = 'Это ваш текущий никнейм'; return; }
         const result = await API.updateNickname(userData.user_uid, newNick);
-        if (result === true) { nickname = newNick; userData.nickname = newNick; $('nicknameDisplay').textContent = newNick; localStorage.setItem('wdVdsNickname', newNick); $('profileMsg').textContent = 'Никнейм изменён!'; setTimeout(() => { $('profileMsg').textContent = ''; }, 2000); }
-        else if (result === 'taken') { $('profileMsg').textContent = 'Этот никнейм уже занят'; }
-        else { $('profileMsg').textContent = 'Ошибка изменения'; }
+        if (result === true) {
+          nickname = newNick;
+          userData.nickname = newNick;
+          $('nicknameDisplay').textContent = newNick;
+          localStorage.setItem('wdVdsNickname', newNick);
+          $('profileMsg').textContent = 'Никнейм изменён!';
+          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
+        } else if (result === 'taken') {
+          $('profileMsg').textContent = 'Этот никнейм уже занят';
+        } else {
+          $('profileMsg').textContent = 'Ошибка изменения';
+        }
       }
       window.changeNickname = changeNickname;
 
       function updateSupportBadge() {
-        const badge = $('supportBadge'); const btn = $('supportBtn');
+        const badge = $('supportBadge');
+        const btn = $('supportBtn');
         if (!badge || !btn) return;
-        if (supportUnreadCount > 0) { badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount; badge.classList.remove('hidden'); btn.classList.add('unread'); }
-        else { badge.classList.add('hidden'); btn.classList.remove('unread'); }
+        if (supportUnreadCount > 0) {
+          badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount;
+          badge.classList.remove('hidden');
+          btn.classList.add('unread');
+        } else {
+          badge.classList.add('hidden');
+          btn.classList.remove('unread');
+        }
       }
+
       function startSupportPolling() {
         if (supportPollingInterval) clearInterval(supportPollingInterval);
         supportPollingInterval = setInterval(async () => {
           if (!userData) return;
           try {
-            const chats = await API.getSupportChats(); const uid = userData.user_uid;
+            const chats = await API.getSupportChats();
+            const uid = userData.user_uid;
             if (chats[uid] && chats[uid].messages) {
-              const oldCount = supportMessages.length; supportMessages = chats[uid].messages;
+              const oldCount = supportMessages.length;
+              supportMessages = chats[uid].messages;
               const newAdminMessages = supportMessages.filter((m, i) => m.from === 'admin' && i >= oldCount && !m.read);
-              if (newAdminMessages.length > 0) { supportUnreadCount += newAdminMessages.length; updateSupportBadge(); playNotificationSound(); if (!$('supportModal').classList.contains('hidden')) renderSupportMessages(); }
+              if (newAdminMessages.length > 0) {
+                supportUnreadCount += newAdminMessages.length;
+                updateSupportBadge();
+                playNotificationSound();
+                if (!$('supportModal').classList.contains('hidden')) renderSupportMessages();
+              }
             }
           } catch (e) {}
         }, 10000);
       }
 
+      // ========== INITIALIZATION ==========
       setLanguage('ru');
       updateAllTexts();
-      $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
-      $('logoutBtn').style.display = 'none'; $('googleLoginBtn').style.display = 'flex';
+      $('mainMenu').classList.add('hidden');
+      $('slotUI').classList.add('hidden');
+      $('logoutBtn').style.display = 'none';
+      $('googleLoginBtn').style.display = 'flex';
       updateSupportBadge();
       showRegistrationPage();
     })();
