@@ -586,6 +586,76 @@
             letter-spacing: 2px;
         }
 
+        /* НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ */
+        .free-diamonds-btn {
+            background: linear-gradient(180deg, #2d1840 0%, #150920 100%);
+            border: 2px solid transparent;
+            border-radius: 50px;
+            padding: clamp(12px, 3vw, 18px) clamp(8px, 2vw, 12px);
+            font-weight: 900;
+            color: #ffd700;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 200, 0, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            backdrop-filter: blur(8px);
+            white-space: normal;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            text-align: center;
+            line-height: 1.2;
+            position: relative;
+            z-index: 0;
+            animation: freeDiamondsGlow 2s ease-in-out infinite alternate;
+        }
+
+        .free-diamonds-btn::before {
+            content: "";
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 53px;
+            background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #8a2be2, #ff0080);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: gradientBorderRotate 3s linear infinite;
+            filter: blur(2px);
+        }
+
+        .free-diamonds-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50px;
+            background: linear-gradient(180deg, #2d1840 0%, #150920 100%);
+            z-index: -1;
+        }
+
+        @keyframes gradientBorderRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes freeDiamondsGlow {
+            0% { box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 200, 0, 0.5); transform: scale(1); }
+            100% { box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 35px rgba(255, 200, 0, 0.9), 0 0 60px rgba(255, 100, 0, 0.6); transform: scale(1.02); }
+        }
+
+        .free-diamonds-btn:active {
+            transform: scale(0.96);
+            box-shadow: 0 5px 12px black, 0 0 28px gold;
+        }
+
         .slot-machine {
             background: rgba(0, 0, 0, 0.4);
             border: 2px solid #b49450;
@@ -1752,6 +1822,8 @@
         <div id="mainMenu" class="menu-grid">
             <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn">Мои желания</button>
             <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
+            <!-- НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ -->
+            <button class="free-diamonds-btn full-width-btn" id="freeDiamondsBtn">✨Получи 1000 алмазов бесплатно✨</button>
             <div class="menu-lang-row">
                 <button id="langRuMenu" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
                 <button id="langUaMenu" class="lang-btn" onclick="setLanguage('ua')">UA</button>
@@ -1861,6 +1933,24 @@
         </div>
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ БЕСПЛАТНЫХ АЛМАЗОВ -->
+    <div id="freeDiamondsModal" class="overlay hidden">
+        <div class="win-card">
+            <h3 style="color:#ffd700; margin-bottom:16px;">✨ Получи 1000 алмазов бесплатно ✨</h3>
+            <div style="color:#f0dbb0; text-align:left; line-height:1.8; font-size:0.95rem; margin-bottom:20px;">
+                <p>Для получения <strong style="color:#ffd700;">1000 алмазов</strong> нужно отправить мне в телеграмм:</p>
+                <p style="margin-top:12px;">1) <strong style="color:#ffd966;">Ваш ID</strong></p>
+                <p>2) <strong style="color:#ffd966;">Выиграть джек пот и скачать сертификат джек пота</strong> (получите его автоматически после выигрыша)</p>
+                <p>3) <strong style="color:#ffd966;">Видео исполнения желания в формате mp4</strong></p>
+            </div>
+            <a href="https://t.me/casper_lider" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#0088cc; color:white; padding:12px 24px; border-radius:30px; text-decoration:none; font-weight:bold; font-size:1rem; margin-bottom:16px; transition:0.2s; box-shadow:0 4px 15px rgba(0,136,204,0.4);">
+                💬 Написать в Telegram
+            </a>
+            <p style="color:#888; font-size:0.75rem; margin-bottom:16px;">Ссылка: https://t.me/casper_lider</p>
+            <button id="closeFreeDiamondsBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
+        </div>
+    </div>
+
     <script src="api.js"></script>
     <script>
     // ========== ORIGINAL SCRIPT – FULLY PRESERVED ==========
@@ -1889,8 +1979,7 @@
         });
         client.requestAccessToken();
       };
-
-      // Generic symbols for the slot machine
+              // Generic symbols for the slot machine
       const ICONS = ['🍒', '🍋', '🍊', '🍇', '⭐'];
 
       const CERTIFICATE_TEXTS = {
@@ -2815,6 +2904,17 @@
       [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('cryptoPaymentModal'), $('profileModal'), $('promoCodeModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
 
       $('regBgGifts').addEventListener('click', handleRegGiftClick);
+
+      // ========== НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ ==========
+      $('freeDiamondsBtn').addEventListener('click', function() {
+        $('freeDiamondsModal').classList.remove('hidden');
+      });
+      $('closeFreeDiamondsBtn').addEventListener('click', function() {
+        $('freeDiamondsModal').classList.add('hidden');
+      });
+      $('freeDiamondsModal').addEventListener('click', function(e) {
+        if (e.target === $('freeDiamondsModal')) $('freeDiamondsModal').classList.add('hidden');
+      });
 
       function openProfile() {
         if (!userData) return;
