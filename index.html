@@ -1862,7 +1862,7 @@
     <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
     <div class="spin-win-display" id="spinWinDisplay"></div>
 
-    <!-- Modals (unchanged) -->
+    <!-- Modals -->
     <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
     <div id="nameFormModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3><input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя"><input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра"><button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button><button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button></div></div>
     <div id="paymentModal" class="overlay hidden"><div class="win-card" style="max-width:340px;"><h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3><div id="diamondOptions"><div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div><div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div><div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div><div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div><div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div></div><button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button></div></div>
@@ -1979,7 +1979,8 @@
         });
         client.requestAccessToken();
       };
-              // Generic symbols for the slot machine
+
+      // Generic symbols for the slot machine
       const ICONS = ['🍒', '🍋', '🍊', '🍇', '⭐'];
 
       const CERTIFICATE_TEXTS = {
@@ -2365,6 +2366,7 @@
         loadCryptoRates();
         startTypingAnimation();
         startMenuFallingGifts();
+        updateAllTexts();
       }
 
       async function logout() {
@@ -2518,8 +2520,7 @@
         updateFreeSpinsBadge();
         renderHistory();
       }
-
-      function loadUserData() { /* ... unchanged ... */ }
+              function loadUserData() { /* ... unchanged ... */ }
       function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
       function saveDiamonds() { localStorage.setItem('wdVdsDiamonds_' + nickname, diamonds); updateDiamondsDisplay(); updateMainBalance(); }
       function updateDiamondsDisplay() { if ($('diamondsCount')) $('diamondsCount').textContent = diamonds; }
@@ -2612,7 +2613,11 @@
         document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
         const langPrefix = lang.charAt(0).toUpperCase() + lang.slice(1);
         document.querySelectorAll('[id^="lang' + langPrefix + '"]').forEach(function(b) { b.classList.add('active'); });
-        updateAllTexts(); updateFreeSpinsBadge();
+        updateAllTexts();
+        updateFreeSpinsBadge();
+        // Принудительно обновляем текст кнопки и модального окна
+        if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
+        updateFreeDiamondsModalTexts();
         if (userData) {
           stopTypingAnimation();
           startTypingAnimation();
