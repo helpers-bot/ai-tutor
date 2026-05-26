@@ -1936,17 +1936,17 @@
     <!-- МОДАЛЬНОЕ ОКНО ДЛЯ БЕСПЛАТНЫХ АЛМАЗОВ -->
     <div id="freeDiamondsModal" class="overlay hidden">
         <div class="win-card">
-            <h3 style="color:#ffd700; margin-bottom:16px;">✨ Получи 1000 алмазов бесплатно ✨</h3>
-            <div style="color:#f0dbb0; text-align:left; line-height:1.8; font-size:0.95rem; margin-bottom:20px;">
-                <p>Для получения <strong style="color:#ffd700;">1000 алмазов</strong> нужно отправить мне в телеграмм:</p>
-                <p style="margin-top:12px;">1) <strong style="color:#ffd966;">Ваш ID</strong></p>
-                <p>2) <strong style="color:#ffd966;">Выиграть джек пот и скачать сертификат джек пота</strong> (получите его автоматически после выигрыша)</p>
-                <p>3) <strong style="color:#ffd966;">Видео исполнения желания в формате mp4</strong></p>
+            <h3 style="color:#ffd700; margin-bottom:16px;" id="freeDiamondsTitle">✨ Получи 1000 алмазов бесплатно ✨</h3>
+            <div style="color:#f0dbb0; text-align:left; line-height:1.8; font-size:0.95rem; margin-bottom:20px;" id="freeDiamondsContent">
+                <p id="freeDiamondsIntro">Для получения <strong style="color:#ffd700;">1000 алмазов</strong> нужно отправить мне в телеграмм:</p>
+                <p style="margin-top:12px;" id="freeDiamondsStep1">1) <strong style="color:#ffd966;">Ваш ID</strong></p>
+                <p id="freeDiamondsStep2">2) <strong style="color:#ffd966;">Выиграть джек пот и скачать сертификат джек пота</strong> (получите его автоматически после выигрыша)</p>
+                <p id="freeDiamondsStep3">3) <strong style="color:#ffd966;">Видео исполнения желания в формате mp4</strong></p>
             </div>
-            <a href="https://t.me/casper_lider" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#0088cc; color:white; padding:12px 24px; border-radius:30px; text-decoration:none; font-weight:bold; font-size:1rem; margin-bottom:16px; transition:0.2s; box-shadow:0 4px 15px rgba(0,136,204,0.4);">
+            <a href="https://t.me/casper_lider" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#0088cc; color:white; padding:12px 24px; border-radius:30px; text-decoration:none; font-weight:bold; font-size:1rem; margin-bottom:16px; transition:0.2s; box-shadow:0 4px 15px rgba(0,136,204,0.4);" id="freeDiamondsTelegramBtn">
                 💬 Написать в Telegram
             </a>
-            <p style="color:#888; font-size:0.75rem; margin-bottom:16px;">Ссылка: https://t.me/casper_lider</p>
+            <p style="color:#888; font-size:0.75rem; margin-bottom:16px;" id="freeDiamondsLink">Ссылка: https://t.me/casper_lider</p>
             <button id="closeFreeDiamondsBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
         </div>
     </div>
@@ -2002,7 +2002,15 @@
           supportGreeting:'👋 Здравствуйте! Чем могу помочь?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введите промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активировать',
           promoCodeClose:'ЗАКРЫТЬ', promoCodeSuccess:'🎉 Промокод активирован! +20💎 и +5 бесплатных спинов', promoCodeAlready:'⏳ Этот промокод уже использован', promoCodeInvalid:'❌ Неверный промокод',
           regGlowText: 'Исполняет желания',
-          wishPhrases: ['Следуй за мечтой', 'Загадай желание', 'Закажи счастье', 'Поймай удачу', 'Мечтай смело', 'Звезда желаний', 'Раскрой магию', 'Лови момент']
+          wishPhrases: ['Следуй за мечтой', 'Загадай желание', 'Закажи счастье', 'Поймай удачу', 'Мечтай смело', 'Звезда желаний', 'Раскрой магию', 'Лови момент'],
+          freeDiamondsBtn: '✨Получи 1000 алмазов бесплатно✨',
+          freeDiamondsTitle: '✨ Получи 1000 алмазов бесплатно ✨',
+          freeDiamondsIntro: 'Для получения <strong style="color:#ffd700;">1000 алмазов</strong> нужно отправить мне в телеграмм:',
+          freeDiamondsStep1: '1) <strong style="color:#ffd966;">Ваш ID</strong>',
+          freeDiamondsStep2: '2) <strong style="color:#ffd966;">Выиграть джек пот и скачать сертификат джек пота</strong> (получите его автоматически после выигрыша)',
+          freeDiamondsStep3: '3) <strong style="color:#ffd966;">Видео исполнения желания в формате mp4</strong>',
+          freeDiamondsTelegramBtn: '💬 Написать в Telegram',
+          freeDiamondsLink: 'Ссылка: https://t.me/casper_lider'
         },
         ua: {
           loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія',
@@ -2017,7 +2025,15 @@
           supportGreeting:'👋 Здравствуйте! Чим можу допомогти?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введіть промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активувати',
           promoCodeClose:'ЗАКРИТИ', promoCodeSuccess:'🎉 Промокод активовано! +20💎 та +5 безкоштовних спинів', promoCodeAlready:'⏳ Цей промокод вже використано', promoCodeInvalid:'❌ Невірний промокод',
           regGlowText: 'Виконує бажання',
-          wishPhrases: ['Йди за мрією', 'Загадай бажання', 'Замов щастя', 'Впіймай удачу', 'Мрій сміливо', 'Зірка бажань', 'Відкрий магію', 'Лови момент']
+          wishPhrases: ['Йди за мрією', 'Загадай бажання', 'Замов щастя', 'Впіймай удачу', 'Мрій сміливо', 'Зірка бажань', 'Відкрий магію', 'Лови момент'],
+          freeDiamondsBtn: '✨Отримай 1000 алмазів безкоштовно✨',
+          freeDiamondsTitle: '✨ Отримай 1000 алмазів безкоштовно ✨',
+          freeDiamondsIntro: 'Для отримання <strong style="color:#ffd700;">1000 алмазів</strong> потрібно надіслати мені в телеграм:',
+          freeDiamondsStep1: '1) <strong style="color:#ffd966;">Ваш ID</strong>',
+          freeDiamondsStep2: '2) <strong style="color:#ffd966;">Виграти джек пот і завантажити сертифікат джек поту</strong> (отримаєте його автоматично після виграшу)',
+          freeDiamondsStep3: '3) <strong style="color:#ffd966;">Відео виконання бажання у форматі mp4</strong>',
+          freeDiamondsTelegramBtn: '💬 Написати в Telegram',
+          freeDiamondsLink: 'Посилання: https://t.me/casper_lider'
         },
         en: {
           loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History',
@@ -2032,7 +2048,15 @@
           supportGreeting:'👋 Hello! How can I help you?', promoCodeBtn:'🎟️ Promo Code', promoCodeTitle:'🎟️ Enter Promo Code', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Activate',
           promoCodeClose:'CLOSE', promoCodeSuccess:'🎉 Promo code activated! +20💎 and +5 free spins', promoCodeAlready:'⏳ This promo code has already been used', promoCodeInvalid:'❌ Invalid promo code',
           regGlowText: 'Fulfills wishes',
-          wishPhrases: ['Follow your dream', 'Get a wish', 'Order happiness', 'Make a wish', 'Dream big', 'Wish upon a star', 'Unlock magic', 'Chase the magic']
+          wishPhrases: ['Follow your dream', 'Get a wish', 'Order happiness', 'Make a wish', 'Dream big', 'Wish upon a star', 'Unlock magic', 'Chase the magic'],
+          freeDiamondsBtn: '✨Get 1000 Diamonds Free✨',
+          freeDiamondsTitle: '✨ Get 1000 Diamonds Free ✨',
+          freeDiamondsIntro: 'To get <strong style="color:#ffd700;">1000 diamonds</strong> you need to send me in telegram:',
+          freeDiamondsStep1: '1) <strong style="color:#ffd966;">Your ID</strong>',
+          freeDiamondsStep2: '2) <strong style="color:#ffd966;">Win the jackpot and download the jackpot certificate</strong> (you will get it automatically after winning)',
+          freeDiamondsStep3: '3) <strong style="color:#ffd966;">Video of wish fulfillment in mp4 format</strong>',
+          freeDiamondsTelegramBtn: '💬 Write to Telegram',
+          freeDiamondsLink: 'Link: https://t.me/casper_lider'
         }
       };
 
@@ -2308,7 +2332,7 @@
       }
 
       function stopTypingAnimation() {
-        if (typingInterval) { clearTimeout(typingInterval); typingInterval = null; }
+        if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
         const btn = $('customRewardsBtn');
         if (btn) btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>';
       }
@@ -2482,6 +2506,15 @@
         $('promoCodeSubmitBtn').textContent = t('promoCodeActivate');
         $('closePromoCodeBtn').textContent = t('promoCodeClose');
         if ($('regGlowText')) $('regGlowText').textContent = t('regGlowText');
+        // Free diamonds button and modal
+        if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
+        if ($('freeDiamondsTitle')) $('freeDiamondsTitle').textContent = t('freeDiamondsTitle');
+        if ($('freeDiamondsIntro')) $('freeDiamondsIntro').innerHTML = t('freeDiamondsIntro');
+        if ($('freeDiamondsStep1')) $('freeDiamondsStep1').innerHTML = t('freeDiamondsStep1');
+        if ($('freeDiamondsStep2')) $('freeDiamondsStep2').innerHTML = t('freeDiamondsStep2');
+        if ($('freeDiamondsStep3')) $('freeDiamondsStep3').innerHTML = t('freeDiamondsStep3');
+        if ($('freeDiamondsTelegramBtn')) $('freeDiamondsTelegramBtn').textContent = t('freeDiamondsTelegramBtn');
+        if ($('freeDiamondsLink')) $('freeDiamondsLink').textContent = t('freeDiamondsLink');
         updateFreeSpinsBadge();
         renderHistory();
       }
@@ -2735,6 +2768,7 @@
         $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
         $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden');
         $('cryptoPaymentModal').classList.add('hidden'); $('profileModal').classList.add('hidden'); $('promoCodeModal').classList.add('hidden');
+        $('freeDiamondsModal').classList.add('hidden');
         if (rateInterval) clearInterval(rateInterval);
         useCustomRewards = false; updateMainBalance(); debouncedSave();
         startMenuFallingGifts();
@@ -2907,6 +2941,7 @@
 
       // ========== НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ ==========
       $('freeDiamondsBtn').addEventListener('click', function() {
+        updateFreeDiamondsModalTexts();
         $('freeDiamondsModal').classList.remove('hidden');
       });
       $('closeFreeDiamondsBtn').addEventListener('click', function() {
@@ -2915,6 +2950,16 @@
       $('freeDiamondsModal').addEventListener('click', function(e) {
         if (e.target === $('freeDiamondsModal')) $('freeDiamondsModal').classList.add('hidden');
       });
+
+      function updateFreeDiamondsModalTexts() {
+        if ($('freeDiamondsTitle')) $('freeDiamondsTitle').textContent = t('freeDiamondsTitle');
+        if ($('freeDiamondsIntro')) $('freeDiamondsIntro').innerHTML = t('freeDiamondsIntro');
+        if ($('freeDiamondsStep1')) $('freeDiamondsStep1').innerHTML = t('freeDiamondsStep1');
+        if ($('freeDiamondsStep2')) $('freeDiamondsStep2').innerHTML = t('freeDiamondsStep2');
+        if ($('freeDiamondsStep3')) $('freeDiamondsStep3').innerHTML = t('freeDiamondsStep3');
+        if ($('freeDiamondsTelegramBtn')) $('freeDiamondsTelegramBtn').textContent = t('freeDiamondsTelegramBtn');
+        if ($('freeDiamondsLink')) $('freeDiamondsLink').textContent = t('freeDiamondsLink');
+      }
 
       function openProfile() {
         if (!userData) return;
