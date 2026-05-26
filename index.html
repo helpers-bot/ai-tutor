@@ -2529,7 +2529,8 @@
         updateFreeSpinsBadge();
         renderHistory();
       }
-              function loadUserData() { /* ... unchanged ... */ }
+
+      function loadUserData() { /* ... unchanged ... */ }
       function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
       function saveDiamonds() { localStorage.setItem('wdVdsDiamonds_' + nickname, diamonds); updateDiamondsDisplay(); updateMainBalance(); }
       function updateDiamondsDisplay() { if ($('diamondsCount')) $('diamondsCount').textContent = diamonds; }
@@ -2624,11 +2625,16 @@
         document.querySelectorAll('[id^="lang' + langPrefix + '"]').forEach(function(b) { b.classList.add('active'); });
         updateAllTexts();
         updateFreeSpinsBadge();
+        // Принудительно обновляем текст кнопки и модального окна
         if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
         updateFreeDiamondsModalTexts();
+        // Принудительно обновляем текст кнопок Google
         if ($('googleLoginBtnText')) $('googleLoginBtnText').textContent = t('googleLoginBtnText');
         if ($('regGoogleBtnText')) $('regGoogleBtnText').textContent = t('regGoogleBtnText');
-        if (userData) { stopTypingAnimation(); startTypingAnimation(); }
+        if (userData) {
+          stopTypingAnimation();
+          startTypingAnimation();
+        }
       }
       window.setLanguage = setLanguage;
       function updateFreeSpinsBadge() {
@@ -2748,41 +2754,32 @@
         var now = new Date();
         var dateStr = now.toLocaleDateString();
         var timeStr = now.toLocaleTimeString();
-        // Золотой фон
-        ctx.fillStyle = '#1a1a00'; ctx.fillRect(0, 0, 1200, 800);
-        ctx.fillStyle = 'rgba(255,215,0,0.25)'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 8;
-        for (var i = 0; i < 1200; i += 12) { for (var j = 0; j < 800; j += 12) { if (Math.random() > 0.6) { ctx.beginPath(); ctx.arc(i, j, 3 + Math.random() * 8, 0, Math.PI * 2); ctx.fill(); } } }
+        ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0, 0, 1200, 800);
+        ctx.fillStyle = 'rgba(255,215,0,0.35)'; ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 8;
+        for (var i = 0; i < 1200; i += 8) { for (var j = 0; j < 800; j += 8) { if (Math.random() > 0.7) { ctx.beginPath(); if (Math.random() > 0.5) ctx.arc(i, j, 2 + Math.random() * 6, 0, Math.PI * 2); else ctx.fillRect(i, j, 3 + Math.random() * 5, 3 + Math.random() * 5); ctx.fill(); } } }
         ctx.shadowBlur = 0;
-        // Светло-красная рамка
-        ctx.strokeStyle = '#ff6666'; ctx.lineWidth = 8; ctx.shadowColor = '#ff6666'; ctx.shadowBlur = 30; ctx.strokeRect(25, 25, 1150, 750); ctx.shadowBlur = 0;
-        ctx.strokeStyle = '#ff8888'; ctx.lineWidth = 3; ctx.strokeRect(50, 50, 1100, 700);
+        ctx.strokeStyle = '#ff9999'; ctx.lineWidth = 8; ctx.shadowColor = '#ff6666'; ctx.shadowBlur = 30; ctx.strokeRect(30, 30, 1140, 740); ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#ffaaaa'; ctx.lineWidth = 3; ctx.strokeRect(50, 50, 1100, 700);
         [[50,50],[1150,50],[50,750],[1150,750]].forEach(function(p) { var x = p[0], y = p[1]; ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(x, y, 15, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = '#ffcc00'; ctx.lineWidth = 3; ctx.stroke(); });
-        // Заголовок фиолетовым
-        ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 48px serif'; ctx.textAlign = 'center'; ctx.fillText(certTexts.title, 600, 140);
-        ctx.fillStyle = '#8e44ad'; ctx.font = 'italic 30px serif'; ctx.fillText(certTexts.subtitle, 600, 185);
-        ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(200, 205); ctx.lineTo(1000, 205); ctx.stroke();
-        // Иконка
-        ctx.font = '80px sans-serif'; ctx.fillText(icon, 600, 290);
-        // Победитель
-        ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(certTexts.wonMsg(userName, partnerName), 600, 450);
-        // Желание с иконками
-        ctx.fillStyle = '#b482ff'; ctx.font = 'bold 38px serif';
+        ctx.fillStyle = '#b482ff'; ctx.font = 'bold 44px serif'; ctx.textAlign = 'center'; ctx.fillText(certTexts.title, 600, 140);
+        ctx.fillStyle = '#9b6bff'; ctx.font = 'italic 28px serif'; ctx.fillText(certTexts.subtitle, 600, 185);
+        ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(200, 210); ctx.lineTo(1000, 210); ctx.stroke();
+        ctx.font = '80px sans-serif'; ctx.fillText(icon, 600, 295);
+        ctx.fillStyle = '#b482ff'; ctx.font = 'bold 28px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(certTexts.wonMsg(userName, partnerName), 600, 510);
+        ctx.fillStyle = '#d4b0ff'; ctx.font = 'bold 36px serif';
         var wishText = icon + ' ' + wish + ' ' + icon;
-        var words = wishText.split(' '); var line = '', y = 505;
-        words.forEach(function(w) { var tl = line + w + ' '; if (ctx.measureText(tl).width > 800) { ctx.fillText(line, 600, y); line = w + ' '; y += 50; } else line = tl; });
+        var words = wishText.split(' '); var line = '', y = 560;
+        words.forEach(function(w) { var tl = line + w + ' '; if (ctx.measureText(tl).width > 800) { ctx.fillText(line, 600, y); line = w + ' '; y += 45; } else line = tl; });
         ctx.fillText(line, 600, y);
-        // Официальный чек
-        ctx.fillStyle = '#9b59b6'; ctx.font = 'bold 28px monospace'; ctx.textAlign = 'center'; ctx.fillText(certTexts.official, 600, 600);
-        // Дата и время под чеком (тёмно-красный)
-        ctx.fillStyle = '#8b0000'; ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center'; ctx.fillText(dateStr + '  ' + timeStr, 600, 640);
-        // Мокрая печать в правом углу
+        ctx.fillStyle = '#b482ff'; ctx.font = 'bold 26px monospace'; ctx.textAlign = 'center'; ctx.fillText(certTexts.official, 600, 650);
+        ctx.fillStyle = '#8b0000'; ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center'; ctx.fillText(dateStr + '  ' + timeStr, 600, 685);
         ctx.save();
         ctx.translate(1080, 700);
         ctx.rotate(-0.2);
-        ctx.fillStyle = 'rgba(139, 0, 0, 0.25)';
+        ctx.fillStyle = 'rgba(180, 130, 255, 0.3)';
         ctx.beginPath(); ctx.arc(0, 0, 55, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = '#8b0000'; ctx.lineWidth = 4; ctx.stroke();
-        ctx.fillStyle = 'rgba(139, 0, 0, 0.4)'; ctx.font = 'bold 22px Times New Roman'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VDS', 0, 0);
+        ctx.strokeStyle = '#b482ff'; ctx.lineWidth = 4; ctx.stroke();
+        ctx.fillStyle = 'rgba(180, 130, 255, 0.5)'; ctx.font = 'bold 22px Times New Roman'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VDS', 0, 0);
         ctx.restore();
         canvas.toBlob(function(b) { var u = URL.createObjectURL(b); var a = document.createElement('a'); a.href = u; a.download = 'VDS_Wish_' + icon + '.png'; a.click(); URL.revokeObjectURL(u); });
       }
@@ -2805,9 +2802,8 @@
         useCustomRewards = false; updateMainBalance(); debouncedSave();
         startMenuFallingGifts();
       }
-      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: free_spins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
-
-      // Promo code
+      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
+              // Promo code
       function openPromoCode() {
         if (!userData) return;
         $('promoCodeInput').value = '';
