@@ -2561,24 +2561,28 @@
       }
       window.updateCustomReward = function(i, v) { customRewards[i] = v; };
       window.removeCustomReward = function(i) { customRewards.splice(i, 1); renderCustomRewards(); };
+
+      // ===== ИСПРАВЛЕНО: loadSupportHistory с const вместо var =====
       async function loadSupportHistory() {
         const uid = userData ? userData.user_uid : 'guest';
         try {
-          var chats = await API.getSupportChats();
+          const chats = await API.getSupportChats();
           if (chats[uid] && chats[uid].messages) supportMessages = chats[uid].messages;
           else supportMessages = [];
         } catch (e) { supportMessages = []; }
       }
+
       async function saveSupportMessage() {
         const uid = userData ? userData.user_uid : 'guest';
         try {
-          var chats = await API.getSupportChats();
+          const chats = await API.getSupportChats();
           if (!chats[uid]) chats[uid] = { messages: [], userName: userData ? nickname : 'Гость' };
           chats[uid].messages = supportMessages;
           chats[uid].userName = userData ? nickname : 'Гость';
           await API.saveSupportChats(chats);
         } catch (e) { console.error('Save support error:', e); }
       }
+
       function renderSupportMessages() {
         var container = $('chatMessages');
         if (!container) return;
@@ -2601,6 +2605,7 @@
         }
         container.scrollTop = container.scrollHeight;
       }
+
       function handleChatSend() {
         var text = $('chatInput').value.trim();
         if (!text) return;
@@ -2614,10 +2619,12 @@
         $('chatInput').value = '';
         saveSupportMessage();
       }
+
       function showPolicy(type) {
         var policies = POLICIES[currentLanguage] || POLICIES.ru;
         alert(type === 'privacy' ? policies.privacy : policies.terms);
       }
+
       function setLanguage(lang) {
         currentLanguage = lang;
         document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -2625,22 +2632,19 @@
         document.querySelectorAll('[id^="lang' + langPrefix + '"]').forEach(function(b) { b.classList.add('active'); });
         updateAllTexts();
         updateFreeSpinsBadge();
-        // Принудительно обновляем текст кнопки и модального окна
         if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
         updateFreeDiamondsModalTexts();
-        // Принудительно обновляем текст кнопок Google
         if ($('googleLoginBtnText')) $('googleLoginBtnText').textContent = t('googleLoginBtnText');
         if ($('regGoogleBtnText')) $('regGoogleBtnText').textContent = t('regGoogleBtnText');
-        if (userData) {
-          stopTypingAnimation();
-          startTypingAnimation();
-        }
+        if (userData) { stopTypingAnimation(); startTypingAnimation(); }
       }
       window.setLanguage = setLanguage;
+
       function updateFreeSpinsBadge() {
         if (freeSpins > 0) { $('freeSpinsBadge').classList.remove('hidden'); $('freeSpinsBadge').textContent = '🎁 ' + (currentLanguage === 'ru' ? 'Бесплатные спины' : currentLanguage === 'ua' ? 'Безкоштовні спини' : 'Free spins') + ': ' + freeSpins + ' (Шанс джекпота +50%)'; }
         else { $('freeSpinsBadge').classList.add('hidden'); jackpotBoost = false; }
       }
+
       function updateTreasureProgress(add) {
         treasureProgress = Math.min(100, treasureProgress + add);
         $('progressFill').style.width = treasureProgress + '%';
@@ -2648,8 +2652,10 @@
         $('progressText').textContent = bonusWord + ': ' + treasureProgress.toFixed(1) + '/100%';
         updateGiftSize(treasureProgress); debouncedSave();
       }
+
       function updateTreasure(add) { updateTreasureProgress(add); if (treasureProgress >= 100) animateGiftShakeAndExplosion(); }
       function showMessage(text) { $('messageDisplay').textContent = text; setTimeout(function() { if ($('messageDisplay').textContent === text) $('messageDisplay').textContent = ''; }, 3000); }
+
       function showSpinWin(amount) {
         $('spinWinDisplay').textContent = '+' + amount + '💎';
         $('spinWinDisplay').classList.remove('show');
@@ -2657,6 +2663,7 @@
         $('spinWinDisplay').classList.add('show');
         setTimeout(function() { $('spinWinDisplay').classList.remove('show'); }, 2000);
       }
+
       function startGiftRain() {
         var giftTypes = ['🎁', '🎀', '💝', '🎊', '🎉', '✨', '💎', '🌟', '🎈', '🎪'];
         for (var i = 0; i < 50; i++) {
@@ -2672,6 +2679,7 @@
           }, i * 100);
         }
       }
+
       function showJackpotBanner() {
         var banner = document.createElement('div');
         banner.className = 'jackpot-banner';
@@ -2679,7 +2687,9 @@
         document.body.appendChild(banner);
         setTimeout(function() { if (banner.parentNode) banner.remove(); }, 5000);
       }
+
       function getSymbolHeight() { var s = document.querySelector('.symbol'); return s ? parseFloat(getComputedStyle(s).height) || 40 : 40; }
+
       function createReels() {
         $('machine').innerHTML = ''; strips = [];
         for (var c = 0; c < GRID; c++) {
@@ -2689,25 +2699,31 @@
           reel.appendChild(strip); $('machine').appendChild(reel); strips.push(strip);
         }
       }
+
       function buildGrid() { visibleGrid = []; for (var r = 0; r < GRID; r++) { visibleGrid[r] = []; for (var c = 0; c < GRID; c++) visibleGrid[r][c] = ICONS[Math.floor(Math.random() * ICONS.length)]; } }
       function applyGrid() { for (var c = 0; c < GRID; c++) { var ch = strips[c].children; for (var r = 0; r < GRID; r++) ch[r + 6].textContent = visibleGrid[r][c]; strips[c].style.top = -(6 * getSymbolHeight()) + 'px'; } }
+
       function findMatches() {
         var matches = [], dirs = [[0,1],[1,0],[1,1],[1,-1]];
         dirs.forEach(function(d) { var dr = d[0], dc = d[1]; for (var r = 0; r < GRID; r++) for (var c = 0; c < GRID; c++) { var sym = visibleGrid[r][c]; var match = [{ row: r, col: c }]; var nr = r + dr, nc = c + dc; while (nr >= 0 && nr < GRID && nc >= 0 && nc < GRID && visibleGrid[nr][nc] === sym) { match.push({ row: nr, col: nc }); nr += dr; nc += dc; } if (match.length >= 3) { var pr = r - dr, pc = c - dc; if (pr < 0 || pr >= GRID || pc < 0 || pc >= GRID || visibleGrid[pr][pc] !== sym) matches.push(match); } } });
         return matches;
       }
+
       function clearLines() { $('winLines').innerHTML = ''; }
+
       function drawLines(matches) {
         clearLines();
         var reels = [].slice.call(document.querySelectorAll('.reel'));
         matches.forEach(function(match) { for (var i = 0; i < match.length - 1; i++) { var a = match[i], b = match[i + 1]; var ra = reels[a.col], rb = reels[b.col]; var rA = ra.getBoundingClientRect(), rB = rb.getBoundingClientRect(); var wr = $('winLines').getBoundingClientRect(); var sh = rA.height / 5; var x1 = rA.left + rA.width / 2 - wr.left, y1 = rA.top + (a.row * sh) + sh / 2 - wr.top; var x2 = rB.left + rB.width / 2 - wr.left, y2 = rB.top + (b.row * sh) + sh / 2 - wr.top; var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy), ang = Math.atan2(dy, dx) * 180 / Math.PI; var line = document.createElement('div'); line.className = 'win-line'; line.style.left = x1 + 'px'; line.style.top = y1 + 'px'; line.style.width = len + 'px'; line.style.transform = 'rotate(' + ang + 'deg)'; $('winLines').appendChild(line); } });
         setTimeout(clearLines, 2800);
       }
+
       function getRandomWish(icon) {
         if (useCustomRewards && customRewards.length >= 3) return customRewards[Math.floor(Math.random() * customRewards.length)];
         var prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
         return prizes[Math.floor(Math.random() * prizes.length)];
       }
+
       function spin() {
         if (spinning) return;
         if (gamePaused) return;
@@ -2719,6 +2735,7 @@
         else if (Math.random() < 0.005) { var sym = ICONS[Math.floor(Math.random() * ICONS.length)]; var row = Math.floor(Math.random() * GRID); for (var c = 0; c < GRID; c++) visibleGrid[row][c] = sym; }
         strips.forEach(function(strip, idx) { var pos = -getSymbolHeight(); var reelSoundInterval = setInterval(function() { playReelSpinSound(); }, 80); var loop = setInterval(function() { pos -= 28 + Math.random() * 7; if (pos < -3500) pos = -getSymbolHeight(); strip.style.top = pos + 'px'; }, 40); setTimeout(function() { clearInterval(loop); clearInterval(reelSoundInterval); playReelStopSound(); applyGrid(); if (idx === GRID - 1) setTimeout(finishSpin, 400); }, 1700 + idx * 400); });
       }
+
       async function finishSpin() {
         spinning = false; $('spinButton').disabled = gamePaused ? true : false;
         var matches = findMatches(); if (matches.length) drawLines(matches);
@@ -2741,6 +2758,7 @@
         updateFreeSpinsBadge();
         if (autoSpinning && !jackpot && !gamePaused) { setTimeout(function() { if (autoSpinning) spin(); }, 500); }
       }
+
       function triggerJackpot(icon, wish) {
         $('winIcons').textContent = icon + icon + icon;
         $('winMessage').textContent = wish;
@@ -2748,62 +2766,54 @@
         pendingJackpotIcon = icon;
         pendingJackpotWish = wish;
       }
+
       function generateLuxuryCertificate(icon, wish, userName, partnerName) {
         var canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 800; var ctx = canvas.getContext('2d');
         var certTexts = CERTIFICATE_TEXTS[currentLanguage] || CERTIFICATE_TEXTS.ru;
         var now = new Date();
         var dateStr = now.toLocaleDateString();
         var timeStr = now.toLocaleTimeString();
-        // Глубокий тёмный фон с тёплым сиянием
         var bgGrad = ctx.createRadialGradient(600, 400, 100, 600, 400, 750);
         bgGrad.addColorStop(0, '#1a1025');
         bgGrad.addColorStop(1, '#0a0510');
         ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, 1200, 800);
-        // Лёгкий узор из звёздочек
         ctx.fillStyle = 'rgba(255,215,0,0.08)';
         for (var i = 0; i < 1200; i += 30) { for (var j = 0; j < 800; j += 30) { if (Math.random() > 0.7) { ctx.beginPath(); ctx.arc(i, j, 2, 0, Math.PI * 2); ctx.fill(); } } }
-        // Двойная рамка
         ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 6; ctx.strokeRect(30, 30, 1140, 740);
         ctx.strokeStyle = '#b49450'; ctx.lineWidth = 2; ctx.strokeRect(45, 45, 1110, 710);
-        // Уголки
         [[45,45],[1155,45],[45,755],[1155,755]].forEach(function(p) { var x = p[0], y = p[1]; ctx.fillStyle = '#d4af37'; ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fill(); ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.stroke(); });
-        // Заголовок
         ctx.fillStyle = '#ffd700'; ctx.font = 'bold 46px serif'; ctx.textAlign = 'center'; ctx.fillText(certTexts.title, 600, 135);
         ctx.fillStyle = '#d4af37'; ctx.font = 'italic 26px serif'; ctx.fillText(certTexts.subtitle, 600, 175);
         ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(150, 195); ctx.lineTo(1050, 195); ctx.stroke();
-        // Иконка
         ctx.font = '90px sans-serif'; ctx.fillText(icon, 600, 300);
-        // Кто выиграл и для кого (крупно, с подсветкой)
         ctx.fillStyle = '#ffffff'; ctx.font = 'bold 32px sans-serif'; ctx.shadowColor = '#d4af37'; ctx.shadowBlur = 12;
         ctx.fillText(certTexts.wonMsg(userName, partnerName), 600, 470);
         ctx.shadowBlur = 0;
-        // Желание (очень крупно, с иконками)
         ctx.fillStyle = '#ffd700'; ctx.font = 'bold 40px serif';
         var wishText = icon + ' ' + wish + ' ' + icon;
         var words = wishText.split(' '); var line = '', y = 540;
         words.forEach(function(w) { var tl = line + w + ' '; if (ctx.measureText(tl).width > 850) { ctx.fillText(line, 600, y); line = w + ' '; y += 52; } else line = tl; });
         ctx.fillText(line, 600, y);
-        // Официальный чек и дата
         ctx.fillStyle = '#d4af37'; ctx.font = 'bold 22px monospace'; ctx.fillText(certTexts.official, 600, 650);
         ctx.fillStyle = '#b49450'; ctx.font = '18px monospace'; ctx.fillText(dateStr + '  ' + timeStr, 600, 680);
-        // Красивая печать
-        ctx.save();
-        ctx.translate(1080, 700);
-        ctx.rotate(-0.15);
-        ctx.fillStyle = 'rgba(212, 175, 55, 0.2)';
-        ctx.beginPath(); ctx.arc(0, 0, 60, 0, Math.PI*2); ctx.fill();
+        ctx.save(); ctx.translate(1080, 700); ctx.rotate(-0.15);
+        ctx.fillStyle = 'rgba(212, 175, 55, 0.2)'; ctx.beginPath(); ctx.arc(0, 0, 60, 0, Math.PI*2); ctx.fill();
         ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 5; ctx.stroke();
         ctx.fillStyle = 'rgba(255, 215, 0, 0.35)'; ctx.font = 'bold 26px Times New Roman'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VDS', 0, 0);
         ctx.restore();
         canvas.toBlob(function(b) { var u = URL.createObjectURL(b); var a = document.createElement('a'); a.href = u; a.download = 'VDS_Wish_' + icon + '.png'; a.click(); URL.revokeObjectURL(u); });
       }
+
       function openNameForm() { $('nameFormModal').classList.remove('hidden'); $('userNameInput').value = ''; $('partnerNameInput').value = ''; }
+
       function showWinDetail(item) {
         $('winDetailTitle').textContent = t('winDetailTitle');
         $('winDetailContent').innerHTML = '<p><strong>Иконка:</strong> ' + item.icon + '</p><p><strong>Желание:</strong> ' + item.wish + '</p><p><strong>Дата:</strong> ' + item.date + '</p><p><strong>Время:</strong> ' + item.time + '</p>';
         $('winDetailModal').classList.remove('hidden');
       }
+
       function enterSlot() { $('mainMenu').classList.add('hidden'); $('slotUI').classList.remove('hidden'); createReels(); buildGrid(); applyGrid(); $('messageDisplay').textContent = ''; gamePaused = false; $('spinButton').disabled = false; updateGiftSize(treasureProgress); updateTreasureProgress(0); autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; stopMenuFallingGifts(); }
+
       function backToMenu() {
         autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; gamePaused = false;
         $('slotUI').classList.add('hidden'); $('mainMenu').classList.remove('hidden');
@@ -2816,6 +2826,7 @@
         useCustomRewards = false; updateMainBalance(); debouncedSave();
         startMenuFallingGifts();
       }
+
       async function debouncedSave() { if (!userData) { saveDiamonds(); return; } if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: free_spins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
               // Promo code
       function openPromoCode() {
@@ -3059,6 +3070,7 @@
         }
       }
 
+      // ===== ИСПРАВЛЕНО: startSupportPolling с сохранением read = true и без звука при открытом окне =====
       function startSupportPolling() {
         if (supportPollingInterval) clearInterval(supportPollingInterval);
         supportPollingInterval = setInterval(async () => {
@@ -3073,8 +3085,17 @@
               if (newAdminMessages.length > 0) {
                 supportUnreadCount += newAdminMessages.length;
                 updateSupportBadge();
-                playNotificationSound();
-                if (!$('supportModal').classList.contains('hidden')) renderSupportMessages();
+                // Проигрываем звук только если окно поддержки закрыто
+                if ($('supportModal').classList.contains('hidden')) {
+                  playNotificationSound();
+                }
+                // Обновляем чат если он открыт
+                if (!$('supportModal').classList.contains('hidden')) {
+                  renderSupportMessages();
+                  // Помечаем новые сообщения как прочитанные и сохраняем в базу
+                  newAdminMessages.forEach(m => m.read = true);
+                  await saveSupportMessage();
+                }
               }
             }
           } catch (e) {}
