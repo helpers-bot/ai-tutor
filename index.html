@@ -1148,7 +1148,7 @@
             // Выход
             document.getElementById('logoutBtn').onclick = () => {
                 localStorage.removeItem('pirxmix_user');
-                window.location.reload();
+                window.location.href = 'https://vds-game.ink/';
             };
 
             // Политика
@@ -1200,7 +1200,7 @@
                 const vipInfoBox = document.getElementById('vipInfoBox');
                 const confirmVipBtn = document.getElementById('confirmVipBtn');
                 if (data && data.vip_paid) {
-                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=' + data.referral_code + '</p>';
+                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p>';
                     confirmVipBtn.style.display = 'none';
                 } else {
                     vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';
@@ -1213,7 +1213,7 @@
             document.getElementById('confirmVipBtn').onclick = async () => {
                 const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
                 if (!error && data && data.success) {
-                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=' + data.referral_code + '</p>';
+                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p>';
                     document.getElementById('confirmVipBtn').style.display = 'none';
                     await loadUserData();
                 }
