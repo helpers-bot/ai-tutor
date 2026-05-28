@@ -39,7 +39,6 @@
             pointer-events: none;
         }
 
-        /* Шапка */
         .header {
             width: 100%;
             max-width: 1300px;
@@ -100,7 +99,6 @@
             box-shadow: 0 0 15px rgba(243, 185, 91, 0.3);
         }
 
-        /* Основной контент */
         .dashboard {
             width: 100%;
             max-width: 1300px;
@@ -147,17 +145,29 @@
         .stat-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin: 0.5rem 0;
             font-size: 0.95rem;
         }
 
         .stat-label {
             color: #9b927a;
+            flex: 1;
         }
 
         .stat-value {
             color: #f5d78c;
             font-weight: 600;
+            text-align: right;
+            min-width: 60px;
+        }
+
+        .stat-earn {
+            color: #4caf50;
+            font-weight: 600;
+            text-align: right;
+            min-width: 60px;
+            font-size: 0.85rem;
         }
 
         .btn-primary {
@@ -205,12 +215,10 @@
             background: linear-gradient(135deg, #d8b4fe, #9333ea);
         }
 
-        /* Реферальная ссылка скрыта */
         .ref-link-box {
             display: none;
         }
 
-        /* Нижняя лента */
         .live-feed {
             width: 100%;
             max-width: 1300px;
@@ -271,7 +279,6 @@
         .deposit .feed-amount { color: #4caf50; }
         .withdraw .feed-amount { color: #ff7043; }
 
-        /* Модальное окно профиля */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -342,7 +349,6 @@
             margin-top: 1.5rem;
         }
 
-        /* VIP модальное окно */
         .vip-info-box {
             background: rgba(0,0,0,0.3);
             border-radius: 1rem;
@@ -371,7 +377,6 @@
             display: none !important;
         }
 
-        /* Футер с политикой */
         .footer {
             width: 100%;
             max-width: 1300px;
@@ -395,7 +400,6 @@
             color: #f3b95b;
         }
 
-        /* Модальное окно политики */
         .policy-modal {
             max-width: 700px;
             max-height: 80vh;
@@ -432,7 +436,6 @@
 </head>
 <body>
 
-<!-- Шапка -->
 <header class="header">
     <div class="logo">✨ Пирамикс</div>
     <div class="header-right">
@@ -442,9 +445,7 @@
     </div>
 </header>
 
-<!-- Дашборд -->
 <div class="dashboard">
-    <!-- Баланс -->
     <div class="card">
         <h3>💰 Мой баланс</h3>
         <div class="balance" id="balance">0.00 $</div>
@@ -455,28 +456,32 @@
         <button class="btn-primary" id="withdrawBtn">💸 Вывести средства</button>
     </div>
 
-    <!-- Рефералы -->
     <div class="card">
         <h3>👥 Мои рефералы</h3>
         <div class="stat-row">
             <span class="stat-label">1 уровень (1%)</span>
             <span class="stat-value" id="lvl1">0 чел.</span>
+            <span class="stat-earn" id="earn1">0.00 $</span>
         </div>
         <div class="stat-row">
             <span class="stat-label">2 уровень (2%)</span>
             <span class="stat-value" id="lvl2">0 чел.</span>
+            <span class="stat-earn" id="earn2">0.00 $</span>
         </div>
         <div class="stat-row">
             <span class="stat-label">3 уровень (3%)</span>
             <span class="stat-value" id="lvl3">0 чел.</span>
+            <span class="stat-earn" id="earn3">0.00 $</span>
         </div>
         <div class="stat-row">
             <span class="stat-label">4 уровень (4%)</span>
             <span class="stat-value" id="lvl4">0 чел.</span>
+            <span class="stat-earn" id="earn4">0.00 $</span>
         </div>
         <div class="stat-row">
             <span class="stat-label">5 уровень (5%)</span>
             <span class="stat-value" id="lvl5">0 чел.</span>
+            <span class="stat-earn" id="earn5">0.00 $</span>
         </div>
         <div class="ref-link-box">
             <input type="text" id="refLink" readonly>
@@ -484,7 +489,6 @@
         </div>
     </div>
 
-    <!-- Статистика и VIP -->
     <div class="card">
         <h3>📊 Статистика платформы</h3>
         <div class="stat-row">
@@ -503,7 +507,6 @@
     </div>
 </div>
 
-<!-- Лента транзакций -->
 <div class="live-feed">
     <div class="feed-half deposit-feed">
         <div class="feed-title">🟢 Последние пополнения</div>
@@ -515,12 +518,10 @@
     </div>
 </div>
 
-<!-- Футер -->
 <div class="footer">
     <span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span>
 </div>
 
-<!-- Модальное окно профиля -->
 <div class="modal-overlay hidden" id="profileModal">
     <div class="modal">
         <h2>👤 Профиль пользователя</h2>
@@ -543,18 +544,14 @@
     </div>
 </div>
 
-<!-- Модальное окно VIP -->
 <div class="modal-overlay hidden" id="vipModal">
     <div class="modal">
         <h2>👑 VIP статус</h2>
-        <div class="vip-info-box">
+        <div class="vip-info-box" id="vipInfoBox">
             <p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p>
             <div class="vip-price">10$</div>
             <p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">
                 Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.
-            </p>
-            <p style="color: #c084fc; font-size: 0.8rem; margin-top: 0.5rem;">
-                Доход с рефералов увеличивается на 50%!
             </p>
         </div>
         <div class="modal-buttons">
@@ -564,66 +561,52 @@
     </div>
 </div>
 
-<!-- Модальное окно политики -->
 <div class="modal-overlay hidden" id="policyModal">
     <div class="modal policy-modal">
         <h2>📄 Политика конфиденциальности и правила пользования</h2>
-        
         <h3>1. Общие положения</h3>
         <p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
-        
         <h3>2. Термины и определения</h3>
         <p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br>
         <strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br>
         <strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br>
         <strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
-        
         <h3>3. Регистрация и аккаунт</h3>
         <p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>
         3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>
         3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>
         3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p>
-        
         <h3>4. Реферальная программа</h3>
         <p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>
         4.2. Реферальная программа имеет 5 уровней глубины.<br>
-        4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.<br>
-        4.4. VIP статус увеличивает доход с рефералов на 50%.</p>
-        
+        4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p>
         <h3>5. VIP статус</h3>
         <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>
         5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>
         5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>
         5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
-        
         <h3>6. Вывод средств</h3>
         <p>6.1. Минимальная сумма вывода составляет 10$.<br>
         6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>
         6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>
         6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем.</p>
-        
         <h3>7. Конфиденциальность</h3>
         <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>
         7.2. Персональные данные используются исключительно для функционирования Платформы.<br>
         7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>
         7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
-        
         <h3>8. Ответственность</h3>
         <p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>
         8.2. Пользователь обязуется использовать Платформу в законных целях.<br>
         8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>
         8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
-        
         <h3>9. Изменения и дополнения</h3>
         <p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>
         9.2. Изменения вступают в силу с момента публикации на Платформе.<br>
         9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
-        
         <h3>10. Контакты</h3>
         <p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
-        
         <p style="text-align: center; color: #c9ad7a; margin-top: 1.5rem;"><em>Последнее обновление: 2026 год</em></p>
-        
         <div class="modal-buttons" style="justify-content: center;">
             <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
         </div>
@@ -632,30 +615,30 @@
 
 <script>
     (function() {
-        // Проверка авторизации
         const userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-        
         if (!userData || !userData.nickname) {
             window.location.href = 'https://vds-game.ink/reg';
             return;
         }
 
-        // Отображение приветствия
         document.getElementById('userGreeting').textContent = `Привет, ${userData.nickname}`;
 
-        // Рефералы — все по 0
+        // Рефералы — все по 0, заработок тоже 0
         document.getElementById('lvl1').textContent = '0 чел.';
         document.getElementById('lvl2').textContent = '0 чел.';
         document.getElementById('lvl3').textContent = '0 чел.';
         document.getElementById('lvl4').textContent = '0 чел.';
         document.getElementById('lvl5').textContent = '0 чел.';
+        document.getElementById('earn1').textContent = '0.00 $';
+        document.getElementById('earn2').textContent = '0.00 $';
+        document.getElementById('earn3').textContent = '0.00 $';
+        document.getElementById('earn4').textContent = '0.00 $';
+        document.getElementById('earn5').textContent = '0.00 $';
 
-        // Загрузка баланса
         const savedBalance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
         document.getElementById('balance').textContent = savedBalance.toFixed(2) + ' $';
         document.getElementById('totalEarned').textContent = (savedBalance * 1.2).toFixed(2) + ' $';
 
-        // Кнопка вывода
         document.getElementById('withdrawBtn').addEventListener('click', function() {
             const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
             if (balance < 10) return;
@@ -667,10 +650,35 @@
 
         // VIP модальное окно
         const vipModal = document.getElementById('vipModal');
-        
+        const vipInfoBox = document.getElementById('vipInfoBox');
+        const confirmVipBtn = document.getElementById('confirmVipBtn');
+
+        function updateVipBox(vipId) {
+            vipInfoBox.innerHTML = `
+                <p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p>
+                <p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p>
+                <div class="vip-id">${vipId}</div>
+                <p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p>
+                <p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=${vipId}</p>
+            `;
+        }
+
         document.getElementById('vipBtn').addEventListener('click', function() {
             const isVip = localStorage.getItem('pirxmix_vip') === 'true';
-            if (isVip) return;
+            if (isVip) {
+                const vipId = localStorage.getItem('pirxmix_vip_id') || '--------';
+                updateVipBox(vipId);
+                confirmVipBtn.style.display = 'none';
+            } else {
+                vipInfoBox.innerHTML = `
+                    <p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p>
+                    <div class="vip-price">10$</div>
+                    <p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">
+                        Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.
+                    </p>
+                `;
+                confirmVipBtn.style.display = 'inline-block';
+            }
             vipModal.classList.remove('hidden');
         });
 
@@ -682,7 +690,7 @@
             if (e.target === vipModal) vipModal.classList.add('hidden');
         });
 
-        document.getElementById('confirmVipBtn').addEventListener('click', function() {
+        confirmVipBtn.addEventListener('click', function() {
             const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
             if (balance < 10) return;
             
@@ -691,117 +699,79 @@
             document.getElementById('balance').textContent = newBalance.toFixed(2) + ' $';
             document.getElementById('totalEarned').textContent = (newBalance * 1.2).toFixed(2) + ' $';
             
-            // Генерируем 8-значный ID
             const vipId = Math.floor(10000000 + Math.random() * 90000000).toString();
             localStorage.setItem('pirxmix_vip', 'true');
             localStorage.setItem('pirxmix_vip_id', vipId);
             
-            // Показываем VIP статус в модальном окне
-            const vipInfoBox = vipModal.querySelector('.vip-info-box');
-            vipInfoBox.innerHTML = `
-                <p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p>
-                <p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p>
-                <div class="vip-id">${vipId}</div>
-                <p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p>
-                <p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=${vipId}</p>
-                <p style="color: #c084fc; font-size: 0.8rem; margin-top: 0.8rem;">Доход с рефералов увеличен на 50%!</p>
-            `;
-            
-            // Меняем кнопку
-            document.getElementById('confirmVipBtn').style.display = 'none';
+            updateVipBox(vipId);
+            confirmVipBtn.style.display = 'none';
         });
 
-        // Проверяем VIP статус при загрузке
         const isVip = localStorage.getItem('pirxmix_vip') === 'true';
         if (isVip) {
             const vipId = localStorage.getItem('pirxmix_vip_id') || '--------';
-            const vipInfoBox = document.getElementById('vipModal').querySelector('.vip-info-box');
-            vipInfoBox.innerHTML = `
-                <p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ У вас уже есть VIP статус!</p>
-                <p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p>
-                <div class="vip-id">${vipId}</div>
-                <p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p>
-                <p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=${vipId}</p>
-                <p style="color: #c084fc; font-size: 0.8rem; margin-top: 0.8rem;">Доход с рефералов увеличен на 50%!</p>
-            `;
-            document.getElementById('confirmVipBtn').style.display = 'none';
+            updateVipBox(vipId);
+            confirmVipBtn.style.display = 'none';
         }
 
         // Профиль
         const profileModal = document.getElementById('profileModal');
-
         document.getElementById('profileBtn').addEventListener('click', function() {
             document.getElementById('profileNickname').value = userData.nickname;
             document.getElementById('profilePassword').value = '';
             document.getElementById('profilePassword2').value = '';
             profileModal.classList.remove('hidden');
         });
-
         document.getElementById('closeProfileBtn').addEventListener('click', function() {
             profileModal.classList.add('hidden');
         });
-
         profileModal.addEventListener('click', function(e) {
             if (e.target === profileModal) profileModal.classList.add('hidden');
         });
-
         document.getElementById('saveProfileBtn').addEventListener('click', function() {
             const newNickname = document.getElementById('profileNickname').value.trim();
             const newPass = document.getElementById('profilePassword').value;
             const newPass2 = document.getElementById('profilePassword2').value;
-
             if (!newNickname) return;
             if (newPass && newPass !== newPass2) return;
-
-            const updatedUser = {
-                nickname: newNickname,
-                password: newPass || userData.password
-            };
-
+            const updatedUser = { nickname: newNickname, password: newPass || userData.password };
             localStorage.setItem('pirxmix_user', JSON.stringify(updatedUser));
             userData.nickname = newNickname;
             document.getElementById('userGreeting').textContent = `Привет, ${newNickname}`;
             profileModal.classList.add('hidden');
         });
 
-        // Выход
         document.getElementById('logoutBtn').addEventListener('click', function() {
             localStorage.removeItem('pirxmix_user');
             window.location.href = 'https://vds-game.ink/reg';
         });
 
-        // Политика конфиденциальности
+        // Политика
         const policyModal = document.getElementById('policyModal');
-        
         document.getElementById('policyLink').addEventListener('click', function() {
             policyModal.classList.remove('hidden');
         });
-
         document.getElementById('closePolicyBtn').addEventListener('click', function() {
             policyModal.classList.add('hidden');
         });
-
         policyModal.addEventListener('click', function(e) {
             if (e.target === policyModal) policyModal.classList.add('hidden');
         });
 
-        // ---------- Счётчики ----------
+        // Счётчики
         let totalUsers = 24344;
         let todayUsers = 127;
 
-        function animateValue(element, start, end, duration) {
+        function animateValue(element, start, end, duration, suffix = '') {
             duration = duration || 600;
-            if (start === end) {
-                element.textContent = end;
-                return;
-            }
+            if (start === end) { element.textContent = end + suffix; return; }
             const range = end - start;
             const increment = range > 0 ? 1 : -1;
             const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
             let current = start;
             const timer = setInterval(function() {
                 current += increment;
-                element.textContent = current;
+                element.textContent = current + suffix;
                 if (current === end) clearInterval(timer);
             }, stepTime);
         }
@@ -836,7 +806,7 @@
         }
         scheduleMidnightReset();
 
-        // ---------- Лента транзакций ----------
+        // Лента транзакций
         const depositList = document.getElementById('depositList');
         const withdrawList = document.getElementById('withdrawList');
         const MAX_ITEMS = 10;
@@ -874,21 +844,16 @@
         function addTransaction(container, type) {
             const item = document.createElement('div');
             item.className = 'feed-item ' + type;
-            
             const amount = type === 'deposit' ? 10 : getRandomWithdrawAmount();
-            
             item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + amount + '$</span>';
-            
             container.insertBefore(item, container.firstChild);
-            
             while (container.children.length > MAX_ITEMS) {
                 container.removeChild(container.lastChild);
             }
-
             if (type === 'withdraw') {
                 const oldWithdrawn = totalWithdrawn;
                 totalWithdrawn += amount;
-                animateValue(document.getElementById('totalWithdrawn'), oldWithdrawn, totalWithdrawn, 500);
+                animateValue(document.getElementById('totalWithdrawn'), oldWithdrawn, totalWithdrawn, 500, ' $');
             }
         }
 
@@ -903,9 +868,11 @@
             } else {
                 addTransaction(withdrawList, 'withdraw');
             }
-            setTimeout(randomTransaction, Math.floor(Math.random() * 3000) + 2000);
+            // Интервал 25-130 секунд (25000-130000 мс)
+            const delay = Math.floor(Math.random() * 105000) + 25000;
+            setTimeout(randomTransaction, delay);
         }
-        setTimeout(randomTransaction, 2000);
+        setTimeout(randomTransaction, 25000);
 
     })();
 </script>
