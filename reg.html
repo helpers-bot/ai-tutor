@@ -209,6 +209,18 @@
             color: #ffd966;
         }
 
+        .error-message {
+            color: #ff7043;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
         .stats-panel {
             flex: 0 0 260px;
             background: rgba(20, 22, 27, 0.8);
@@ -461,6 +473,8 @@
                 <input type="password" id="password2" placeholder="••••••••">
             </div>
 
+            <div class="error-message" id="errorMessage">❌ Данные неверны</div>
+
             <button class="action-btn" id="actionButton">Зарегистрироваться</button>
             <div class="switch-text" id="switchTextBlock">
                 Если есть аккаунт, <span id="toggleModeLink">вход</span>
@@ -522,17 +536,13 @@
         const actionButton = document.getElementById('actionButton');
         const toggleModeLink = document.getElementById('toggleModeLink');
         const switchTextBlock = document.getElementById('switchTextBlock');
+        const errorMessage = document.getElementById('errorMessage');
         let isLoginMode = false;
 
-        // Проверяем, есть ли уже зарегистрированный пользователь
-        const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
-        if (savedUser && savedUser.nickname) {
-            // Если пользователь уже зарегистрирован, сразу переходим в его профиль
-            window.location.href = 'https://vds-game.ink/home';
-            return;
-        }
-
         function updateUIForMode() {
+            // Скрываем ошибку при переключении режима
+            errorMessage.classList.remove('visible');
+            
             if (isLoginMode) {
                 password2Group.classList.remove('visible-password');
                 password2Group.classList.add('hidden-password');
@@ -548,26 +558,46 @@
             }
         }
 
-        function switchToLogin() { isLoginMode = true; updateUIForMode(); }
-        function switchToRegister() { isLoginMode = false; updateUIForMode(); }
+        function switchToLogin() { 
+            isLoginMode = true; 
+            updateUIForMode(); 
+        }
+        
+        function switchToRegister() { 
+            isLoginMode = false; 
+            updateUIForMode(); 
+        }
+        
         updateUIForMode();
 
         actionButton.addEventListener('click', function(e) {
             e.preventDefault();
             const nickname = document.getElementById('nickname').value.trim();
             const password1 = document.getElementById('password1').value;
+            
+            // Скрываем ошибку при новом клике
+            errorMessage.classList.remove('visible');
+            
             if (!nickname || !password1) return;
 
             if (isLoginMode) {
-                // При входе проверяем, совпадает ли никнейм с сохранённым
+                // Режим входа: проверяем, существует ли пользователь в localStorage
                 const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
-                if (!savedUser || savedUser.nickname !== nickname) return;
-                // Если никнейм совпадает, входим в профиль
+                
+                if (!savedUser || savedUser.nickname !== nickname) {
+                    // Пользователь не найден — показываем ошибку
+                    errorMessage.classList.add('visible');
+                    return;
+                }
+                
+                // Пользователь найден — входим
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 window.location.href = 'https://vds-game.ink/home';
             } else {
+                // Режим регистрации
                 const password2 = document.getElementById('password2').value;
                 if (password1 !== password2) return;
+                
                 // Сохраняем нового пользователя
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 localStorage.setItem('pirxmix_balance', '0');
@@ -586,12 +616,10 @@
         const todayUsersEl = document.getElementById('todayUsers');
         const totalWithdrawnEl = document.getElementById('totalWithdrawn');
 
-        // Функция форматирования чисел с точкой
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        // Отображаем сохранённые значения с форматированием
         totalUsersEl.textContent = formatNumber(totalUsers);
         todayUsersEl.textContent = todayUsers;
         totalWithdrawnEl.textContent = formatNumber(totalWithdrawn) + ' $';
@@ -604,7 +632,6 @@
             let current = start;
             const timer = setInterval(() => {
                 current += increment;
-                // Если элемент totalUsers или totalWithdrawn, форматируем с точкой
                 if (element === totalUsersEl || element === totalWithdrawnEl) {
                     element.textContent = formatNumber(current) + suffix;
                 } else {
@@ -742,7 +769,6 @@
             saveTransactions();
         }
 
-        // Загружаем сохранённые транзакции или создаём новые
         const savedDeposits = localStorage.getItem('pirxmix_deposits');
         const savedWithdraws = localStorage.getItem('pirxmix_withdraws');
 
