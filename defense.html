@@ -6,1021 +6,933 @@
 <title>🏰 Kingdom Defense</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{width:100%;height:100%;overflow:hidden;background:#0a0f1e;font-family:'Arial',sans-serif;touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;position:fixed;top:0;left:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#0a0f1e;font-family:'Arial',sans-serif;touch-action:manipulation;user-select:none}
 canvas{display:block;position:absolute;top:0;left:0}
-
-/* Верхняя панель */
-.top-panel{position:fixed;top:3px;left:3px;right:3px;display:flex;align-items:center;gap:4px;pointer-events:auto;z-index:20}
+.top-panel{position:fixed;top:3px;left:3px;right:3px;display:flex;align-items:center;gap:4px;z-index:20}
 .resource-bar{flex:1;display:flex;gap:2px;background:rgba(30,20,15,0.92);border:2px solid #6b4c3b;border-radius:18px;padding:3px 8px;align-items:center;backdrop-filter:blur(10px);justify-content:center;min-height:28px}
-.res-item{display:flex;align-items:center;gap:2px;color:#ffecb3;font-weight:bold;font-size:clamp(9px,2vw,12px);padding:0 2px;white-space:nowrap}
-.btn{width:clamp(26px,5vw,30px);height:clamp(26px,5vw,30px);background:linear-gradient(180deg,#6b4c3b,#4a3028);border:2px solid #8b6b4a;border-radius:8px;color:#ffd966;font-size:clamp(11px,2vw,13px);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.4);pointer-events:auto;flex-shrink:0}
-
-/* Боковые панели башен */
-.side-left{position:fixed;left:3px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;z-index:20;pointer-events:auto}
-.side-right{position:fixed;right:3px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;z-index:20;pointer-events:auto}
-.tower-card-side{display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg,#5a3a1a,#2a1000);border:2px solid #a0522d;border-radius:10px;padding:clamp(3px,0.8vw,5px) clamp(4px,1vw,7px);cursor:pointer;transition:0.15s;width:clamp(48px,10vw,58px)}
+.res-item{display:flex;align-items:center;gap:2px;color:#ffecb3;font-weight:bold;font-size:12px;padding:0 2px}
+.btn{width:30px;height:30px;background:linear-gradient(180deg,#6b4c3b,#4a3028);border:2px solid #8b6b4a;border-radius:8px;color:#ffd966;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.4);flex-shrink:0}
+.side-left{position:fixed;left:3px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;z-index:20}
+.side-right{position:fixed;right:3px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:4px;z-index:20}
+.tower-card-side{display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg,#5a3a1a,#2a1000);border:2px solid #a0522d;border-radius:10px;padding:5px 7px;cursor:pointer;width:58px}
 .tower-card-side.selected{border-color:#ffd700;background:linear-gradient(180deg,#7a4a20,#3a1808);box-shadow:0 0 12px rgba(255,200,0,0.5)}
-.tower-icon{font-size:clamp(18px,4vw,24px)}
-.tower-label{color:#ccc;font-size:clamp(6px,1.2vw,7px);margin-top:1px;text-align:center}
-.tower-price{color:#ffd966;font-size:clamp(6px,1.2vw,7px);font-weight:bold}
-
-/* Нижняя панель с кнопками */
-.bottom-panel{position:fixed;bottom:0;left:0;right:0;height:clamp(55px,10vh,70px);background:rgba(15,10,5,0.95);border-top:2px solid #6b4c3b;display:flex;align-items:center;justify-content:center;gap:10px;z-index:20;pointer-events:auto;padding:0 10px}
-.spawn-btn{width:clamp(50px,10vw,65px);height:clamp(38px,7vh,50px);background:linear-gradient(180deg,#c4952b,#7a5a1a);border:3px solid #ffd966;border-radius:12px;color:#fff;font-weight:bold;font-size:clamp(10px,2vw,13px);cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2;flex-shrink:0}
-.auto-btn{width:clamp(38px,7vw,48px);height:clamp(38px,7vh,48px);background:linear-gradient(180deg,#5a3d2e,#3a2015);border:2px solid #8b6b4a;border-radius:12px;color:#ffd966;font-size:clamp(8px,1.5vw,10px);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.4);flex-shrink:0}
+.tower-icon{font-size:24px}
+.tower-label{color:#ccc;font-size:7px;margin-top:1px;text-align:center}
+.tower-price{color:#ffd966;font-size:7px;font-weight:bold}
+.bottom-panel{position:fixed;bottom:0;left:0;right:0;height:60px;background:rgba(15,10,5,0.95);border-top:2px solid #6b4c3b;display:flex;align-items:center;justify-content:center;gap:10px;z-index:20;padding:0 10px}
+.spawn-btn{width:65px;height:50px;background:linear-gradient(180deg,#c4952b,#7a5a1a);border:3px solid #ffd966;border-radius:12px;color:#fff;font-weight:bold;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.2}
+.auto-btn{width:48px;height:48px;background:linear-gradient(180deg,#5a3d2e,#3a2015);border:2px solid #8b6b4a;border-radius:12px;color:#ffd966;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .auto-btn.active{background:linear-gradient(180deg,#2e7d32,#1b5e20);border-color:#4caf50;color:#fff}
-.next-wave-btn{background:#e65100;border:2px solid #ff9800;color:#fff;padding:clamp(6px,1.2vw,8px) clamp(10px,2vw,14px);border-radius:10px;font-size:clamp(9px,1.8vw,11px);cursor:pointer;font-weight:bold;box-shadow:0 3px 10px rgba(0,0,0,0.6);white-space:nowrap;display:none;flex-shrink:0}
-
-.tower-menu{position:fixed;background:rgba(15,10,5,0.95);border:2px solid #d4af37;border-radius:12px;padding:10px;z-index:30;pointer-events:auto;display:none;color:#ffecb3;font-size:clamp(9px,1.8vw,11px);min-width:130px;text-align:center}
-.tower-menu button{background:linear-gradient(180deg,#5a3d2e,#3a2015);border:1px solid #c9a04b;color:#ffd966;padding:clamp(4px,0.8vw,5px) clamp(8px,1.5vw,10px);border-radius:7px;cursor:pointer;font-size:clamp(8px,1.5vw,10px);margin:3px;white-space:nowrap}
-
-.menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at center,#1b2a55 0%,#05070d 100%);pointer-events:auto;z-index:50;overflow-y:auto;padding:10px}
+.next-wave-btn{background:#e65100;border:2px solid #ff9800;color:#fff;padding:8px 14px;border-radius:10px;font-size:11px;cursor:pointer;font-weight:bold;display:none}
+.tower-menu{position:fixed;background:rgba(15,10,5,0.95);border:2px solid #d4af37;border-radius:12px;padding:10px;z-index:30;display:none;color:#ffecb3;font-size:11px;min-width:130px;text-align:center}
+.tower-menu button{background:linear-gradient(180deg,#5a3d2e,#3a2015);border:1px solid #c9a04b;color:#ffd966;padding:5px 10px;border-radius:7px;cursor:pointer;margin:3px}
+.menu-overlay{position:fixed;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(circle at center,#1b2a55 0%,#05070d 100%);z-index:50;overflow-y:auto;padding:10px}
 .hidden{display:none!important}
-.menu-title{font-size:clamp(22px,5vw,42px);font-weight:bold;color:#ffd966;text-shadow:0 0 20px #e6b422,0 0 40px #ff8c00;font-family:'Georgia',serif;margin-bottom:4px;text-align:center}
-
-/* Кнопки языка только в меню */
-.lang-btns{display:flex;gap:5px;margin:5px 0;z-index:55}
-.lang-btn{background:rgba(20,30,50,0.85);border:1.5px solid #6b4c3b;color:#ffecb3;padding:clamp(3px,0.6vw,5px) clamp(8px,2vw,12px);border-radius:12px;cursor:pointer;font-size:clamp(10px,2vw,12px);font-weight:bold}
-.lang-btn.active{background:#d4af37;color:#000;border-color:#ffd700}
-
-.gems-display{color:#ffecb3;font-size:clamp(12px,2.5vw,14px);margin:2px 0 6px 0;font-weight:bold}
-
-.map-grid{display:flex;gap:10px;max-width:90vw;margin:10px auto 15px auto;padding:10px 5px;justify-content:center;flex-wrap:wrap;min-height:60px}
-.map-card{width:clamp(50px,10vw,65px);height:clamp(50px,10vw,65px);background:rgba(20,30,50,0.85);border:2px solid #6b4c3b;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:clamp(18px,3.5vw,24px);color:#ffd966;font-weight:bold;transition:0.2s}
-.map-card.locked{opacity:0.5;filter:grayscale(1);cursor:pointer}
+.menu-title{font-size:42px;font-weight:bold;color:#ffd966;text-shadow:0 0 20px #e6b422;font-family:'Georgia',serif;margin-bottom:4px}
+.lang-btns{display:flex;gap:5px;margin:5px 0}
+.lang-btn{background:rgba(20,30,50,0.85);border:1.5px solid #6b4c3b;color:#ffecb3;padding:5px 12px;border-radius:12px;cursor:pointer;font-size:12px;font-weight:bold}
+.lang-btn.active{background:#d4af37;color:#000}
+.gems-display{color:#ffecb3;font-size:14px;margin:2px 0 6px}
+.map-grid{display:flex;gap:10px;max-width:90vw;margin:10px auto;padding:10px 5px;justify-content:center;flex-wrap:wrap}
+.map-card{width:65px;height:65px;background:rgba(20,30,50,0.85);border:2px solid #6b4c3b;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:24px;color:#ffd966;font-weight:bold}
+.map-card.locked{opacity:0.5;filter:grayscale(1)}
 .map-card.selected{border-color:#ffd700;box-shadow:0 0 15px rgba(255,200,0,0.7);background:rgba(40,30,20,0.9);transform:scale(1.05)}
-
-.menu-btn{background:rgba(20,30,50,0.9);border:2px solid #d4af37;color:#fff3cd;font-size:clamp(12px,2vw,16px);padding:clamp(6px,1.2vw,8px) clamp(15px,3vw,20px);margin:3px;border-radius:25px;font-weight:bold;cursor:pointer;width:75%;max-width:250px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.5);font-family:'Georgia',serif}
+.menu-btn{background:rgba(20,30,50,0.9);border:2px solid #d4af37;color:#fff3cd;font-size:16px;padding:8px 20px;margin:3px;border-radius:25px;font-weight:bold;cursor:pointer;width:250px;text-align:center}
 .menu-btn:active{background:#d4af37;color:black}
-.info-text{color:#aaa;font-size:clamp(8px,1.5vw,10px);margin-top:4px;text-align:center}
-
-/* Админка */
+.info-text{color:#aaa;font-size:10px;margin-top:4px}
 .admin-panel{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.95);z-index:100;display:flex;flex-direction:column}
-.admin-toolbar{display:flex;gap:3px;padding:3px;background:#1a1a2e;flex-wrap:wrap;align-items:center;border-bottom:2px solid #d4af37;min-height:30px}
-.admin-toolbar button{padding:clamp(3px,0.6vw,5px) clamp(6px,1.2vw,10px);background:#4a3028;border:1px solid #d4af37;color:#ffd966;border-radius:5px;cursor:pointer;font-size:clamp(8px,1.5vw,11px);white-space:nowrap}
+.admin-toolbar{display:flex;gap:3px;padding:3px;background:#1a1a2e;flex-wrap:wrap;align-items:center;border-bottom:2px solid #d4af37}
+.admin-toolbar button{padding:5px 8px;background:#4a3028;border:1px solid #d4af37;color:#ffd966;border-radius:5px;cursor:pointer;font-size:11px}
 .admin-toolbar button.active{background:#d4af37;color:#000}
-.admin-toolbar select{padding:clamp(3px,0.6vw,5px);background:#4a3028;border:1px solid #d4af37;color:#ffd966;border-radius:5px;font-size:clamp(8px,1.5vw,11px)}
+.admin-toolbar select{padding:5px;background:#4a3028;border:1px solid #d4af37;color:#ffd966;border-radius:5px}
 .admin-canvas-wrap{flex:1;overflow:hidden;position:relative;background:#333}
-.admin-info{color:#ffd966;font-size:clamp(8px,1.5vw,10px);padding:2px 5px}
-.admin-new-map-btn{background:#2e7d32!important;border-color:#4caf50!important;margin-left:5px}
+.admin-info{color:#ffd966;font-size:10px;padding:2px 5px}
+.admin-new-map-btn{background:#2e7d32!important;border-color:#4caf50!important}
 .admin-delete-btn{background:#8b0000!important;border-color:#ff4444!important}
-.tile-size-select{margin-left:8px;background:#2c2c3a;color:#ffd966;border:1px solid #d4af37;padding:2px 4px;border-radius:5px;font-size:clamp(8px,1.5vw,11px)}
+.tile-size-select{margin-left:8px;background:#2c2c3a;color:#ffd966;border:1px solid #d4af37;padding:5px;border-radius:5px}
 </style>
 </head>
 <body>
 
 <canvas id="gameCanvas"></canvas>
 
-<!-- Верхняя панель -->
-<div class="top-panel" id="topPanel">
-  <button class="btn" id="exitBtn" title="Выход">🚪</button>
+<div class="top-panel">
+  <button class="btn" id="exitBtn">🚪</button>
   <div class="resource-bar">
     <div class="res-item">💰<span id="goldDisplay">200</span></div>
     <div class="res-item">💎<span id="gemDisplay">0</span></div>
     <div class="res-item">❤️<span id="hpDisplay">25</span></div>
-    <div class="res-item" id="waveLabel">🌊<span id="waveDisplay">1</span></div>
+    <div class="res-item">🌊<span id="waveDisplay">1</span></div>
   </div>
   <button class="btn" id="pauseBtn">⏸</button>
   <button class="btn" id="speedBtn">×1</button>
 </div>
 
-<!-- Башни -->
-<div class="side-left" id="sideLeft">
+<div class="side-left">
   <div class="tower-card-side selected" data-tower="archer">
-    <span class="tower-icon">🏹</span><span class="tower-label" data-lang="archer">Archer</span><span class="tower-price">💰60</span>
+    <span class="tower-icon">🏹</span><span class="tower-label">Лучник</span><span class="tower-price">💰60</span>
   </div>
   <div class="tower-card-side" data-tower="fire">
-    <span class="tower-icon">🔥</span><span class="tower-label" data-lang="fire">Fire</span><span class="tower-price">💰85</span>
+    <span class="tower-icon">🔥</span><span class="tower-label">Огонь</span><span class="tower-price">💰85</span>
   </div>
 </div>
-<div class="side-right" id="sideRight">
+<div class="side-right">
   <div class="tower-card-side" data-tower="cannon">
-    <span class="tower-icon">💣</span><span class="tower-label" data-lang="cannon">Cannon</span><span class="tower-price">💰110</span>
+    <span class="tower-icon">💣</span><span class="tower-label">Пушка</span><span class="tower-price">💰110</span>
   </div>
   <div class="tower-card-side" data-tower="ice">
-    <span class="tower-icon">❄️</span><span class="tower-label" data-lang="ice">Ice</span><span class="tower-price">💰75</span>
+    <span class="tower-icon">❄️</span><span class="tower-label">Лёд</span><span class="tower-price">💰75</span>
   </div>
 </div>
 
-<!-- Нижняя панель -->
-<div class="bottom-panel" id="bottomPanel">
-  <button class="auto-btn" id="autoBtn" title="Auto">AUTO</button>
-  <button class="spawn-btn" id="waveBtn">▶<br>СТАРТ</button>
+<div class="bottom-panel">
+  <button class="auto-btn" id="autoBtn">AUTO</button>
+  <button class="spawn-btn" id="waveBtn">▶ СТАРТ</button>
   <button class="next-wave-btn" id="nextWaveBtn">⚡ ДАЛЬШЕ (+💰<span id="nextBonus">25</span>)</button>
 </div>
 
 <div class="tower-menu" id="towerMenu">
   <div id="towerMenuInfo"></div>
-  <button id="towerUpgradeBtn">⬆ <span data-lang="upgrade">Улучшить</span> (💰<span id="upgradeCost">35</span>)</button>
-  <button id="towerCloseBtn">✕ <span data-lang="close">Закрыть</span></button>
+  <button id="towerUpgradeBtn">⬆ Улучшить (💰<span id="upgradeCost">35</span>)</button>
+  <button id="towerCloseBtn">✕ Закрыть</button>
 </div>
 
-<!-- Главное меню -->
 <div class="menu-overlay" id="mainMenu">
   <div class="menu-title">🏰 KINGDOM DEFENSE</div>
-  <div class="gems-display">💎 <span data-lang="gems">Алмазы</span>: <span id="menuGems">0</span></div>
-  <div class="lang-btns" id="langBtns">
-    <button class="lang-btn active" data-lang-btn="ru">🇷🇺 Русский</button>
-    <button class="lang-btn" data-lang-btn="en">🇬🇧 English</button>
+  <div class="gems-display">💎 Алмазы: <span id="menuGems">0</span></div>
+  <div class="lang-btns">
+    <button class="lang-btn active" data-lang="ru">🇷🇺 Русский</button>
+    <button class="lang-btn" data-lang="en">🇬🇧 English</button>
   </div>
-  <div style="color:#ccc;font-size:clamp(11px,2vw,13px);margin-bottom:4px;" data-lang="selectMap">Выберите карту</div>
+  <div style="color:#ccc;margin-bottom:4px">Выберите карту</div>
   <div class="map-grid" id="mapGrid"></div>
-  <button class="menu-btn" id="playBtn" data-lang="play">⚔️ Играть</button>
-  <button class="menu-btn" id="resetBtn" data-lang="reset">🔄 Сброс</button>
-  <button class="menu-btn" id="adminBtn" style="background:rgba(80,20,20,0.9);border-color:#ff4444;font-size:clamp(8px,1.5vw,10px);">🔧 Админ</button>
-  <div class="info-text"><span data-lang="best">Лучшая волна</span>: <span id="bestWave">1</span> | <span data-lang="gold">Золото</span>: <span id="totalGold">200</span></div>
+  <button class="menu-btn" id="playBtn">⚔️ Играть</button>
+  <button class="menu-btn" id="resetBtn">🔄 Сброс</button>
+  <button class="menu-btn" id="adminBtn">🔧 Админ</button>
+  <div class="info-text">Лучшая волна: <span id="bestWave">1</span> | Золото: <span id="totalGold">200</span></div>
 </div>
 
-<!-- Пауза -->
 <div class="menu-overlay hidden" id="pauseMenu">
-  <h2 style="color:#ffd966;font-size:clamp(1.2rem,3vw,1.8rem);margin-bottom:15px;">⏸️ <span data-lang="paused">ПАУЗА</span></h2>
-  <button class="menu-btn" id="resumeBtn" data-lang="resume">▶️ Продолжить</button>
-  <button class="menu-btn" id="quitBtn" data-lang="quit">🏠 В меню</button>
+  <h2 style="color:#ffd966;margin-bottom:15px;">⏸️ ПАУЗА</h2>
+  <button class="menu-btn" id="resumeBtn">▶️ Продолжить</button>
+  <button class="menu-btn" id="quitBtn">🏠 В меню</button>
 </div>
 
-<!-- Админ панель -->
 <div class="admin-panel hidden" id="adminPanel">
   <div class="admin-toolbar">
-    <button id="adminToolSpawn" title="Точка спавна">📍 S</button>
-    <button id="adminToolCastle" title="Замок">🏰 C</button>
-    <button id="adminToolTree" title="Дерево">🌳 Д</button>
-    <button id="adminToolRock" title="Камень">🪨 К</button>
-    <button id="adminToolWater" title="Вода">💧 В</button>
-    <button id="adminToolTower" title="Место для башни">🗼 Б</button>
-    <button id="adminToolRoad" title="Дорога">🛤 ДР</button>
-    <button id="adminToolErase" title="Стереть">🧹 Х</button>
+    <button id="adminToolSpawn">📍 Спавн</button>
+    <button id="adminToolCastle">🏰 Замок</button>
+    <button id="adminToolTree">🌳 Дерево</button>
+    <button id="adminToolRock">🪨 Камень</button>
+    <button id="adminToolWater">💧 Вода</button>
+    <button id="adminToolTower">🗼 Место башни</button>
+    <button id="adminToolRoad">🛤 Дорога</button>
+    <button id="adminToolErase">🧹 Стереть</button>
     <select id="adminMapSelect"></select>
-    <button id="adminNewMap" class="admin-new-map-btn" title="Новая карта">+ Новая</button>
-    <button id="adminDeleteMap" class="admin-delete-btn" title="Удалить карту">🗑 Удалить</button>
-    <button id="adminSave" title="Сохранить">💾 Сохранить</button>
-    <button id="adminTest" title="Тест игры">▶ Тест</button>
-    <button id="adminExit" style="background:#8b0000;" title="Выход">✕ Выход</button>
-    <!-- Выбор размера тайлов -->
+    <button id="adminNewMap" class="admin-new-map-btn">+ Новая</button>
+    <button id="adminDeleteMap" class="admin-delete-btn">🗑 Удалить</button>
+    <button id="adminSave">💾 Сохранить</button>
+    <button id="adminTest">▶ Тест</button>
+    <button id="adminExit">✕ Выход</button>
     <select id="tileSizeSelect" class="tile-size-select">
       <option value="32">32x32</option>
       <option value="48" selected>48x48</option>
       <option value="64">64x64</option>
     </select>
-    <span style="color:#ffd966;font-size:10px;">Размер блока</span>
+    <span style="color:#ffd966">Размер блоков</span>
   </div>
   <div class="admin-info" id="adminInfo">Спавн | Карта 1</div>
-  <div class="admin-canvas-wrap" id="adminCanvasWrap">
+  <div class="admin-canvas-wrap">
     <canvas id="adminCanvas"></canvas>
   </div>
 </div>
 
 <script>
-(function(){
-const canvas=document.getElementById('gameCanvas');
-const ctx=canvas.getContext('2d');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-let audioCtx=null;
-function initAudio(){if(!audioCtx)try{audioCtx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}
-function sfx(f=400,t='square',d=0.04,v=0.02){if(!audioCtx)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=t;o.frequency.setValueAtTime(f,audioCtx.currentTime);g.gain.setValueAtTime(v,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+d);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+d)}catch(e){}}
+const COLS = 28, ROWS = 38;
+let TILE = 48;
+let gx = 0, gy = 0;
 
-let saveData={bestWave:1,totalGold:200,gems:0,unlockedMaps:[0],selectedMap:0,lang:'ru'};
-const TOTAL_WAVES=300;
-const NEXT_WAVE_DELAY=180;
-const COLS=28,ROWS=38;
-
-let adminMaps=[{spawn:{c:2,r:35},castle:{c:25,r:5},trees:[],rocks:[],water:[],towerSpots:[],roads:[]}];
-
-function loadSave(){
-  try{
-    const s=localStorage.getItem('kdSave26');
-    if(s){
-      const d=JSON.parse(s);
-      saveData={...saveData,...d};
-      if(!saveData.unlockedMaps||saveData.unlockedMaps.length===0)saveData.unlockedMaps=[0];
-    }
-    const am=localStorage.getItem('kdAdminMaps26');
-    if(am){
-      adminMaps=JSON.parse(am);
-      if(adminMaps.length===0)adminMaps=[{spawn:{c:2,r:35},castle:{c:25,r:5},trees:[],rocks:[],water:[],towerSpots:[],roads:[]}];
-    }
-  }catch(e){}
-}
-function saveProgress(){try{localStorage.setItem('kdSave26',JSON.stringify(saveData))}catch(e){}}
-function saveAdminMaps(){try{localStorage.setItem('kdAdminMaps26',JSON.stringify(adminMaps))}catch(e){}}
-loadSave();
-
-function getTotalMaps(){return adminMaps.length;}
-
-const translations={
-  ru:{archer:'Лучник',fire:'Огонь',cannon:'Пушка',ice:'Лёд',upgrade:'Улучшить',close:'Закрыть',selectMap:'Выберите карту',gems:'Алмазы',play:'⚔️ Играть',reset:'🔄 Сброс',best:'Лучшая волна',gold:'Золото',paused:'ПАУЗА',resume:'▶️ Продолжить',quit:'🏠 В меню',start:'СТАРТ',next:'ДАЛЬШЕ',wave:'Волна'},
-  en:{archer:'Archer',fire:'Fire',cannon:'Cannon',ice:'Ice',upgrade:'Upgrade',close:'Close',selectMap:'Select Map',gems:'Gems',play:'⚔️ Play',reset:'🔄 Reset',best:'Best Wave',gold:'Gold',paused:'PAUSED',resume:'▶️ Resume',quit:'🏠 Main Menu',start:'START',next:'NEXT',wave:'Wave'}
+let saveData = {
+  bestWave: 1,
+  totalGold: 200,
+  gems: 0,
+  unlockedMaps: [0],
+  selectedMap: 0,
+  lang: 'ru'
 };
 
-let lang=saveData.lang||'ru';
-function tr(key){return (translations[lang]&&translations[lang][key])||key}
+let adminMaps = [{
+  spawn: {c: 2, r: 35},
+  castle: {c: 25, r: 5},
+  trees: [],
+  rocks: [],
+  water: [],
+  towerSpots: [],
+  roads: []
+}];
 
-function applyLanguage(){
-  document.querySelectorAll('[data-lang]').forEach(el=>{
-    const key=el.getAttribute('data-lang');
-    if(el.tagName==='SPAN'||el.tagName==='DIV'){
-      el.textContent=tr(key);
-    }else if(el.tagName==='BUTTON'){
-      const icon=(el.textContent.match(/^[⚔🔄▶⏸🏠⬆✕⚡]/)||[''])[0];
-      el.innerHTML=(icon?icon+' ':'')+tr(key);
+function loadSave() {
+  try {
+    const s = localStorage.getItem('kdSave');
+    if (s) {
+      const d = JSON.parse(s);
+      saveData = {...saveData, ...d};
+      if (!saveData.unlockedMaps || saveData.unlockedMaps.length === 0) saveData.unlockedMaps = [0];
     }
+    const am = localStorage.getItem('kdMaps');
+    if (am) {
+      adminMaps = JSON.parse(am);
+      if (adminMaps.length === 0) adminMaps = [{spawn:{c:2,r:35},castle:{c:25,r:5},trees:[],rocks:[],water:[],towerSpots:[],roads:[]}];
+    }
+  } catch(e) {}
+}
+function saveProgress() { localStorage.setItem('kdSave', JSON.stringify(saveData)); }
+function saveAdminMaps() { localStorage.setItem('kdMaps', JSON.stringify(adminMaps)); }
+loadSave();
+
+let lang = saveData.lang;
+const translations = {
+  ru: {archer:'Лучник',fire:'Огонь',cannon:'Пушка',ice:'Лёд',upgrade:'Улучшить',close:'Закрыть',selectMap:'Выберите карту',gems:'Алмазы',play:'Играть',reset:'Сброс',best:'Лучшая волна',gold:'Золото',paused:'ПАУЗА',resume:'Продолжить',quit:'В меню',start:'СТАРТ',next:'ДАЛЬШЕ'},
+  en: {archer:'Archer',fire:'Fire',cannon:'Cannon',ice:'Ice',upgrade:'Upgrade',close:'Close',selectMap:'Select Map',gems:'Gems',play:'Play',reset:'Reset',best:'Best Wave',gold:'Gold',paused:'PAUSED',resume:'Resume',quit:'Main Menu',start:'START',next:'NEXT'}
+};
+function t(key) { return translations[lang]?.[key] || key; }
+
+function applyLanguage() {
+  document.querySelectorAll('[data-lang]').forEach(el => el.textContent = t(el.dataset.lang));
+  document.querySelectorAll('.tower-label').forEach((el, i) => {
+    const types = ['archer', 'fire', 'cannon', 'ice'];
+    if (i < 4) el.textContent = t(types[i]);
   });
-  document.getElementById('waveLabel').innerHTML='🌊 '+tr('wave')+' <span id="waveDisplay">'+game.wave+'</span>';
-  document.getElementById('waveBtn').innerHTML='▶<br>'+tr('start');
-  document.getElementById('nextWaveBtn').innerHTML='⚡ '+tr('next')+' (+💰<span id="nextBonus">25</span>)';
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.langBtn===lang));
+  document.getElementById('waveBtn').innerHTML = '▶ ' + t('start');
+  document.getElementById('nextWaveBtn').innerHTML = '⚡ ' + t('next') + ' (+💰<span id="nextBonus">25</span>)';
 }
 
-document.querySelectorAll('.lang-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{lang=btn.dataset.langBtn;saveData.lang=lang;saveProgress();applyLanguage();document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.langBtn===lang))});
-});
+const game = {
+  mode: 'menu',
+  gold: 200,
+  gems: 0,
+  lives: 25,
+  wave: 1,
+  waveActive: false,
+  autoMode: false,
+  enemiesLeft: 0,
+  spawnTimer: 0,
+  spawnDelay: 55,
+  speed: 1,
+  selectedTower: 'archer',
+  towers: [],
+  enemies: [],
+  projectiles: [],
+  particles: [],
+  texts: [],
+  grid: [],
+  path: [],
+  spawn: null,
+  end: null,
+  selectedTowerObj: null,
+  currentMap: 0,
+  nextWaveAvailable: false,
+  nextWaveTimer: 0,
+  nextWaveBonus: 25
+};
 
-let currentTileSize = 48; // базовый размер тайла (48x48)
-let TILE = 48;
-let gx=0,gy=0;
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const totalW = COLS * TILE;
+  const totalH = ROWS * TILE;
+  gx = (canvas.width - totalW) / 2;
+  gy = (canvas.height - 60 - 35 - totalH) / 2 + 35;
+  if (gy < 35) gy = 35;
+  if (gx < 5) gx = 5;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-function calcTileSizeFromSetting(){
-  const sel = document.getElementById('tileSizeSelect');
-  if(sel) currentTileSize = parseInt(sel.value);
-  return currentTileSize;
+function tileXY(c, r) {
+  return { x: gx + c * TILE + TILE/2, y: gy + r * TILE + TILE/2 };
+}
+function screenToTile(sx, sy) {
+  return { c: Math.floor((sx - gx) / TILE), r: Math.floor((sy - gy) / TILE) };
 }
 
-function resizeFullscreen(){
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-  TILE = calcTileSizeFromSetting();
-  
-  const topPanelH=35;
-  const bottomPanelH=document.getElementById('bottomPanel').offsetHeight||60;
-  
-  const totalWidth = COLS * TILE;
-  const totalHeight = ROWS * TILE;
-  
-  gx = Math.floor((canvas.width - totalWidth) / 2);
-  gy = 35 + Math.floor((canvas.height - 35 - bottomPanelH - totalHeight) / 2);
-  
-  if(gy < 35) gy = 35;
-  if(gx < 5) gx = 5;
-  if(gx + totalWidth > canvas.width - 5) gx = Math.max(5, canvas.width - totalWidth - 5);
-  if(gy + totalHeight > canvas.height - bottomPanelH - 5) gy = Math.max(35, canvas.height - bottomPanelH - totalHeight - 5);
-  
-  if(game.mode==='playing') rebuildGameGrid();
+class Enemy {
+  constructor(wave) {
+    this.pi = 0;
+    const s = tileXY(game.spawn.c, game.spawn.r);
+    this.x = s.x; this.y = s.y;
+    this.speed = 0.6 + wave * 0.02;
+    this.maxHp = 30 + wave * 12;
+    this.hp = this.maxHp;
+    this.size = TILE * 0.3;
+    this.color = '#e74c3c';
+    this.reward = 1;
+    this.dead = false;
+    this.slow = 0;
+  }
+  update(dt) {
+    if (this.dead) return;
+    let sp = this.speed;
+    if (this.slow > 0) { sp *= 0.35; this.slow -= dt; }
+    if (this.pi < game.path.length - 1) {
+      const n = game.path[this.pi + 1];
+      const t = tileXY(n.c, n.r);
+      const dx = t.x - this.x, dy = t.y - this.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 1.5) this.pi++;
+      else { this.x += (dx / d) * sp * (dt/16); this.y += (dy / d) * sp * (dt/16); }
+    } else {
+      game.lives--;
+      this.dead = true;
+    }
+  }
+  draw() {
+    if (this.dead) return;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(0, 0, this.size, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(-3, -2, 2.5, 0, Math.PI*2);
+    ctx.arc(3, -2, 2.5, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(-3, -2, 1.2, 0, Math.PI*2);
+    ctx.arc(3, -2, 1.2, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+    if (this.hp < this.maxHp) {
+      const bw = this.size * 2;
+      ctx.fillStyle = '#333';
+      ctx.fillRect(this.x - bw/2, this.y - this.size - 7, bw, 4);
+      ctx.fillStyle = '#2ecc71';
+      ctx.fillRect(this.x - bw/2, this.y - this.size - 7, bw * (this.hp/this.maxHp), 4);
+    }
+  }
+  hit(dmg) {
+    this.hp -= dmg;
+    if (this.hp <= 0) {
+      this.dead = true;
+      game.gold += this.reward;
+    }
+  }
 }
-window.addEventListener('resize',()=>{resizeFullscreen();});
-resizeFullscreen();
 
-function buildGrid(){
-  game.grid=[];game.path=[];
-  TILE = calcTileSizeFromSetting();
+class Tower {
+  constructor(c, r, type) {
+    this.c = c; this.r = r; this.type = type;
+    this.lv = 1; this.subLv = 1;
+    const p = tileXY(c, r);
+    this.x = p.x; this.y = p.y;
+    this.cd = 0;
+    this.target = null;
+    this.setStats();
+  }
+  setStats() {
+    const br = TILE * 3.5;
+    this.range = br + this.lv * 7;
+    this.dmg = 12 + this.lv * 3;
+    this.maxCd = Math.max(10, 24 - this.lv);
+  }
+  update(dt, enemies) {
+    if (this.cd > 0) this.cd -= dt;
+    this.target = null;
+    let closest = this.range;
+    for (let e of enemies) {
+      if (e.dead) continue;
+      const d = Math.hypot(e.x - this.x, e.y - this.y);
+      if (d < closest) {
+        closest = d;
+        this.target = e;
+      }
+    }
+    if (this.target && this.cd <= 0) {
+      this.cd = this.maxCd;
+      game.projectiles.push(new Projectile(this.x, this.y, this.target, this.dmg));
+    }
+  }
+  draw() {
+    const s = TILE/2 - 1;
+    ctx.fillStyle = 'rgba(0,0,0,0.25)';
+    ctx.fillRect(this.x - s, this.y - s, s*2, s*2);
+    ctx.fillStyle = '#2e7d32';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, s*0.7, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 8px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Lv'+this.lv, this.x, this.y - s - 2);
+  }
+  getUpgradeCost() { return 35 + this.lv * 10; }
+  upgradeSub() {
+    const cost = this.getUpgradeCost();
+    if (game.gold < cost) return false;
+    game.gold -= cost;
+    this.lv++;
+    this.setStats();
+    return true;
+  }
+}
+
+class Projectile {
+  constructor(x, y, target, dmg) {
+    this.x = x; this.y = y; this.target = target; this.dmg = dmg;
+    this.speed = 6; this.dead = false;
+  }
+  update() {
+    if (!this.target || this.target.dead) { this.dead = true; return; }
+    const dx = this.target.x - this.x, dy = this.target.y - this.y;
+    const d = Math.hypot(dx, dy);
+    if (d < 6) {
+      this.target.hit(this.dmg);
+      this.dead = true;
+    } else {
+      this.x += (dx / d) * this.speed;
+      this.y += (dy / d) * this.speed;
+    }
+  }
+  draw() {
+    ctx.fillStyle = '#ffaa00';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 3, 0, Math.PI*2);
+    ctx.fill();
+  }
+}
+
+function buildGrid() {
+  game.grid = [];
+  game.path = [];
+  const map = adminMaps[game.currentMap] || adminMaps[0];
   
-  const am=adminMaps[game.currentMap]||adminMaps[0];
-  
-  for(let r=0;r<ROWS;r++){
-    game.grid[r]=[];
-    for(let c=0;c<COLS;c++){
-      game.grid[r][c]={type:'grass',tower:null,canBuild:false};
+  for (let r = 0; r < ROWS; r++) {
+    game.grid[r] = [];
+    for (let c = 0; c < COLS; c++) {
+      game.grid[r][c] = { type: 'grass', tower: null, canBuild: false };
     }
   }
   
-  if(am.roads&&am.roads.length>0){
-    am.roads.forEach(p=>{
-      if(p.r>=0&&p.r<ROWS&&p.c>=0&&p.c<COLS){
-        game.grid[p.r][p.c].type='road';
+  if (map.roads) {
+    map.roads.forEach(p => {
+      if (p.r >= 0 && p.r < ROWS && p.c >= 0 && p.c < COLS) {
+        game.grid[p.r][p.c].type = 'road';
         game.path.push(p);
       }
     });
   }
   
-  if(game.path.length===0){
-    const sc=am.spawn?am.spawn.c:2;
-    const sr=am.spawn?am.spawn.r:35;
-    const ec=am.castle?am.castle.c:25;
-    const er=am.castle?am.castle.r:5;
-    
-    for(let r=sr;r>=er;r--){
-      game.path.push({c:sc,r:r});
-      if(r>=0&&r<ROWS&&sc>=0&&sc<COLS)game.grid[r][sc].type='road';
+  if (game.path.length === 0) {
+    for (let r = 35; r >= 5; r--) {
+      game.path.push({c: 2, r: r});
+      if (r >= 0 && r < ROWS) game.grid[r][2].type = 'road';
     }
-    for(let c=sc;c<=ec;c++){
-      game.path.push({c:c,r:er});
-      if(er>=0&&er<ROWS&&c>=0&&c<COLS)game.grid[er][c].type='road';
+    for (let c = 2; c <= 25; c++) {
+      game.path.push({c: c, r: 5});
+      if (5 >= 0 && 5 < ROWS && c >= 0 && c < COLS) game.grid[5][c].type = 'road';
     }
   }
   
-  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-    if(c<=1||c>=COLS-2||r<=1||r>=ROWS-2){
-      if(game.grid[r][c].type!=='road')game.grid[r][c].type='wall';
-    }
-  }
-  
-  if(am.towerSpots)am.towerSpots.forEach(s=>{
-    if(s.r>=0&&s.r<ROWS&&s.c>=0&&s.c<COLS&&game.grid[s.r][s.c].type==='grass'){
-      game.grid[s.r][s.c].canBuild=true;
-      game.grid[s.r][s.c].nearRoad=true;
-    }
-  });
-  
-  if(!am.towerSpots||am.towerSpots.length===0){
-    const buildCandidates=[];
-    for(let r=3;r<ROWS-3;r++)for(let c=3;c<COLS-3;c++){
-      if(game.grid[r][c].type==='grass'){
-        let minDist=999;
-        for(let p of game.path){
-          const d=Math.hypot(c-p.c,r-p.r);
-          if(d<minDist)minDist=d;
+  if (map.towerSpots) {
+    map.towerSpots.forEach(s => {
+      if (s.r >= 0 && s.r < ROWS && s.c >= 0 && s.c < COLS && game.grid[s.r][s.c].type === 'grass') {
+        game.grid[s.r][s.c].canBuild = true;
+      }
+    });
+  } else {
+    for (let r = 3; r < ROWS-3; r++) {
+      for (let c = 3; c < COLS-3; c++) {
+        if (game.grid[r][c].type === 'grass') {
+          let near = false;
+          for (let p of game.path) {
+            if (Math.hypot(c - p.c, r - p.r) < 2.5) { near = true; break; }
+          }
+          if (near) game.grid[r][c].canBuild = true;
         }
-        if(minDist<=2.2&&minDist>=0.6)buildCandidates.push({c,r,dist:minDist});
       }
     }
-    buildCandidates.sort((a,b)=>a.dist-b.dist);
-    const numSpots=Math.min(28,Math.max(20,Math.floor(buildCandidates.length*0.4)));
-    for(let i=0;i<numSpots&&i<buildCandidates.length;i++){
-      game.grid[buildCandidates[i].r][buildCandidates[i].c].canBuild=true;
-      game.grid[buildCandidates[i].r][buildCandidates[i].c].nearRoad=true;
-    }
   }
   
-  if(am.trees)am.trees.forEach(s=>{
-    if(s.r>=0&&s.r<ROWS&&s.c>=0&&s.c<COLS&&game.grid[s.r][s.c].type==='grass'&&!game.grid[s.r][s.c].nearRoad){
-      game.grid[s.r][s.c].type='tree';
-    }
-  });
-  
-  if(am.rocks)am.rocks.forEach(s=>{
-    if(s.r>=0&&s.r<ROWS&&s.c>=0&&s.c<COLS&&game.grid[s.r][s.c].type==='grass'&&!game.grid[s.r][s.c].nearRoad){
-      game.grid[s.r][s.c].type='rock';
-    }
-  });
-  
-  if(am.water)am.water.forEach(s=>{
-    if(s.r>=0&&s.r<ROWS&&s.c>=0&&s.c<COLS&&game.grid[s.r][s.c].type==='grass'&&!game.grid[s.r][s.c].nearRoad){
-      game.grid[s.r][s.c].type='water';
-    }
-  });
-  
-  game.spawn=am.spawn?{c:am.spawn.c,r:am.spawn.r}:(game.path[0]||{c:2,r:35});
-  game.end=am.castle?{c:am.castle.c,r:am.castle.r}:(game.path[game.path.length-1]||{c:25,r:5});
+  game.spawn = map.spawn || {c: 2, r: 35};
+  game.end = map.castle || {c: 25, r: 5};
 }
 
-function rebuildGameGrid(){
-  const old=game.towers.map(t=>({c:t.c,r:t.r,type:t.type,lv:t.lv,subLv:t.subLv}));
-  buildGrid();
-  game.towers=[];
-  for(let o of old){
-    if(o.r>=0&&o.r<ROWS&&o.c>=0&&o.c<COLS&&game.grid[o.r][o.c]&&game.grid[o.r][o.c].canBuild){
-      game.grid[o.r][o.c].tower=new Tower(o.c,o.r,o.type);
-      const tw=game.grid[o.r][o.c].tower;
-      tw.lv=o.lv;
-      tw.subLv=o.subLv;
-      tw.setStats();
-      game.towers.push(tw);
-    }
+function startWave() {
+  if (game.waveActive) return;
+  game.waveActive = true;
+  game.enemiesLeft = 5 + game.wave * 2;
+  game.spawnTimer = game.spawnDelay;
+  game.nextWaveAvailable = false;
+  game.nextWaveTimer = 0;
+  game.nextWaveBonus = 20 + game.wave * 3;
+  document.getElementById('nextWaveBtn').style.display = 'none';
+  spawnEnemy();
+}
+function spawnEnemy() {
+  if (game.enemiesLeft > 0) {
+    game.enemies.push(new Enemy(game.wave));
+    game.enemiesLeft--;
   }
 }
-
-function tileXY(c,r){
-  return{x:gx+c*TILE+TILE/2,y:gy+r*TILE+TILE/2};
-}
-function screenToTile(sx,sy){
-  return{c:Math.floor((sx-gx)/TILE),r:Math.floor((sy-gy)/TILE)};
-}
-
-class Enemy{
-  constructor(wave){
-    this.pi=0;
-    const s=tileXY(game.spawn.c,game.spawn.r);
-    this.x=s.x;this.y=s.y;
-    this.animTimer=Math.random()*Math.PI*2;
-    this.animSpeed=0.1;
-    const hpMult=1+wave*0.25,r=Math.random();
-    if(wave>=150&&r<0.15){this.type='boss';this.speed=0.3+wave*0.004;this.maxHp=Math.floor((500+wave*50)*hpMult);this.size=Math.floor(TILE*0.42);this.color='#c0392b';this.reward=5;this.shape='star'}
-    else if(wave>=80&&r<0.3){this.type='tank';this.speed=0.35+wave*0.01;this.maxHp=Math.floor((200+wave*30)*hpMult);this.size=Math.floor(TILE*0.35);this.color='#8e44ad';this.reward=2;this.armor=5;this.shape='square'}
-    else if(wave>=40&&r<0.5){this.type='fast';this.speed=1.2+wave*0.03;this.maxHp=Math.floor((50+wave*15)*hpMult);this.size=Math.floor(TILE*0.25);this.color='#f39c12';this.reward=2;this.shape='triangle'}
-    else{this.type='basic';this.speed=0.6+wave*0.02;this.maxHp=Math.floor((30+wave*12)*hpMult);this.size=Math.floor(TILE*0.3);this.color='#e74c3c';this.reward=1;this.shape='circle'}
-    this.hp=this.maxHp;this.dead=false;this.slow=0;
-  }
-  update(dt){
-    if(this.dead)return;
-    let sp=this.speed;
-    this.animTimer+=dt*this.animSpeed;
-    if(this.animTimer>Math.PI*2)this.animTimer-=Math.PI*2;
-    if(this.slow>0){sp*=0.35;this.slow-=dt;}
-    if(this.pi<game.path.length-1){
-      const n=game.path[this.pi+1];
-      const t=tileXY(n.c,n.r);
-      const dx=t.x-this.x,dy=t.y-this.y;
-      const d=Math.sqrt(dx*dx+dy*dy);
-      if(d<1.5)this.pi++;
-      else{this.x+=(dx/d)*sp*(dt/16);this.y+=(dy/d)*sp*(dt/16);}
-    }else{
-      game.lives-=this.type==='boss'?10:this.type==='tank'?3:1;
-      this.dead=true;
-      if(game.lives<0)game.lives=0;
-    }
-  }
-  hit(dmg){
-    const ed=Math.max(1,dmg-(this.armor||0));
-    this.hp-=ed;
-    game.texts.push({x:this.x,y:this.y-10,t:Math.floor(ed),l:18});
-    if(this.hp<=0){
-      this.dead=true;
-      game.gold+=this.reward;
-      if(this.type==='boss')game.gems+=3;
-      for(let i=0;i<(this.type==='boss'?15:6);i++)game.particles.push(new Particle(this.x,this.y,this.color));
-      sfx(50,'sawtooth',0.1,0.03);
-    }
-  }
-  draw(ctx){
-    if(this.dead)return;
-    const swing=Math.sin(this.animTimer)*3;
-    ctx.save();ctx.translate(this.x,this.y);
-    ctx.fillStyle=this.slow>0?'#88ccff':this.color;
-    if(this.shape==='star'){ctx.beginPath();for(let i=0;i<5;i++){const a=(i*4*Math.PI)/5-Math.PI/2;const px=Math.cos(a)*this.size,py=Math.sin(a)*this.size;i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);}ctx.fill();}
-    else if(this.shape==='square')ctx.fillRect(-this.size,-this.size,this.size*2,this.size*2);
-    else if(this.shape==='triangle'){ctx.beginPath();ctx.moveTo(0,-this.size);ctx.lineTo(-this.size,this.size);ctx.lineTo(this.size,this.size);ctx.fill();}
-    else{ctx.beginPath();ctx.arc(0,0,this.size,0,Math.PI*2);ctx.fill();}
-    ctx.fillStyle='white';ctx.beginPath();ctx.arc(-3,-2,2.5,0,Math.PI*2);ctx.arc(3,-2,2.5,0,Math.PI*2);ctx.fill();
-    ctx.fillStyle='black';ctx.beginPath();ctx.arc(-3,-2,1.2,0,Math.PI*2);ctx.arc(3,-2,1.2,0,Math.PI*2);ctx.fill();
-    ctx.strokeStyle=this.slow>0?'#88ccff':this.color;ctx.lineWidth=2;ctx.lineCap='round';
-    ctx.beginPath();ctx.moveTo(-this.size*0.5,-1);ctx.lineTo(-this.size*0.9,-3+Math.sin(this.animTimer+1)*2.5);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(this.size*0.5,-1);ctx.lineTo(this.size*0.9,-3+Math.cos(this.animTimer+1)*2.5);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(-2.5,this.size*0.6);ctx.lineTo(-3.5-swing,this.size*1.2+1);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(2.5,this.size*0.6);ctx.lineTo(3.5+swing,this.size*1.2+1);ctx.stroke();
-    ctx.restore();
-    if(this.hp<this.maxHp){
-      const bw=this.size*2;
-      ctx.fillStyle='#333';ctx.fillRect(this.x-bw/2,this.y-this.size-7,bw,4);
-      ctx.fillStyle=this.hp/this.maxHp>0.5?'#2ecc71':'#e74c3c';ctx.fillRect(this.x-bw/2,this.y-this.size-7,bw*(this.hp/this.maxHp),4);
-    }
+function startNextWave() {
+  if (!game.waveActive) return;
+  game.gold += game.nextWaveBonus;
+  game.wave++;
+  game.enemiesLeft = 5 + game.wave * 2;
+  game.spawnTimer = game.spawnDelay;
+  game.nextWaveAvailable = false;
+  game.nextWaveTimer = 0;
+  document.getElementById('nextWaveBtn').style.display = 'none';
+  spawnEnemy();
+  if (game.wave > saveData.bestWave) {
+    saveData.bestWave = game.wave;
+    saveProgress();
   }
 }
 
-class Tower{
-  constructor(c,r,type){
-    this.c=c;this.r=r;this.type=type;this.lv=1;this.subLv=1;
-    const p=tileXY(c,r);this.x=p.x;this.y=p.y;
-    this.cd=0;this.target=null;this.angle=0;this.setStats();
+function updateUI() {
+  document.getElementById('goldDisplay').textContent = Math.floor(game.gold);
+  document.getElementById('gemDisplay').textContent = game.gems;
+  document.getElementById('hpDisplay').textContent = game.lives;
+  document.getElementById('waveDisplay').textContent = game.wave;
+  const alive = game.enemies.filter(e => !e.dead).length;
+  if (game.waveActive) {
+    document.getElementById('waveBtn').innerHTML = '⚔ ' + alive;
+  } else {
+    document.getElementById('waveBtn').innerHTML = '▶ ' + t('start');
   }
-  setStats(){
-    const tl=this.lv+this.subLv*0.1,br=TILE*3.5;
-    switch(this.type){
-      case'archer':this.range=br+tl*7;this.dmg=Math.floor(12+tl*3);this.maxCd=Math.max(10,24-tl*1.5);break;
-      case'fire':this.range=br*0.8+tl*6;this.dmg=Math.floor(20+tl*5);this.maxCd=Math.max(12,38-tl*2);this.burn=true;break;
-      case'cannon':this.range=br*0.65+tl*6;this.dmg=Math.floor(32+tl*8);this.maxCd=Math.max(14,50-tl*2.5);this.aoe=true;break;
-      case'ice':this.range=br*0.9+tl*7;this.dmg=0;this.maxCd=Math.max(10,28-tl*1.5);this.slow=true;break;
-    }
-  }
-  upgradeSub(){if(this.subLv>=10)return false;const c=Math.floor(12+this.lv*6+this.subLv*2);if(game.gold<c)return false;game.gold-=c;this.subLv++;this.setStats();sfx(800,'sine',0.06,0.03);return true;}
-  upgradeMain(){if(this.subLv<10||this.lv>=5)return false;const c=Math.floor(40+this.lv*25);if(game.gold<c)return false;game.gold-=c;this.lv++;this.subLv=1;this.setStats();sfx(1000,'sine',0.08,0.04);return true;}
-  getUpgradeCost(){if(this.subLv<10)return Math.floor(12+this.lv*6+this.subLv*2);if(this.lv<5)return Math.floor(40+this.lv*25);return Infinity;}
-  update(dt,enemies){
-    if(this.cd>0)this.cd-=dt;this.target=null;let cl=this.range;
-    for(let e of enemies){if(e.dead)continue;const d=Math.hypot(e.x-this.x,e.y-this.y);if(d<cl){cl=d;this.target=e;}}
-    if(this.target)this.angle=Math.atan2(this.target.y-this.y,this.target.x-this.x);
-    if(this.target&&this.cd<=0){
-      this.cd=this.maxCd;
-      if(this.type==='ice'){this.target.slow=120;sfx(300,'sine',0.06,0.03);}
-      else{game.projectiles.push(new Projectile(this.x,this.y,this.target,this.dmg,this));sfx(550,'square',0.04,0.02);}
-    }
-  }
-  draw(ctx){
-    const s=TILE/2-1,p=tileXY(this.c,this.r);
-    ctx.fillStyle='rgba(0,0,0,0.25)';ctx.fillRect(p.x-s,p.y-s,s*2,s*2);
-    if(this.type==='archer'){ctx.fillStyle='#2e7d32';ctx.beginPath();ctx.arc(p.x,p.y,s*0.7,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#8d6e63';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x+s*0.35,p.y,s*0.35,-Math.PI/2,Math.PI/2);ctx.stroke();}
-    else if(this.type==='fire'){ctx.fillStyle='#e65100';ctx.beginPath();ctx.arc(p.x,p.y,s*0.7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffcc00';ctx.beginPath();ctx.arc(p.x,p.y-s*0.2,s*0.3,0,Math.PI*2);ctx.fill();}
-    else if(this.type==='cannon'){ctx.fillStyle='#3e2723';ctx.beginPath();ctx.arc(p.x,p.y,s*0.7,0,Math.PI*2);ctx.fill();ctx.save();ctx.translate(p.x,p.y);ctx.rotate(this.angle);ctx.fillStyle='#1a1a1a';ctx.fillRect(s*0.2,-2,s*0.8,4);ctx.restore();}
-    else if(this.type==='ice'){ctx.fillStyle='#4fc3f7';ctx.beginPath();ctx.arc(p.x,p.y,s*0.7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e0f7fa';ctx.beginPath();ctx.moveTo(p.x,p.y-s*0.5);ctx.lineTo(p.x+s*0.35,p.y+s*0.25);ctx.lineTo(p.x-s*0.35,p.y+s*0.25);ctx.fill();}
-    ctx.fillStyle='#ffd700';ctx.font='bold 6px Arial';ctx.textAlign='center';ctx.fillText('Lv'+this.lv+'.'+this.subLv,p.x,p.y-s-1);
-    if(game.selectedTowerObj===this){ctx.strokeStyle='rgba(255,255,200,0.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(p.x,p.y,this.range,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
-  }
+  document.getElementById('nextBonus').textContent = game.nextWaveBonus;
 }
 
-class Projectile{
-  constructor(x,y,target,dmg,tower){this.x=x;this.y=y;this.target=target;this.dmg=dmg;this.spd=6;this.dead=false;this.tower=tower;}
-  update(enemies){
-    if(!this.target||this.target.dead){this.dead=true;return;}
-    const dx=this.target.x-this.x,dy=this.target.y-this.y;const d=Math.sqrt(dx*dx+dy*dy);
-    if(d<6){this.target.hit(this.dmg);if(this.tower?.aoe)for(let e of enemies)if(!e.dead&&e!==this.target&&Math.hypot(e.x-this.target.x,e.y-this.target.y)<TILE*1.5)e.hit(Math.floor(this.dmg*0.5));if(this.tower?.burn)this.target.hp-=3;this.dead=true;return;}
-    this.x+=(dx/d)*this.spd;this.y+=(dy/d)*this.spd;
-  }
-  draw(ctx){ctx.fillStyle='#ffaa00';ctx.beginPath();ctx.arc(this.x,this.y,3,0,Math.PI*2);ctx.fill();}
-}
-class Particle{
-  constructor(x,y,c){this.x=x;this.y=y;this.vx=(Math.random()-0.5)*2.5;this.vy=(Math.random()-0.5)*2.5-1.5;this.l=10+Math.random()*10;this.c=c;this.s=1.5+Math.random()*1.5;}
-  update(){this.x+=this.vx;this.y+=this.vy;this.vy+=0.06;this.l--;return this.l<=0;}
-  draw(ctx){ctx.globalAlpha=this.l/20;ctx.fillStyle=this.c;ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
-}
-
-const game={
-  mode:'menu',gold:saveData.totalGold,gems:saveData.gems,lives:25,wave:1,waveActive:false,
-  autoMode:false,enemiesLeft:0,spawnTimer:0,spawnDelay:55,speed:1,selectedTower:'archer',
-  towers:[],enemies:[],projectiles:[],particles:[],texts:[],grid:[],path:[],spawn:null,end:null,
-  selectedTowerObj:null,currentMap:0,selectedMap:saveData.selectedMap||0,nextWaveAvailable:false,nextWaveTimer:0,nextWaveBonus:0
-};
-
-function startWave(){if(game.waveActive||game.wave>=TOTAL_WAVES)return;game.waveActive=true;game.nextWaveAvailable=false;game.nextWaveTimer=0;game.nextWaveBonus=Math.floor(20+game.wave*3);game.enemiesLeft=5+game.wave*2+Math.floor(game.wave/5)*3;game.spawnTimer=game.spawnDelay;document.getElementById('nextWaveBtn').style.display='none';spawnOne();game.enemiesLeft--;}
-function startNextWave(){if(!game.waveActive)return;game.gold+=game.nextWaveBonus;game.gems+=Math.floor(game.nextWaveBonus/20);game.wave++;game.enemiesLeft=5+game.wave*2+Math.floor(game.wave/5)*3;game.spawnTimer=game.spawnDelay;game.nextWaveAvailable=false;game.nextWaveTimer=0;game.nextWaveBonus=Math.floor(20+game.wave*3);document.getElementById('nextWaveBtn').style.display='none';spawnOne();game.enemiesLeft--;if(game.wave>saveData.bestWave){saveData.bestWave=game.wave;saveData.totalGold=Math.max(saveData.totalGold,game.gold);saveData.gems=game.gems;saveProgress();}}
-function spawnOne(){game.enemies.push(new Enemy(game.wave));}
-
-function updateUI(){
-  document.getElementById('goldDisplay').textContent=Math.floor(game.gold);
-  document.getElementById('gemDisplay').textContent=game.gems;
-  document.getElementById('hpDisplay').textContent=game.lives;
-  document.getElementById('waveDisplay').textContent=game.wave;
-  const a=game.enemies.filter(e=>!e.dead).length;
-  document.getElementById('waveBtn').innerHTML=(game.waveActive?'⚔<br>'+a:(game.wave>=TOTAL_WAVES?'🏆':'▶<br>'+tr('start')));
-  document.getElementById('nextBonus').textContent=game.nextWaveBonus;
-}
-
-canvas.addEventListener('click',e=>{
-  initAudio();
-  if(game.mode!=='playing')return;
-  const {c,r}=screenToTile(e.clientX,e.clientY);
-  if(c>=0&&c<COLS&&r>=0&&r<ROWS){
-    const cell=game.grid[r][c];
-    if(cell.canBuild&&!cell.tower){
-      const costs={archer:60,fire:85,cannon:110,ice:75};
-      if(game.gold>=costs[game.selectedTower]){
-        game.gold-=costs[game.selectedTower];
-        cell.tower=new Tower(c,r,game.selectedTower);
+canvas.addEventListener('click', (e) => {
+  if (game.mode !== 'playing') return;
+  const {c, r} = screenToTile(e.clientX, e.clientY);
+  if (c >= 0 && c < COLS && r >= 0 && r < ROWS && game.grid[r] && game.grid[r][c]) {
+    const cell = game.grid[r][c];
+    if (cell.canBuild && !cell.tower) {
+      const costs = {archer: 60, fire: 85, cannon: 110, ice: 75};
+      if (game.gold >= costs[game.selectedTower]) {
+        game.gold -= costs[game.selectedTower];
+        cell.tower = new Tower(c, r, game.selectedTower);
         game.towers.push(cell.tower);
-        sfx(500,'triangle',0.05,0.02);
+        updateUI();
       }
-    }else if(cell.tower){
-      game.selectedTowerObj=cell.tower;
-      showTowerMenu(cell.tower,e.clientX,e.clientY);
-    }else{hideTowerMenu();game.selectedTowerObj=null;}
-  }else{hideTowerMenu();game.selectedTowerObj=null;}
-  updateUI();
-});
-
-function showTowerMenu(tower,clickX,clickY){
-  const menu=document.getElementById('towerMenu');
-  menu.style.display='block';
-  let leftPos=Math.min(clickX,window.innerWidth-140);
-  let topPos=Math.min(clickY,window.innerHeight-200);
-  if(leftPos<5)leftPos=5;if(topPos<5)topPos=5;
-  menu.style.left=leftPos+'px';menu.style.top=topPos+'px';
-  const towerName=tr(tower.type);
-  document.getElementById('towerMenuInfo').innerHTML=`${towerName} Lv${tower.lv}.${tower.subLv}<br>DMG:${tower.type==='ice'?'❄️ Slow':Math.floor(tower.dmg)} RNG:${Math.floor(tower.range)}`;
-  document.getElementById('upgradeCost').textContent=tower.getUpgradeCost();
-}
-function hideTowerMenu(){document.getElementById('towerMenu').style.display='none';game.selectedTowerObj=null;}
-
-document.getElementById('towerUpgradeBtn').addEventListener('click',()=>{
-  if(game.selectedTowerObj){
-    if(game.selectedTowerObj.subLv<10)game.selectedTowerObj.upgradeSub();
-    else game.selectedTowerObj.upgradeMain();
-    const menu=document.getElementById('towerMenu');
-    showTowerMenu(game.selectedTowerObj,parseInt(menu.style.left)||100,parseInt(menu.style.top)||100);
-    updateUI();
-  }
-});
-document.getElementById('towerCloseBtn').addEventListener('click',()=>{hideTowerMenu();updateUI();});
-document.querySelectorAll('.tower-card-side').forEach(card=>{
-  card.addEventListener('click',e=>{
-    e.stopPropagation();
-    document.querySelectorAll('.tower-card-side').forEach(c=>c.classList.remove('selected'));
-    card.classList.add('selected');
-    game.selectedTower=card.dataset.tower;
-  });
-});
-document.getElementById('waveBtn').addEventListener('click',e=>{e.stopPropagation();initAudio();if(!game.waveActive)startWave();else if(game.nextWaveAvailable)startNextWave();updateUI();});
-document.getElementById('nextWaveBtn').addEventListener('click',e=>{e.stopPropagation();startNextWave();updateUI();});
-document.getElementById('autoBtn').addEventListener('click',e=>{e.stopPropagation();game.autoMode=!game.autoMode;document.getElementById('autoBtn').classList.toggle('active',game.autoMode);if(game.autoMode&&!game.waveActive)startWave();updateUI();});
-document.getElementById('pauseBtn').addEventListener('click',e=>{e.stopPropagation();if(game.mode==='playing'){game.mode='paused';document.getElementById('pauseMenu').classList.remove('hidden');}});
-document.getElementById('speedBtn').addEventListener('click',e=>{e.stopPropagation();game.speed=game.speed===1?2:game.speed===2?3:1;document.getElementById('speedBtn').textContent='×'+game.speed;});
-document.getElementById('resumeBtn').addEventListener('click',()=>{game.mode='playing';document.getElementById('pauseMenu').classList.add('hidden');});
-document.getElementById('quitBtn').addEventListener('click',backToMenu);
-document.getElementById('exitBtn').addEventListener('click',()=>{if(game.mode==='playing'||game.mode==='paused')backToMenu();});
-document.getElementById('playBtn').addEventListener('click',startGame);
-document.getElementById('resetBtn').addEventListener('click',()=>{if(confirm(tr('reset')+'?')){saveData={bestWave:1,totalGold:200,gems:0,unlockedMaps:[0],selectedMap:0,lang:saveData.lang};saveProgress();location.reload();}});
-
-// АДМИНКА
-let adminMode=false;
-let adminTool='spawn';
-let adminCurrentMap=0;
-
-const adminCanvas=document.getElementById('adminCanvas');
-const adminCtx=adminCanvas.getContext('2d');
-let adminTILE=48;
-let adminGX=0,adminGY=0;
-
-function initAdminCanvas(){
-  adminCanvas.width=document.getElementById('adminCanvasWrap').clientWidth;
-  adminCanvas.height=document.getElementById('adminCanvasWrap').clientHeight;
-  adminTILE = calcTileSizeFromSetting();
-  adminGX=Math.floor((adminCanvas.width-COLS*adminTILE)/2);
-  adminGY=Math.floor((adminCanvas.height-ROWS*adminTILE)/2);
-  if(adminGY<2)adminGY=2;
-  if(adminGX<2)adminGX=2;
-}
-
-function adminScreenToTile(sx,sy){
-  return{c:Math.floor((sx-adminGX)/adminTILE),r:Math.floor((sy-adminGY)/adminTILE)};
-}
-
-function drawAdminGrid(){
-  adminCtx.clearRect(0,0,adminCanvas.width,adminCanvas.height);
-  adminCtx.fillStyle='#2a2a2a';
-  adminCtx.fillRect(0,0,adminCanvas.width,adminCanvas.height);
-  
-  const am=adminMaps[adminCurrentMap]||adminMaps[0];
-  
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const x=adminGX+c*adminTILE,y=adminGY+r*adminTILE;
-      adminCtx.fillStyle='#555';
-      adminCtx.fillRect(x,y,adminTILE,adminTILE);
-      adminCtx.strokeStyle='#888';
-      adminCtx.strokeRect(x,y,adminTILE,adminTILE);
+    } else if (cell.tower) {
+      game.selectedTowerObj = cell.tower;
+      const menu = document.getElementById('towerMenu');
+      menu.style.display = 'block';
+      menu.style.left = e.clientX + 'px';
+      menu.style.top = e.clientY + 'px';
+      document.getElementById('towerMenuInfo').innerHTML = `${t(cell.tower.type)} Lv${cell.tower.lv}<br>Урон: ${cell.tower.dmg}`;
+      document.getElementById('upgradeCost').textContent = cell.tower.getUpgradeCost();
     }
   }
-  
-  if(am.roads)am.roads.forEach(p=>{
-    const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='#8B7355';adminCtx.fillRect(x,y,adminTILE,adminTILE);
-  });
-  
-  if(am.water)am.water.forEach(p=>{
-    const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='#4a90d9';adminCtx.fillRect(x,y,adminTILE,adminTILE);
-  });
-  
-  if(am.towerSpots)am.towerSpots.forEach(p=>{
-    const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='rgba(255,215,0,0.25)';adminCtx.fillRect(x,y,adminTILE,adminTILE);
-    adminCtx.strokeStyle='rgba(255,215,0,0.8)';adminCtx.setLineDash([2,2]);
-    adminCtx.strokeRect(x,y,adminTILE,adminTILE);adminCtx.setLineDash([]);
-  });
-  
-  if(am.trees)am.trees.forEach(p=>{
-    const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='#2d5a1e';adminCtx.beginPath();
-    adminCtx.arc(x+adminTILE/2,y+adminTILE*0.35,adminTILE*0.4,0,Math.PI*2);adminCtx.fill();
-    adminCtx.fillStyle='#5a3a1a';adminCtx.fillRect(x+adminTILE*0.35,y+adminTILE*0.5,adminTILE*0.3,adminTILE*0.5);
-  });
-  
-  if(am.rocks)am.rocks.forEach(p=>{
-    const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='#808080';adminCtx.beginPath();
-    adminCtx.moveTo(x+adminTILE*0.2,y+adminTILE*0.7);
-    adminCtx.lineTo(x+adminTILE*0.5,y+adminTILE*0.15);
-    adminCtx.lineTo(x+adminTILE*0.8,y+adminTILE*0.7);
-    adminCtx.closePath();adminCtx.fill();
-  });
-  
-  if(am.spawn){
-    const x=adminGX+am.spawn.c*adminTILE,y=adminGY+am.spawn.r*adminTILE;
-    adminCtx.fillStyle='#8b0000';adminCtx.beginPath();
-    adminCtx.arc(x+adminTILE/2,y+adminTILE/2,adminTILE*0.4,0,Math.PI*2);adminCtx.fill();
-    adminCtx.fillStyle='#fff';adminCtx.font='bold '+(adminTILE*0.5)+'px Arial';adminCtx.textAlign='center';
-    adminCtx.fillText('S',x+adminTILE/2,y+adminTILE/2+adminTILE*0.15);
-  }
-  
-  if(am.castle){
-    const x=adminGX+am.castle.c*adminTILE,y=adminGY+am.castle.r*adminTILE;
-    adminCtx.font=adminTILE*0.8+'px Arial';adminCtx.textAlign='center';
-    adminCtx.fillText('🏰',x+adminTILE/2,y+adminTILE*0.8);
-  }
-  
-  adminCtx.strokeStyle='#ffd700';adminCtx.lineWidth=3;
-  adminCtx.strokeRect(adminGX,adminGY,COLS*adminTILE,ROWS*adminTILE);
-}
+});
 
-function adminAddAt(c,r){
-  if(adminMaps.length===0)return;
-  const am=adminMaps[adminCurrentMap]||adminMaps[0];
-  ['trees','rocks','water','towerSpots','roads'].forEach(k=>{
-    if(am[k])am[k]=am[k].filter(p=>!(p.c===c&&p.r===r));
+document.getElementById('towerUpgradeBtn').addEventListener('click', () => {
+  if (game.selectedTowerObj && game.selectedTowerObj.upgradeSub()) {
+    updateUI();
+    document.getElementById('upgradeCost').textContent = game.selectedTowerObj.getUpgradeCost();
+    document.getElementById('towerMenuInfo').innerHTML = `${t(game.selectedTowerObj.type)} Lv${game.selectedTowerObj.lv}<br>Урон: ${game.selectedTowerObj.dmg}`;
+  }
+});
+document.getElementById('towerCloseBtn').addEventListener('click', () => {
+  document.getElementById('towerMenu').style.display = 'none';
+  game.selectedTowerObj = null;
+});
+document.querySelectorAll('.tower-card-side').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.tower-card-side').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    game.selectedTower = card.dataset.tower;
   });
+});
+document.getElementById('waveBtn').addEventListener('click', () => {
+  if (!game.waveActive) startWave();
+  else if (game.nextWaveAvailable) startNextWave();
+});
+document.getElementById('nextWaveBtn').addEventListener('click', startNextWave);
+document.getElementById('autoBtn').addEventListener('click', () => {
+  game.autoMode = !game.autoMode;
+  document.getElementById('autoBtn').classList.toggle('active', game.autoMode);
+  if (game.autoMode && !game.waveActive) startWave();
+});
+document.getElementById('pauseBtn').addEventListener('click', () => {
+  if (game.mode === 'playing') {
+    game.mode = 'paused';
+    document.getElementById('pauseMenu').classList.remove('hidden');
+  }
+});
+document.getElementById('speedBtn').addEventListener('click', () => {
+  game.speed = game.speed === 1 ? 2 : game.speed === 2 ? 3 : 1;
+  document.getElementById('speedBtn').textContent = '×' + game.speed;
+});
+document.getElementById('resumeBtn').addEventListener('click', () => {
+  game.mode = 'playing';
+  document.getElementById('pauseMenu').classList.add('hidden');
+});
+document.getElementById('quitBtn').addEventListener('click', backToMenu);
+document.getElementById('exitBtn').addEventListener('click', backToMenu);
+document.getElementById('playBtn').addEventListener('click', startGame);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (confirm('Сбросить прогресс?')) {
+    localStorage.clear();
+    location.reload();
+  }
+});
+
+// Админка
+let adminMode = false;
+let adminTool = 'spawn';
+let adminCurrentMap = 0;
+const adminCanvas = document.getElementById('adminCanvas');
+const adminCtx = adminCanvas.getContext('2d');
+
+function initAdminCanvas() {
+  const wrap = document.querySelector('.admin-canvas-wrap');
+  adminCanvas.width = wrap.clientWidth;
+  adminCanvas.height = wrap.clientHeight;
+  drawAdminGrid();
+}
+function drawAdminGrid() {
+  adminCtx.fillStyle = '#333';
+  adminCtx.fillRect(0, 0, adminCanvas.width, adminCanvas.height);
+  const tile = TILE;
+  const map = adminMaps[adminCurrentMap];
+  const w = COLS * tile;
+  const h = ROWS * tile;
+  const offX = (adminCanvas.width - w) / 2;
+  const offY = (adminCanvas.height - h) / 2;
   
-  switch(adminTool){
-    case'spawn':am.spawn={c,r};break;
-    case'castle':am.castle={c,r};break;
-    case'tree':if(!am.trees)am.trees=[];am.trees.push({c,r});break;
-    case'rock':if(!am.rocks)am.rocks=[];am.rocks.push({c,r});break;
-    case'water':if(!am.water)am.water=[];am.water.push({c,r});break;
-    case'tower':if(!am.towerSpots)am.towerSpots=[];am.towerSpots.push({c,r});break;
-    case'road':if(!am.roads)am.roads=[];am.roads.push({c,r});break;
-    case'erase':
-      if(am.spawn&&am.spawn.c===c&&am.spawn.r===r)am.spawn=null;
-      if(am.castle&&am.castle.c===c&&am.castle.r===r)am.castle=null;
-      for(let k of ['trees','rocks','water','towerSpots','roads']){
-        if(am[k])am[k]=am[k].filter(p=>!(p.c===c&&p.r===r));
-      }
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const x = offX + c * tile;
+      const y = offY + r * tile;
+      adminCtx.fillStyle = '#555';
+      adminCtx.fillRect(x, y, tile-1, tile-1);
+      adminCtx.strokeStyle = '#777';
+      adminCtx.strokeRect(x, y, tile, tile);
+    }
+  }
+  if (map.roads) map.roads.forEach(p => {
+    const x = offX + p.c * tile, y = offY + p.r * tile;
+    adminCtx.fillStyle = '#8B7355';
+    adminCtx.fillRect(x, y, tile-1, tile-1);
+  });
+  if (map.towerSpots) map.towerSpots.forEach(p => {
+    const x = offX + p.c * tile, y = offY + p.r * tile;
+    adminCtx.fillStyle = 'rgba(255,215,0,0.3)';
+    adminCtx.fillRect(x, y, tile-1, tile-1);
+  });
+  if (map.spawn) {
+    const x = offX + map.spawn.c * tile, y = offY + map.spawn.r * tile;
+    adminCtx.fillStyle = '#8b0000';
+    adminCtx.beginPath();
+    adminCtx.arc(x + tile/2, y + tile/2, tile*0.3, 0, Math.PI*2);
+    adminCtx.fill();
+    adminCtx.fillStyle = '#fff';
+    adminCtx.font = 'bold ' + tile*0.4 + 'px Arial';
+    adminCtx.fillText('S', x + tile/2 - 3, y + tile/2 + 5);
+  }
+  if (map.castle) {
+    const x = offX + map.castle.c * tile, y = offY + map.castle.r * tile;
+    adminCtx.font = tile*0.7 + 'px Arial';
+    adminCtx.fillText('🏰', x + tile/2 - 5, y + tile*0.7);
+  }
+}
+function adminAdd(c, r) {
+  const map = adminMaps[adminCurrentMap];
+  const removeFrom = ['trees', 'rocks', 'water', 'towerSpots', 'roads'];
+  removeFrom.forEach(k => {
+    if (map[k]) map[k] = map[k].filter(p => !(p.c === c && p.r === r));
+  });
+  switch(adminTool) {
+    case 'spawn': map.spawn = {c, r}; break;
+    case 'castle': map.castle = {c, r}; break;
+    case 'tree': if (!map.trees) map.trees = []; map.trees.push({c,r}); break;
+    case 'rock': if (!map.rocks) map.rocks = []; map.rocks.push({c,r}); break;
+    case 'water': if (!map.water) map.water = []; map.water.push({c,r}); break;
+    case 'tower': if (!map.towerSpots) map.towerSpots = []; map.towerSpots.push({c,r}); break;
+    case 'road': if (!map.roads) map.roads = []; map.roads.push({c,r}); break;
+    case 'erase':
+      if (map.spawn && map.spawn.c === c && map.spawn.r === r) map.spawn = null;
+      if (map.castle && map.castle.c === c && map.castle.r === r) map.castle = null;
       break;
   }
-  adminMaps[adminCurrentMap]=am;
   saveAdminMaps();
   drawAdminGrid();
 }
-
-function refreshAdminSelect(){
-  const sel=document.getElementById('adminMapSelect');
-  sel.innerHTML='';
-  for(let i=0;i<adminMaps.length;i++){
-    const opt=document.createElement('option');
-    opt.value=i;
-    opt.textContent='Карта '+(i+1);
-    sel.appendChild(opt);
+adminCanvas.addEventListener('click', (e) => {
+  if (!adminMode) return;
+  const rect = adminCanvas.getBoundingClientRect();
+  const tile = TILE;
+  const w = COLS * tile;
+  const h = ROWS * tile;
+  const offX = (adminCanvas.width - w) / 2;
+  const offY = (adminCanvas.height - h) / 2;
+  const mx = e.clientX - rect.left - offX;
+  const my = e.clientY - rect.top - offY;
+  if (mx >= 0 && mx < w && my >= 0 && my < h) {
+    const c = Math.floor(mx / tile);
+    const r = Math.floor(my / tile);
+    if (c >= 0 && c < COLS && r >= 0 && r < ROWS) adminAdd(c, r);
   }
-  sel.value=adminCurrentMap;
-}
-
-function openAdminPanel(){
-  const pw=prompt('Введите пароль:');
-  if(pw!=='135710Aa'){alert('Неверный пароль!');return;}
-  adminMode=true;
-  if(adminCurrentMap>=adminMaps.length)adminCurrentMap=0;
+});
+function openAdmin() {
+  if (prompt('Пароль:') !== '135710Aa') return;
+  adminMode = true;
   document.getElementById('adminPanel').classList.remove('hidden');
   document.getElementById('mainMenu').classList.add('hidden');
-  refreshAdminSelect();
-  updateAdminInfo();
+  const sel = document.getElementById('adminMapSelect');
+  sel.innerHTML = '';
+  for (let i = 0; i < adminMaps.length; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'Карта ' + (i+1);
+    sel.appendChild(opt);
+  }
+  sel.value = adminCurrentMap;
   initAdminCanvas();
-  drawAdminGrid();
 }
-
-function closeAdminPanel(){
-  adminMode=false;
+function closeAdmin() {
+  adminMode = false;
   document.getElementById('adminPanel').classList.add('hidden');
   document.getElementById('mainMenu').classList.remove('hidden');
   buildMapGrid();
 }
-
-function updateAdminInfo(){
-  document.getElementById('adminInfo').textContent=`${adminTool} | Карта ${adminCurrentMap+1}/${adminMaps.length}`;
-  document.querySelectorAll('.admin-toolbar button').forEach(b=>b.classList.remove('active'));
-  const btn=document.getElementById('adminTool'+adminTool.charAt(0).toUpperCase()+adminTool.slice(1));
-  if(btn)btn.classList.add('active');
-}
-
-document.getElementById('adminBtn').addEventListener('click',openAdminPanel);
-document.getElementById('adminExit').addEventListener('click',closeAdminPanel);
-
-const tileSizeSelect = document.getElementById('tileSizeSelect');
-tileSizeSelect.addEventListener('change', (e) => {
-  currentTileSize = parseInt(e.target.value);
-  if(game.mode === 'playing') {
-    resizeFullscreen();
-    rebuildGameGrid();
-  }
-  if(adminMode) {
-    initAdminCanvas();
-    drawAdminGrid();
-  }
-});
-
-document.querySelectorAll('.admin-toolbar button[id^="adminTool"]').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    adminTool=btn.id.replace('adminTool','').toLowerCase();
-    updateAdminInfo();
+document.getElementById('adminBtn').addEventListener('click', openAdmin);
+document.getElementById('adminExit').addEventListener('click', closeAdmin);
+document.querySelectorAll('[id^="adminTool"]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    adminTool = btn.id.replace('adminTool', '').toLowerCase();
+    document.getElementById('adminInfo').textContent = adminTool + ' | Карта ' + (adminCurrentMap+1);
+    document.querySelectorAll('[id^="adminTool"]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
   });
 });
-
-document.getElementById('adminMapSelect').addEventListener('change',e=>{
-  adminCurrentMap=parseInt(e.target.value);
-  updateAdminInfo();
+document.getElementById('adminMapSelect').addEventListener('change', (e) => {
+  adminCurrentMap = parseInt(e.target.value);
   drawAdminGrid();
 });
-
-document.getElementById('adminNewMap').addEventListener('click',()=>{
+document.getElementById('adminNewMap').addEventListener('click', () => {
   adminMaps.push({spawn:{c:2,r:35},castle:{c:25,r:5},trees:[],rocks:[],water:[],towerSpots:[],roads:[]});
-  adminCurrentMap=adminMaps.length-1;
+  adminCurrentMap = adminMaps.length - 1;
   saveAdminMaps();
-  refreshAdminSelect();
-  updateAdminInfo();
+  const sel = document.getElementById('adminMapSelect');
+  const opt = document.createElement('option');
+  opt.value = adminCurrentMap;
+  opt.textContent = 'Карта ' + (adminCurrentMap+1);
+  sel.appendChild(opt);
+  sel.value = adminCurrentMap;
   drawAdminGrid();
 });
-
-document.getElementById('adminDeleteMap').addEventListener('click',()=>{
-  if(adminMaps.length<=1){alert('Нужна хотя бы одна карта!');return;}
-  if(!confirm('Удалить карту '+(adminCurrentMap+1)+'?'))return;
-  adminMaps.splice(adminCurrentMap,1);
-  if(adminCurrentMap>=adminMaps.length)adminCurrentMap=adminMaps.length-1;
-  if(saveData.selectedMap>=adminMaps.length)saveData.selectedMap=0;
+document.getElementById('adminDeleteMap').addEventListener('click', () => {
+  if (adminMaps.length <= 1) { alert('Нельзя удалить единственную карту'); return; }
+  adminMaps.splice(adminCurrentMap, 1);
+  if (adminCurrentMap >= adminMaps.length) adminCurrentMap = adminMaps.length - 1;
   saveAdminMaps();
-  saveProgress();
-  refreshAdminSelect();
-  updateAdminInfo();
+  const sel = document.getElementById('adminMapSelect');
+  sel.innerHTML = '';
+  for (let i = 0; i < adminMaps.length; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'Карта ' + (i+1);
+    sel.appendChild(opt);
+  }
+  sel.value = adminCurrentMap;
   drawAdminGrid();
 });
-
-document.getElementById('adminSave').addEventListener('click',()=>{
+document.getElementById('adminSave').addEventListener('click', () => {
   saveAdminMaps();
-  alert('Сохранено! Карт: '+adminMaps.length);
+  alert('Сохранено!');
 });
-
-document.getElementById('adminTest').addEventListener('click',()=>{
-  saveAdminMaps();
-  saveData.selectedMap=adminCurrentMap;
-  saveData.totalGold=9999;
-  saveData.gems=999;
+document.getElementById('adminTest').addEventListener('click', () => {
+  saveData.selectedMap = adminCurrentMap;
+  saveData.totalGold = 9999;
   saveProgress();
-  closeAdminPanel();
+  closeAdmin();
   startGame();
 });
-
-adminCanvas.addEventListener('click',e=>{
-  if(!adminMode)return;
-  const rect=adminCanvas.getBoundingClientRect();
-  const sx=e.clientX-rect.left,sy=e.clientY-rect.top;
-  const {c,r}=adminScreenToTile(sx,sy);
-  if(c>=0&&c<COLS&&r>=0&&r<ROWS)adminAddAt(c,r);
+document.getElementById('tileSizeSelect').addEventListener('change', (e) => {
+  TILE = parseInt(e.target.value);
+  resizeCanvas();
+  if (game.mode === 'playing') {
+    const oldTowers = game.towers.map(t => ({c:t.c, r:t.r, type:t.type, lv:t.lv}));
+    buildGrid();
+    game.towers = [];
+    for (let t of oldTowers) {
+      if (game.grid[t.r][t.c] && game.grid[t.r][t.c].canBuild) {
+        game.grid[t.r][t.c].tower = new Tower(t.c, t.r, t.type);
+        game.grid[t.r][t.c].tower.lv = t.lv;
+        game.grid[t.r][t.c].tower.setStats();
+        game.towers.push(game.grid[t.r][t.c].tower);
+      }
+    }
+    for (let e of game.enemies) {
+      const s = tileXY(game.spawn.c, game.spawn.r);
+      e.x = s.x; e.y = s.y;
+    }
+  }
+  if (adminMode) drawAdminGrid();
 });
 
-window.addEventListener('resize',()=>{if(adminMode){initAdminCanvas();drawAdminGrid();}});
-
-function buildMapGrid(){
-  const grid=document.getElementById('mapGrid');
-  grid.innerHTML='';
-  const total=getTotalMaps();
-  for(let i=0;i<total;i++){
-    const card=document.createElement('div');
-    card.className='map-card';
-    card.style.display='flex';
-    card.style.alignItems='center';
-    card.style.justifyContent='center';
-    
-    const unlocked=saveData.unlockedMaps.includes(i);
-    if(!unlocked)card.classList.add('locked');
-    if(saveData.selectedMap===i)card.classList.add('selected');
-    card.textContent=unlocked?(i+1):'🔒';
-    
-    if(unlocked){
-      card.addEventListener('click',()=>{
-        saveData.selectedMap=i;
+function buildMapGrid() {
+  const grid = document.getElementById('mapGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < adminMaps.length; i++) {
+    const card = document.createElement('div');
+    card.className = 'map-card';
+    if (!saveData.unlockedMaps.includes(i)) card.classList.add('locked');
+    if (saveData.selectedMap === i) card.classList.add('selected');
+    card.textContent = saveData.unlockedMaps.includes(i) ? (i+1) : '🔒';
+    if (saveData.unlockedMaps.includes(i)) {
+      card.addEventListener('click', () => {
+        saveData.selectedMap = i;
         saveProgress();
-        document.querySelectorAll('.map-card').forEach(c=>c.classList.remove('selected'));
+        document.querySelectorAll('.map-card').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
       });
-    }else{
-      card.addEventListener('click',()=>{
-        if(saveData.gems>=10){
-          saveData.gems-=10;
+    } else {
+      card.addEventListener('click', () => {
+        if (saveData.gems >= 10) {
+          saveData.gems -= 10;
           saveData.unlockedMaps.push(i);
           saveProgress();
           buildMapGrid();
-          updateMenuGems();
-        }else{
-          alert(lang==='ru'?'Нужно 10 💎!':'Need 10 💎!');
-        }
+          document.getElementById('menuGems').textContent = saveData.gems;
+        } else alert('Нужно 10 алмазов!');
       });
     }
     grid.appendChild(card);
   }
 }
 
-function updateMenuGems(){document.getElementById('menuGems').textContent=saveData.gems;}
-
-function startGame(){
-  initAudio();
-  game.mode='playing';
-  game.currentMap=saveData.selectedMap;
-  game.selectedMap=saveData.selectedMap;
-  game.gold=saveData.totalGold;
-  game.gems=saveData.gems;
-  game.lives=25;
-  game.wave=1;
-  game.waveActive=false;
-  game.autoMode=false;
-  game.enemiesLeft=0;
-  game.spawnTimer=0;
-  game.speed=1;
-  game.towers=[];
-  game.enemies=[];
-  game.projectiles=[];
-  game.particles=[];
-  game.texts=[];
-  game.selectedTowerObj=null;
-  game.nextWaveAvailable=false;
-  game.nextWaveTimer=0;
-  hideTowerMenu();
-  document.getElementById('autoBtn').classList.remove('active');
-  document.getElementById('nextWaveBtn').style.display='none';
-  document.getElementById('bottomPanel').style.display='flex';
+function startGame() {
+  game.mode = 'playing';
+  game.currentMap = saveData.selectedMap;
+  game.gold = saveData.totalGold;
+  game.gems = saveData.gems;
+  game.lives = 25;
+  game.wave = 1;
+  game.waveActive = false;
+  game.autoMode = false;
+  game.enemies = [];
+  game.towers = [];
+  game.projectiles = [];
+  game.texts = [];
+  game.nextWaveAvailable = false;
   buildGrid();
-  resizeFullscreen();
+  resizeCanvas();
   document.getElementById('mainMenu').classList.add('hidden');
   document.getElementById('pauseMenu').classList.add('hidden');
-  document.getElementById('adminPanel').classList.add('hidden');
-  document.getElementById('speedBtn').textContent='×1';
-  applyLanguage();
+  document.getElementById('bottomPanel').style.display = 'flex';
+  document.getElementById('nextWaveBtn').style.display = 'none';
   updateUI();
 }
 
-function backToMenu(){
-  if(game.wave>saveData.bestWave){
-    saveData.bestWave=game.wave;
-    saveData.totalGold=Math.max(saveData.totalGold,game.gold);
-    saveData.gems=game.gems;
+function backToMenu() {
+  if (game.wave > saveData.bestWave) {
+    saveData.bestWave = game.wave;
+    saveData.totalGold = Math.max(saveData.totalGold, game.gold);
+    saveData.gems = game.gems;
     saveProgress();
   }
-  game.mode='menu';
-  game.autoMode=false;
-  game.waveActive=false;
+  game.mode = 'menu';
   document.getElementById('mainMenu').classList.remove('hidden');
   document.getElementById('pauseMenu').classList.add('hidden');
-  document.getElementById('adminPanel').classList.add('hidden');
-  document.getElementById('bottomPanel').style.display='none';
-  hideTowerMenu();
-  document.getElementById('nextWaveBtn').style.display='none';
-  document.getElementById('bestWave').textContent=saveData.bestWave;
-  document.getElementById('totalGold').textContent=saveData.totalGold;
-  updateMenuGems();
+  document.getElementById('bottomPanel').style.display = 'none';
+  document.getElementById('bestWave').textContent = saveData.bestWave;
+  document.getElementById('totalGold').textContent = saveData.totalGold;
+  document.getElementById('menuGems').textContent = saveData.gems;
   buildMapGrid();
-  applyLanguage();
 }
 
-let last=0,acc=0;
-function loop(ts){
-  requestAnimationFrame(loop);
-  if(!last)last=ts;
-  let dt=ts-last;
-  last=ts;
-  if(dt>100)dt=100;
-  if(game.mode==='playing'){
-    const edt=dt*game.speed;
-    acc+=edt;
-    while(acc>=16){tick(16);acc-=16;}
+let lastTime = 0;
+function gameLoop(now) {
+  requestAnimationFrame(gameLoop);
+  let dt = Math.min(32, now - (lastTime || now));
+  lastTime = now;
+  
+  if (game.mode === 'playing') {
+    const steps = game.speed;
+    for (let s = 0; s < steps; s++) {
+      if (game.waveActive && game.enemiesLeft > 0) {
+        game.spawnTimer -= 16;
+        while (game.spawnTimer <= 0 && game.enemiesLeft > 0) {
+          spawnEnemy();
+          game.spawnTimer += game.spawnDelay;
+        }
+      }
+      if (game.waveActive && !game.nextWaveAvailable && game.enemiesLeft === 0 && game.enemies.filter(e => !e.dead).length === 0) {
+        game.nextWaveTimer += 16;
+        if (game.nextWaveTimer >= NEXT_WAVE_DELAY) {
+          game.nextWaveAvailable = true;
+          document.getElementById('nextWaveBtn').style.display = 'block';
+        }
+      }
+      if (game.autoMode && !game.waveActive && game.enemies.filter(e => !e.dead).length === 0) {
+        startWave();
+      }
+      for (let e of game.enemies) e.update(16);
+      for (let t of game.towers) t.update(16, game.enemies);
+      for (let p of game.projectiles) p.update();
+      game.projectiles = game.projectiles.filter(p => !p.dead);
+      game.enemies = game.enemies.filter(e => !e.dead);
+      if (game.lives <= 0) backToMenu();
+      updateUI();
+    }
   }
   draw();
-  if(game.mode==='playing'){updateUI();}
 }
-
-function tick(dt){
-  if(game.autoMode&&!game.waveActive&&game.enemies.filter(e=>!e.dead).length===0&&game.wave<TOTAL_WAVES)startWave();
-  if(game.waveActive&&game.enemiesLeft>0){
-    game.spawnTimer+=dt;
-    while(game.spawnTimer>=game.spawnDelay&&game.enemiesLeft>0){spawnOne();game.enemiesLeft--;game.spawnTimer-=game.spawnDelay;}
-  }
-  if(game.waveActive&&!game.nextWaveAvailable&&game.wave<TOTAL_WAVES){
-    game.nextWaveTimer+=dt;
-    if(game.nextWaveTimer>=NEXT_WAVE_DELAY){game.nextWaveAvailable=true;document.getElementById('nextWaveBtn').style.display='inline-block';}
-  }
-  if(game.waveActive&&game.enemiesLeft<=0&&game.enemies.filter(e=>!e.dead).length===0){
-    game.waveActive=false;
-    game.gold+=10+game.wave*2;
-    game.gems+=1;
-    game.wave++;
-    game.nextWaveAvailable=false;
-    game.nextWaveTimer=0;
-    document.getElementById('nextWaveBtn').style.display='none';
-    if(game.wave>=TOTAL_WAVES){
-      alert(lang==='ru'?'🏆 Победа! Все 300 волн пройдены!':'🏆 Victory! All 300 waves completed!');
+function draw() {
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+      const cell = game.grid[r]?.[c];
+      if (!cell) continue;
+      const x = gx + c * TILE, y = gy + r * TILE;
+      if (cell.type === 'grass') {
+        ctx.fillStyle = '#7ec850';
+        ctx.fillRect(x, y, TILE, TILE);
+      } else if (cell.type === 'road') {
+        ctx.fillStyle = '#c4a882';
+        ctx.fillRect(x, y, TILE, TILE);
+      } else if (cell.type === 'wall') {
+        ctx.fillStyle = '#8b4513';
+        ctx.fillRect(x, y, TILE, TILE);
+      }
+      if (cell.canBuild && !cell.tower) {
+        ctx.fillStyle = 'rgba(255,215,0,0.15)';
+        ctx.fillRect(x, y, TILE, TILE);
+        ctx.strokeStyle = 'rgba(255,215,0,0.5)';
+        ctx.setLineDash([3, 3]);
+        ctx.strokeRect(x, y, TILE, TILE);
+        ctx.setLineDash([]);
+      }
     }
-    if(game.wave>saveData.bestWave){saveData.bestWave=game.wave;saveData.totalGold=Math.max(saveData.totalGold,game.gold);saveData.gems=game.gems;saveProgress();}
-    if(game.autoMode&&game.wave<TOTAL_WAVES)startWave();
   }
-  for(let e of game.enemies)e.update(dt);
-  for(let t of game.towers)t.update(dt,game.enemies);
-  for(let p of game.projectiles)p.update(game.enemies);
-  for(let i=game.particles.length-1;i>=0;i--)if(game.particles[i].update())game.particles.splice(i,1);
-  for(let i=game.texts.length-1;i>=0;i--){game.texts[i].y-=0.8;game.texts[i].l--;if(game.texts[i].l<=0)game.texts.splice(i,1);}
-  game.enemies=game.enemies.filter(e=>!e.dead);
-  game.projectiles=game.projectiles.filter(p=>!p.dead);
-  if(game.lives<=0){game.lives=0;alert(lang==='ru'?'💀 Игра окончена! Волна: '+game.wave:'💀 Game Over! Wave: '+game.wave);backToMenu();}
+  for (let t of game.towers) t.draw();
+  for (let e of game.enemies) e.draw();
+  for (let p of game.projectiles) p.draw();
+  ctx.strokeStyle = '#5c2e0a';
+  ctx.lineWidth = 3;
+  ctx.strokeRect(gx, gy, COLS * TILE, ROWS * TILE);
 }
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  if(game.mode==='menu'){ctx.fillStyle='#0a0f1e';ctx.fillRect(0,0,canvas.width,canvas.height);return;}
-  ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,canvas.width,canvas.height);
-  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){
-    const x=gx+c*TILE,y=gy+r*TILE;const cell=game.grid[r][c];
-    if(cell.type==='grass'){ctx.fillStyle='#7ec850';ctx.fillRect(x,y,TILE,TILE);ctx.fillStyle='#72b845';ctx.fillRect(x+2,y+2,TILE-4,TILE-4);}
-    else if(cell.type==='road'){ctx.fillStyle='#c4a882';ctx.fillRect(x,y,TILE,TILE);}
-    else if(cell.type==='wall'){ctx.fillStyle='#8b4513';ctx.fillRect(x,y,TILE,TILE);ctx.fillStyle='#a0522d';ctx.fillRect(x+2,y+2,TILE-4,TILE-4);ctx.strokeStyle='#5c2e0a';ctx.lineWidth=0.5;for(let i=0;i<TILE;i+=8){ctx.beginPath();ctx.moveTo(x+i,y);ctx.lineTo(x+i,y+TILE);ctx.stroke();}}
-    else if(cell.type==='tree'){ctx.fillStyle='#7ec850';ctx.fillRect(x,y,TILE,TILE);ctx.fillStyle='#5a3a1a';ctx.fillRect(x+TILE*0.35,y+TILE*0.5,TILE*0.3,TILE*0.5);ctx.fillStyle='#2d5a1e';ctx.beginPath();ctx.arc(x+TILE/2,y+TILE*0.35,TILE*0.45,0,Math.PI*2);ctx.fill();}
-    else if(cell.type==='rock'){ctx.fillStyle='#7ec850';ctx.fillRect(x,y,TILE,TILE);ctx.fillStyle='#808080';ctx.beginPath();ctx.moveTo(x+TILE*0.2,y+TILE*0.7);ctx.lineTo(x+TILE*0.5,y+TILE*0.15);ctx.lineTo(x+TILE*0.8,y+TILE*0.7);ctx.closePath();ctx.fill();}
-    else if(cell.type==='water'){ctx.fillStyle='#4a90d9';ctx.fillRect(x,y,TILE,TILE);}
-  }
-  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(game.grid[r][c].canBuild&&!game.grid[r][c].tower){
-    const x=gx+c*TILE,y=gy+r*TILE;
-    ctx.fillStyle='rgba(255,215,0,0.15)';ctx.fillRect(x,y,TILE,TILE);
-    ctx.strokeStyle='rgba(255,215,0,0.5)';ctx.lineWidth=1.5;ctx.setLineDash([3,3]);ctx.strokeRect(x,y,TILE,TILE);ctx.setLineDash([]);
-  }
-  if(game.spawn){const s=tileXY(game.spawn.c,game.spawn.r);ctx.fillStyle='#2c1810';ctx.beginPath();ctx.arc(s.x,s.y,12,0,Math.PI*2);ctx.fill();ctx.fillStyle='#8b0000';ctx.beginPath();ctx.arc(s.x,s.y,8,0,Math.PI*2);ctx.fill();}
-  if(game.end){const e=tileXY(game.end.c,game.end.r);ctx.font=Math.floor(TILE*0.9)+'px Arial';ctx.textAlign='center';ctx.fillText('🏰',e.x,e.y+Math.floor(TILE*0.3));}
-  ctx.strokeStyle='#5c2e0a';ctx.lineWidth=3;ctx.strokeRect(gx,gy,COLS*TILE,ROWS*TILE);
-  for(let t of game.towers)t.draw(ctx);
-  for(let e of game.enemies)e.draw(ctx);
-  for(let p of game.projectiles)p.draw(ctx);
-  for(let pt of game.particles)pt.draw(ctx);
-  ctx.font='bold 9px Arial';ctx.textAlign='center';
-  for(let ft of game.texts){ctx.fillStyle=`rgba(255,221,87,${ft.l/18})`;ctx.fillText(ft.t,ft.x,ft.y);}
-}
-
-document.getElementById('bottomPanel').style.display='none';
-
-buildGrid();
+document.getElementById('bottomPanel').style.display = 'none';
 buildMapGrid();
-updateMenuGems();
-document.getElementById('bestWave').textContent=saveData.bestWave;
-document.getElementById('totalGold').textContent=saveData.totalGold;
+document.getElementById('bestWave').textContent = saveData.bestWave;
+document.getElementById('totalGold').textContent = saveData.totalGold;
+document.getElementById('menuGems').textContent = saveData.gems;
 applyLanguage();
-updateUI();
-requestAnimationFrame(loop);
-})();
+requestAnimationFrame(gameLoop);
 </script>
 </body>
 </html>
