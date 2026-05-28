@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
     <title>Пирамикс • Регистрация</title>
+    <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Регистрируйтесь и получайте доход от приглашённых пользователей!">
+    <meta name="keywords" content="Пирамикс, регистрация, реферальная программа, заработок, пирамида, рефералы, VIP статус">
+    <meta property="og:title" content="Пирамикс — Регистрация">
+    <meta property="og:description" content="Зарегистрируйтесь в Пирамикс и зарабатывайте на рефералах с 5 уровнями глубины!">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -560,14 +566,19 @@
 
         document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
 
-        // ---------- Счётчики ----------
-        let totalUsers = 24344;
-        let todayUsers = 127;
-        let totalWithdrawn = 18500;
+        // ---------- Счётчики с сохранением в localStorage ----------
+        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 24344;
+        let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
+        let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
 
         const totalUsersEl = document.getElementById('totalUsers');
         const todayUsersEl = document.getElementById('todayUsers');
         const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+
+        // Отображаем сохранённые значения
+        totalUsersEl.textContent = totalUsers;
+        todayUsersEl.textContent = todayUsers;
+        totalWithdrawnEl.textContent = totalWithdrawn + ' $';
 
         function animateValue(element, start, end, duration, suffix = '') {
             if (start === end) return;
@@ -586,6 +597,8 @@
             const oldTotal = totalUsers;
             totalUsers++;
             todayUsers++;
+            localStorage.setItem('pirxmix_totalUsers', totalUsers);
+            localStorage.setItem('pirxmix_todayUsers', todayUsers);
             animateValue(totalUsersEl, oldTotal, totalUsers, 400);
             animateValue(todayUsersEl, todayUsers - 1, todayUsers, 400);
         }
@@ -606,35 +619,29 @@
             const msToMidnight = midnight - now;
             setTimeout(() => {
                 todayUsers = 0;
+                localStorage.setItem('pirxmix_todayUsers', '0');
                 todayUsersEl.textContent = '0';
                 scheduleMidnightReset();
             }, msToMidnight);
         }
         scheduleMidnightReset();
 
-        // ---------- Лента транзакций ----------
+        // ---------- Лента транзакций с сохранением ----------
         const depositList = document.getElementById('depositList');
         const withdrawList = document.getElementById('withdrawList');
         const MAX_ITEMS = 10;
 
-        // Никнеймы на русском и английском в разных форматах
         const allNicks = [
-            // Русские одно слово с большой
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
             'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-            // Русские два слова (разный регистр)
             'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
             'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
             'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
-            // Русские одно слово с маленькой
             'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
-            // Русские два слова с большой
             'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
             'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
-            // Английские одно слово
             'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
             'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
-            // Английские два слова
             'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
             'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
             'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
@@ -650,15 +657,52 @@
         }
 
         function getRandomWithdrawAmount() {
-            // Случайная сумма вывода от 1 до 168 $
             return Math.floor(Math.random() * 168) + 1;
+        }
+
+        function saveTransactions() {
+            const deposits = [];
+            const withdraws = [];
+            depositList.querySelectorAll('.feed-item').forEach(item => {
+                deposits.push(item.innerHTML);
+            });
+            withdrawList.querySelectorAll('.feed-item').forEach(item => {
+                withdraws.push(item.innerHTML);
+            });
+            localStorage.setItem('pirxmix_deposits', JSON.stringify(deposits));
+            localStorage.setItem('pirxmix_withdraws', JSON.stringify(withdraws));
+        }
+
+        function loadTransactions() {
+            const savedDeposits = JSON.parse(localStorage.getItem('pirxmix_deposits') || '[]');
+            const savedWithdraws = JSON.parse(localStorage.getItem('pirxmix_withdraws') || '[]');
+            
+            savedDeposits.forEach(html => {
+                const item = document.createElement('div');
+                item.className = 'feed-item deposit';
+                item.innerHTML = html;
+                depositList.appendChild(item);
+            });
+            
+            savedWithdraws.forEach(html => {
+                const item = document.createElement('div');
+                item.className = 'feed-item withdraw';
+                item.innerHTML = html;
+                withdrawList.appendChild(item);
+            });
+
+            while (depositList.children.length > MAX_ITEMS) {
+                depositList.removeChild(depositList.lastChild);
+            }
+            while (withdrawList.children.length > MAX_ITEMS) {
+                withdrawList.removeChild(withdrawList.lastChild);
+            }
         }
 
         function addTransaction(container, type) {
             const item = document.createElement('div');
             item.className = `feed-item ${type}`;
             
-            // Пополнение всегда 10$, вывод — случайная сумма от 1 до 168$
             const amount = type === 'deposit' ? 10 : getRandomWithdrawAmount();
             
             item.innerHTML = `<span><span class="feed-user">${randomNick()}</span><span class="feed-time">${getCurrentTime()}</span></span><span class="feed-amount">${amount}$</span>`;
@@ -667,17 +711,27 @@
                 container.removeChild(container.lastChild);
             }
 
-            // Если это вывод, увеличиваем счётчик "Всего выведено" на сумму вывода
             if (type === 'withdraw') {
                 const oldWithdrawn = totalWithdrawn;
                 totalWithdrawn += amount;
+                localStorage.setItem('pirxmix_totalWithdrawn', totalWithdrawn);
                 animateValue(totalWithdrawnEl, oldWithdrawn, totalWithdrawn, 500, ' $');
             }
+            
+            saveTransactions();
         }
 
-        for (let i = 0; i < MAX_ITEMS; i++) {
-            addTransaction(depositList, 'deposit');
-            addTransaction(withdrawList, 'withdraw');
+        // Загружаем сохранённые транзакции или создаём новые
+        const savedDeposits = localStorage.getItem('pirxmix_deposits');
+        const savedWithdraws = localStorage.getItem('pirxmix_withdraws');
+
+        if (savedDeposits && savedWithdraws) {
+            loadTransactions();
+        } else {
+            for (let i = 0; i < MAX_ITEMS; i++) {
+                addTransaction(depositList, 'deposit');
+                addTransaction(withdrawList, 'withdraw');
+            }
         }
 
         function randomTransaction() {
