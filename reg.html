@@ -39,7 +39,6 @@
             pointer-events: none;
         }
 
-        /* Верхний контент */
         .top-content {
             width: 100%;
             max-width: 1300px;
@@ -204,7 +203,6 @@
             color: #ffd966;
         }
 
-        /* Боковая панель статистики */
         .stats-panel {
             flex: 0 0 260px;
             background: rgba(20, 22, 27, 0.8);
@@ -245,7 +243,6 @@
             transition: all 0.2s;
         }
 
-        /* Правая секция с графиком */
         .info-section {
             flex: 1 1 400px;
             background: rgba(12, 14, 18, 0.65);
@@ -353,7 +350,6 @@
             padding-top: 1.2rem;
         }
 
-        /* Нижняя лента транзакций */
         .live-feed {
             width: 100%;
             max-width: 1300px;
@@ -550,19 +546,16 @@
             if (!password1) { alert('Введите пароль.'); return; }
 
             if (isLoginMode) {
-                // Проверяем, есть ли такой пользователь
                 const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
                 if (!savedUser || savedUser.nickname !== nickname) {
                     alert('❌ Пользователь не найден. Зарегистрируйтесь.');
                     return;
                 }
-                // Сохраняем и переходим на главную
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 window.location.href = 'https://vds-game.ink/home';
             } else {
                 const password2 = document.getElementById('password2').value;
                 if (password1 !== password2) { alert('❌ Пароли не совпадают.'); return; }
-                // Сохраняем нового пользователя
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 localStorage.setItem('pirxmix_balance', '0');
                 alert('✅ Регистрация успешна! Сейчас вы будете перенаправлены в личный кабинет.');
@@ -575,16 +568,21 @@
         // ---------- Счётчики ----------
         let totalUsers = 24344;
         let todayUsers = 127;
+        let totalWithdrawn = 18500; // Переменная для отслеживания суммы выводов
 
-        function animateValue(element, start, end, duration = 600) {
+        const totalUsersEl = document.getElementById('totalUsers');
+        const todayUsersEl = document.getElementById('todayUsers');
+        const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+
+        function animateValue(element, start, end, duration, suffix = '') {
             if (start === end) return;
             const range = end - start;
             const increment = range > 0 ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / range));
+            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
             let current = start;
             const timer = setInterval(() => {
                 current += increment;
-                element.textContent = current;
+                element.textContent = current + suffix;
                 if (current === end) clearInterval(timer);
             }, stepTime);
         }
@@ -593,12 +591,13 @@
             const oldTotal = totalUsers;
             totalUsers++;
             todayUsers++;
-            animateValue(document.getElementById('totalUsers'), oldTotal, totalUsers, 400);
-            animateValue(document.getElementById('todayUsers'), todayUsers - 1, todayUsers, 400);
+            animateValue(totalUsersEl, oldTotal, totalUsers, 400);
+            animateValue(todayUsersEl, todayUsers - 1, todayUsers, 400);
         }
 
         function scheduleNextIncrement() {
-            const delay = Math.floor(Math.random() * 4000) + 3000;
+            // Увеличенный промежуток: 5-25 секунд (5000-25000 мс)
+            const delay = Math.floor(Math.random() * 20000) + 5000;
             setTimeout(() => {
                 incrementUsers();
                 scheduleNextIncrement();
@@ -613,7 +612,7 @@
             const msToMidnight = midnight - now;
             setTimeout(() => {
                 todayUsers = 0;
-                document.getElementById('todayUsers').textContent = '0';
+                todayUsersEl.textContent = '0';
                 scheduleMidnightReset();
             }, msToMidnight);
         }
@@ -644,6 +643,13 @@
             container.prepend(item);
             while (container.children.length > MAX_ITEMS) {
                 container.removeChild(container.lastChild);
+            }
+
+            // Если это вывод, увеличиваем счётчик "Всего вывели денег"
+            if (type === 'withdraw') {
+                const oldWithdrawn = totalWithdrawn;
+                totalWithdrawn += 10;
+                animateValue(totalWithdrawnEl, oldWithdrawn, totalWithdrawn, 500, ' $');
             }
         }
 
