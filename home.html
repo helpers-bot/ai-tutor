@@ -518,7 +518,7 @@
         <h3>📊 Статистика платформы</h3>
         <div class="stat-row">
             <span class="stat-label">Всего пользователей</span>
-            <span class="stat-value" id="totalUsers">24344</span>
+            <span class="stat-value" id="totalUsers">146.353</span>
         </div>
         <div class="stat-row">
             <span class="stat-label">Сегодня зарегистрировано</span>
@@ -526,7 +526,7 @@
         </div>
         <div class="stat-row">
             <span class="stat-label">Всего выведено</span>
-            <span class="stat-value" id="totalWithdrawn">18500 $</span>
+            <span class="stat-value" id="totalWithdrawn">18.500 $</span>
         </div>
         <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
     </div>
@@ -676,7 +676,6 @@
         </div>
     </div>
 </div>
-
 <script>
     (function() {
         // ============================================
@@ -695,7 +694,7 @@
             return;
         }
 
-        document.getElementById('userGreeting').textContent = `Привет, ${userData.nickname}`;
+        document.getElementById('userGreeting').textContent = 'Привет, ' + userData.nickname;
 
         // Начальные значения рефералов
         document.getElementById('lvl1').textContent = '0 чел.';
@@ -740,6 +739,159 @@
         }
 
         // ============================================
+        // НИКНЕЙМЫ ДЛЯ ТРАНЗАКЦИЙ
+        // ============================================
+        const allNicks = [
+            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
+            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
+            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
+            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
+            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
+            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
+            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
+            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
+            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
+            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
+            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
+            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
+            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
+            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore'
+        ];
+
+        function randomNick() {
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
+
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        // ============================================
+        // СЧЁТЧИКИ С АНИМАЦИЕЙ
+        // ============================================
+        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 146353;
+        let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
+        let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
+
+        const totalUsersEl = document.getElementById('totalUsers');
+        const todayUsersEl = document.getElementById('todayUsers');
+        const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+
+        totalUsersEl.textContent = formatNumber(totalUsers);
+        todayUsersEl.textContent = todayUsers;
+        totalWithdrawnEl.textContent = formatNumber(totalWithdrawn) + ' $';
+
+        function animateValue(element, start, end, duration, suffix) {
+            suffix = suffix || '';
+            duration = duration || 400;
+            if (start === end) {
+                element.textContent = end + suffix;
+                return;
+            }
+            const range = end - start;
+            const increment = range > 0 ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
+            let current = start;
+            const timer = setInterval(function() {
+                current += increment;
+                if (element === totalUsersEl || element === totalWithdrawnEl) {
+                    element.textContent = formatNumber(current) + suffix;
+                } else {
+                    element.textContent = current + suffix;
+                }
+                if (current === end) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        function incrementUsers() {
+            const oldTotal = totalUsers;
+            totalUsers++;
+            todayUsers++;
+            localStorage.setItem('pirxmix_totalUsers', totalUsers);
+            localStorage.setItem('pirxmix_todayUsers', todayUsers);
+            animateValue(totalUsersEl, oldTotal, totalUsers, 400);
+            animateValue(todayUsersEl, todayUsers - 1, todayUsers, 400);
+        }
+
+        function scheduleNextIncrement() {
+            const delay = Math.floor(Math.random() * 20000) + 5000;
+            setTimeout(function() {
+                incrementUsers();
+                scheduleNextIncrement();
+            }, delay);
+        }
+        scheduleNextIncrement();
+
+        function scheduleMidnightReset() {
+            const now = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0);
+            const msToMidnight = midnight.getTime() - now.getTime();
+            setTimeout(function() {
+                todayUsers = 0;
+                localStorage.setItem('pirxmix_todayUsers', '0');
+                todayUsersEl.textContent = '0';
+                scheduleMidnightReset();
+            }, msToMidnight);
+        }
+        scheduleMidnightReset();
+
+        // ============================================
+        // ТРАНЗАКЦИИ (ГЕНЕРИРУЮТСЯ В КОДЕ САЙТА)
+        // ============================================
+        const depositList = document.getElementById('depositList');
+        const withdrawList = document.getElementById('withdrawList');
+        const MAX_ITEMS = 10;
+
+        function addDeposit() {
+            const item = document.createElement('div');
+            item.className = 'feed-item deposit';
+            item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">10$</span>';
+            depositList.prepend(item);
+            while (depositList.children.length > MAX_ITEMS) {
+                depositList.removeChild(depositList.lastChild);
+            }
+        }
+
+        function addWithdraw() {
+            const amount = Math.floor(Math.random() * 168) + 1;
+            const item = document.createElement('div');
+            item.className = 'feed-item withdraw';
+            item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + amount + '$</span>';
+            withdrawList.prepend(item);
+            while (withdrawList.children.length > MAX_ITEMS) {
+                withdrawList.removeChild(withdrawList.lastChild);
+            }
+            const oldWithdrawn = totalWithdrawn;
+            totalWithdrawn += amount;
+            localStorage.setItem('pirxmix_totalWithdrawn', totalWithdrawn);
+            animateValue(totalWithdrawnEl, oldWithdrawn, totalWithdrawn, 500, ' $');
+        }
+
+        // Начальное заполнение
+        for (let i = 0; i < MAX_ITEMS; i++) {
+            addDeposit();
+            addWithdraw();
+        }
+
+        function generateTransaction() {
+            if (Math.random() < 0.5) {
+                addDeposit();
+            } else {
+                addWithdraw();
+            }
+            const delay = Math.floor(Math.random() * 105000) + 25000;
+            setTimeout(generateTransaction, delay);
+        }
+        setTimeout(generateTransaction, 25000);
+
+        // ============================================
         // ВЫВОД СРЕДСТВ
         // ============================================
         const withdrawModal = document.getElementById('withdrawModal');
@@ -779,8 +931,6 @@
 
             if (!error && data && data.success) {
                 await loadUserData();
-                await loadStats();
-                await loadTransactions();
             }
             
             withdrawModal.classList.add('hidden');
@@ -794,13 +944,7 @@
         const confirmVipBtn = document.getElementById('confirmVipBtn');
 
         function updateVipBox(vipId) {
-            vipInfoBox.innerHTML = `
-                <p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p>
-                <p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p>
-                <div class="vip-id">${vipId}</div>
-                <p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p>
-                <p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=${vipId}</p>
-            `;
+            vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + vipId + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=' + vipId + '</p>';
         }
 
         document.getElementById('vipBtn').addEventListener('click', async function() {
@@ -809,13 +953,7 @@
                 updateVipBox(data.referral_code);
                 confirmVipBtn.style.display = 'none';
             } else {
-                vipInfoBox.innerHTML = `
-                    <p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p>
-                    <div class="vip-price">10$</div>
-                    <p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">
-                        Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.
-                    </p>
-                `;
+                vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';
                 confirmVipBtn.style.display = 'inline-block';
             }
             vipModal.classList.remove('hidden');
@@ -860,10 +998,17 @@
             const newPass2 = document.getElementById('profilePassword2').value;
             if (!newNickname) return;
             if (newPass && newPass !== newPass2) return;
-            const updatedUser = { id: userData.id, nickname: newNickname, password: newPass || userData.password, vip_paid: userData.vip_paid, referral_code: userData.referral_code, balance: userData.balance };
+            const updatedUser = {
+                id: userData.id,
+                nickname: newNickname,
+                password: newPass || userData.password,
+                vip_paid: userData.vip_paid,
+                referral_code: userData.referral_code,
+                balance: userData.balance
+            };
             localStorage.setItem('pirxmix_user', JSON.stringify(updatedUser));
             userData.nickname = newNickname;
-            document.getElementById('userGreeting').textContent = `Привет, ${newNickname}`;
+            document.getElementById('userGreeting').textContent = 'Привет, ' + newNickname;
             profileModal.classList.add('hidden');
         });
 
@@ -890,65 +1035,13 @@
         });
 
         // ============================================
-        // ЗАГРУЗКА СТАТИСТИКИ ИЗ SUPABASE
-        // ============================================
-        async function loadStats() {
-            const { data, error } = await supabase.rpc('get_platform_stats');
-            if (data) {
-                document.getElementById('totalUsers').textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                document.getElementById('todayUsers').textContent = data.today_users;
-                document.getElementById('totalWithdrawn').textContent = data.total_withdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
-            }
-        }
-
-        // ============================================
-        // ЗАГРУЗКА ТРАНЗАКЦИЙ ИЗ SUPABASE
-        // ============================================
-        async function loadTransactions() {
-            const depositList = document.getElementById('depositList');
-            const withdrawList = document.getElementById('withdrawList');
-            depositList.innerHTML = '';
-            withdrawList.innerHTML = '';
-            
-            const { data: deposits } = await supabase.rpc('get_recent_transactions', { p_type: 'deposit', p_limit: 10 });
-            if (deposits) {
-                deposits.forEach(t => {
-                    const item = document.createElement('div');
-                    item.className = 'feed-item deposit';
-                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    item.innerHTML = '<span><span class="feed-user">' + t.nickname + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">' + t.amount + '$</span>';
-                    depositList.appendChild(item);
-                });
-            }
-            
-            const { data: withdrawals } = await supabase.rpc('get_recent_transactions', { p_type: 'withdraw', p_limit: 10 });
-            if (withdrawals) {
-                withdrawals.forEach(t => {
-                    const item = document.createElement('div');
-                    item.className = 'feed-item withdraw';
-                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    item.innerHTML = '<span><span class="feed-user">' + t.nickname + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">' + t.amount + '$</span>';
-                    withdrawList.appendChild(item);
-                });
-            }
-        }
-
-        // ============================================
-        // ПЕРВИЧНАЯ ЗАГРУЗКА ВСЕХ ДАННЫХ
+        // ПЕРВИЧНАЯ ЗАГРУЗКА И АВТООБНОВЛЕНИЕ
         // ============================================
         loadUserData();
         loadReferrals();
-        loadStats();
-        loadTransactions();
-
-        // ============================================
-        // АВТООБНОВЛЕНИЕ КАЖДЫЕ 30 СЕКУНД
-        // ============================================
         setInterval(function() {
             loadUserData();
             loadReferrals();
-            loadStats();
-            loadTransactions();
         }, 30000);
 
     })();
