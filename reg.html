@@ -500,11 +500,11 @@
 <!-- Нижняя лента транзакций -->
 <div class="live-feed">
     <div class="feed-half deposit-feed">
-        <div class="feed-title">🟢 Пополнения (10$)</div>
+        <div class="feed-title">🟢 Пополнения</div>
         <div class="feed-list" id="depositList"></div>
     </div>
     <div class="feed-half withdraw-feed">
-        <div class="feed-title">🔴 Выводы (10$)</div>
+        <div class="feed-title">🔴 Выводы</div>
         <div class="feed-list" id="withdrawList"></div>
     </div>
 </div>
@@ -568,7 +568,7 @@
         // ---------- Счётчики ----------
         let totalUsers = 24344;
         let todayUsers = 127;
-        let totalWithdrawn = 18500; // Переменная для отслеживания суммы выводов
+        let totalWithdrawn = 18500;
 
         const totalUsersEl = document.getElementById('totalUsers');
         const todayUsersEl = document.getElementById('todayUsers');
@@ -596,7 +596,6 @@
         }
 
         function scheduleNextIncrement() {
-            // Увеличенный промежуток: 5-25 секунд (5000-25000 мс)
             const delay = Math.floor(Math.random() * 20000) + 5000;
             setTimeout(() => {
                 incrementUsers();
@@ -623,32 +622,50 @@
         const withdrawList = document.getElementById('withdrawList');
         const MAX_ITEMS = 10;
 
-        const firstNames = ['Alex', 'Mira', 'Jon', 'Lena', 'Max', 'Sara', 'Tom', 'Anna', 'Leo', 'Kate'];
-        const lastNames = ['Gold', 'Fox', 'Star', 'Moon', 'Wolf', 'Sky', 'Rose', 'Hill', 'Byte', 'Coin'];
+        // Русские ники в разных форматах (без цифр)
+        const russianNicks = [
+            // Одно слово с большой буквы
+            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
+            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
+            // Два слова с большой и с маленькой
+            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
+            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
+            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
+            // Одно слово с маленькой буквы
+            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
+            // Два слова с большой буквы каждое
+            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
+            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
+            'Тёмный Рыцарь', 'Снежный Барс', 'Огненный Феникс', 'Морской Волк', 'Лесной Дух'
+        ];
 
         function randomNick() {
-            return firstNames[Math.floor(Math.random() * firstNames.length)] + 
-                   lastNames[Math.floor(Math.random() * lastNames.length)] + 
-                   Math.floor(Math.random() * 100);
+            return russianNicks[Math.floor(Math.random() * russianNicks.length)];
         }
 
         function getCurrentTime() {
             return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
+        function getRandomAmount() {
+            // Случайная сумма от 1 до 168 $
+            return Math.floor(Math.random() * 168) + 1;
+        }
+
         function addTransaction(container, type) {
             const item = document.createElement('div');
             item.className = `feed-item ${type}`;
-            item.innerHTML = `<span><span class="feed-user">${randomNick()}</span><span class="feed-time">${getCurrentTime()}</span></span><span class="feed-amount">10$</span>`;
+            const amount = getRandomAmount();
+            item.innerHTML = `<span><span class="feed-user">${randomNick()}</span><span class="feed-time">${getCurrentTime()}</span></span><span class="feed-amount">${amount}$</span>`;
             container.prepend(item);
             while (container.children.length > MAX_ITEMS) {
                 container.removeChild(container.lastChild);
             }
 
-            // Если это вывод, увеличиваем счётчик "Всего вывели денег"
+            // Если это вывод, увеличиваем счётчик "Всего вывели денег" на сумму вывода
             if (type === 'withdraw') {
                 const oldWithdrawn = totalWithdrawn;
-                totalWithdrawn += 10;
+                totalWithdrawn += amount;
                 animateValue(totalWithdrawnEl, oldWithdrawn, totalWithdrawn, 500, ' $');
             }
         }
