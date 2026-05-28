@@ -81,9 +81,14 @@
             box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15);
             color: #f5efe0;
             transition: all 0.3s ease;
-            animation: slideFromTopRight 0.9s cubic-bezier(0.22, 0.98, 0.41, 1.1) forwards;
-            transform-origin: top right;
+            animation: slideFromTop 2s ease-out forwards;
+            transform-origin: top center;
             margin-top: 8px;
+        }
+
+        @keyframes slideFromTop {
+            0% { opacity: 0; transform: translateY(-300px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         @keyframes slideFromTopRight {
@@ -417,7 +422,6 @@
             flex-wrap: wrap;
         }
 
-        /* Анимированные буквы для никнейма */
         .user-greeting {
             font-weight: 600;
             font-size: 0.9rem;
@@ -561,6 +565,101 @@
 
         .btn-vip:hover {
             background: linear-gradient(135deg, #d8b4fe, #9333ea);
+        }
+
+        /* Новая карточка заработка */
+        .earn-info-text {
+            color: #b9b09a;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .earn-highlight {
+            color: #f5d78c;
+            font-weight: 600;
+        }
+
+        .btn-calculator {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+
+        .btn-calculator:hover {
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        /* Калькулятор */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.6rem 0;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            color: #b9b09a;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        .calc-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .calc-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #c9a357;
+            background: rgba(0,0,0,0.3);
+            color: #f5d78c;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: #f3b95b30;
+        }
+
+        .calc-value {
+            color: #f5d78c;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .calc-result {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .calc-total {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
         }
 
         .live-feed {
@@ -906,6 +1005,21 @@
             <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">18.500 $</span></div>
             <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
         </div>
+
+        <!-- НОВАЯ КАРТОЧКА: ЗАРАБОТОК -->
+        <div class="card">
+            <h3>📈 Как работает заработок</h3>
+            <p class="earn-info-text">
+                Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях.
+                Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.
+            </p>
+            <div class="stat-row"><span class="stat-label">1 ур. — 1%</span><span class="stat-value">0.10$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">2 ур. — 2%</span><span class="stat-value">0.20$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">3 ур. — 3%</span><span class="stat-value">0.30$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">4 ур. — 4%</span><span class="stat-value">0.40$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">5 ур. — 5%</span><span class="stat-value">0.50$ с чел.</span></div>
+            <button class="btn-calculator" id="calculatorBtn">🧮 Калькулятор дохода</button>
+        </div>
     </div>
 
     <div class="live-feed" id="homeLiveFeed">
@@ -993,6 +1107,64 @@
         <p style="text-align: center; color: #c9ad7a; margin-top: 1.2rem;"><em>Последнее обновление: 2026 год</em></p>
         <div class="modal-buttons" style="justify-content: center;">
             <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно калькулятора -->
+<div class="modal-overlay hidden" id="calculatorModal">
+    <div class="modal" style="max-width: 400px;">
+        <h2>🧮 Калькулятор дохода</h2>
+        <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p>
+        
+        <div class="calc-row">
+            <span class="calc-label">1 уровень (1% = 0.10$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="changeCalcValue('calc1', -1)">−</button>
+                <span class="calc-value" id="calc1">0</span>
+                <button class="calc-btn" onclick="changeCalcValue('calc1', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">2 уровень (2% = 0.20$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="changeCalcValue('calc2', -1)">−</button>
+                <span class="calc-value" id="calc2">0</span>
+                <button class="calc-btn" onclick="changeCalcValue('calc2', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">3 уровень (3% = 0.30$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="changeCalcValue('calc3', -1)">−</button>
+                <span class="calc-value" id="calc3">0</span>
+                <button class="calc-btn" onclick="changeCalcValue('calc3', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">4 уровень (4% = 0.40$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="changeCalcValue('calc4', -1)">−</button>
+                <span class="calc-value" id="calc4">0</span>
+                <button class="calc-btn" onclick="changeCalcValue('calc4', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">5 уровень (5% = 0.50$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="changeCalcValue('calc5', -1)">−</button>
+                <span class="calc-value" id="calc5">0</span>
+                <button class="calc-btn" onclick="changeCalcValue('calc5', 1)">+</button>
+            </div>
+        </div>
+        
+        <div class="calc-result">
+            <p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p>
+            <div class="calc-total" id="calcTotal">0.00 $</div>
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button>
         </div>
     </div>
 </div>
@@ -1173,7 +1345,6 @@
             depositList.innerHTML = '';
             withdrawList.innerHTML = '';
 
-            // Начальное заполнение
             for (let i = 0; i < MAX_ITEMS; i++) {
                 const depItem = document.createElement('div');
                 depItem.className = 'feed-item deposit';
@@ -1187,7 +1358,6 @@
                 withdrawList.appendChild(witItem);
             }
 
-            // Интервал пополнения: 45-150 секунд, всегда 10$
             function scheduleDeposit() {
                 const delay = Math.floor(Math.random() * (150000 - 45000) + 45000);
                 setTimeout(() => {
@@ -1202,7 +1372,6 @@
                 }, delay);
             }
 
-            // Интервал вывода: 65-240 секунд
             function scheduleWithdraw() {
                 const delay = Math.floor(Math.random() * (240000 - 65000) + 65000);
                 setTimeout(() => {
@@ -1214,12 +1383,30 @@
                     while (withdrawList.children.length > MAX_ITEMS) {
                         withdrawList.removeChild(withdrawList.lastChild);
                     }
+                    // Обновляем статистику вывода на странице регистрации
+                    updateWithdrawnStats(amount);
                     scheduleWithdraw();
                 }, delay);
             }
 
             scheduleDeposit();
             scheduleWithdraw();
+        }
+
+        // Обновление статистики "Всего выведено"
+        function updateWithdrawnStats(amount) {
+            // Для страницы регистрации
+            const regWithdrawnEl = document.getElementById('regTotalWithdrawn');
+            if (regWithdrawnEl && regWithdrawnEl.textContent) {
+                const current = parseFloat(regWithdrawnEl.textContent.replace(/[^0-9.]/g, '')) || 0;
+                regWithdrawnEl.textContent = (current + amount).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+            }
+            // Для главной страницы
+            const homeWithdrawnEl = document.getElementById('totalWithdrawn');
+            if (homeWithdrawnEl && homeWithdrawnEl.textContent) {
+                const current = parseFloat(homeWithdrawnEl.textContent.replace(/[^0-9.]/g, '')) || 0;
+                homeWithdrawnEl.textContent = (current + amount).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+            }
         }
 
         // ============================================
@@ -1238,6 +1425,7 @@
             initHomeTransactions();
             initCounters();
             initModals();
+            initCalculator();
 
             setInterval(() => {
                 loadUserData();
@@ -1278,7 +1466,6 @@
             depositList.innerHTML = '';
             withdrawList.innerHTML = '';
 
-            // Начальное заполнение
             for (let i = 0; i < MAX_ITEMS; i++) {
                 const depItem = document.createElement('div');
                 depItem.className = 'feed-item deposit';
@@ -1292,7 +1479,6 @@
                 withdrawList.appendChild(witItem);
             }
 
-            // Интервал пополнения: 45-150 секунд, всегда 10$
             function scheduleDeposit() {
                 const delay = Math.floor(Math.random() * (150000 - 45000) + 45000);
                 setTimeout(() => {
@@ -1307,7 +1493,6 @@
                 }, delay);
             }
 
-            // Интервал вывода: 65-240 секунд
             function scheduleWithdraw() {
                 const delay = Math.floor(Math.random() * (240000 - 65000) + 65000);
                 setTimeout(() => {
@@ -1319,6 +1504,8 @@
                     while (withdrawList.children.length > MAX_ITEMS) {
                         withdrawList.removeChild(withdrawList.lastChild);
                     }
+                    // Обновляем статистику вывода
+                    updateWithdrawnStats(amount);
                     scheduleWithdraw();
                 }, delay);
             }
@@ -1344,15 +1531,52 @@
             setInterval(updateStats, 30000);
         }
 
+        // Калькулятор
+        function initCalculator() {
+            const calcLevels = ['calc1', 'calc2', 'calc3', 'calc4', 'calc5'];
+            const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
+
+            window.changeCalcValue = function(id, delta) {
+                const el = document.getElementById(id);
+                let val = parseInt(el.textContent) || 0;
+                val = Math.max(0, val + delta);
+                el.textContent = val;
+                updateCalcTotal();
+            };
+
+            function updateCalcTotal() {
+                let total = 0;
+                calcLevels.forEach((id, i) => {
+                    const val = parseInt(document.getElementById(id).textContent) || 0;
+                    total += val * percents[i];
+                });
+                document.getElementById('calcTotal').textContent = total.toFixed(2) + ' $';
+            }
+
+            document.getElementById('calculatorBtn').onclick = function() {
+                calcLevels.forEach(id => { document.getElementById(id).textContent = '0'; });
+                document.getElementById('calcTotal').textContent = '0.00 $';
+                document.getElementById('calculatorModal').classList.remove('hidden');
+            };
+
+            document.getElementById('closeCalculatorBtn').onclick = function() {
+                document.getElementById('calculatorModal').classList.add('hidden');
+            };
+
+            document.getElementById('calculatorModal').onclick = function(e) {
+                if (e.target === document.getElementById('calculatorModal')) {
+                    document.getElementById('calculatorModal').classList.add('hidden');
+                }
+            };
+        }
+
         function initModals() {
-            // Выход
             document.getElementById('logoutBtn').onclick = function() {
                 localStorage.removeItem('pirxmix_user');
                 userData = null;
                 showStage('register');
             };
 
-            // Политика
             document.getElementById('policyLink').onclick = function() {
                 document.getElementById('policyModal').classList.remove('hidden');
             };
@@ -1365,7 +1589,6 @@
                 }
             };
 
-            // Профиль
             document.getElementById('profileBtn').onclick = function() {
                 document.getElementById('profileNickname').value = userData.nickname;
                 document.getElementById('profilePassword').value = '';
@@ -1389,7 +1612,6 @@
                 document.getElementById('profileModal').classList.add('hidden');
             };
 
-            // Вывод средств
             document.getElementById('withdrawBtn').onclick = function() {
                 document.getElementById('withdrawCrypto').value = '';
                 document.getElementById('withdrawAmount').value = '';
@@ -1422,7 +1644,6 @@
                 document.getElementById('withdrawModal').classList.add('hidden');
             };
 
-            // VIP
             document.getElementById('vipBtn').onclick = async function() {
                 const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
                 const vipInfoBox = document.getElementById('vipInfoBox');
@@ -1455,7 +1676,6 @@
             };
         }
 
-        // Обновление статистики регистрации раз в 30 секунд
         setInterval(() => {
             if (stageRegister.style.display !== 'none') loadRegStats();
         }, 30000);
