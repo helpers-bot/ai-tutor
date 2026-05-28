@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
-    <title>Пирамикс • Регистрация</title>
+    <title>Пирамикс • Главная</title>
     <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Регистрируйтесь и получайте доход от приглашённых пользователей!">
     <meta name="keywords" content="Пирамикс, регистрация, реферальная программа, заработок, пирамида, рефералы, VIP статус">
     <meta property="og:title" content="Пирамикс — Регистрация">
@@ -15,77 +15,785 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; overflow-x: hidden; }
-        body::before { content: ""; position: fixed; top: -30%; left: -10%; width: 70%; height: 70%; background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%); border-radius: 50%; z-index: 0; pointer-events: none; }
-        .top-content { width: 100%; max-width: 1300px; display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 2rem; position: relative; z-index: 2; margin-bottom: 30px; }
-        .form-wrapper { flex: 0 0 340px; display: flex; justify-content: center; align-items: flex-start; }
-        .auth-card { background: rgba(20, 22, 27, 0.9); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255, 215, 150, 0.18); border-radius: 2.5rem; padding: 2rem 2rem 1.8rem; width: 100%; max-width: 360px; box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15); color: #f5efe0; transition: all 0.3s ease; animation: slideFromTopRight 0.9s cubic-bezier(0.22, 0.98, 0.41, 1.1) forwards; transform-origin: top right; margin-top: 10px; }
-        @keyframes slideFromTopRight { 0% { opacity: 0; transform: translate(60px, -160px) scale(0.92); } 30% { opacity: 0.9; transform: translate(30px, -40px) scale(0.98); } 70% { opacity: 1; transform: translate(8px, 5px) scale(1.01); } 100% { opacity: 1; transform: translate(0, 0) scale(1); } }
-        .auth-card h3 { font-size: 1.7rem; font-weight: 600; margin-bottom: 1.8rem; letter-spacing: -0.3px; background: linear-gradient(135deg, #f9d56e, #e6a861); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
-        .input-group { margin-bottom: 1.4rem; }
-        .input-group label { display: block; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.4px; color: #b9b09a; margin-bottom: 0.3rem; text-transform: uppercase; }
-        .input-group input { width: 100%; background: rgba(15, 16, 20, 0.8); border: 1px solid rgba(220, 180, 100, 0.25); border-radius: 1.2rem; padding: 0.9rem 1.2rem; font-size: 1rem; color: #f5e7cc; outline: none; transition: all 0.25s; font-family: 'Inter', sans-serif; backdrop-filter: blur(4px); }
-        .input-group input:focus { border-color: #f3b95b; box-shadow: 0 0 14px rgba(243, 185, 91, 0.4); background: rgba(22, 22, 28, 0.9); }
-        .input-group input::placeholder { color: #5e5a4f; font-weight: 400; font-size: 0.9rem; }
-        .password-field { transition: all 0.35s ease; overflow: hidden; }
-        .hidden-password { max-height: 0; opacity: 0; margin-bottom: 0; pointer-events: none; transform: translateY(-8px); }
-        .visible-password { max-height: 80px; opacity: 1; margin-bottom: 1.4rem; transform: translateY(0); }
-        .action-btn { background: linear-gradient(135deg, #e2a542, #c7851e); border: none; color: #0f0e0a; font-weight: 700; font-size: 1rem; padding: 0.8rem 1.8rem; border-radius: 2.5rem; cursor: pointer; backdrop-filter: blur(8px); transition: 0.25s; margin-top: 0.2rem; margin-bottom: 0.8rem; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35); width: auto; min-width: 180px; }
-        .action-btn:hover { background: linear-gradient(135deg, #f3b95b, #da9729); box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6); color: #000; }
-        .switch-text { font-size: 0.85rem; color: #b9b09a; margin-top: 0.5rem; display: block; }
-        .switch-text span { color: #f3b95b; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; margin-left: 4px; }
-        .switch-text span:hover { color: #ffd966; }
-        .error-message { color: #ff7043; font-size: 0.8rem; text-align: center; margin-bottom: 0.8rem; display: none; }
-        .error-message.visible { display: block; }
-        .stats-panel { flex: 0 0 260px; background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 2rem; padding: 1.8rem 1.5rem; border: 1px solid rgba(255, 215, 150, 0.2); color: #f5efe0; box-shadow: 0 20px 35px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 1.2rem; }
-        .stat-item { background: rgba(0,0,0,0.3); border-radius: 1.2rem; padding: 1rem; text-align: center; }
-        .stat-label { font-size: 0.8rem; color: #b9b09a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
-        .stat-value { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transition: all 0.2s; }
-        .info-section { flex: 1 1 400px; background: rgba(12, 14, 18, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 2.8rem; padding: 2.2rem 2rem; border: 1px solid rgba(230, 180, 70, 0.2); box-shadow: 0 25px 45px rgba(0,0,0,0.8); color: #ece3d5; animation: fadeInInfo 1s ease-out; }
-        @keyframes fadeInInfo { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .info-section h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.4rem; background: linear-gradient(to right, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px; }
-        .subtitle { color: #b7a16c; font-weight: 500; margin-bottom: 2rem; font-size: 1rem; border-left: 3px solid #e3a94d; padding-left: 1rem; }
-        .chart-container { margin: 1.8rem 0 2rem; }
-        .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; height: 180px; padding: 0 0.4rem; border-bottom: 2px solid rgba(230, 180, 70, 0.4); margin-bottom: 0.8rem; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 70px; }
-        .bar { width: 40px; background: linear-gradient(180deg, #f3b95b, #d18e2c); border-radius: 20px 20px 6px 6px; box-shadow: 0 -5px 15px rgba(243, 185, 91, 0.5); margin-bottom: 6px; }
-        .bar-percent { font-weight: 700; font-size: 1.1rem; color: #efc468; margin-bottom: 4px; }
-        .bar-label { font-weight: 600; font-size: 1rem; color: #f5d78c; margin-top: 4px; }
-        .legend { display: flex; justify-content: center; gap: 2rem; margin-top: 0.4rem; color: #cfbc8b; font-size: 0.9rem; }
-        .legend span::before { content: "●"; margin-right: 6px; color: #f3b95b; font-size: 1rem; }
-        .graph-note { margin-top: 1.5rem; font-size: 0.95rem; color: #c9ad7a; text-align: center; border-top: 1px dashed #b49450; padding-top: 1.2rem; }
-        @media (max-width: 780px) { .auth-card { margin-left: 0; margin-right: auto; animation: slideFromTopMobile 0.8s ease-out forwards; } @keyframes slideFromTopMobile { 0% { transform: translate(10px, -130px); opacity: 0; } 100% { transform: translate(0,0); opacity: 1; } } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: -30%;
+            left: -10%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Стили для ЭТАПА 1 (Регистрация) */
+        .reg-container {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 2rem;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 30px;
+        }
+
+        .form-wrapper {
+            flex: 0 0 340px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .auth-card {
+            background: rgba(20, 22, 27, 0.9);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 215, 150, 0.18);
+            border-radius: 2.5rem;
+            padding: 2rem 2rem 1.8rem;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15);
+            color: #f5efe0;
+            transition: all 0.3s ease;
+            animation: slideFromTopRight 0.9s cubic-bezier(0.22, 0.98, 0.41, 1.1) forwards;
+            transform-origin: top right;
+            margin-top: 10px;
+        }
+
+        @keyframes slideFromTopRight {
+            0% { opacity: 0; transform: translate(60px, -160px) scale(0.92); }
+            30% { opacity: 0.9; transform: translate(30px, -40px) scale(0.98); }
+            70% { opacity: 1; transform: translate(8px, 5px) scale(1.01); }
+            100% { opacity: 1; transform: translate(0, 0) scale(1); }
+        }
+
+        .auth-card h3 {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-bottom: 1.8rem;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #f9d56e, #e6a861);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .input-group {
+            margin-bottom: 1.4rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.4px;
+            color: #b9b09a;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1.2rem;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            color: #f5e7cc;
+            outline: none;
+            transition: all 0.25s;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(4px);
+        }
+
+        .input-group select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .input-group select option {
+            background: #1a1c22;
+            color: #f5e7cc;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #f3b95b;
+            box-shadow: 0 0 14px rgba(243, 185, 91, 0.4);
+            background: rgba(22, 22, 28, 0.9);
+        }
+
+        .input-group input::placeholder {
+            color: #5e5a4f;
+            font-weight: 400;
+            font-size: 0.9rem;
+        }
+
+        .password-field {
+            transition: all 0.35s ease;
+            overflow: hidden;
+        }
+
+        .hidden-password {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+        }
+
+        .visible-password {
+            max-height: 80px;
+            opacity: 1;
+            margin-bottom: 1.4rem;
+            transform: translateY(0);
+        }
+
+        .action-btn, .btn-primary {
+            background: linear-gradient(135deg, #e2a542, #c7851e);
+            border: none;
+            color: #0f0e0a;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.8rem 1.8rem;
+            border-radius: 2.5rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: 0.25s;
+            margin-top: 0.2rem;
+            margin-bottom: 0.8rem;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35);
+            width: auto;
+            min-width: 180px;
+        }
+
+        .action-btn:hover, .btn-primary:hover {
+            background: linear-gradient(135deg, #f3b95b, #da9729);
+            box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6);
+            color: #000;
+        }
+
+        .switch-text {
+            font-size: 0.85rem;
+            color: #b9b09a;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        .switch-text span {
+            color: #f3b95b;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+            margin-left: 4px;
+        }
+
+        .switch-text span:hover {
+            color: #ffd966;
+        }
+
+        .error-message {
+            color: #ff7043;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 0.8rem;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        .stats-panel {
+            flex: 0 0 260px;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            padding: 1.8rem 1.5rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            color: #f5efe0;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1.2rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #b9b09a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.2s;
+        }
+
+        .info-section {
+            flex: 1 1 400px;
+            background: rgba(12, 14, 18, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 2.8rem;
+            padding: 2.2rem 2rem;
+            border: 1px solid rgba(230, 180, 70, 0.2);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.8);
+            color: #ece3d5;
+            animation: fadeInInfo 1s ease-out;
+        }
+
+        @keyframes fadeInInfo {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-section h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(to right, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #b7a16c;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            border-left: 3px solid #e3a94d;
+            padding-left: 1rem;
+        }
+
+        .chart-container {
+            margin: 1.8rem 0 2rem;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 180px;
+            padding: 0 0.4rem;
+            border-bottom: 2px solid rgba(230, 180, 70, 0.4);
+            margin-bottom: 0.8rem;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 70px;
+        }
+
+        .bar {
+            width: 40px;
+            background: linear-gradient(180deg, #f3b95b, #d18e2c);
+            border-radius: 20px 20px 6px 6px;
+            box-shadow: 0 -5px 15px rgba(243, 185, 91, 0.5);
+            margin-bottom: 6px;
+        }
+
+        .bar-percent {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #efc468;
+            margin-bottom: 4px;
+        }
+
+        .bar-label {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #f5d78c;
+            margin-top: 4px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 0.4rem;
+            color: #cfbc8b;
+            font-size: 0.9rem;
+        }
+
+        .legend span::before {
+            content: "●";
+            margin-right: 6px;
+            color: #f3b95b;
+            font-size: 1rem;
+        }
+
+        .graph-note {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: #c9ad7a;
+            text-align: center;
+            border-top: 1px dashed #b49450;
+            padding-top: 1.2rem;
+        }
+
+        /* Стили для ЭТАПА 2 (Главная) */
+        .header {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f9d56e, #e6a861);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .user-greeting {
+            color: #f5efe0;
+            font-weight: 500;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #c9a357;
+            color: #e9c274;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            background: #f3b95b20;
+            border-color: #f3b95b;
+            color: #ffe6b3;
+            box-shadow: 0 0 15px rgba(243, 185, 91, 0.3);
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1300px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.8rem;
+            padding: 1.8rem;
+            border: 1px solid rgba(255, 215, 150, 0.15);
+            color: #f5efe0;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(243, 185, 91, 0.4);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #e9c274;
+        }
+
+        .balance {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .stat-row .stat-label {
+            color: #9b927a;
+            flex: 1;
+        }
+
+        .stat-row .stat-value {
+            color: #f5d78c;
+            font-weight: 600;
+            text-align: right;
+            min-width: 60px;
+        }
+
+        .stat-earn {
+            color: #4caf50;
+            font-weight: 600;
+            text-align: right;
+            min-width: 60px;
+            font-size: 0.85rem;
+        }
+
+        .btn-vip {
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.8rem 2rem;
+            border-radius: 2.5rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4);
+            width: 100%;
+            margin-top: 0.5rem;
+            animation: glowPulse 2s infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 8px 30px rgba(192, 132, 252, 0.7); }
+        }
+
+        .btn-vip:hover {
+            background: linear-gradient(135deg, #d8b4fe, #9333ea);
+        }
+
+        .live-feed {
+            width: 100%;
+            max-width: 1300px;
+            background: rgba(10, 12, 15, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 180, 70, 0.25);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            z-index: 3;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.7);
+            margin-top: 10px;
+        }
+
+        .feed-half {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .feed-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #c9ad7a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.8rem;
+        }
+
+        .feed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .feed-item {
+            background: rgba(25, 22, 17, 0.6);
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            border: 1px solid rgba(212, 165, 60, 0.2);
+            animation: fadeInUp 0.4s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .feed-user { font-weight: 600; color: #f5d78c; }
+        .feed-time { color: #8b8a7a; font-size: 0.7rem; margin-left: 0.5rem; }
+        .feed-amount { font-weight: 700; }
+        .deposit .feed-amount { color: #4caf50; }
+        .withdraw .feed-amount { color: #ff7043; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: rgba(20, 22, 27, 0.95);
+            border: 1px solid rgba(255, 215, 150, 0.3);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            color: #f5efe0;
+            animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1);
+        }
+
+        @keyframes modalSlideIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(30px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal h2 {
+            margin-bottom: 1.5rem;
+            color: #e9c274;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .vip-info-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+
+        .vip-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #c084fc;
+            margin: 0.5rem 0;
+        }
+
+        .vip-id {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f5d78c;
+            letter-spacing: 3px;
+            margin: 0.5rem 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .footer {
+            width: 100%;
+            max-width: 1300px;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .footer-link {
+            color: #9b927a;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: #f3b95b;
+        }
+
+        .policy-modal {
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            line-height: 1.7;
+        }
+
+        .policy-modal h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .policy-modal h3 {
+            color: #e9c274;
+            margin: 1.2rem 0 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .policy-modal p {
+            color: #b9b09a;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .optional-label {
+            color: #6b6352;
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+
+        @media (max-width: 900px) {
+            .live-feed { flex-direction: column; }
+            .feed-list { height: 160px; }
+            .header { flex-direction: column; text-align: center; }
+            .header-right { justify-content: center; }
+        }
+
+        @media (max-width: 780px) {
+            .auth-card {
+                margin-left: 0;
+                margin-right: auto;
+                animation: slideFromTopMobile 0.8s ease-out forwards;
+            }
+            @keyframes slideFromTopMobile {
+                0% { transform: translate(10px, -130px); opacity: 0; }
+                100% { transform: translate(0,0); opacity: 1; }
+            }
+        }
     </style>
 </head>
 <body>
-<div class="top-content">
+
+<!-- ================= ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД ================= -->
+<div id="stageRegister" class="reg-container">
     <div class="form-wrapper">
         <div class="auth-card" id="authCard">
             <h3>✨ Пирамикс</h3>
-            <div class="input-group"><label>Никнейм</label><input type="text" id="nickname" placeholder="Введите ник" autocomplete="off"></div>
-            <div class="input-group" id="password1Group"><label>Пароль</label><input type="password" id="password1" placeholder="••••••••"></div>
-            <div class="input-group visible-password" id="password2Group"><label>Повторите пароль</label><input type="password" id="password2" placeholder="••••••••"></div>
+            <div class="input-group">
+                <label>Никнейм</label>
+                <input type="text" id="nickname" placeholder="Введите ник" autocomplete="off">
+            </div>
+            <div class="input-group" id="password1Group">
+                <label>Пароль</label>
+                <input type="password" id="password1" placeholder="••••••••">
+            </div>
+            <div class="input-group visible-password" id="password2Group">
+                <label>Повторите пароль</label>
+                <input type="password" id="password2" placeholder="••••••••">
+            </div>
             <div class="error-message" id="errorMessage">❌ Данные неверны</div>
             <button class="action-btn" id="actionButton">Зарегистрироваться</button>
-            <div class="switch-text" id="switchTextBlock">Если есть аккаунт, <span id="toggleModeLink">вход</span></div>
+            <div class="switch-text" id="switchTextBlock">
+                Если есть аккаунт, <span id="toggleModeLink">вход</span>
+            </div>
         </div>
     </div>
     <div class="stats-panel">
-        <div class="stat-item"><div class="stat-label">👥 Всего пользователей</div><div class="stat-value" id="totalUsers">146.353</div></div>
-        <div class="stat-item"><div class="stat-label">📅 Сегодня зарегистрировано</div><div class="stat-value" id="todayUsers">127</div></div>
-        <div class="stat-item"><div class="stat-label">💰 Всего выведено</div><div class="stat-value" id="totalWithdrawn">18.500 $</div></div>
+        <div class="stat-item">
+            <div class="stat-label">👥 Всего пользователей</div>
+            <div class="stat-value" id="regTotalUsers">146.353</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">📅 Сегодня зарегистрировано</div>
+            <div class="stat-value" id="regTodayUsers">127</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">💰 Всего выведено</div>
+            <div class="stat-value" id="regTotalWithdrawn">18.500 $</div>
+        </div>
     </div>
     <div class="info-section">
         <h2>5 линий рефералов</h2>
         <div class="subtitle">Ваш доход растёт с каждым уровнем</div>
         <div class="chart-container">
             <div class="chart-bars">
-                <div class="bar-wrapper"><span class="bar-percent">1%</span><div class="bar" style="height:30px;"></div><span class="bar-label">1 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">2%</span><div class="bar" style="height:55px;"></div><span class="bar-label">2 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">3%</span><div class="bar" style="height:80px;"></div><span class="bar-label">3 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">4%</span><div class="bar" style="height:105px;"></div><span class="bar-label">4 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">5%</span><div class="bar" style="height:130px;"></div><span class="bar-label">5 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">1%</span><div class="bar" style="height: 30px;"></div><span class="bar-label">1 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">2%</span><div class="bar" style="height: 55px;"></div><span class="bar-label">2 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">3%</span><div class="bar" style="height: 80px;"></div><span class="bar-label">3 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">4%</span><div class="bar" style="height: 105px;"></div><span class="bar-label">4 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">5%</span><div class="bar" style="height: 130px;"></div><span class="bar-label">5 ур.</span></div>
             </div>
             <div class="legend"><span>Процент от дохода рефералов</span></div>
         </div>
@@ -93,202 +801,74 @@
     </div>
 </div>
 
-<script>
-(function() {
-    const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
-    const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+<!-- ================= ЭТАП 2: ГЛАВНАЯ СТРАНИЦА ================= -->
+<div id="stageHome" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+    <header class="header">
+        <div class="logo">✨ Пирамикс</div>
+        <div class="header-right">
+            <span class="user-greeting" id="userGreeting">Привет, Пользователь</span>
+            <button class="btn-outline" id="profileBtn">👤 Профиль</button>
+            <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
+        </div>
+    </header>
 
-    const password2Group = document.getElementById('password2Group');
-    const actionButton = document.getElementById('actionButton');
-    const errorMessage = document.getElementById('errorMessage');
-    let isLoginMode = false;
+    <div class="dashboard">
+        <div class="card">
+            <h3>💰 Мой баланс</h3>
+            <div class="balance" id="balance">0.00 $</div>
+            <div class="stat-row">
+                <span class="stat-label">Заработано всего</span>
+                <span class="stat-value" id="totalEarned">0.00 $</span>
+            </div>
+            <button class="btn-primary" id="withdrawBtn" style="width:100%;">💸 Вывести средства</button>
+        </div>
 
-    function updateUIForMode() {
-        errorMessage.classList.remove('visible');
-        if (isLoginMode) {
-            password2Group.classList.remove('visible-password'); password2Group.classList.add('hidden-password');
-            actionButton.textContent = 'Войти';
-            document.getElementById('switchTextBlock').innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
-        } else {
-            password2Group.classList.remove('hidden-password'); password2Group.classList.add('visible-password');
-            actionButton.textContent = 'Зарегистрироваться';
-            document.getElementById('switchTextBlock').innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
-        }
-        document.getElementById('toggleModeLink').addEventListener('click', function(){ isLoginMode = !isLoginMode; updateUIForMode(); });
-    }
-    updateUIForMode();
+        <div class="card">
+            <h3>👥 Мои рефералы</h3>
+            <div class="stat-row"><span class="stat-label">1 уровень (1%)</span><span class="stat-value" id="lvl1">0 чел.</span><span class="stat-earn" id="earn1">0.00 $</span></div>
+            <div class="stat-row"><span class="stat-label">2 уровень (2%)</span><span class="stat-value" id="lvl2">0 чел.</span><span class="stat-earn" id="earn2">0.00 $</span></div>
+            <div class="stat-row"><span class="stat-label">3 уровень (3%)</span><span class="stat-value" id="lvl3">0 чел.</span><span class="stat-earn" id="earn3">0.00 $</span></div>
+            <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0 чел.</span><span class="stat-earn" id="earn4">0.00 $</span></div>
+            <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0 чел.</span><span class="stat-earn" id="earn5">0.00 $</span></div>
+        </div>
 
-    actionButton.addEventListener('click', async function(e) {
-        e.preventDefault();
-        const nickname = document.getElementById('nickname').value.trim();
-        const password = document.getElementById('password1').value;
-        errorMessage.classList.remove('visible');
-        if (!nickname || !password) return;
-
-        if (isLoginMode) {
-            const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
-            if (error || !data || !data.success) { errorMessage.textContent = '❌ Данные неверны'; errorMessage.classList.add('visible'); return; }
-            localStorage.setItem('pirxmix_user', JSON.stringify({ id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid, referral_code: data.referral_code, balance: data.balance }));
-            window.location.href = 'https://vds-game.ink/home';
-        } else {
-            const password2 = document.getElementById('password2').value;
-            if (password !== password2) { errorMessage.textContent = '❌ Пароли не совпадают'; errorMessage.classList.add('visible'); return; }
-            const urlParams = new URLSearchParams(window.location.search);
-            const refCode = urlParams.get('ref') || null;
-            const { data, error } = await supabase.rpc('register_user', { p_nickname: nickname, p_password: password, p_referral_code: refCode });
-            if (error || !data || !data.success) { errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации'); errorMessage.classList.add('visible'); return; }
-            localStorage.setItem('pirxmix_user', JSON.stringify({ id: data.user_id, nickname: data.nickname, vip_paid: false, referral_code: null, balance: 0 }));
-            window.location.href = 'https://vds-game.ink/home';
-        }
-    });
-
-    document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
-
-    async function loadStats() {
-        const { data } = await supabase.rpc('get_platform_stats');
-        if (data) {
-            document.getElementById('totalUsers').textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            document.getElementById('todayUsers').textContent = data.today_users;
-            document.getElementById('totalWithdrawn').textContent = data.total_withdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
-        }
-    }
-    loadStats();
-    setInterval(loadStats, 30000);
-})();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
-    <title>Пирамикс • Главная</title>
-    <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Получайте доход от приглашённых пользователей. Регистрируйтесь и зарабатывайте!">
-    <meta name="keywords" content="Пирамикс, реферальная программа, заработок, пирамида, рефералы, VIP статус, криптовалюта, вывод средств">
-    <meta property="og:title" content="Пирамикс — Реферальная программа">
-    <meta property="og:description" content="Зарабатывайте на рефералах с 5 уровнями глубины. Присоединяйтесь к Пирамикс!">
-    <meta property="og:type" content="website">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; overflow-x: hidden; }
-        body::before { content: ""; position: fixed; top: -30%; left: -10%; width: 70%; height: 70%; background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%); border-radius: 50%; z-index: 0; pointer-events: none; }
-        .header { width: 100%; max-width: 1300px; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(255, 215, 150, 0.2); margin-bottom: 2rem; position: relative; z-index: 2; flex-wrap: wrap; gap: 1rem; }
-        .logo { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #f9d56e, #e6a861); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .header-right { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
-        .user-greeting { color: #f5efe0; font-weight: 500; }
-        .btn-outline { background: transparent; border: 1px solid #c9a357; color: #e9c274; font-weight: 600; font-size: 0.9rem; padding: 0.5rem 1.5rem; border-radius: 2rem; cursor: pointer; transition: 0.25s; text-decoration: none; }
-        .btn-outline:hover { background: #f3b95b20; border-color: #f3b95b; color: #ffe6b3; box-shadow: 0 0 15px rgba(243, 185, 91, 0.3); }
-        .dashboard { width: 100%; max-width: 1300px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; position: relative; z-index: 2; margin-bottom: 2rem; }
-        .card { background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 1.8rem; padding: 1.8rem; border: 1px solid rgba(255, 215, 150, 0.15); color: #f5efe0; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-3px); border-color: rgba(243, 185, 91, 0.4); }
-        .card h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #e9c274; }
-        .balance { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .stat-row { display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0; font-size: 0.95rem; }
-        .stat-label { color: #9b927a; flex: 1; }
-        .stat-value { color: #f5d78c; font-weight: 600; text-align: right; min-width: 60px; }
-        .stat-earn { color: #4caf50; font-weight: 600; text-align: right; min-width: 60px; font-size: 0.85rem; }
-        .btn-primary { background: linear-gradient(135deg, #e2a542, #c7851e); border: none; color: #0f0e0a; font-weight: 700; font-size: 1rem; padding: 0.8rem 2rem; border-radius: 2.5rem; cursor: pointer; transition: 0.25s; box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35); width: 100%; margin-top: 0.5rem; }
-        .btn-primary:hover { background: linear-gradient(135deg, #f3b95b, #da9729); box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6); }
-        .btn-vip { background: linear-gradient(135deg, #c084fc, #7c3aed); border: none; color: #fff; font-weight: 700; font-size: 1rem; padding: 0.8rem 2rem; border-radius: 2.5rem; cursor: pointer; transition: 0.25s; box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); width: 100%; margin-top: 0.5rem; animation: glowPulse 2s infinite; }
-        @keyframes glowPulse { 0%, 100% { box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); } 50% { box-shadow: 0 8px 30px rgba(192, 132, 252, 0.7); } }
-        .btn-vip:hover { background: linear-gradient(135deg, #d8b4fe, #9333ea); }
-        .ref-link-box { display: none; }
-        .live-feed { width: 100%; max-width: 1300px; background: rgba(10, 12, 15, 0.8); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(230, 180, 70, 0.25); padding: 1.2rem 1.5rem; display: flex; gap: 1.5rem; z-index: 3; position: relative; }
-        .feed-half { flex: 1; min-width: 0; }
-        .feed-title { font-size: 0.9rem; font-weight: 600; color: #c9ad7a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem; }
-        .feed-list { display: flex; flex-direction: column; gap: 0.3rem; height: 220px; overflow: hidden; }
-        .feed-item { background: rgba(25, 22, 17, 0.6); border-radius: 1rem; padding: 0.5rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border: 1px solid rgba(212, 165, 60, 0.2); animation: fadeInUp 0.4s ease-out; }
-        @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
-        .feed-user { font-weight: 600; color: #f5d78c; }
-        .feed-time { color: #8b8a7a; font-size: 0.7rem; margin-left: 0.5rem; }
-        .feed-amount { font-weight: 700; }
-        .deposit .feed-amount { color: #4caf50; }
-        .withdraw .feed-amount { color: #ff7043; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal { background: rgba(20, 22, 27, 0.95); border: 1px solid rgba(255, 215, 150, 0.3); border-radius: 2rem; padding: 2rem; width: 90%; max-width: 450px; color: #f5efe0; animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1); }
-        @keyframes modalSlideIn { 0% { opacity: 0; transform: scale(0.85) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal h2 { margin-bottom: 1.5rem; color: #e9c274; }
-        .modal .input-group { margin-bottom: 1.2rem; }
-        .modal .input-group label { display: block; font-size: 0.8rem; color: #b9b09a; margin-bottom: 0.3rem; }
-        .modal .input-group input, .modal .input-group select { width: 100%; background: rgba(15, 16, 20, 0.8); border: 1px solid rgba(220, 180, 100, 0.25); border-radius: 1rem; padding: 0.8rem 1rem; color: #f5e7cc; outline: none; font-family: 'Inter', sans-serif; }
-        .modal .input-group select { appearance: none; cursor: pointer; }
-        .modal .input-group select option { background: #1a1c22; color: #f5e7cc; }
-        .modal .input-group input:focus, .modal .input-group select:focus { border-color: #f3b95b; }
-        .modal-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; }
-        .vip-info-box { background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1.2rem; margin: 1rem 0; text-align: center; border: 1px solid rgba(192, 132, 252, 0.3); }
-        .vip-price { font-size: 2rem; font-weight: 700; color: #c084fc; margin: 0.5rem 0; }
-        .vip-id { font-size: 1.4rem; font-weight: 600; color: #f5d78c; letter-spacing: 3px; margin: 0.5rem 0; }
-        .hidden { display: none !important; }
-        .footer { width: 100%; max-width: 1300px; text-align: center; padding: 1.5rem; margin-top: 1rem; z-index: 2; position: relative; }
-        .footer-link { color: #9b927a; font-size: 0.8rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
-        .footer-link:hover { color: #f3b95b; }
-        .policy-modal { max-width: 700px; max-height: 80vh; overflow-y: auto; text-align: left; line-height: 1.7; }
-        .policy-modal h2 { text-align: center; margin-bottom: 1.5rem; }
-        .policy-modal h3 { color: #e9c274; margin: 1.2rem 0 0.5rem; font-size: 1.1rem; }
-        .policy-modal p { color: #b9b09a; font-size: 0.85rem; margin-bottom: 0.8rem; }
-        .optional-label { color: #6b6352; font-size: 0.75rem; font-style: italic; }
-        @media (max-width: 768px) { .live-feed { flex-direction: column; } .feed-list { height: 150px; } .header { flex-direction: column; text-align: center; } .header-right { justify-content: center; } .balance { font-size: 2rem; } }
-    </style>
-</head>
-<body>
-
-<header class="header">
-    <div class="logo">✨ Пирамикс</div>
-    <div class="header-right">
-        <span class="user-greeting" id="userGreeting">Привет, Пользователь</span>
-        <button class="btn-outline" id="profileBtn">👤 Профиль</button>
-        <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
+        <div class="card">
+            <h3>📊 Статистика платформы</h3>
+            <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">146.353</span></div>
+            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">127</span></div>
+            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">18.500 $</span></div>
+            <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
+        </div>
     </div>
-</header>
 
-<div class="dashboard">
-    <div class="card">
-        <h3>💰 Мой баланс</h3>
-        <div class="balance" id="balance">0.00 $</div>
-        <div class="stat-row"><span class="stat-label">Заработано всего</span><span class="stat-value" id="totalEarned">0.00 $</span></div>
-        <button class="btn-primary" id="withdrawBtn">💸 Вывести средства</button>
+    <div class="live-feed">
+        <div class="feed-half deposit-feed">
+            <div class="feed-title">🟢 Последние пополнения</div>
+            <div class="feed-list" id="depositList"></div>
+        </div>
+        <div class="feed-half withdraw-feed">
+            <div class="feed-title">🔴 Последние выводы</div>
+            <div class="feed-list" id="withdrawList"></div>
+        </div>
     </div>
-    <div class="card">
-        <h3>👥 Мои рефералы</h3>
-        <div class="stat-row"><span class="stat-label">1 уровень (1%)</span><span class="stat-value" id="lvl1">0 чел.</span><span class="stat-earn" id="earn1">0.00 $</span></div>
-        <div class="stat-row"><span class="stat-label">2 уровень (2%)</span><span class="stat-value" id="lvl2">0 чел.</span><span class="stat-earn" id="earn2">0.00 $</span></div>
-        <div class="stat-row"><span class="stat-label">3 уровень (3%)</span><span class="stat-value" id="lvl3">0 чел.</span><span class="stat-earn" id="earn3">0.00 $</span></div>
-        <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0 чел.</span><span class="stat-earn" id="earn4">0.00 $</span></div>
-        <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0 чел.</span><span class="stat-earn" id="earn5">0.00 $</span></div>
-        <div class="ref-link-box"><input type="text" id="refLink" readonly><button class="copy-btn" id="copyRefBtn">📋 Копировать</button></div>
-    </div>
-    <div class="card">
-        <h3>📊 Статистика платформы</h3>
-        <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">146.353</span></div>
-        <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">127</span></div>
-        <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">18.500 $</span></div>
-        <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
+
+    <div class="footer">
+        <span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span>
     </div>
 </div>
 
-<div class="live-feed">
-    <div class="feed-half deposit-feed"><div class="feed-title">🟢 Последние пополнения</div><div class="feed-list" id="depositList"></div></div>
-    <div class="feed-half withdraw-feed"><div class="feed-title">🔴 Последние выводы</div><div class="feed-list" id="withdrawList"></div></div>
-</div>
-
-<div class="footer"><span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span></div>
-
+<!-- Модальные окна (скрыты по умолчанию) -->
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
-        <p style="color:#b9b09a;font-size:0.85rem;margin-bottom:1.2rem;">Минимальная сумма вывода: <strong style="color:#f5d78c;">1$</strong></p>
-        <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
+        <p style="color: #b9b09a; font-size: 0.85rem; margin-bottom: 1.2rem;">Минимальная сумма вывода: <strong style="color: #f5d78c;">1$</strong></p>
+        <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите криптовалюту --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
         <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="Минимум 1$" min="1" step="0.01"></div>
-        <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий..."></div>
-        <div class="modal-buttons"><button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button><button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button></div>
+        <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв..."></div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
+            <button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button>
+        </div>
     </div>
 </div>
 
@@ -296,122 +876,423 @@
     <div class="modal">
         <h2>👤 Профиль пользователя</h2>
         <div class="input-group"><label>Никнейм</label><input type="text" id="profileNickname"></div>
-        <div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Оставьте пустым"></div>
-        <div class="input-group"><label>Повторите новый пароль</label><input type="password" id="profilePassword2" placeholder="Оставьте пустым"></div>
-        <div class="modal-buttons"><button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button><button class="btn-outline" id="closeProfileBtn">❌ Отмена</button></div>
+        <div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете"></div>
+        <div class="input-group"><label>Повторите новый пароль</label><input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете"></div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
+            <button class="btn-outline" id="closeProfileBtn">❌ Отмена</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="vipModal">
     <div class="modal">
         <h2>👑 VIP статус</h2>
-        <div class="vip-info-box" id="vipInfoBox"><p style="color:#b9b09a;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color:#9b927a;font-size:0.85rem;margin-top:0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p></div>
-        <div class="modal-buttons"><button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button><button class="btn-outline" id="closeVipBtn">❌ Отмена</button></div>
+        <div class="vip-info-box" id="vipInfoBox">
+            <p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p>
+            <div class="vip-price">10$</div>
+            <p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button>
+            <button class="btn-outline" id="closeVipBtn">❌ Отмена</button>
+        </div>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="policyModal">
     <div class="modal policy-modal">
         <h2>📄 Политика конфиденциальности и правила пользования</h2>
-        <h3>1. Общие положения</h3><p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
-        <h3>2. Термины и определения</h3><p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
-        <h3>3. Регистрация и аккаунт</h3><p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p>
-        <h3>4. Реферальная программа</h3><p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>4.2. Реферальная программа имеет 5 уровней глубины.<br>4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p>
-        <h3>5. VIP статус</h3><p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
-        <h3>6. Вывод средств</h3><p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
-        <h3>7. Конфиденциальность</h3><p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
-        <h3>8. Ответственность</h3><p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>8.2. Пользователь обязуется использовать Платформу в законных целях.<br>8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
-        <h3>9. Изменения и дополнения</h3><p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>9.2. Изменения вступают в силу с момента публикации на Платформе.<br>9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
-        <h3>10. Контакты</h3><p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
-        <p style="text-align:center;color:#c9ad7a;margin-top:1.5rem;"><em>Последнее обновление: 2026 год</em></p>
-        <div class="modal-buttons" style="justify-content:center;"><button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button></div>
+        <h3>1. Общие положения</h3>
+        <p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
+        <h3>2. Термины и определения</h3>
+        <p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
+        <h3>3. Регистрация и аккаунт</h3>
+        <p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p>
+        <h3>4. Реферальная программа</h3>
+        <p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>4.2. Реферальная программа имеет 5 уровней глубины.<br>4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p>
+        <h3>5. VIP статус</h3>
+        <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
+        <h3>6. Вывод средств</h3>
+        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
+        <h3>7. Конфиденциальность</h3>
+        <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
+        <h3>8. Ответственность</h3>
+        <p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>8.2. Пользователь обязуется использовать Платформу в законных целях.<br>8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
+        <h3>9. Изменения и дополнения</h3>
+        <p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>9.2. Изменения вступают в силу с момента публикации на Платформе.<br>9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
+        <h3>10. Контакты</h3>
+        <p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
+        <p style="text-align: center; color: #c9ad7a; margin-top: 1.5rem;"><em>Последнее обновление: 2026 год</em></p>
+        <div class="modal-buttons" style="justify-content: center;">
+            <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
+        </div>
     </div>
 </div>
 
 <script>
-(function() {
-    const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
-    const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    (function() {
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ SUPABASE
+        // ============================================
+        const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+        const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-    if (!userData || !userData.id) { window.location.href = 'https://vds-game.ink/reg'; return; }
+        // DOM элементы этапов
+        const stageRegister = document.getElementById('stageRegister');
+        const stageHome = document.getElementById('stageHome');
 
-    document.getElementById('userGreeting').textContent = 'Привет, ' + userData.nickname;
-    document.getElementById('lvl1').textContent = '0 чел.'; document.getElementById('lvl2').textContent = '0 чел.';
-    document.getElementById('lvl3').textContent = '0 чел.'; document.getElementById('lvl4').textContent = '0 чел.';
-    document.getElementById('lvl5').textContent = '0 чел.';
-    document.getElementById('earn1').textContent = '0.00 $'; document.getElementById('earn2').textContent = '0.00 $';
-    document.getElementById('earn3').textContent = '0.00 $'; document.getElementById('earn4').textContent = '0.00 $';
-    document.getElementById('earn5').textContent = '0.00 $';
+        // ============================================
+        // ПРОВЕРКА АВТОРИЗАЦИИ И ОПРЕДЕЛЕНИЕ ЭТАПА
+        // ============================================
+        let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
 
-    // Никнеймы
-    const allNicks = ['Алексей','Мария','Дмитрий','Елена','Сергей','Ольга','Андрей','Татьяна','Николай','Анна','Владимир','Ирина','Павел','Наталья','Максим','Светлана','Роман','Юлия','Артём','Виктория','Иван петров','Мария сидорова','Пётр кузнецов','Екатерина смирнова','Александр попов','дарья Васильева','ольга Зайцева','никита Морозов','арина Соколова','тимофей Лебедев','Кристина волкова','Артур козлов','Диана новикова','Глеб егоров','Алиса фёдорова','сокол','волк','медведь','лиса','орёл','ястреб','барс','тигр','филин','ворон','Лунный Свет','Белый Клык','Чёрный Ворон','Золотой Орёл','Серебряный Лис','Красный Дракон','Синий Кит','Быстрый Ветер','Тихий Шёпот','Громкий Зов','Alexander','Victoria','Maxim','Svetlana','Dmitry','Natalie','Sergey','Ekaterina','Roman','Yulia','shadow','phoenix','dragon','wolf','eagle','hawk','tiger','raven','fox','bear','Dark Knight','Silver Fox','Golden Eagle','White Wolf','Black Raven','Red Phoenix','Blue Dragon','Swift Wind','Silent Shadow','Lucky Star','john smith','mary jones','peter brown','anna white','tom black','alice Green','bob Taylor','kate Wilson','mike Davis','lisa Moore'];
-    function rNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
-    function gTime() { return new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
-    function fNum(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+        function showStage(stage) {
+            if (stage === 'home') {
+                stageRegister.style.display = 'none';
+                stageHome.style.display = 'flex';
+                stageHome.classList.remove('hidden');
+                initHomeStage();
+            } else {
+                stageHome.style.display = 'none';
+                stageHome.classList.add('hidden');
+                stageRegister.style.display = 'flex';
+                initRegStage();
+            }
+        }
 
-    // Счётчики
-    let tUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 146353;
-    let tToday = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
-    let tWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
-    const tUsersEl = document.getElementById('totalUsers');
-    const tTodayEl = document.getElementById('todayUsers');
-    const tWithdrawnEl = document.getElementById('totalWithdrawn');
-    tUsersEl.textContent = fNum(tUsers); tTodayEl.textContent = tToday; tWithdrawnEl.textContent = fNum(tWithdrawn) + ' $';
+        if (userData && userData.id) {
+            showStage('home');
+        } else {
+            showStage('register');
+        }
 
-    function aVal(el, s, e, d, sf) { sf=sf||''; d=d||400; if(s===e){el.textContent=e+sf;return;} var r=e-s, inc=r>0?1:-1, st=Math.abs(Math.floor(d/Math.abs(r))), c=s; var t=setInterval(function(){c+=inc; el.textContent=(el===tUsersEl||el===tWithdrawnEl?fNum(c):c)+sf; if(c===e)clearInterval(t);}, st); }
-    function incU() { var o=tUsers; tUsers++; tToday++; localStorage.setItem('pirxmix_totalUsers',tUsers); localStorage.setItem('pirxmix_todayUsers',tToday); aVal(tUsersEl,o,tUsers,400); aVal(tTodayEl,tToday-1,tToday,400); }
-    function sInc() { setTimeout(function(){incU();sInc();}, Math.floor(Math.random()*20000)+5000); } sInc();
-    function mReset() { var n=new Date(), m=new Date(n); m.setHours(24,0,0,0); setTimeout(function(){tToday=0; localStorage.setItem('pirxmix_todayUsers','0'); tTodayEl.textContent='0'; mReset();}, m-n); } mReset();
+        // ============================================
+        // ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД
+        // ============================================
+        function initRegStage() {
+            const password2Group = document.getElementById('password2Group');
+            const actionButton = document.getElementById('actionButton');
+            const toggleModeLink = document.getElementById('toggleModeLink');
+            const switchTextBlock = document.getElementById('switchTextBlock');
+            const errorMessage = document.getElementById('errorMessage');
+            let isLoginMode = false;
 
-    // Транзакции (генерируются в коде)
-    const depList = document.getElementById('depositList');
-    const witList = document.getElementById('withdrawList');
-    const MAX = 10;
-    function addDep() { var it=document.createElement('div'); it.className='feed-item deposit'; it.innerHTML='<span><span class="feed-user">'+rNick()+'</span><span class="feed-time">'+gTime()+'</span></span><span class="feed-amount">10$</span>'; depList.prepend(it); while(depList.children.length>MAX)depList.removeChild(depList.lastChild); }
-    function addWit() { var amt=Math.floor(Math.random()*168)+1; var it=document.createElement('div'); it.className='feed-item withdraw'; it.innerHTML='<span><span class="feed-user">'+rNick()+'</span><span class="feed-time">'+gTime()+'</span></span><span class="feed-amount">'+amt+'$</span>'; witList.prepend(it); while(witList.children.length>MAX)witList.removeChild(witList.lastChild); var ow=tWithdrawn; tWithdrawn+=amt; localStorage.setItem('pirxmix_totalWithdrawn',tWithdrawn); aVal(tWithdrawnEl,ow,tWithdrawn,500,' $'); }
-    for(var i=0;i<MAX;i++){addDep();addWit();}
-    function gTx(){if(Math.random()<0.5)addDep();else addWit();setTimeout(gTx,Math.floor(Math.random()*105000)+25000);}
-    setTimeout(gTx,25000);
+            function updateUIForMode() {
+                errorMessage.classList.remove('visible');
+                if (isLoginMode) {
+                    password2Group.classList.remove('visible-password');
+                    password2Group.classList.add('hidden-password');
+                    actionButton.textContent = 'Войти';
+                    switchTextBlock.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
+                    document.getElementById('toggleModeLink').addEventListener('click', switchToRegister);
+                } else {
+                    password2Group.classList.remove('hidden-password');
+                    password2Group.classList.add('visible-password');
+                    actionButton.textContent = 'Зарегистрироваться';
+                    switchTextBlock.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
+                    document.getElementById('toggleModeLink').addEventListener('click', switchToLogin);
+                }
+            }
 
-    // Загрузка из БД
-    async function lUD(){var d=await supabase.rpc('get_user_by_id',{p_user_id:userData.id});if(d.data&&d.data.success){document.getElementById('balance').textContent=parseFloat(d.data.balance).toFixed(2)+' $';document.getElementById('totalEarned').textContent=(parseFloat(d.data.balance)*1.2).toFixed(2)+' $';localStorage.setItem('pirxmix_balance',d.data.balance);if(d.data.vip_paid){localStorage.setItem('pirxmix_vip','true');if(d.data.referral_code)localStorage.setItem('pirxmix_vip_id',d.data.referral_code);}}}
-    async function lRef(){var d=await supabase.rpc('get_user_referrals',{p_user_id:userData.id});if(d.data){document.getElementById('lvl1').textContent=(d.data.level_1?.count||0)+' чел.';document.getElementById('lvl2').textContent=(d.data.level_2?.count||0)+' чел.';document.getElementById('lvl3').textContent=(d.data.level_3?.count||0)+' чел.';document.getElementById('lvl4').textContent=(d.data.level_4?.count||0)+' чел.';document.getElementById('lvl5').textContent=(d.data.level_5?.count||0)+' чел.';}}
-    lUD();lRef();setInterval(function(){lUD();lRef();},30000);
+            function switchToLogin() { isLoginMode = true; updateUIForMode(); }
+            function switchToRegister() { isLoginMode = false; updateUIForMode(); }
+            updateUIForMode();
 
-    // Вывод
-    var wModal=document.getElementById('withdrawModal');
-    document.getElementById('withdrawBtn').addEventListener('click',function(){document.getElementById('withdrawCrypto').value='';document.getElementById('withdrawAmount').value='';document.getElementById('withdrawComment').value='';wModal.classList.remove('hidden');});
-    document.getElementById('closeWithdrawBtn').addEventListener('click',function(){wModal.classList.add('hidden');});
-    wModal.addEventListener('click',function(e){if(e.target===wModal)wModal.classList.add('hidden');});
-    document.getElementById('confirmWithdrawBtn').addEventListener('click',async function(){var cr=document.getElementById('withdrawCrypto').value,am=parseFloat(document.getElementById('withdrawAmount').value),cm=document.getElementById('withdrawComment').value.trim();if(!cr||!am||am<1)return;var bal=parseFloat(localStorage.getItem('pirxmix_balance'))||0;if(am>bal)return;var r=await supabase.rpc('withdraw_funds',{p_user_id:userData.id,p_amount:am,p_crypto_type:cr,p_comment:cm||null});if(!r.error&&r.data&&r.data.success){await lUD();}wModal.classList.add('hidden');});
+            actionButton.addEventListener('click', async function(e) {
+                e.preventDefault();
+                const nickname = document.getElementById('nickname').value.trim();
+                const password = document.getElementById('password1').value;
+                errorMessage.classList.remove('visible');
+                if (!nickname || !password) return;
 
-    // VIP
-    var vModal=document.getElementById('vipModal'),vBox=document.getElementById('vipInfoBox'),vBtn=document.getElementById('confirmVipBtn');
-    function uVip(id){vBox.innerHTML='<p style="color:#4caf50;font-weight:600;">✅ VIP статус активирован!</p><p style="color:#b9b09a;font-size:0.85rem;">Ваш уникальный ID:</p><div class="vip-id">'+id+'</div><p style="color:#b9b09a;font-size:0.85rem;margin-top:0.5rem;">Реферальная ссылка:</p><p style="color:#f5d78c;font-size:0.8rem;word-break:break-all;">https://vds-game.ink/reg?ref='+id+'</p>';}
-    document.getElementById('vipBtn').addEventListener('click',async function(){var d=await supabase.rpc('get_user_by_id',{p_user_id:userData.id});if(d.data&&d.data.vip_paid){uVip(d.data.referral_code);vBtn.style.display='none';}else{vBox.innerHTML='<p style="color:#b9b09a;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color:#9b927a;font-size:0.85rem;margin-top:0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';vBtn.style.display='inline-block';}vModal.classList.remove('hidden');});
-    document.getElementById('closeVipBtn').addEventListener('click',function(){vModal.classList.add('hidden');});
-    vModal.addEventListener('click',function(e){if(e.target===vModal)vModal.classList.add('hidden');});
-    vBtn.addEventListener('click',async function(){var r=await supabase.rpc('purchase_vip',{p_user_id:userData.id});if(!r.error&&r.data&&r.data.success){uVip(r.data.referral_code);vBtn.style.display='none';await lUD();}});
+                if (isLoginMode) {
+                    const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
+                    if (error || !data || !data.success) {
+                        errorMessage.textContent = '❌ Данные неверны';
+                        errorMessage.classList.add('visible');
+                        return;
+                    }
+                    localStorage.setItem('pirxmix_user', JSON.stringify({
+                        id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid,
+                        referral_code: data.referral_code, balance: data.balance
+                    }));
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+                    showStage('home');
+                } else {
+                    const password2 = document.getElementById('password2').value;
+                    if (password !== password2) {
+                        errorMessage.textContent = '❌ Пароли не совпадают';
+                        errorMessage.classList.add('visible');
+                        return;
+                    }
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const refCode = urlParams.get('ref') || null;
+                    const { data, error } = await supabase.rpc('register_user', {
+                        p_nickname: nickname, p_password: password, p_referral_code: refCode
+                    });
+                    if (error || !data || !data.success) {
+                        errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
+                        errorMessage.classList.add('visible');
+                        return;
+                    }
+                    localStorage.setItem('pirxmix_user', JSON.stringify({
+                        id: data.user_id, nickname: data.nickname, vip_paid: false,
+                        referral_code: null, balance: 0
+                    }));
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+                    showStage('home');
+                }
+            });
 
-    // Профиль
-    var pModal=document.getElementById('profileModal');
-    document.getElementById('profileBtn').addEventListener('click',function(){document.getElementById('profileNickname').value=userData.nickname;document.getElementById('profilePassword').value='';document.getElementById('profilePassword2').value='';pModal.classList.remove('hidden');});
-    document.getElementById('closeProfileBtn').addEventListener('click',function(){pModal.classList.add('hidden');});
-    pModal.addEventListener('click',function(e){if(e.target===pModal)pModal.classList.add('hidden');});
-    document.getElementById('saveProfileBtn').addEventListener('click',function(){var nn=document.getElementById('profileNickname').value.trim();if(!nn)return;userData.nickname=nn;localStorage.setItem('pirxmix_user',JSON.stringify(userData));document.getElementById('userGreeting').textContent='Привет, '+nn;pModal.classList.add('hidden');});
+            document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
+            loadRegStats();
+            loadTransactions('reg');
+        }
 
-    // Выход
-    document.getElementById('logoutBtn').addEventListener('click',function(){localStorage.removeItem('pirxmix_user');window.location.href='https://vds-game.ink/reg';});
+        async function loadRegStats() {
+            const { data, error } = await supabase.rpc('get_platform_stats');
+            if (data && !error) {
+                document.getElementById('regTotalUsers').textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                document.getElementById('regTodayUsers').textContent = data.today_users;
+                document.getElementById('regTotalWithdrawn').textContent = data.total_withdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+            }
+        }
 
-    // Политика
-    var polModal=document.getElementById('policyModal');
-    document.getElementById('policyLink').addEventListener('click',function(){polModal.classList.remove('hidden');});
-    document.getElementById('closePolicyBtn').addEventListener('click',function(){polModal.classList.add('hidden');});
-    polModal.addEventListener('click',function(e){if(e.target===polModal)polModal.classList.add('hidden');});
+        // ============================================
+        // ЭТАП 2: ГЛАВНАЯ СТРАНИЦА
+        // ============================================
+        function initHomeStage() {
+            if (!userData || !userData.id) {
+                showStage('register');
+                return;
+            }
 
-})();
+            document.getElementById('userGreeting').textContent = 'Привет, ' + userData.nickname;
+            document.getElementById('lvl1').textContent = '0 чел.';
+            document.getElementById('lvl2').textContent = '0 чел.';
+            document.getElementById('lvl3').textContent = '0 чел.';
+            document.getElementById('lvl4').textContent = '0 чел.';
+            document.getElementById('lvl5').textContent = '0 чел.';
+            document.getElementById('earn1').textContent = '0.00 $';
+            document.getElementById('earn2').textContent = '0.00 $';
+            document.getElementById('earn3').textContent = '0.00 $';
+            document.getElementById('earn4').textContent = '0.00 $';
+            document.getElementById('earn5').textContent = '0.00 $';
+
+            loadUserData();
+            loadReferrals();
+            loadTransactions('home');
+            initCounters();
+            initModals();
+
+            setInterval(() => {
+                loadUserData();
+                loadReferrals();
+            }, 30000);
+        }
+
+        async function loadUserData() {
+            const { data, error } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
+            if (data && data.success) {
+                document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
+                document.getElementById('totalEarned').textContent = (parseFloat(data.balance) * 1.2).toFixed(2) + ' $';
+                localStorage.setItem('pirxmix_balance', data.balance);
+                if (data.vip_paid) {
+                    localStorage.setItem('pirxmix_vip', 'true');
+                    if (data.referral_code) localStorage.setItem('pirxmix_vip_id', data.referral_code);
+                }
+            }
+        }
+
+        async function loadReferrals() {
+            const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
+            if (data) {
+                document.getElementById('lvl1').textContent = (data.level_1?.count || 0) + ' чел.';
+                document.getElementById('lvl2').textContent = (data.level_2?.count || 0) + ' чел.';
+                document.getElementById('lvl3').textContent = (data.level_3?.count || 0) + ' чел.';
+                document.getElementById('lvl4').textContent = (data.level_4?.count || 0) + ' чел.';
+                document.getElementById('lvl5').textContent = (data.level_5?.count || 0) + ' чел.';
+            }
+        }
+
+        function initCounters() {
+            let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 146353;
+            let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
+            let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
+
+            const totalUsersEl = document.getElementById('totalUsers');
+            const todayUsersEl = document.getElementById('todayUsers');
+            const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+
+            totalUsersEl.textContent = totalUsers.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            todayUsersEl.textContent = todayUsers;
+            totalWithdrawnEl.textContent = totalWithdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+
+            function scheduleIncrement() {
+                setTimeout(() => {
+                    totalUsers++;
+                    todayUsers++;
+                    localStorage.setItem('pirxmix_totalUsers', totalUsers);
+                    localStorage.setItem('pirxmix_todayUsers', todayUsers);
+                    totalUsersEl.textContent = totalUsers.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    todayUsersEl.textContent = todayUsers;
+                    scheduleIncrement();
+                }, Math.floor(Math.random() * 20000) + 5000);
+            }
+            scheduleIncrement();
+        }
+
+        function initModals() {
+            // Выход
+            document.getElementById('logoutBtn').onclick = () => {
+                localStorage.removeItem('pirxmix_user');
+                window.location.reload();
+            };
+
+            // Политика
+            document.getElementById('policyLink').onclick = () => document.getElementById('policyModal').classList.remove('hidden');
+            document.getElementById('closePolicyBtn').onclick = () => document.getElementById('policyModal').classList.add('hidden');
+            document.getElementById('policyModal').onclick = (e) => { if (e.target === document.getElementById('policyModal')) document.getElementById('policyModal').classList.add('hidden'); };
+
+            // Профиль
+            document.getElementById('profileBtn').onclick = () => {
+                document.getElementById('profileNickname').value = userData.nickname;
+                document.getElementById('profilePassword').value = '';
+                document.getElementById('profilePassword2').value = '';
+                document.getElementById('profileModal').classList.remove('hidden');
+            };
+            document.getElementById('closeProfileBtn').onclick = () => document.getElementById('profileModal').classList.add('hidden');
+            document.getElementById('profileModal').onclick = (e) => { if (e.target === document.getElementById('profileModal')) document.getElementById('profileModal').classList.add('hidden'); };
+            document.getElementById('saveProfileBtn').onclick = () => {
+                const newNickname = document.getElementById('profileNickname').value.trim();
+                if (!newNickname) return;
+                userData.nickname = newNickname;
+                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
+                document.getElementById('userGreeting').textContent = 'Привет, ' + newNickname;
+                document.getElementById('profileModal').classList.add('hidden');
+            };
+
+            // Вывод средств
+            document.getElementById('withdrawBtn').onclick = () => {
+                document.getElementById('withdrawCrypto').value = '';
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('withdrawComment').value = '';
+                document.getElementById('withdrawModal').classList.remove('hidden');
+            };
+            document.getElementById('closeWithdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.add('hidden');
+            document.getElementById('withdrawModal').onclick = (e) => { if (e.target === document.getElementById('withdrawModal')) document.getElementById('withdrawModal').classList.add('hidden'); };
+            document.getElementById('confirmWithdrawBtn').onclick = async () => {
+                const crypto = document.getElementById('withdrawCrypto').value;
+                const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                if (!crypto || !amount || amount < 1) return;
+                const { data, error } = await supabase.rpc('withdraw_funds', {
+                    p_user_id: userData.id, p_amount: amount, p_crypto_type: crypto, p_comment: document.getElementById('withdrawComment').value.trim() || null
+                });
+                if (!error && data && data.success) await loadUserData();
+                document.getElementById('withdrawModal').classList.add('hidden');
+            };
+
+            // VIP
+            document.getElementById('vipBtn').onclick = async () => {
+                const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
+                const vipInfoBox = document.getElementById('vipInfoBox');
+                const confirmVipBtn = document.getElementById('confirmVipBtn');
+                if (data && data.vip_paid) {
+                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=' + data.referral_code + '</p>';
+                    confirmVipBtn.style.display = 'none';
+                } else {
+                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.5rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.85rem; margin-top: 0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';
+                    confirmVipBtn.style.display = 'inline-block';
+                }
+                document.getElementById('vipModal').classList.remove('hidden');
+            };
+            document.getElementById('closeVipBtn').onclick = () => document.getElementById('vipModal').classList.add('hidden');
+            document.getElementById('vipModal').onclick = (e) => { if (e.target === document.getElementById('vipModal')) document.getElementById('vipModal').classList.add('hidden'); };
+            document.getElementById('confirmVipBtn').onclick = async () => {
+                const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
+                if (!error && data && data.success) {
+                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.5rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.85rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.85rem; margin-top: 0.5rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.8rem; word-break: break-all;">https://vds-game.ink/reg?ref=' + data.referral_code + '</p>';
+                    document.getElementById('confirmVipBtn').style.display = 'none';
+                    await loadUserData();
+                }
+            };
+        }
+
+        // ============================================
+        // ОБЩАЯ ФУНКЦИЯ ЗАГРУЗКИ ТРАНЗАКЦИЙ
+        // ============================================
+        const allNicks = [
+            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
+            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
+            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
+            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
+            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
+            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
+            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
+            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
+            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
+            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
+            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
+            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
+            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
+            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore'
+        ];
+
+        function randomNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
+        function getCurrentTime() { return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+
+        function loadTransactions(stage) {
+            const depositList = document.getElementById('depositList');
+            const withdrawList = document.getElementById('withdrawList');
+            if (!depositList || !withdrawList) return;
+
+            depositList.innerHTML = '';
+            withdrawList.innerHTML = '';
+            const MAX_ITEMS = 10;
+
+            for (let i = 0; i < MAX_ITEMS; i++) {
+                const depItem = document.createElement('div');
+                depItem.className = 'feed-item deposit';
+                depItem.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">10$</span>';
+                depositList.appendChild(depItem);
+
+                const witAmount = Math.floor(Math.random() * 168) + 1;
+                const witItem = document.createElement('div');
+                witItem.className = 'feed-item withdraw';
+                witItem.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + witAmount + '$</span>';
+                withdrawList.appendChild(witItem);
+            }
+
+            if (stage === 'home') {
+                function generateTransaction() {
+                    if (Math.random() < 0.5) {
+                        const item = document.createElement('div');
+                        item.className = 'feed-item deposit';
+                        item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">10$</span>';
+                        depositList.prepend(item);
+                        if (depositList.children.length > MAX_ITEMS) depositList.removeChild(depositList.lastChild);
+                    } else {
+                        const amount = Math.floor(Math.random() * 168) + 1;
+                        const item = document.createElement('div');
+                        item.className = 'feed-item withdraw';
+                        item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + amount + '$</span>';
+                        withdrawList.prepend(item);
+                        if (withdrawList.children.length > MAX_ITEMS) withdrawList.removeChild(withdrawList.lastChild);
+                    }
+                    setTimeout(generateTransaction, Math.floor(Math.random() * 105000) + 25000);
+                }
+                setTimeout(generateTransaction, 25000);
+            }
+        }
+
+        // Обновление статистики регистрации раз в 30 секунд
+        setInterval(() => {
+            if (stageRegister.style.display !== 'none') loadRegStats();
+        }, 30000);
+
+    })();
 </script>
 </body>
 </html>
