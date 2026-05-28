@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -678,14 +679,25 @@
 
 <script>
     (function() {
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ SUPABASE
+        // ============================================
+        const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+        const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // ============================================
+        // ПРОВЕРКА АВТОРИЗАЦИИ
+        // ============================================
         const userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-        if (!userData || !userData.nickname) {
+        if (!userData || !userData.id) {
             window.location.href = 'https://vds-game.ink/reg';
             return;
         }
 
         document.getElementById('userGreeting').textContent = `Привет, ${userData.nickname}`;
 
+        // Начальные значения рефералов
         document.getElementById('lvl1').textContent = '0 чел.';
         document.getElementById('lvl2').textContent = '0 чел.';
         document.getElementById('lvl3').textContent = '0 чел.';
@@ -697,11 +709,39 @@
         document.getElementById('earn4').textContent = '0.00 $';
         document.getElementById('earn5').textContent = '0.00 $';
 
-        const savedBalance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
-        document.getElementById('balance').textContent = savedBalance.toFixed(2) + ' $';
-        document.getElementById('totalEarned').textContent = (savedBalance * 1.2).toFixed(2) + ' $';
+        // ============================================
+        // ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ИЗ SUPABASE
+        // ============================================
+        async function loadUserData() {
+            const { data, error } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
+            if (data && data.success) {
+                document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
+                document.getElementById('totalEarned').textContent = (parseFloat(data.balance) * 1.2).toFixed(2) + ' $';
+                localStorage.setItem('pirxmix_balance', data.balance);
+                if (data.vip_paid) {
+                    localStorage.setItem('pirxmix_vip', 'true');
+                    if (data.referral_code) localStorage.setItem('pirxmix_vip_id', data.referral_code);
+                }
+            }
+        }
 
-        // Вывод средств — модальное окно
+        // ============================================
+        // ЗАГРУЗКА РЕФЕРАЛОВ ИЗ SUPABASE
+        // ============================================
+        async function loadReferrals() {
+            const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
+            if (data) {
+                document.getElementById('lvl1').textContent = (data.level_1?.count || 0) + ' чел.';
+                document.getElementById('lvl2').textContent = (data.level_2?.count || 0) + ' чел.';
+                document.getElementById('lvl3').textContent = (data.level_3?.count || 0) + ' чел.';
+                document.getElementById('lvl4').textContent = (data.level_4?.count || 0) + ' чел.';
+                document.getElementById('lvl5').textContent = (data.level_5?.count || 0) + ' чел.';
+            }
+        }
+
+        // ============================================
+        // ВЫВОД СРЕДСТВ
+        // ============================================
         const withdrawModal = document.getElementById('withdrawModal');
         
         document.getElementById('withdrawBtn').addEventListener('click', function() {
@@ -719,7 +759,7 @@
             if (e.target === withdrawModal) withdrawModal.classList.add('hidden');
         });
 
-        document.getElementById('confirmWithdrawBtn').addEventListener('click', function() {
+        document.getElementById('confirmWithdrawBtn').addEventListener('click', async function() {
             const crypto = document.getElementById('withdrawCrypto').value;
             const amount = parseFloat(document.getElementById('withdrawAmount').value);
             const comment = document.getElementById('withdrawComment').value.trim();
@@ -729,16 +769,26 @@
             
             const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
             if (amount > balance) return;
-            
-            const newBalance = balance - amount;
-            localStorage.setItem('pirxmix_balance', newBalance.toString());
-            document.getElementById('balance').textContent = newBalance.toFixed(2) + ' $';
-            document.getElementById('totalEarned').textContent = (newBalance * 1.2).toFixed(2) + ' $';
+
+            const { data, error } = await supabase.rpc('withdraw_funds', {
+                p_user_id: userData.id,
+                p_amount: amount,
+                p_crypto_type: crypto,
+                p_comment: comment || null
+            });
+
+            if (!error && data && data.success) {
+                await loadUserData();
+                await loadStats();
+                await loadTransactions();
+            }
             
             withdrawModal.classList.add('hidden');
         });
 
-        // VIP модальное окно
+        // ============================================
+        // VIP
+        // ============================================
         const vipModal = document.getElementById('vipModal');
         const vipInfoBox = document.getElementById('vipInfoBox');
         const confirmVipBtn = document.getElementById('confirmVipBtn');
@@ -753,11 +803,10 @@
             `;
         }
 
-        document.getElementById('vipBtn').addEventListener('click', function() {
-            const isVip = localStorage.getItem('pirxmix_vip') === 'true';
-            if (isVip) {
-                const vipId = localStorage.getItem('pirxmix_vip_id') || '--------';
-                updateVipBox(vipId);
+        document.getElementById('vipBtn').addEventListener('click', async function() {
+            const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
+            if (data && data.vip_paid) {
+                updateVipBox(data.referral_code);
                 confirmVipBtn.style.display = 'none';
             } else {
                 vipInfoBox.innerHTML = `
@@ -780,31 +829,18 @@
             if (e.target === vipModal) vipModal.classList.add('hidden');
         });
 
-        confirmVipBtn.addEventListener('click', function() {
-            const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
-            if (balance < 10) return;
-            
-            const newBalance = balance - 10;
-            localStorage.setItem('pirxmix_balance', newBalance.toString());
-            document.getElementById('balance').textContent = newBalance.toFixed(2) + ' $';
-            document.getElementById('totalEarned').textContent = (newBalance * 1.2).toFixed(2) + ' $';
-            
-            const vipId = Math.floor(10000000 + Math.random() * 90000000).toString();
-            localStorage.setItem('pirxmix_vip', 'true');
-            localStorage.setItem('pirxmix_vip_id', vipId);
-            
-            updateVipBox(vipId);
-            confirmVipBtn.style.display = 'none';
+        confirmVipBtn.addEventListener('click', async function() {
+            const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
+            if (!error && data && data.success) {
+                updateVipBox(data.referral_code);
+                confirmVipBtn.style.display = 'none';
+                await loadUserData();
+            }
         });
 
-        const isVip = localStorage.getItem('pirxmix_vip') === 'true';
-        if (isVip) {
-            const vipId = localStorage.getItem('pirxmix_vip_id') || '--------';
-            updateVipBox(vipId);
-            confirmVipBtn.style.display = 'none';
-        }
-
-        // Профиль
+        // ============================================
+        // ПРОФИЛЬ
+        // ============================================
         const profileModal = document.getElementById('profileModal');
         document.getElementById('profileBtn').addEventListener('click', function() {
             document.getElementById('profileNickname').value = userData.nickname;
@@ -824,19 +860,24 @@
             const newPass2 = document.getElementById('profilePassword2').value;
             if (!newNickname) return;
             if (newPass && newPass !== newPass2) return;
-            const updatedUser = { nickname: newNickname, password: newPass || userData.password };
+            const updatedUser = { id: userData.id, nickname: newNickname, password: newPass || userData.password, vip_paid: userData.vip_paid, referral_code: userData.referral_code, balance: userData.balance };
             localStorage.setItem('pirxmix_user', JSON.stringify(updatedUser));
             userData.nickname = newNickname;
             document.getElementById('userGreeting').textContent = `Привет, ${newNickname}`;
             profileModal.classList.add('hidden');
         });
 
+        // ============================================
+        // ВЫХОД
+        // ============================================
         document.getElementById('logoutBtn').addEventListener('click', function() {
             localStorage.removeItem('pirxmix_user');
             window.location.href = 'https://vds-game.ink/reg';
         });
 
-        // Политика
+        // ============================================
+        // ПОЛИТИКА
+        // ============================================
         const policyModal = document.getElementById('policyModal');
         document.getElementById('policyLink').addEventListener('click', function() {
             policyModal.classList.remove('hidden');
@@ -848,176 +889,67 @@
             if (e.target === policyModal) policyModal.classList.add('hidden');
         });
 
-        // Счётчики с сохранением в localStorage
-        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 24344;
-        let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
-        let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
-
-        document.getElementById('totalUsers').textContent = totalUsers;
-        document.getElementById('todayUsers').textContent = todayUsers;
-        document.getElementById('totalWithdrawn').textContent = totalWithdrawn + ' $';
-
-        function animateValue(element, start, end, duration, suffix = '') {
-            duration = duration || 600;
-            if (start === end) { element.textContent = end + suffix; return; }
-            const range = end - start;
-            const increment = range > 0 ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
-            let current = start;
-            const timer = setInterval(function() {
-                current += increment;
-                element.textContent = current + suffix;
-                if (current === end) clearInterval(timer);
-            }, stepTime);
+        // ============================================
+        // ЗАГРУЗКА СТАТИСТИКИ ИЗ SUPABASE
+        // ============================================
+        async function loadStats() {
+            const { data, error } = await supabase.rpc('get_platform_stats');
+            if (data) {
+                document.getElementById('totalUsers').textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                document.getElementById('todayUsers').textContent = data.today_users;
+                document.getElementById('totalWithdrawn').textContent = data.total_withdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+            }
         }
 
-        function incrementUsers() {
-            const oldTotal = totalUsers;
-            totalUsers++;
-            todayUsers++;
-            localStorage.setItem('pirxmix_totalUsers', totalUsers);
-            localStorage.setItem('pirxmix_todayUsers', todayUsers);
-            animateValue(document.getElementById('totalUsers'), oldTotal, totalUsers, 400);
-            animateValue(document.getElementById('todayUsers'), todayUsers - 1, todayUsers, 400);
-        }
-
-        function scheduleNextIncrement() {
-            const delay = Math.floor(Math.random() * 20000) + 5000;
-            setTimeout(function() {
-                incrementUsers();
-                scheduleNextIncrement();
-            }, delay);
-        }
-        scheduleNextIncrement();
-
-        function scheduleMidnightReset() {
-            const now = new Date();
-            const midnight = new Date(now);
-            midnight.setHours(24, 0, 0, 0);
-            const msToMidnight = midnight.getTime() - now.getTime();
-            setTimeout(function() {
-                todayUsers = 0;
-                localStorage.setItem('pirxmix_todayUsers', '0');
-                document.getElementById('todayUsers').textContent = '0';
-                scheduleMidnightReset();
-            }, msToMidnight);
-        }
-        scheduleMidnightReset();
-
-        // Лента транзакций с сохранением в localStorage
-        const depositList = document.getElementById('depositList');
-        const withdrawList = document.getElementById('withdrawList');
-        const MAX_ITEMS = 10;
-
-        const allNicks = [
-            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
-            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
-            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
-            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
-            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
-            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
-            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
-            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
-            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
-            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
-            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
-            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore'
-        ];
-
-        function randomNick() {
-            return allNicks[Math.floor(Math.random() * allNicks.length)];
-        }
-
-        function getCurrentTime() {
-            return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        function getRandomWithdrawAmount() {
-            return Math.floor(Math.random() * 168) + 1;
-        }
-
-        function saveTransactions() {
-            const deposits = [];
-            const withdraws = [];
-            depositList.querySelectorAll('.feed-item').forEach(item => {
-                deposits.push(item.innerHTML);
-            });
-            withdrawList.querySelectorAll('.feed-item').forEach(item => {
-                withdraws.push(item.innerHTML);
-            });
-            localStorage.setItem('pirxmix_deposits', JSON.stringify(deposits));
-            localStorage.setItem('pirxmix_withdraws', JSON.stringify(withdraws));
-        }
-
-        function loadTransactions() {
-            const savedDeposits = JSON.parse(localStorage.getItem('pirxmix_deposits') || '[]');
-            const savedWithdraws = JSON.parse(localStorage.getItem('pirxmix_withdraws') || '[]');
+        // ============================================
+        // ЗАГРУЗКА ТРАНЗАКЦИЙ ИЗ SUPABASE
+        // ============================================
+        async function loadTransactions() {
+            const depositList = document.getElementById('depositList');
+            const withdrawList = document.getElementById('withdrawList');
+            depositList.innerHTML = '';
+            withdrawList.innerHTML = '';
             
-            savedDeposits.forEach(html => {
-                const item = document.createElement('div');
-                item.className = 'feed-item deposit';
-                item.innerHTML = html;
-                depositList.appendChild(item);
-            });
+            const { data: deposits } = await supabase.rpc('get_recent_transactions', { p_type: 'deposit', p_limit: 10 });
+            if (deposits) {
+                deposits.forEach(t => {
+                    const item = document.createElement('div');
+                    item.className = 'feed-item deposit';
+                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    item.innerHTML = '<span><span class="feed-user">' + t.nickname + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">' + t.amount + '$</span>';
+                    depositList.appendChild(item);
+                });
+            }
             
-            savedWithdraws.forEach(html => {
-                const item = document.createElement('div');
-                item.className = 'feed-item withdraw';
-                item.innerHTML = html;
-                withdrawList.appendChild(item);
-            });
-
-            while (depositList.children.length > MAX_ITEMS) {
-                depositList.removeChild(depositList.lastChild);
-            }
-            while (withdrawList.children.length > MAX_ITEMS) {
-                withdrawList.removeChild(withdrawList.lastChild);
+            const { data: withdrawals } = await supabase.rpc('get_recent_transactions', { p_type: 'withdraw', p_limit: 10 });
+            if (withdrawals) {
+                withdrawals.forEach(t => {
+                    const item = document.createElement('div');
+                    item.className = 'feed-item withdraw';
+                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    item.innerHTML = '<span><span class="feed-user">' + t.nickname + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">' + t.amount + '$</span>';
+                    withdrawList.appendChild(item);
+                });
             }
         }
 
-        function addTransaction(container, type) {
-            const item = document.createElement('div');
-            item.className = 'feed-item ' + type;
-            const amount = type === 'deposit' ? 10 : getRandomWithdrawAmount();
-            item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + amount + '$</span>';
-            container.insertBefore(item, container.firstChild);
-            while (container.children.length > MAX_ITEMS) {
-                container.removeChild(container.lastChild);
-            }
-            if (type === 'withdraw') {
-                const oldWithdrawn = totalWithdrawn;
-                totalWithdrawn += amount;
-                localStorage.setItem('pirxmix_totalWithdrawn', totalWithdrawn);
-                animateValue(document.getElementById('totalWithdrawn'), oldWithdrawn, totalWithdrawn, 500, ' $');
-            }
-            saveTransactions();
-        }
+        // ============================================
+        // ПЕРВИЧНАЯ ЗАГРУЗКА ВСЕХ ДАННЫХ
+        // ============================================
+        loadUserData();
+        loadReferrals();
+        loadStats();
+        loadTransactions();
 
-        // Загружаем сохранённые транзакции или создаём новые
-        const savedDeposits = localStorage.getItem('pirxmix_deposits');
-        const savedWithdraws = localStorage.getItem('pirxmix_withdraws');
-
-        if (savedDeposits && savedWithdraws) {
+        // ============================================
+        // АВТООБНОВЛЕНИЕ КАЖДЫЕ 30 СЕКУНД
+        // ============================================
+        setInterval(function() {
+            loadUserData();
+            loadReferrals();
+            loadStats();
             loadTransactions();
-        } else {
-            for (let i = 0; i < MAX_ITEMS; i++) {
-                addTransaction(depositList, 'deposit');
-                addTransaction(withdrawList, 'withdraw');
-            }
-        }
-
-        function randomTransaction() {
-            if (Math.random() < 0.5) {
-                addTransaction(depositList, 'deposit');
-            } else {
-                addTransaction(withdrawList, 'withdraw');
-            }
-            const delay = Math.floor(Math.random() * 105000) + 25000;
-            setTimeout(randomTransaction, delay);
-        }
-        setTimeout(randomTransaction, 25000);
+        }, 30000);
 
     })();
 </script>
