@@ -2,3086 +2,416 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, height=device-height">
-    <title>VDS | Vibe Dare Smile - Wheel of Desires</title>
-    <meta name="description" content="VDS - Vibe Dare Smile: Luxury casino-style game of desires. Spin the wheel, win diamonds, and send romantic wishes to your partner.">
-    <meta name="keywords" content="VDS, Vibe Dare Smile, wheel of desires, casino game, romantic wishes, slot machine, diamonds">
-    <meta name="author" content="VDS Games">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#1a0530">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="VDS Game">
-    <meta property="og:title" content="VDS | Vibe Dare Smile - Wheel of Desires">
-    <meta property="og:description" content="Luxury casino-style game of desires. Spin, win, and share romantic wishes!">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
+    <title>Пирамикс • Регистрация</title>
+    <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Регистрируйтесь и получайте доход от приглашённых пользователей!">
+    <meta name="keywords" content="Пирамикс, регистрация, реферальная программа, заработок, пирамида, рефералы, VIP статус">
+    <meta property="og:title" content="Пирамикс — Регистрация">
+    <meta property="og:description" content="Зарегистрируйтесь в Пирамикс и зарабатывайте на рефералах с 5 уровнями глубины!">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vds-game.ink">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Crect width='32' height='32' rx='8' fill='%231a0530'/%3E%3Ctext x='16' y='22' font-size='16' fill='%23ffd700' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%231a0530'/%3E%3Ctext x='90' y='110' font-size='90' font-weight='bold' fill='%23ffd700' text-anchor='middle' font-family='serif'%3EVDS%3C/text%3E%3C/svg%3E">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        body {
-            font-family: 'Cormorant Garamond', 'Segoe UI', 'Times New Roman', serif;
-            background: radial-gradient(circle at 20% 30%, #1a0530, #050010 90%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 8px;
-            margin: 0;
-            touch-action: manipulation;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(ellipse at 30% 40%, rgba(255, 215, 0, 0.1) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 20%, rgba(180, 100, 255, 0.12) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .outer-header {
-            position: fixed;
-            top: 6px;
-            left: 12px;
-            right: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        .outer-header>* {
-            pointer-events: auto;
-        }
-
-        .outer-site-title {
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            font-weight: 900;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            filter: drop-shadow(0 0 15px #ffb700);
-            line-height: 1;
-        }
-
-        .outer-site-subtitle {
-            font-size: clamp(0.45rem, 1.8vw, 0.65rem);
-            color: #d4af37;
-            letter-spacing: 2px;
-            text-shadow: 0 0 6px black;
-        }
-
-        .user-id-display {
-            font-size: 0.6rem;
-            color: #b8945f;
-            letter-spacing: 1px;
-            margin-top: 2px;
-        }
-
-        .outer-right-group {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .lang-btn {
-            background: rgba(20, 5, 35, 0.8);
-            border: 1px solid #c9a13b;
-            color: #ddc07a;
-            padding: 2px 5px;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-            letter-spacing: 1px;
-        }
-
-        .lang-btn.active {
-            background: #d4af37;
-            color: #150a1f;
-            border-color: #fff;
-        }
-
-        .logout-btn {
-            background: rgba(20, 5, 35, 0.8);
-            border: 1px solid #c9a13b;
-            color: #ddc07a;
-            padding: 2px 6px;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
-            cursor: pointer;
-            backdrop-filter: blur(8px);
-        }
-
-        .google-btn-outer {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            width: auto;
-            max-width: 180px;
-            padding: 8px 10px;
-            background: #fff;
-            color: #333;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: clamp(0.6rem, 2vw, 0.85rem);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .google-btn-outer:hover {
-            background: #f1f1f1;
-            transform: scale(1.02);
-        }
-
-        #app {
-            width: 100%;
-            max-width: 650px;
-            background: rgba(8, 3, 18, 0.7);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 2px solid rgba(212, 175, 55, 0.4);
-            box-shadow: 0 30px 50px rgba(0, 0, 0, 0.9), 0 0 45px rgba(180, 130, 50, 0.5);
-            border-radius: clamp(24px, 5vw, 48px);
-            padding: clamp(10px, 3vw, 18px) clamp(10px, 3vw, 18px) clamp(12px, 3vw, 22px);
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            gap: clamp(8px, 2vw, 14px);
-            margin-top: 80px;
-        }
-
-        @media (min-width: 481px) {
-            #app {
-                margin-top: 60px;
-            }
-        }
-
-        .user-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(20, 5, 35, 0.6);
-            border: 2px solid #d4af37;
-            border-radius: 40px;
-            padding: 6px 10px;
-            margin: 0 2px;
-            box-shadow: 0 0 18px rgba(255, 215, 0, 0.3);
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .user-bar.hidden-bar {
-            display: none;
-        }
-
-        .nickname {
-            font-weight: 900;
-            font-size: clamp(0.8rem, 3vw, 1rem);
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b;
-            animation: nickGlow 2s ease-in-out infinite alternate;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-
-        @keyframes nickGlow {
-            0% {
-                text-shadow: 0 0 8px #ffd700, 0 0 16px #b8860b;
-            }
-            100% {
-                text-shadow: 0 0 15px #ffea80, 0 0 30px #ff8c00;
-            }
-        }
-
-        .profile-btn {
-            background: rgba(212, 175, 55, 0.3);
-            border: 1px solid #d4af37;
-            color: #ffd700;
-            padding: 2px 8px;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: clamp(0.55rem, 1.8vw, 0.7rem);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-
-        .profile-btn:hover {
-            background: rgba(212, 175, 55, 0.5);
-        }
-
-        .balance-display {
-            font-weight: 900;
-            font-size: clamp(0.8rem, 3vw, 1rem);
-            color: #ffd966;
-            text-shadow: 0 0 10px #ffd700;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-
-        .top-up-btn {
-            background: rgba(20, 5, 35, 0.6);
-            border: 1px solid #d4af37;
-            color: #ffd966;
-            padding: 2px 6px;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .spin-win-display {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(2rem, 5vw, 3rem);
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
-            z-index: 300;
-            pointer-events: none;
-            opacity: 0;
-            animation: none;
-        }
-
-        .spin-win-display.show {
-            animation: winPopup 2s ease-out forwards;
-        }
-
-        @keyframes winPopup {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0.5);
-            }
-            20% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.2);
-            }
-            40% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -120%) scale(0.8);
-            }
-        }
-
-        .jackpot-banner {
-            position: fixed;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: clamp(2rem, 8vw, 4rem);
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 40px #ffd700, 0 0 80px #ff8c00, 0 0 120px #ff4500;
-            z-index: 350;
-            pointer-events: none;
-            opacity: 0;
-            animation: jackpotBannerIn 0.5s ease-out forwards, jackpotBannerOut 0.5s ease-in 4.5s forwards;
-            letter-spacing: 8px;
-        }
-
-        @keyframes jackpotBannerIn {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) scale(0.3) rotate(-10deg);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) scale(1) rotate(0deg);
-            }
-        }
-
-        @keyframes jackpotBannerOut {
-            0% {
-                opacity: 1;
-                transform: translateX(-50%) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) scale(1.5);
-            }
-        }
-
-        .falling-gift {
-            position: fixed;
-            top: -60px;
-            z-index: 340;
-            pointer-events: none;
-            animation: giftFall linear forwards;
-            font-size: 2rem;
-        }
-
-        @keyframes giftFall {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(110vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        .gift-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .gift-icon {
-            transition: all 0.5s ease;
-            filter: drop-shadow(0 0 8px gold);
-            animation: giftPulse 2s ease-in-out infinite;
-            position: relative;
-            font-size: clamp(1rem, 5vw, 1.5rem);
-        }
-
-        @keyframes giftPulse {
-            0%,
-            100% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 8px gold);
-            }
-            50% {
-                transform: scale(1.1);
-                filter: drop-shadow(0 0 15px gold);
-            }
-        }
-
-        .gift-shake {
-            animation: giftShake 0.15s ease-in-out infinite !important;
-        }
-
-        @keyframes giftShake {
-            0%,
-            100% {
-                transform: translateX(0) rotate(0deg);
-            }
-            15% {
-                transform: translateX(-4px) rotate(-3deg);
-            }
-            30% {
-                transform: translateX(3px) rotate(2deg);
-            }
-            45% {
-                transform: translateX(-3px) rotate(-2deg);
-            }
-            60% {
-                transform: translateX(3px) rotate(1deg);
-            }
-            75% {
-                transform: translateX(-2px) rotate(-1deg);
-            }
-            90% {
-                transform: translateX(2px) rotate(1deg);
-            }
-        }
-
-        .gift-explosion {
-            animation: giftExplode 0.6s ease-out forwards !important;
-        }
-
-        @keyframes giftExplode {
-            0% {
-                transform: scale(0.5);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-            }
-        }
-
-        .gift-reappear {
-            animation: giftReappear 0.6s ease-in forwards;
-        }
-
-        @keyframes giftReappear {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .particle {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-radius: 2px;
-            pointer-events: none;
-            z-index: 360;
-            animation: particleFly 1.5s ease-out forwards;
-        }
-
-        @keyframes particleFly {
-            0% {
-                transform: translate(0, 0) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(var(--px), var(--py)) scale(0);
-                opacity: 0;
-            }
-        }
-
-        .auto-spin-btn {
-            width: clamp(40px, 15vw, 60px);
-            height: clamp(40px, 15vw, 60px);
-            border-radius: 50%;
-            background: linear-gradient(135deg, #2d1840, #150920);
-            border: 2px solid #c9a13b;
-            color: #f7e9c3;
-            font-weight: 900;
-            font-size: clamp(0.5rem, 2vw, 0.7rem);
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 200, 0, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            flex-shrink: 0;
-            line-height: 1.1;
-            text-align: center;
-            padding: 2px;
-        }
-
-        .auto-spin-btn.active {
-            background: linear-gradient(135deg, #ff8c00, #ff4500);
-            border-color: #ffd700;
-            box-shadow: 0 0 25px rgba(255, 140, 0, 0.7);
-            animation: autoSpinPulse 1s ease-in-out infinite;
-        }
-
-        @keyframes autoSpinPulse {
-            0%,
-            100% {
-                box-shadow: 0 0 20px rgba(255, 140, 0, 0.5);
-            }
-            50% {
-                box-shadow: 0 0 40px rgba(255, 200, 0, 0.9);
-            }
-        }
-
-        .auto-spin-btn:active {
-            transform: scale(0.9);
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: clamp(8px, 2vw, 12px);
-            margin: 4px 0;
-            padding: 0 4px;
-        }
-
-        .menu-grid .thread-btn {
-            font-size: clamp(0.9rem, 3vw, 1rem);
-            padding: clamp(12px, 3vw, 18px) clamp(8px, 2vw, 12px);
-        }
-
-        .menu-lang-row {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 8px;
-            z-index: 2;
-        }
-
-        .reg-lang-row {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 18px;
-            z-index: 2;
-        }
-
-        .reg-lang-row .lang-btn {
-            font-size: clamp(0.6rem, 2vw, 0.75rem);
-            padding: 3px 8px;
-        }
-
-        .menu-lang-row .lang-btn {
-            font-size: clamp(0.6rem, 2vw, 0.75rem);
-            padding: 4px 10px;
-        }
-
-        .thread-btn {
-            background: linear-gradient(180deg, #2d1840 0%, #150920 100%);
-            border: 2px solid #c9a13b;
-            border-radius: 50px;
-            padding: clamp(8px, 2vw, 14px) clamp(8px, 2vw, 14px);
-            font-weight: 700;
-            color: #f7e9c3;
-            letter-spacing: 1px;
-            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 200, 0, 0.4);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            backdrop-filter: blur(8px);
-            white-space: normal;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .thread-btn:active {
-            transform: scale(0.96);
-            box-shadow: 0 5px 12px black, 0 0 28px gold;
-        }
-
-        .full-width-btn {
-            grid-column: 1 / -1;
-        }
-
-        .gold-text-btn {
-            color: #ffd700;
-            text-shadow: 0 0 10px #ffd700, 0 0 20px #b8860b;
-            font-weight: 900;
-            letter-spacing: 2px;
-        }
-
-        /* НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ */
-        .free-diamonds-btn {
-            background: linear-gradient(180deg, #2d1840 0%, #150920 100%);
-            border: 2px solid transparent;
-            border-radius: 50px;
-            padding: clamp(12px, 3vw, 18px) clamp(8px, 2vw, 12px);
-            font-weight: 900;
-            color: #ffd700;
-            letter-spacing: 1px;
-            box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 200, 0, 0.5);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            backdrop-filter: blur(8px);
-            white-space: normal;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            text-align: center;
-            line-height: 1.2;
-            position: relative;
-            z-index: 0;
-            animation: freeDiamondsGlow 2s ease-in-out infinite alternate;
-        }
-
-        .free-diamonds-btn::before {
-            content: "";
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            right: -3px;
-            bottom: -3px;
-            border-radius: 53px;
-            background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #8a2be2, #ff0080);
-            background-size: 300% 300%;
-            z-index: -1;
-            animation: gradientBorderRotate 3s linear infinite;
-            filter: blur(2px);
-        }
-
-        .free-diamonds-btn::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 50px;
-            background: linear-gradient(180deg, #2d1840 0%, #150920 100%);
-            z-index: -1;
-        }
-
-        @keyframes gradientBorderRotate {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes freeDiamondsGlow {
-            0% { box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 200, 0, 0.5); transform: scale(1); }
-            100% { box-shadow: 0 8px 14px rgba(0, 0, 0, 0.6), 0 0 35px rgba(255, 200, 0, 0.9), 0 0 60px rgba(255, 100, 0, 0.6); transform: scale(1.02); }
-        }
-
-        .free-diamonds-btn:active {
-            transform: scale(0.96);
-            box-shadow: 0 5px 12px black, 0 0 28px gold;
-        }
-
-        .slot-machine {
-            background: rgba(0, 0, 0, 0.4);
-            border: 2px solid #b49450;
-            border-radius: 38px;
-            padding: 8px 8px;
-            backdrop-filter: blur(14px);
-            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8), 0 12px 22px black;
-        }
-
-        .slot-top-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 6px;
-            margin-bottom: 3px;
-            flex-wrap: wrap;
-        }
-
-        .treasure-section {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            background: rgba(20, 5, 35, 0.6);
-            border-radius: 35px;
-            padding: 4px 8px;
-            border: 1px solid #d4af37;
-            flex: 1 1 auto;
-            min-width: 0;
-            min-height: auto;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .treasure-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .progress-container {
-            flex: 1;
-            max-width: 130px;
-        }
-
-        .progress-text {
-            color: #ffd966;
-            font-weight: bold;
-            font-size: clamp(0.5rem, 1.8vw, 0.65rem);
-            margin-bottom: 1px;
-            text-align: center;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: clamp(6px, 1.5vw, 8px);
-            background: #1f0b2e;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid #c9a13b;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ffd700, #ffaa00);
-            transition: width 0.4s ease;
-            width: 0%;
-            border-radius: 6px;
-        }
-
-        .balance-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #e5d9b0;
-            font-weight: bold;
-            margin: 3px 3px;
-            font-size: clamp(0.6rem, 2vw, 0.8rem);
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .free-spins-badge {
-            color: #ffd966;
-            font-weight: bold;
-            font-size: clamp(0.6rem, 2vw, 0.75rem);
-            text-align: center;
-            margin: 2px 0;
-            text-shadow: 0 0 8px gold;
-        }
-
-        .jackpot-prizes-btn {
-            background: rgba(20, 5, 35, 0.6);
-            border: 1px solid #d4af37;
-            color: #ffd966;
-            padding: 2px 6px;
-            border-radius: 16px;
-            font-weight: bold;
-            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .machine {
-            --reel-height: clamp(120px, 25vw, 200px);
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 4px;
-            margin-bottom: 6px;
-        }
-
-        .reel {
-            height: var(--reel-height);
-            background: #160c24;
-            border-radius: 14px;
-            overflow: hidden;
-            border: 2px solid #e4b429;
-            position: relative;
-            box-shadow: inset 0 0 16px black, 0 0 8px rgba(255, 215, 0, 0.3);
-        }
-
-        .strip {
-            position: absolute;
-            width: 100%;
-            top: -40px;
-        }
-
-        .symbol {
-            height: calc(var(--reel-height) / 5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: calc(var(--reel-height) / 7);
-            color: #ffd966;
-        }
-
-        @media (max-width: 480px) {
-            .machine {
-                --reel-height: clamp(100px, 35vw, 150px);
-            }
-        }
-
-        .win-lines {
-            position: relative;
-            pointer-events: none;
-            z-index: 40;
-        }
-
-        .win-line {
-            position: absolute;
-            height: 2px;
-            background: linear-gradient(90deg, #fff, #ffd700, #fff);
-            border-radius: 8px;
-            transform-origin: left center;
-            box-shadow: 0 0 10px white, 0 0 16px gold;
-            animation: linePulse 1.2s infinite alternate;
-        }
-
-        @keyframes linePulse {
-            0% {
-                opacity: 0.5;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-        .controls-row {
-            display: flex;
-            gap: 6px;
-            align-items: stretch;
-            margin-top: 3px;
-        }
-
-        .left-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            flex: 0 0 auto;
-            width: 45%;
-        }
-
-        .left-buttons .thread-btn {
-            animation: none;
-            font-size: clamp(0.6rem, 2vw, 0.7rem);
-            padding: clamp(6px, 1.5vw, 9px) clamp(6px, 1.5vw, 9px);
-        }
-
-        .middle-buttons {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex: 0 0 auto;
-        }
-
-        .spin-btn {
-            background: radial-gradient(circle at 30% 30%, #ffea80, #b5891a);
-            border: none;
-            color: #1f0a2e;
-            font-weight: 900;
-            font-size: clamp(1rem, 4vw, 1.4rem);
-            letter-spacing: 2px;
-            box-shadow: 0 0 25px #ffaa33;
-            flex: 1;
-            padding: 8px;
-            animation: spinPulse 1.5s ease-in-out infinite;
-            border-radius: 16px;
-        }
-
-        @keyframes spinPulse {
-            0%,
-            100% {
-                transform: scale(1);
-                box-shadow: 0 0 20px #ffaa33;
-            }
-            50% {
-                transform: scale(1.03);
-                box-shadow: 0 0 35px #ffcc00;
-            }
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(18px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 200;
-        }
-
-        .win-card {
-            background: #1f1233;
-            border: 3px solid #e4b429;
-            border-radius: clamp(24px, 5vw, 44px);
-            padding: clamp(16px, 3vw, 24px) clamp(12px, 3vw, 18px);
-            max-width: 90vw;
-            width: 90vw;
-            text-align: center;
-            box-shadow: 0 0 60px gold;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: winCardAppear 0.5s ease-out;
-        }
-
-        @keyframes winCardAppear {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .win-card.wide {
-            max-width: 95vw;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .social-btn {
-            background: #4b2c6e;
-            border: 1px solid #cfaa4a;
-            color: #ffd966;
-            padding: clamp(8px, 2vw, 12px) clamp(10px, 2vw, 16px);
-            border-radius: 35px;
-            font-weight: bold;
-            margin-top: 12px;
-            width: 100%;
-            cursor: pointer;
-            font-size: clamp(0.8rem, 2.5vw, 1rem);
-        }
-
-        .history-list {
-            max-height: 280px;
-            overflow-y: auto;
-            margin: 12px 0;
-            text-align: left;
-            color: #f0dbb0;
-        }
-
-        .history-item {
-            background: rgba(255, 215, 0, 0.1);
-            border: 1px solid #d4af37;
-            border-radius: 16px;
-            padding: 8px;
-            margin: 6px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .history-item button {
-            background: #d4af37;
-            color: #150a1f;
-            border: none;
-            border-radius: 16px;
-            padding: 5px 10px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .view-btn {
-            background: #4b2c6e;
-            border: 1px solid #cfaa4a;
-            color: #ffd966;
-            padding: 5px 10px;
-            border-radius: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: clamp(6px, 2vw, 10px);
-            margin: 6px 0;
-            border-radius: 25px;
-            border: 2px solid #d4af37;
-            background: #2a1540;
-            color: #ffd966;
-            font-size: clamp(0.8rem, 2.5vw, 0.9rem);
-            text-align: center;
-            outline: none;
-        }
-
-        .form-input::placeholder {
-            color: #b8945f;
-        }
-
-        .diamond-option {
-            background: #2a1540;
-            border: 1px solid #d4af37;
-            color: #ffd966;
-            padding: 8px;
-            margin: 5px 0;
-            border-radius: 16px;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 0.8rem;
-        }
-
-        .diamond-option:hover {
-            background: #3d2058;
-        }
-
-        .auth-title {
-            color: #ffd700;
-            font-size: 1.3rem;
-            margin-bottom: 12px;
-            text-shadow: 0 0 12px gold;
-        }
-
-        .custom-reward-input {
-            width: 100%;
-            padding: 6px;
-            margin: 3px 0;
-            border-radius: 16px;
-            border: 1px solid #d4af37;
-            background: #2a1540;
-            color: #ffd966;
-            font-size: 0.85rem;
-            text-align: center;
-            outline: none;
-        }
-
-        .footer {
-            text-align: center;
-            color: #b8945f;
-            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
-            margin-top: 8px;
-            z-index: 1;
-            position: relative;
-            max-width: 650px;
-            width: 100%;
-            padding-bottom: 10px;
-        }
-
-        .footer a {
-            color: #d4af37;
-            text-decoration: underline;
-            cursor: pointer;
-            margin: 0 4px;
-        }
-
-        .footer a:hover {
-            color: #ffd700;
-        }
-
-        .prizes-list {
-            text-align: left;
-            color: #f0dbb0;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-
-        .win-detail-text {
-            text-align: left;
-            color: #f0dbb0;
-            font-size: 0.95rem;
-            line-height: 1.7;
-        }
-
-        .support-btn {
-            position: fixed;
-            bottom: calc(16px + env(safe-area-inset-bottom));
-            right: calc(16px + env(safe-area-inset-right));
-            width: clamp(40px, 10vw, 52px);
-            height: clamp(40px, 10vw, 52px);
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6), 0 6px 16px rgba(0, 0, 0, 0.5);
-            cursor: pointer;
-            z-index: 150;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(1.2rem, 4vw, 1.6rem);
-            transition: transform 0.2s;
-        }
-
-        .support-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .support-btn:active {
-            transform: scale(0.95);
-        }
-
-        .support-btn.unread {
-            background: linear-gradient(45deg, #0000ff, #ff0000, #ffff00, #0000ff);
-            background-size: 400% 400%;
-            animation: supportGradientGlow 2s ease infinite;
-            box-shadow: 0 0 25px #0000ff, 0 0 35px #ff0000, 0 0 50px #ffff00;
-        }
-
-        @keyframes supportGradientGlow {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
-
-        .support-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            background: #ff4444;
-            color: #fff;
-            border-radius: 50%;
-            width: clamp(16px, 4vw, 20px);
-            height: clamp(16px, 4vw, 20px);
-            font-size: clamp(0.5rem, 1.5vw, 0.65rem);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-
-        .chat-messages {
-            max-height: 280px;
-            overflow-y: auto;
-            text-align: left;
-            color: #f0dbb0;
-            margin-bottom: 8px;
-            padding: 8px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
-        }
-
-        .chat-message {
-            margin: 5px 0;
-            padding: 7px 10px;
-            border-radius: 14px;
-            font-size: 0.8rem;
-        }
-
-        .chat-message.admin {
-            background: rgba(212, 175, 55, 0.2);
-            border: 1px solid #d4af37;
-            text-align: left;
-            margin-right: 16px;
-        }
-
-        .chat-message.user {
-            background: rgba(75, 44, 110, 0.4);
-            border: 1px solid #cfaa4a;
-            text-align: right;
-            margin-left: 16px;
-        }
-
-        .chat-input-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 8px;
-            border-radius: 22px;
-            border: 2px solid #d4af37;
-            background: #2a1540;
-            color: #ffd966;
-            font-size: 0.8rem;
-            outline: none;
-        }
-
-        .custom-rewards-buttons {
-            display: flex;
-            gap: 6px;
-            margin-top: 6px;
-        }
-
-        .custom-rewards-buttons .thread-btn {
-            flex: 1;
-            animation: none;
-            font-size: 0.75rem;
-            padding: 10px;
-        }
-
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            padding: 12px;
-            background: #fff;
-            color: #333;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 0.95rem;
-            cursor: pointer;
-            margin: 8px 0;
-            transition: all 0.2s;
-        }
-
-        .google-btn:hover {
-            background: #f1f1f1;
-            transform: scale(1.02);
-        }
-
-        .user-avatar {
-            width: clamp(24px, 6vw, 28px);
-            height: clamp(24px, 6vw, 28px);
-            border-radius: 50%;
-            border: 2px solid #d4af37;
-            object-fit: cover;
-        }
-
-        .crypto-payment-card {
-            max-width: 95vw;
-            width: 95vw;
-            padding: clamp(12px, 3vw, 20px);
-        }
-
-        .crypto-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin: 10px 0;
-            justify-content: center;
-        }
-
-        .crypto-option {
-            background: #2a1540;
-            border: 2px solid #444;
-            color: #ffd966;
-            padding: 8px 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: clamp(0.7rem, 2vw, 0.8rem);
-            font-weight: bold;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .crypto-option:hover {
-            border-color: #d4af37;
-        }
-
-        .crypto-option.selected {
-            border-color: #ffd700;
-            background: #3d2058;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .rate-display {
-            color: #ffd966;
-            font-size: 0.75rem;
-            margin: 8px 0;
-            text-align: center;
-        }
-
-        .qr-container {
-            display: flex;
-            justify-content: center;
-            margin: 12px 0;
-        }
-
-        .qr-container img {
-            border-radius: 12px;
-            border: 2px solid #d4af37;
-            max-width: 100%;
-            height: auto;
-        }
-
-        .diamond-amount-select {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            justify-content: center;
-            margin: 10px 0;
-        }
-
-        .diamond-amount-option {
-            background: #2a1540;
-            border: 2px solid #444;
-            color: #ffd966;
-            padding: 10px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .diamond-amount-option .amount {
-            font-size: 1.2rem;
-        }
-
-        .diamond-amount-option .price {
-            font-size: 0.7rem;
-            color: #b8945f;
-        }
-
-        .diamond-amount-option:hover {
-            border-color: #d4af37;
-        }
-
-        .diamond-amount-option.selected {
-            border-color: #ffd700;
-            background: #3d2058;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .copied-msg {
-            color: #44ff44;
-            font-size: 0.7rem;
-            margin-top: 4px;
-        }
-
-        .wallet-address {
-            background: #1a1030;
-            border-radius: 12px;
-            padding: 8px 12px;
-            word-break: break-all;
-            font-size: 0.75rem;
-            color: #ddd;
-            margin: 6px 0;
-        }
-
-        .pay-btn {
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            border: none;
-            color: #000;
-            font-weight: bold;
-            padding: 12px;
-            border-radius: 30px;
-            width: 100%;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 8px;
-        }
-
-        .profile-modal-card {
-            max-width: 95vw;
-            width: 95vw;
-            animation: profileSlideIn 0.4s ease-out;
-        }
-
-        @keyframes profileSlideIn {
-            from {
-                transform: translateY(-30px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .profile-info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-            color: #f0dbb0;
-            font-size: 0.9rem;
-        }
-
-        .profile-info-row strong {
-            color: #ffd700;
-        }
-
-        .copy-btn {
-            background: #4b2c6e;
-            border: 1px solid #cfaa4a;
-            color: #ffd966;
-            padding: 4px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.7rem;
-        }
-
-        .profile-nickname-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            margin-top: 12px;
-        }
-
-        .profile-nickname-row input {
-            flex: 1;
-        }
-
-        .profile-nickname-row button {
-            padding: 8px 16px;
-            background: #d4af37;
-            color: #150a1f;
-            border: none;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        #supportModal {
-            position: fixed;
-            bottom: calc(80px + env(safe-area-inset-bottom));
-            right: calc(2vw + env(safe-area-inset-right));
-            width: auto;
-            max-width: 90vw;
-            z-index: 160;
-            display: none;
-            background: #1f1233;
-            border: 3px solid #e4b429;
-            border-radius: clamp(24px, 5vw, 44px);
-            padding: clamp(16px, 3vw, 24px) clamp(12px, 3vw, 18px);
-            text-align: center;
-            box-shadow: 0 0 60px gold;
-            max-height: 80vh;
-            overflow-y: auto;
-            animation: winCardAppear 0.3s ease-out;
-        }
-
-        #supportModal:not(.hidden) {
-            display: block;
-        }
-
-        /* ========== NEW ANIMATED LOGO REGISTRATION ========== */
-        #registrationWindow {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100vw;
-            height: 100vh;
-            height: 100dvh;
-            background: radial-gradient(circle at 30% 40%, rgba(20, 5, 35, 0.95), #050010 100%);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            overflow: hidden;
-            padding: 20px;
-        }
-
-        .logo-assemble {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.1em;
-            font-size: clamp(5rem, 20vw, 10rem);
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00;
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .logo-letter {
-            display: inline-block;
-            opacity: 0;
-            animation-duration: 1.2s;
-            animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-            animation-fill-mode: forwards;
-        }
-
-        .logo-letter:nth-child(1) {
-            animation-name: flyFromLeft;
-        }
-
-        .logo-letter:nth-child(2) {
-            animation-name: flyFromBottom;
-            animation-delay: 0.2s;
-        }
-
-        .logo-letter:nth-child(3) {
-            animation-name: flyFromRight;
-            animation-delay: 0.4s;
-        }
-
-        @keyframes flyFromLeft {
-            0% {
-                transform: translateX(-100vw) rotate(-30deg);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0) rotate(0deg);
-                opacity: 1;
-            }
-        }
-
-        @keyframes flyFromBottom {
-            0% {
-                transform: translateY(100vh) scale(0.5);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0) scale(1);
-                opacity: 1;
-            }
-        }
-
-        @keyframes flyFromRight {
-            0% {
-                transform: translateX(100vw) rotate(30deg);
-                opacity: 0;
-            }
-            100% {
-                transform: translateX(0) rotate(0deg);
-                opacity: 1;
-            }
-        }
-
-        .logo-glow {
-            margin-top: 0.5rem;
-            font-size: clamp(0.7rem, 3vw, 1.8rem);
-            color: #ffd966;
-            text-align: center;
-            letter-spacing: 2px;
-            text-shadow: 0 0 20px #ffd700;
-            opacity: 0;
-            animation: fadeInUp 1.2s ease-out 1.2s forwards;
-            z-index: 1;
-        }
-
-        .reg-google-btn {
-            margin-top: 2rem;
-            opacity: 0;
-            animation: fadeInUp 1.2s ease-out 1.8s forwards;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 12px 24px;
-            background: #fff;
-            color: #333;
-            border: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: clamp(0.85rem, 3vw, 1.1rem);
-            cursor: pointer;
-            transition: all 0.2s;
-            max-width: 280px;
-            width: 100%;
-            z-index: 1;
-        }
-
-        .reg-google-btn:hover {
-            background: #f1f1f1;
-            transform: scale(1.02);
-        }
-
-        @keyframes fadeInUp {
-            0% {
-                transform: translateY(20px);
-                opacity: 0;
-            }
-            100% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        /* Animated background gifts */
-        .reg-bg-gifts {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: auto;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .reg-bg-gift {
-            position: absolute;
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            opacity: 0.6;
-            pointer-events: auto;
-            cursor: pointer;
-            animation: regGiftFloat linear infinite;
-            transition: transform 0.1s;
-        }
-
-        @keyframes regGiftFloat {
-            0% {
-                transform: translateY(-10vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.6;
-            }
-            90% {
-                opacity: 0.6;
-            }
-            100% {
-                transform: translateY(110vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        .reg-phrase-glow {
-            position: absolute;
-            color: #ffd700;
-            font-size: clamp(1rem, 4vw, 1.5rem);
-            font-weight: bold;
-            text-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00, 0 0 40px #ff4500;
-            pointer-events: none;
-            animation: regPhraseFade 5s forwards;
-            white-space: nowrap;
-            z-index: 10;
-        }
-
-        @keyframes regPhraseFade {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            80% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.1);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(1.3);
-            }
-        }
-
-        @media (max-width: 600px) {
-            .logo-assemble {
-                font-size: clamp(4rem, 18vw, 6rem);
-            }
-        }
-
-        @media (display-mode: standalone) {
-            body {
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-                padding-left: env(safe-area-inset-left);
-                padding-right: env(safe-area-inset-right);
-            }
-        }
-
-        /* ========== SHIMMER & BRACKET ANIMATIONS ========== */
-        #customRewardsBtn {
-            font-size: clamp(1rem, 5vw, 1.3rem);
-            padding: clamp(12px, 3vw, 20px) clamp(10px, 2vw, 16px);
-            background-size: 400% 400%;
-            animation: colorShift 4s ease infinite;
-            border-color: #ffd700;
-            overflow: hidden;
-            position: relative;
-        }
-
-        @keyframes colorShift {
-            0% {
-                background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
-                background-size: 400% 400%;
-                background-position: 0% 50%;
-            }
-            25% {
-                background: linear-gradient(135deg, #ff8c00, #40e0d0, #8a2be2, #ff0080);
-                background-size: 400% 400%;
-                background-position: 100% 0%;
-            }
-            50% {
-                background: linear-gradient(135deg, #40e0d0, #8a2be2, #ff0080, #ff8c00);
-                background-size: 400% 400%;
-                background-position: 100% 100%;
-            }
-            75% {
-                background: linear-gradient(135deg, #8a2be2, #ff0080, #ff8c00, #40e0d0);
-                background-size: 400% 400%;
-                background-position: 0% 100%;
-            }
-            100% {
-                background: linear-gradient(135deg, #ff0080, #ff8c00, #40e0d0, #8a2be2);
-                background-size: 400% 400%;
-                background-position: 0% 50%;
-            }
-        }
-
-        #customRewardsBtn::after {
-            content: "";
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border-radius: 52px;
-            background: inherit;
-            filter: blur(12px);
-            opacity: 0.5;
-            z-index: -1;
-            animation: colorShift 4s ease infinite;
-            background-size: 400% 400%;
-        }
-
-        .bracket-flash {
-            animation: bracketPulse 0.6s ease-in-out infinite alternate;
-            display: inline-block;
-            position: relative;
-            z-index: 2;
-        }
-
-        @keyframes bracketPulse {
-            0% {
-                opacity: 0.3;
-                text-shadow: 0 0 4px #ffffff, 0 0 8px #ffd700;
-                transform: scale(0.95);
-            }
-            100% {
-                opacity: 1;
-                text-shadow: 0 0 16px #ffffff, 0 0 28px #ffd700, 0 0 40px #ff8c00;
-                transform: scale(1.08);
-            }
-        }
-
-        /* ========== MAIN MENU FALLING GIFTS ========== */
-        #mainMenu {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-falling-gift {
-            position: absolute;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.25;
-            animation: menuGiftSpinFall linear forwards;
-            font-size: clamp(0.8rem, 3vw, 1.2rem);
-        }
-
-        @keyframes menuGiftSpinFall {
-            0% {
-                transform: translateY(-40px) rotate(0deg);
-                opacity: 0.35;
-            }
-            10% {
-                opacity: 0.35;
-            }
-            90% {
-                opacity: 0.35;
-            }
-            100% {
-                transform: translateY(calc(100% + 40px)) rotate(360deg);
-                opacity: 0;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; top: -30%; left: -10%; width: 70%; height: 70%; background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%); border-radius: 50%; z-index: 0; pointer-events: none; }
+        .top-content { width: 100%; max-width: 1300px; display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 2rem; position: relative; z-index: 2; margin-bottom: 30px; }
+        .form-wrapper { flex: 0 0 340px; display: flex; justify-content: center; align-items: flex-start; }
+        .auth-card { background: rgba(20, 22, 27, 0.9); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255, 215, 150, 0.18); border-radius: 2.5rem; padding: 2rem 2rem 1.8rem; width: 100%; max-width: 360px; box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15); color: #f5efe0; transition: all 0.3s ease; animation: slideFromTopRight 0.9s cubic-bezier(0.22, 0.98, 0.41, 1.1) forwards; transform-origin: top right; margin-top: 10px; }
+        @keyframes slideFromTopRight { 0% { opacity: 0; transform: translate(60px, -160px) scale(0.92); } 30% { opacity: 0.9; transform: translate(30px, -40px) scale(0.98); } 70% { opacity: 1; transform: translate(8px, 5px) scale(1.01); } 100% { opacity: 1; transform: translate(0, 0) scale(1); } }
+        .auth-card h3 { font-size: 1.7rem; font-weight: 600; margin-bottom: 1.8rem; letter-spacing: -0.3px; background: linear-gradient(135deg, #f9d56e, #e6a861); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
+        .input-group { margin-bottom: 1.4rem; }
+        .input-group label { display: block; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.4px; color: #b9b09a; margin-bottom: 0.3rem; text-transform: uppercase; }
+        .input-group input { width: 100%; background: rgba(15, 16, 20, 0.8); border: 1px solid rgba(220, 180, 100, 0.25); border-radius: 1.2rem; padding: 0.9rem 1.2rem; font-size: 1rem; color: #f5e7cc; outline: none; transition: all 0.25s; font-family: 'Inter', sans-serif; backdrop-filter: blur(4px); }
+        .input-group input:focus { border-color: #f3b95b; box-shadow: 0 0 14px rgba(243, 185, 91, 0.4); background: rgba(22, 22, 28, 0.9); }
+        .input-group input::placeholder { color: #5e5a4f; font-weight: 400; font-size: 0.9rem; }
+        .password-field { transition: all 0.35s ease; overflow: hidden; }
+        .hidden-password { max-height: 0; opacity: 0; margin-bottom: 0; pointer-events: none; transform: translateY(-8px); }
+        .visible-password { max-height: 80px; opacity: 1; margin-bottom: 1.4rem; transform: translateY(0); }
+        .action-btn { background: linear-gradient(135deg, #e2a542, #c7851e); border: none; color: #0f0e0a; font-weight: 700; font-size: 1rem; padding: 0.8rem 1.8rem; border-radius: 2.5rem; cursor: pointer; backdrop-filter: blur(8px); transition: 0.25s; margin-top: 0.2rem; margin-bottom: 0.8rem; letter-spacing: 0.5px; display: inline-block; box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35); width: auto; min-width: 180px; }
+        .action-btn:hover { background: linear-gradient(135deg, #f3b95b, #da9729); box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6); color: #000; }
+        .switch-text { font-size: 0.85rem; color: #b9b09a; margin-top: 0.5rem; display: block; }
+        .switch-text span { color: #f3b95b; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; margin-left: 4px; }
+        .switch-text span:hover { color: #ffd966; }
+        .error-message { color: #ff7043; font-size: 0.8rem; text-align: center; margin-bottom: 0.8rem; display: none; }
+        .error-message.visible { display: block; }
+        .stats-panel { flex: 0 0 260px; background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 2rem; padding: 1.8rem 1.5rem; border: 1px solid rgba(255, 215, 150, 0.2); color: #f5efe0; box-shadow: 0 20px 35px rgba(0,0,0,0.7); display: flex; flex-direction: column; gap: 1.2rem; }
+        .stat-item { background: rgba(0,0,0,0.3); border-radius: 1.2rem; padding: 1rem; text-align: center; }
+        .stat-label { font-size: 0.8rem; color: #b9b09a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+        .stat-value { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transition: all 0.2s; }
+        .info-section { flex: 1 1 400px; background: rgba(12, 14, 18, 0.65); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 2.8rem; padding: 2.2rem 2rem; border: 1px solid rgba(230, 180, 70, 0.2); box-shadow: 0 25px 45px rgba(0,0,0,0.8); color: #ece3d5; animation: fadeInInfo 1s ease-out; }
+        @keyframes fadeInInfo { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+        .info-section h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 0.4rem; background: linear-gradient(to right, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px; }
+        .subtitle { color: #b7a16c; font-weight: 500; margin-bottom: 2rem; font-size: 1rem; border-left: 3px solid #e3a94d; padding-left: 1rem; }
+        .chart-container { margin: 1.8rem 0 2rem; }
+        .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; height: 180px; padding: 0 0.4rem; border-bottom: 2px solid rgba(230, 180, 70, 0.4); margin-bottom: 0.8rem; }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 70px; }
+        .bar { width: 40px; background: linear-gradient(180deg, #f3b95b, #d18e2c); border-radius: 20px 20px 6px 6px; box-shadow: 0 -5px 15px rgba(243, 185, 91, 0.5); margin-bottom: 6px; }
+        .bar-percent { font-weight: 700; font-size: 1.1rem; color: #efc468; margin-bottom: 4px; }
+        .bar-label { font-weight: 600; font-size: 1rem; color: #f5d78c; margin-top: 4px; }
+        .legend { display: flex; justify-content: center; gap: 2rem; margin-top: 0.4rem; color: #cfbc8b; font-size: 0.9rem; }
+        .legend span::before { content: "●"; margin-right: 6px; color: #f3b95b; font-size: 1rem; }
+        .graph-note { margin-top: 1.5rem; font-size: 0.95rem; color: #c9ad7a; text-align: center; border-top: 1px dashed #b49450; padding-top: 1.2rem; }
+        @media (max-width: 780px) { .auth-card { margin-left: 0; margin-right: auto; animation: slideFromTopMobile 0.8s ease-out forwards; } @keyframes slideFromTopMobile { 0% { transform: translate(10px, -130px); opacity: 0; } 100% { transform: translate(0,0); opacity: 1; } } }
     </style>
 </head>
 <body>
-    <div class="outer-header">
-        <div>
-            <div class="outer-site-title">VDS</div>
-            <div class="outer-site-subtitle">VIBE DARE SMILE</div>
-            <div class="user-id-display" id="userIdDisplay"></div>
-        </div>
-        <div class="outer-right-group">
-            <button id="langRuOuter" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
-            <button id="langUaOuter" class="lang-btn" onclick="setLanguage('ua')">UA</button>
-            <button id="langEnOuter" class="lang-btn" onclick="setLanguage('en')">EN</button>
-            <button class="logout-btn" id="logoutBtn" style="display:none;">🚪 Выйти</button>
-            <button class="google-btn-outer" id="googleLoginBtn" onclick="handleGoogleLogin()">
-                <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                <span id="googleLoginBtnText">Войти через Google</span>
-            </button>
-            <p id="authError" style="color:#ff4444;font-size:0.6rem;margin-top:0;display:none;"></p>
+<div class="top-content">
+    <div class="form-wrapper">
+        <div class="auth-card" id="authCard">
+            <h3>✨ Пирамикс</h3>
+            <div class="input-group"><label>Никнейм</label><input type="text" id="nickname" placeholder="Введите ник" autocomplete="off"></div>
+            <div class="input-group" id="password1Group"><label>Пароль</label><input type="password" id="password1" placeholder="••••••••"></div>
+            <div class="input-group visible-password" id="password2Group"><label>Повторите пароль</label><input type="password" id="password2" placeholder="••••••••"></div>
+            <div class="error-message" id="errorMessage">❌ Данные неверны</div>
+            <button class="action-btn" id="actionButton">Зарегистрироваться</button>
+            <div class="switch-text" id="switchTextBlock">Если есть аккаунт, <span id="toggleModeLink">вход</span></div>
         </div>
     </div>
-
-    <!-- Registration window with animated background gifts -->
-    <div id="registrationWindow" class="hidden">
-        <div class="reg-bg-gifts" id="regBgGifts"></div>
-        <div class="logo-assemble">
-            <span class="logo-letter">V</span>
-            <span class="logo-letter">D</span>
-            <span class="logo-letter">S</span>
-        </div>
-        <div class="logo-glow" id="regGlowText">Исполняет желания</div>
-        <button class="reg-google-btn" onclick="handleGoogleLogin()">
-            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-            <span id="regGoogleBtnText">Войти через Google</span>
-        </button>
-        <div class="reg-lang-row">
-            <button id="langRuReg" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
-            <button id="langUaReg" class="lang-btn" onclick="setLanguage('ua')">UA</button>
-            <button id="langEnReg" class="lang-btn" onclick="setLanguage('en')">EN</button>
-        </div>
+    <div class="stats-panel">
+        <div class="stat-item"><div class="stat-label">👥 Всего пользователей</div><div class="stat-value" id="totalUsers">146.353</div></div>
+        <div class="stat-item"><div class="stat-label">📅 Сегодня зарегистрировано</div><div class="stat-value" id="todayUsers">127</div></div>
+        <div class="stat-item"><div class="stat-label">💰 Всего выведено</div><div class="stat-value" id="totalWithdrawn">18.500 $</div></div>
     </div>
-
-    <div id="app">
-        <div class="user-bar hidden-bar" id="userBar">
-            <span style="display:flex;align-items:center;gap:8px;">
-                <img class="user-avatar hidden" id="userAvatar" src="" alt="">
-                <span class="nickname" id="nicknameDisplay">Игрок</span>
-                <button class="profile-btn" id="profileBtn" onclick="openProfile()">📂</button>
-                <button class="profile-btn" id="promoCodeBtn" onclick="openPromoCode()">🎟️ Промокод</button>
-            </span>
-            <span class="balance-display">💎 <span id="mainBalanceDisplay">100</span> <button class="top-up-btn" id="mainTopUpBtn">💎 Пополнить</button></span>
-        </div>
-
-        <div id="mainMenu" class="menu-grid">
-            <button class="thread-btn full-width-btn gold-text-btn" id="customRewardsBtn">Мои желания</button>
-            <button class="thread-btn full-width-btn gold-text-btn" id="historyBtn">История</button>
-            <!-- НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ -->
-            <button class="free-diamonds-btn full-width-btn" id="freeDiamondsBtn">✨Получи 1000 алмазов бесплатно✨</button>
-            <div class="menu-lang-row">
-                <button id="langRuMenu" class="lang-btn active" onclick="setLanguage('ru')">RU</button>
-                <button id="langUaMenu" class="lang-btn" onclick="setLanguage('ua')">UA</button>
-                <button id="langEnMenu" class="lang-btn" onclick="setLanguage('en')">EN</button>
+    <div class="info-section">
+        <h2>5 линий рефералов</h2>
+        <div class="subtitle">Ваш доход растёт с каждым уровнем</div>
+        <div class="chart-container">
+            <div class="chart-bars">
+                <div class="bar-wrapper"><span class="bar-percent">1%</span><div class="bar" style="height:30px;"></div><span class="bar-label">1 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">2%</span><div class="bar" style="height:55px;"></div><span class="bar-label">2 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">3%</span><div class="bar" style="height:80px;"></div><span class="bar-label">3 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">4%</span><div class="bar" style="height:105px;"></div><span class="bar-label">4 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">5%</span><div class="bar" style="height:130px;"></div><span class="bar-label">5 ур.</span></div>
             </div>
+            <div class="legend"><span>Процент от дохода рефералов</span></div>
         </div>
-
-        <div id="slotUI" class="slot-machine hidden">
-            <div class="slot-top-row">
-                <div class="treasure-section" id="treasureSection">
-                    <div class="treasure-box" id="treasureBox"><div class="gift-container" id="giftContainer"><span class="gift-icon" id="giftIcon">🎁</span></div></div>
-                    <div class="progress-container"><div class="progress-text" id="progressText">Бонус: 0/100%</div><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
-                </div>
-                <div class="balance-row" style="margin:0; flex-shrink:0; gap: 6px;">
-                    <span id="diamondsLabel">💎 Алмазы:</span><span id="diamondsCount">100</span>
-                    <button class="jackpot-prizes-btn" id="jackpotPrizesBtn">🎁 Призы</button>
-                </div>
-            </div>
-            <div class="free-spins-badge hidden" id="freeSpinsBadge">🎁 Бесплатные спины: 0 (Шанс джекпота +50%)</div>
-            <div class="machine" id="machine"></div>
-            <div class="win-lines" id="winLines"></div>
-            <div style="color:#ffd966; text-align:center; min-height:20px; font-weight:bold; font-size:0.8rem;" id="messageDisplay"></div>
-            <div class="controls-row">
-                <div class="left-buttons"><button id="donateButton" class="thread-btn">💎 Пополнить</button><button id="backToMenu" class="thread-btn" style="background:#2a1738;">↩️ МЕНЮ</button></div>
-                <div class="middle-buttons"><button id="autoSpinBtn" class="auto-spin-btn" title="Авто-запуск">🔄<br>AUTO</button></div>
-                <button id="spinButton" class="thread-btn spin-btn">🚀 ЗАПУСК</button>
-            </div>
-        </div>
-
-        <div class="footer">
-            <a id="privacyPolicyLink">Политика конфиденциальности</a> |
-            <a id="termsOfUseLink">Условия использования</a>
-        </div>
+        <div class="graph-note">📊 Чем глубже уровень — тем выше процент. <br> Приглашайте активных партнёров и увеличивайте прибыль.</div>
     </div>
+</div>
 
-    <div class="support-btn" id="supportBtn">💬<span class="support-badge hidden" id="supportBadge">0</span></div>
-    <div class="spin-win-display" id="spinWinDisplay"></div>
+<script>
+(function() {
+    const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+    const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    <!-- Modals -->
-    <div id="winOverlay" class="overlay hidden"><div class="win-card"><h2 style="color:#ffd966;" id="jackpotTitle">🎉 ДЖЕКПОТ!</h2><p style="color:#f0dbb0; font-size:1.1rem; margin:8px 0;" id="winMessage"></p><div style="font-size:2.8rem;" id="winIcons"></div><button id="sendToPartnerBtn" class="social-btn">💌 Отправить Партнёру</button><button id="closeWinBtn" class="thread-btn" style="margin-top:12px; animation: none;">ЗАКРЫТЬ</button></div></div>
-    <div id="nameFormModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="nameFormTitle">📝 Введите имена</h3><input type="text" id="userNameInput" class="form-input" placeholder="Ваше имя"><input type="text" id="partnerNameInput" class="form-input" placeholder="Имя партнёра"><button id="downloadWithNamesBtn" class="thread-btn" style="animation:none; margin-top:8px;">📥 Скачать</button><button id="closeNameFormBtn" class="thread-btn" style="animation:none; margin-top:6px;">Отмена</button></div></div>
-    <div id="paymentModal" class="overlay hidden"><div class="win-card" style="max-width:340px;"><h3 style="color:#f7e47b;" id="paymentTitle">💎 ПОПОЛНЕНИЕ АЛМАЗОВ</h3><div id="diamondOptions"><div class="diamond-option" data-diamonds="100" data-price="1">💎 100 алмазов - $1.00</div><div class="diamond-option" data-diamonds="500" data-price="5">💎 500 алмазов - $5.00</div><div class="diamond-option" data-diamonds="1000" data-price="10">💎 1000 алмазов - $10.00</div><div class="diamond-option" data-diamonds="5000" data-price="50">💎 5000 алмазов - $50.00</div><div class="diamond-option" data-diamonds="10000" data-price="100">💎 10000 алмазов - $100.00</div></div><button id="closePaymentBtn" class="thread-btn" style="margin-top:8px; animation: none;">ОТМЕНА</button></div></div>
-    <div id="historyModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="historyTitle">📜 История Джекпотов</h3><div id="historyList" class="history-list"></div><button id="closeHistoryBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
-    <div id="winDetailModal" class="overlay hidden"><div class="win-card"><h3 style="color:#ffd966;" id="winDetailTitle">📋 Детали выигрыша</h3><div class="win-detail-text" id="winDetailContent"></div><button id="closeWinDetailBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
-    <div id="customRewardsModal" class="overlay hidden"><div class="win-card wide"><h3 style="color:#ffd966;" id="customRewardsTitle">🎁 Мои желания (3-10)</h3><p style="color:#ddd; font-size:0.75rem;" id="customRewardsDesc">Введите свои желания для джекпота</p><div id="customRewardsList"></div><button id="addCustomRewardBtn" class="thread-btn" style="animation:none; margin-top:6px;">+ Добавить</button><div class="custom-rewards-buttons"><button id="saveAndPlayBtn" class="thread-btn" style="background:#d4af37; color:#150a1f;">💾 Сохранить и играть</button><button id="closeCustomRewardsBtn" class="thread-btn">ЗАКРЫТЬ</button></div></div></div>
-    <div id="jackpotPrizesModal" class="overlay hidden"><div class="win-card" style="max-width:400px;"><h3 style="color:#ffd966;" id="jackpotPrizesTitle">🎁 Призы джекпота</h3><div class="prizes-list" id="jackpotPrizesList"></div><button id="closeJackpotPrizesBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button></div></div>
-    <div id="supportModal" class="hidden">
-        <h3 style="color:#ffd966;" id="supportTitle">💬 Онлайн поддержка</h3>
-        <div class="chat-messages" id="chatMessages"><div class="chat-message admin">👋 Здравствуйте! Чем могу помочь?</div></div>
-        <div class="chat-input-row"><input type="text" class="chat-input" id="chatInput" placeholder="Введите сообщение..."><button id="sendChatBtn" class="thread-btn" style="animation:none; padding:8px 14px; font-size:0.75rem;">📤</button></div>
-        <button id="closeSupportBtn" class="thread-btn" style="margin-top:6px; animation: none;">ЗАКРЫТЬ</button>
-    </div>
+    const password2Group = document.getElementById('password2Group');
+    const actionButton = document.getElementById('actionButton');
+    const errorMessage = document.getElementById('errorMessage');
+    let isLoginMode = false;
 
-    <div id="promoCodeModal" class="overlay hidden">
-        <div class="win-card">
-            <h3 style="color:#ffd700;" id="promoCodeTitle">🎟️ Введите промокод</h3>
-            <input type="text" class="form-input" id="promoCodeInput" placeholder="WELCOME">
-            <button id="promoCodeSubmitBtn" class="thread-btn" style="margin-top:8px;">💾 Активировать</button>
-            <p id="promoCodeMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;"></p>
-            <button id="closePromoCodeBtn" class="thread-btn" style="margin-top:6px;animation:none;">ЗАКРЫТЬ</button>
-        </div>
-    </div>
-
-    <div id="cryptoPaymentModal" class="overlay hidden">
-        <div class="win-card crypto-payment-card">
-            <h3 style="color:#ffd700;margin-bottom:12px;">💎 Покупка алмазов</h3>
-            <p style="color:#ddd;font-size:0.8rem;margin-bottom:6px;">Выберите сумму:</p>
-            <div class="diamond-amount-select" id="diamondAmounts">
-                <div class="diamond-amount-option selected" data-usd="1" data-diamonds="100"><span class="amount">100 💎</span><span class="price">$1.00</span></div>
-                <div class="diamond-amount-option" data-usd="5" data-diamonds="500"><span class="amount">500 💎</span><span class="price">$5.00</span></div>
-                <div class="diamond-amount-option" data-usd="10" data-diamonds="1000"><span class="amount">1000 💎</span><span class="price">$10.00</span></div>
-                <div class="diamond-amount-option" data-usd="50" data-diamonds="5000"><span class="amount">5000 💎</span><span class="price">$50.00</span></div>
-                <div class="diamond-amount-option" data-usd="100" data-diamonds="10000"><span class="amount">10000 💎</span><span class="price">$100.00</span></div>
-            </div>
-            <p style="color:#ddd;font-size:0.8rem;margin:8px 0;">Выберите криптовалюту:</p>
-            <div class="crypto-list" id="cryptoList">
-                <div class="crypto-option selected" data-currency="USDT">USDT (TRC20)</div>
-                <div class="crypto-option" data-currency="TRX">TRX (TRC20)</div>
-                <div class="crypto-option" data-currency="BNB">BNB (BEP20)</div>
-                <div class="crypto-option" data-currency="ETH">ETH (ERC20)</div>
-                <div class="crypto-option" data-currency="BTC">BTC (BEP20)</div>
-            </div>
-            <div class="rate-display" id="rateDisplay">Загрузка курса...</div>
-            <div class="qr-container" id="qrContainer"></div>
-            <div class="wallet-address" id="walletAddress"></div>
-            <button id="copyAddressBtn" class="thread-btn" style="animation:none;font-size:0.7rem;padding:8px;margin:6px 0;width:100%;">📋 Копировать адрес</button>
-            <p class="copied-msg hidden" id="copiedMsg">Адрес скопирован!</p>
-            <button id="simulatePaymentBtn" class="pay-btn">💰 Я оплатил — получить алмазы</button>
-            <p style="color:#888;font-size:0.65rem;text-align:center;margin:8px 0;">После нажатия алмазы начислятся мгновенно (демо)</p>
-            <button id="closeCryptoPaymentBtn" class="thread-btn" style="margin-top:4px;animation:none;">ЗАКРЫТЬ</button>
-        </div>
-    </div>
-
-    <div id="profileModal" class="overlay hidden">
-        <div class="win-card profile-modal-card">
-            <h3 style="color:#ffd700;text-align:center;margin-bottom:16px;">👤 Профиль</h3>
-            <div class="profile-info-row"><strong>ID:</strong> <span id="profileUID">-</span> <button class="copy-btn" onclick="copyUID()">📋 Копировать</button></div>
-            <div class="profile-info-row"><strong>Email:</strong> <span id="profileEmail">-</span></div>
-            <div class="profile-info-row"><strong>💎 Баланс:</strong> <span id="profileDiamonds">0</span></div>
-            <div class="profile-info-row"><strong>🎰 Всего джекпотов:</strong> <span id="profileJackpots">0</span></div>
-            <div class="profile-nickname-row">
-                <input type="text" class="form-input" id="profileNicknameInput" placeholder="Новый никнейм">
-                <button onclick="changeNickname()">💾 Сохранить</button>
-            </div>
-            <p id="profileMsg" style="color:#44ff44;font-size:0.8rem;margin-top:8px;text-align:center;"></p>
-            <button id="closeProfileBtn" class="thread-btn" style="margin-top:12px;animation:none;width:100%;">ЗАКРЫТЬ</button>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНОЕ ОКНО ДЛЯ БЕСПЛАТНЫХ АЛМАЗОВ -->
-    <div id="freeDiamondsModal" class="overlay hidden">
-        <div class="win-card">
-            <h3 style="color:#ffd700; margin-bottom:16px;" id="freeDiamondsTitle">✨ Получи 1000 алмазов бесплатно ✨</h3>
-            <div style="color:#f0dbb0; text-align:left; line-height:1.8; font-size:0.95rem; margin-bottom:20px;" id="freeDiamondsContent">
-                <p id="freeDiamondsIntro">Для получения <strong style="color:#ffd700;">1000 алмазов</strong> нужно отправить мне в телеграмм:</p>
-                <p style="margin-top:12px;" id="freeDiamondsStep1">1) <strong style="color:#ffd966;">Ваш ID</strong></p>
-                <p id="freeDiamondsStep2">2) <strong style="color:#ffd966;">Выиграть джек пот и скачать сертификат джек пота</strong> (получите его автоматически после выигрыша)</p>
-                <p id="freeDiamondsStep3">3) <strong style="color:#ffd966;">Видео исполнения желания в формате mp4</strong></p>
-            </div>
-            <a href="https://t.me/casper_lider" target="_blank" rel="noopener noreferrer" style="display:inline-block; background:#0088cc; color:white; padding:12px 24px; border-radius:30px; text-decoration:none; font-weight:bold; font-size:1rem; margin-bottom:16px; transition:0.2s; box-shadow:0 4px 15px rgba(0,136,204,0.4);" id="freeDiamondsTelegramBtn">
-                💬 Написать в Telegram
-            </a>
-            <p style="color:#888; font-size:0.75rem; margin-bottom:16px;" id="freeDiamondsLink">Ссылка: https://t.me/casper_lider</p>
-            <button id="closeFreeDiamondsBtn" class="thread-btn" style="margin-top:8px; animation: none;">ЗАКРЫТЬ</button>
-        </div>
-    </div>
-
-    <script src="api.js"></script>
-    <script>
-    // ========== ORIGINAL SCRIPT – FULLY PRESERVED ==========
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        const swCode = `self.addEventListener('install',(e)=>{e.waitUntil(self.skipWaiting())});self.addEventListener('activate',(e)=>{e.waitUntil(self.clients.claim())});self.addEventListener('fetch',(e)=>{e.respondWith(fetch(e.request))});`;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
-      });
+    function updateUIForMode() {
+        errorMessage.classList.remove('visible');
+        if (isLoginMode) {
+            password2Group.classList.remove('visible-password'); password2Group.classList.add('hidden-password');
+            actionButton.textContent = 'Войти';
+            document.getElementById('switchTextBlock').innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
+        } else {
+            password2Group.classList.remove('hidden-password'); password2Group.classList.add('visible-password');
+            actionButton.textContent = 'Зарегистрироваться';
+            document.getElementById('switchTextBlock').innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
+        }
+        document.getElementById('toggleModeLink').addEventListener('click', function(){ isLoginMode = !isLoginMode; updateUIForMode(); });
     }
+    updateUIForMode();
 
-    (function() {
-      const GOOGLE_CLIENT_ID = '12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com';
+    actionButton.addEventListener('click', async function(e) {
+        e.preventDefault();
+        const nickname = document.getElementById('nickname').value.trim();
+        const password = document.getElementById('password1').value;
+        errorMessage.classList.remove('visible');
+        if (!nickname || !password) return;
 
-      window.handleGoogleLogin = function() {
-        const client = google.accounts.oauth2.initTokenClient({
-          client_id: GOOGLE_CLIENT_ID,
-          scope: 'email profile openid',
-          callback: async (response) => {
-            if (response.error) { $('authError').style.display = 'block'; $('authError').textContent = 'Ошибка входа'; return; }
-            const token = response.access_token;
-            const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
-            const result = await API.registerOrLogin({ googleId: userInfo.sub, email: userInfo.email, name: userInfo.name, picture: userInfo.picture });
-            if (result.success) { onLoginSuccess(result); } else { $('authError').style.display = 'block'; $('authError').textContent = result.error || 'Ошибка'; }
-          }
-        });
-        client.requestAccessToken();
-      };
-
-      // Generic symbols for the slot machine
-      const ICONS = ['🍒', '🍋', '🍊', '🍇', '⭐'];
-
-      const CERTIFICATE_TEXTS = {
-        ru: { title: 'VDS СЕРТИФИКАТ ВЫИГРЫША', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' выиграл(а) для '+p+'!', official: 'ОФИЦИАЛЬНЫЙ ЧЕК • VDS' },
-        ua: { title: 'VDS СЕРТИФІКАТ ВИГРАШУ', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' виграв(ла) для '+p+'!', official: 'ОФІЦІЙНИЙ ЧЕК • VDS' },
-        en: { title: 'VDS WINNINGS CERTIFICATE', subtitle: 'Vibe Dare Smile', wonMsg: (u,p) => u+' won for '+p+'!', official: 'OFFICIAL CHECK • VDS' }
-      };
-
-      const TRANSLATIONS = {
-        ru: {
-          loginTitle:'🔐 ВХОД', customRewardsBtn:'Мои желания', historyBtn:'История',
-          diamondsLabel:'💎 Алмазы:', donateButton:'💎 Пополнить', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Отправить Партнёру', closeBtn:'ЗАКРЫТЬ',
-          nameFormTitle:'📝 Введите имена', userNamePlaceholder:'Ваше имя', partnerNamePlaceholder:'Имя партнёра', downloadBtn:'📥 Скачать', cancelBtn:'Отмена',
-          paymentTitle:'💎 ПОПОЛНЕНИЕ АЛМАЗОВ', closePayment:'ОТМЕНА', historyTitle:'📜 История Джекпотов', noJackpots:'Нет джекпотов',
-          customRewardsTitle:'🎁 Мои желания (3-10)', customRewardsDesc:'Введите свои желания для джекпота', addBtn:'+ Добавить', saveAndPlay:'💾 Сохранить и играть', closeCustom:'ЗАКРЫТЬ',
-          jackpotPrizesTitle:'🎁 Призы джекпота', jackpotPrizesBtn:'🎁 Призы', privacyLink:'Политика конфиденциальности', termsLink:'Условия использования',
-          notEnoughDiamonds:'💔 Мало алмазов!', bonusOpened:'🎁 +10 бесплатных спинов!', tryAgain:'💫 Попробуй ещё', win3:'🎉 3 совпадения! +1💎', win4:'🔥 4 совпадения! +3💎',
-          logoutBtn:'🚪 Выйти', mainTopUpBtn:'💎 Пополнить', viewBtn:'👁 Смотреть', winDetailTitle:'📋 Детали выигрыша',
-          supportTitle:'💬 Онлайн поддержка', supportPlaceholder:'Введите сообщение...', sendBtn:'📤', winningsBtn:'🏆 Выигрыши', winningsTitle:'🏆 Последние джекпоты', noWinnings:'Пока нет джекпотов',
-          supportGreeting:'👋 Здравствуйте! Чем могу помочь?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введите промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активировать',
-          promoCodeClose:'ЗАКРЫТЬ', promoCodeSuccess:'🎉 Промокод активирован! +20💎 и +5 бесплатных спинов', promoCodeAlready:'⏳ Этот промокод уже использован', promoCodeInvalid:'❌ Неверный промокод',
-          regGlowText: 'Исполняет желания',
-          wishPhrases: ['Следуй за мечтой', 'Загадай желание', 'Закажи счастье', 'Поймай удачу', 'Мечтай смело', 'Звезда желаний', 'Раскрой магию', 'Лови момент'],
-          freeDiamondsBtn: '✨Получи 1000 алмазов бесплатно✨',
-          freeDiamondsTitle: '✨ Получи 1000 алмазов бесплатно ✨',
-          freeDiamondsIntro: 'Для получения <strong style="color:#ffd700;">1000 алмазов</strong> нужно отправить мне в телеграмм:',
-          freeDiamondsStep1: '1) <strong style="color:#ffd966;">Ваш ID</strong>',
-          freeDiamondsStep2: '2) <strong style="color:#ffd966;">Выиграть джек пот и скачать сертификат джек пота</strong> (получите его автоматически после выигрыша)',
-          freeDiamondsStep3: '3) <strong style="color:#ffd966;">Видео исполнения желания в формате mp4</strong>',
-          freeDiamondsTelegramBtn: '💬 Написать в Telegram',
-          freeDiamondsLink: 'Ссылка: https://t.me/casper_lider',
-          googleLoginBtnText: 'Войти через Google',
-          regGoogleBtnText: 'Войти через Google'
-        },
-        ua: {
-          loginTitle:'🔐 ВХІД', customRewardsBtn:'Мої бажання', historyBtn:'Історія',
-          diamondsLabel:'💎 Алмази:', donateButton:'💎 Поповнити', backToMenu:'↩️ МЕНЮ', spinBtn:'🚀 ЗАПУСК', jackpotTitle:'🎉 ДЖЕКПОТ!', sendToPartner:'💌 Надіслати Партнеру', closeBtn:'ЗАКРИТИ',
-          nameFormTitle:'📝 Введіть імена', userNamePlaceholder:'Ваше ім\'я', partnerNamePlaceholder:'Ім\'я партнера', downloadBtn:'📥 Завантажити', cancelBtn:'Скасувати',
-          paymentTitle:'💎 ПОПОВНЕННЯ АЛМАЗІВ', closePayment:'СКАСУВАТИ', historyTitle:'📜 Історія Джекпотів', noJackpots:'Немає джекпотів',
-          customRewardsTitle:'🎁 Мої бажання (3-10)', customRewardsDesc:'Введіть свої бажання для джекпоту', addBtn:'+ Додати', saveAndPlay:'💾 Зберегти і грати', closeCustom:'ЗАКРИТИ',
-          jackpotPrizesTitle:'🎁 Призи джекпоту', jackpotPrizesBtn:'🎁 Призи', privacyLink:'Політика конфіденційності', termsLink:'Умови використання',
-          notEnoughDiamonds:'💔 Мало алмазів!', bonusOpened:'🎁 +10 безкоштовних спинів!', tryAgain:'💫 Спробуй ще', win3:'🎉 3 збіги! +1💎', win4:'🔥 4 збіги! +3💎',
-          logoutBtn:'🚪 Вийти', mainTopUpBtn:'💎 Поповнити', viewBtn:'👁 Дивитись', winDetailTitle:'📋 Деталі виграшу',
-          supportTitle:'💬 Онлайн підтримка', supportPlaceholder:'Введіть повідомлення...', sendBtn:'📤', winningsBtn:'🏆 Виграші', winningsTitle:'🏆 Останні джекпоти', noWinnings:'Поки немає джекпотів',
-          supportGreeting:'👋 Здравствуйте! Чим можу допомогти?', promoCodeBtn:'🎟️ Промокод', promoCodeTitle:'🎟️ Введіть промокод', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Активувати',
-          promoCodeClose:'ЗАКРИТИ', promoCodeSuccess:'🎉 Промокод активовано! +20💎 та +5 безкоштовних спинів', promoCodeAlready:'⏳ Цей промокод вже використано', promoCodeInvalid:'❌ Невірний промокод',
-          regGlowText: 'Виконує бажання',
-          wishPhrases: ['Йди за мрією', 'Загадай бажання', 'Замов щастя', 'Впіймай удачу', 'Мрій сміливо', 'Зірка бажань', 'Відкрий магію', 'Лови момент'],
-          freeDiamondsBtn: '✨Отримай 1000 алмазів безкоштовно✨',
-          freeDiamondsTitle: '✨ Отримай 1000 алмазів безкоштовно ✨',
-          freeDiamondsIntro: 'Для отримання <strong style="color:#ffd700;">1000 алмазів</strong> потрібно надіслати мені в телеграм:',
-          freeDiamondsStep1: '1) <strong style="color:#ffd966;">Ваш ID</strong>',
-          freeDiamondsStep2: '2) <strong style="color:#ffd966;">Виграти джек пот і завантажити сертифікат джек поту</strong> (отримаєте його автоматично після виграшу)',
-          freeDiamondsStep3: '3) <strong style="color:#ffd966;">Відео виконання бажання у форматі mp4</strong>',
-          freeDiamondsTelegramBtn: '💬 Написати в Telegram',
-          freeDiamondsLink: 'Посилання: https://t.me/casper_lider',
-          googleLoginBtnText: 'Увійти через Google',
-          regGoogleBtnText: 'Увійти через Google'
-        },
-        en: {
-          loginTitle:'🔐 LOGIN', customRewardsBtn:'My Wishes', historyBtn:'History',
-          diamondsLabel:'💎 Diamonds:', donateButton:'💎 Top Up', backToMenu:'↩️ MENU', spinBtn:'🚀 LAUNCH', jackpotTitle:'🎉 JACKPOT!', sendToPartner:'💌 Send to Partner', closeBtn:'CLOSE',
-          nameFormTitle:'📝 Enter Names', userNamePlaceholder:'Your name', partnerNamePlaceholder:'Partner name', downloadBtn:'📥 Download', cancelBtn:'Cancel',
-          paymentTitle:'💎 TOP UP DIAMONDS', closePayment:'CANCEL', historyTitle:'📜 Jackpot History', noJackpots:'No jackpots yet',
-          customRewardsTitle:'🎁 My Wishes (3-10)', customRewardsDesc:'Enter your wishes for jackpot', addBtn:'+ Add', saveAndPlay:'💾 Save & Play', closeCustom:'CLOSE',
-          jackpotPrizesTitle:'🎁 Jackpot Prizes', jackpotPrizesBtn:'🎁 Prizes', privacyLink:'Privacy Policy', termsLink:'Terms of Use',
-          notEnoughDiamonds:'💔 Not enough diamonds!', bonusOpened:'🎁 +10 free spins!', tryAgain:'💫 Try again', win3:'🎉 3 matches! +1💎', win4:'🔥 4 matches! +3💎',
-          logoutBtn:'🚪 Logout', mainTopUpBtn:'💎 Top Up', viewBtn:'👁 View', winDetailTitle:'📋 Win Details',
-          supportTitle:'💬 Online Support', supportPlaceholder:'Enter message...', sendBtn:'📤', winningsBtn:'🏆 Winnings', winningsTitle:'🏆 Latest Jackpots', noWinnings:'No jackpots yet',
-          supportGreeting:'👋 Hello! How can I help you?', promoCodeBtn:'🎟️ Promo Code', promoCodeTitle:'🎟️ Enter Promo Code', promoCodePlaceholder:'WELCOME', promoCodeActivate:'💾 Activate',
-          promoCodeClose:'CLOSE', promoCodeSuccess:'🎉 Promo code activated! +20💎 and +5 free spins', promoCodeAlready:'⏳ This promo code has already been used', promoCodeInvalid:'❌ Invalid promo code',
-          regGlowText: 'Fulfills wishes',
-          wishPhrases: ['Follow your dream', 'Get a wish', 'Order happiness', 'Make a wish', 'Dream big', 'Wish upon a star', 'Unlock magic', 'Chase the magic'],
-          freeDiamondsBtn: '✨Get 1000 Diamonds Free✨',
-          freeDiamondsTitle: '✨ Get 1000 Diamonds Free ✨',
-          freeDiamondsIntro: 'To get <strong style="color:#ffd700;">1000 diamonds</strong> you need to send me in telegram:',
-          freeDiamondsStep1: '1) <strong style="color:#ffd966;">Your ID</strong>',
-          freeDiamondsStep2: '2) <strong style="color:#ffd966;">Win the jackpot and download the jackpot certificate</strong> (you will get it automatically after winning)',
-          freeDiamondsStep3: '3) <strong style="color:#ffd966;">Video of wish fulfillment in mp4 format</strong>',
-          freeDiamondsTelegramBtn: '💬 Write to Telegram',
-          freeDiamondsLink: 'Link: https://t.me/casper_lider',
-          googleLoginBtnText: 'Sign in with Google',
-          regGoogleBtnText: 'Sign in with Google'
-        }
-      };
-
-      const POLICIES = {
-        ru: { privacy: 'Политика конфиденциальности: 1. Мы используем Google аккаунт для входа. 2. Игровые данные хранятся в Supabase. 3. Мы не передаем данные третьим лицам.', terms: 'Условия использования: 1. Игра предназначена для развлекательных целей. 2. Администрация оставляет за собой право изменять правила.' },
-        ua: { privacy: 'Політика конфіденційності: 1. Використовуємо Google для входу. 2. Дані зберігаються в Supabase.', terms: 'Умови використання: 1. Гра для розваг. 2. Адміністрація може змінювати правила.' },
-        en: { privacy: 'Privacy Policy: 1. We use Google for login. 2. Game data is stored in Supabase. 3. We do not share data with third parties.', terms: 'Terms of Use: 1. Game is for entertainment purposes. 2. Administration reserves the right to change the rules.' }
-      };
-
-      // Generic prize phrases for jackpot (replaces old MODE_PRIZES)
-      const GENERIC_PRIZES = {
-        ru: ['Вы выиграли приз!', 'Поздравляем!', 'Удача улыбнулась!', 'Ваш приз ждёт!', 'Заберите подарок!', 'Сегодня ваш день!', 'Сюрприз!'],
-        ua: ['Ви виграли приз!', 'Вітаємо!', 'Удача посміхнулася!', 'Ваш приз чекає!', 'Заберіть подарунок!', 'Сьогодні ваш день!', 'Сюрприз!'],
-        en: ['You won a prize!', 'Congratulations!', 'Lucky day!', 'Your prize awaits!', 'Grab your gift!', 'It\'s your day!', 'Surprise!']
-      };
-
-      // Registration emoji phrases by language
-      const REG_PHRASES_RU = [
-        "Мы можем исполнить твою мечту",
-        "Крути, выигрывай, наслаждайся!",
-        "Удача улыбается тебе",
-        "Осмелься мечтать по-крупному",
-        "Твое желание — мой приказ",
-        "Высвободи магию",
-        "Звезды сошлись для тебя",
-        "Поймай искру",
-        "Пусть приключение начнется",
-        "Прими невозможное",
-        "Сияй как бриллиант",
-        "Загадай смелое желание"
-      ];
-      const REG_PHRASES_UA = [
-        "Ми можемо здійснити твою мрію",
-        "Крути, вигравай, насолоджуйся!",
-        "Удача посміхається тобі",
-        "Наважся мріяти про велике",
-        "Твоє бажання — мій наказ",
-        "Вивільни магію",
-        "Зірки зійшлися для тебе",
-        "Лови іскру",
-        "Нехай пригода почнеться",
-        "Прийми неможливе",
-        "Сяй як діамант",
-        "Загадай сміливе бажання"
-      ];
-      const REG_PHRASES_EN = [
-        "We can make your dream come true",
-        "Spin, Win, Enjoy!",
-        "Fortune smiles on you",
-        "Dare to dream big",
-        "Your wish is my command",
-        "Unleash the magic",
-        "Stars align for you",
-        "Chase the sparkle",
-        "Let the adventure begin",
-        "Embrace the impossible",
-        "Shine like a diamond",
-        "Make a bold wish"
-      ];
-
-      let currentLanguage = 'ru';
-      let userData = null;
-      let nickname = '';
-      let diamonds = 100;
-      let treasureProgress = 0;
-      let freeSpins = 0;
-      let jackpotBoost = false;
-      let spinning = false;
-      let autoSpinning = false;
-      let currentMode = 'generic';
-      let gamePaused = false;
-      const GRID = 5;
-      let visibleGrid = [];
-      let strips = [];
-      let jackpotHistory = [];
-      let pendingJackpotIcon = null;
-      let pendingJackpotWish = null;
-      let customRewards = [];
-      let useCustomRewards = false;
-      let audioCtx = null;
-      let saveTimeout = null;
-      let supportMessages = [];
-      let supportUnreadCount = 0;
-      let supportPollingInterval = null;
-      let cryptoRates = {};
-      let selectedCrypto = 'USDT';
-      let selectedUSD = 1;
-      let selectedDiamonds = 100;
-      let rateInterval = null;
-      let regBgGiftsInterval = null;
-      let logoAnimationTimer = null;
-      let typingInterval = null;
-      let menuGiftsInterval = null;
-
-      // ========== UTILS ==========
-      function t(key) { return TRANSLATIONS[currentLanguage]?.[key] || TRANSLATIONS.ru[key] || key; }
-      function $(id) { return document.getElementById(id); }
-      function initAudio() { if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)(); return audioCtx; }
-      function playTone(f, d, type, v) { type = type || 'sine'; v = v || 0.08; try { const c = initAudio(); const o = c.createOscillator(); const g = c.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, c.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, c.currentTime + d); o.connect(g); g.connect(c.destination); o.start(c.currentTime); o.stop(c.currentTime + d); } catch (e) {} }
-      function playSpinClickSound() { playTone(600, 0.1, 'square', 0.06); setTimeout(function() { playTone(800, 0.1, 'square', 0.05); }, 50); }
-      function playReelSpinSound() { playTone(150 + Math.random() * 80, 0.06, 'sawtooth', 0.02); }
-      function playReelStopSound() { playTone(300, 0.12, 'triangle', 0.04); }
-      function playWinSound() { playTone(523, 0.15); setTimeout(function() { playTone(659, 0.15); }, 120); }
-      function playLoseSound() { playTone(200, 0.2, 'sawtooth', 0.03); }
-      function playJackpotSound() { [523, 659, 784, 1047, 1319, 1568].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.3, 'sine', 0.07); }, i * 100); }); }
-      function playGiftShakeSound() { playTone(250 + Math.random() * 50, 0.05, 'square', 0.03); }
-      function playGiftExplosionSound() { [300, 400, 500, 600, 700, 800, 900, 1000].forEach(function(f, i) { setTimeout(function() { playTone(f, 0.15, 'triangle', 0.05); }, i * 30); }); }
-      function playNotificationSound() { playTone(800, 0.15, 'sine', 0.07); setTimeout(() => playTone(1000, 0.15, 'sine', 0.07), 150); }
-
-      // ========== MAIN MENU FALLING GIFTS ==========
-      function startMenuFallingGifts() {
-        const menu = $('mainMenu');
-        if (!menu) return;
-        stopMenuFallingGifts();
-        const gifts = ['🎁','🎀','💝','🎊','🎉','✨','💎','🌟','🎈','🎪','🦋','🌸','🍀','💫','⭐'];
-        menuGiftsInterval = setInterval(() => {
-          if (!menu.parentNode || menu.classList.contains('hidden')) { return; }
-          const gift = document.createElement('div');
-          gift.className = 'menu-falling-gift';
-          gift.textContent = gifts[Math.floor(Math.random() * gifts.length)];
-          gift.style.left = Math.random() * 90 + '%';
-          gift.style.top = '-40px';
-          gift.style.animationDuration = (6 + Math.random() * 8) + 's';
-          gift.style.fontSize = (0.8 + Math.random() * 1.8) + 'rem';
-          menu.appendChild(gift);
-          setTimeout(() => { if (gift.parentNode) gift.remove(); }, 15000);
-        }, 1800);
-      }
-
-      function stopMenuFallingGifts() {
-        if (menuGiftsInterval) { clearInterval(menuGiftsInterval); menuGiftsInterval = null; }
-        const menu = $('mainMenu');
-        if (menu) {
-          const allGifts = menu.querySelectorAll('.menu-falling-gift');
-          allGifts.forEach(g => g.remove());
-        }
-      }
-
-      // ========== REGISTRATION BACKGROUND GIFTS (top to bottom, clickable) ==========
-      function startRegBgGifts() {
-        const container = $('regBgGifts');
-        if (!container) return;
-        stopRegBgGifts();
-        const gifts = ['🎁','🎀','💝','🎊','🎉','✨','💎','🌟','🎈','🎪'];
-        regBgGiftsInterval = setInterval(() => {
-          if (!container.parentNode) { stopRegBgGifts(); return; }
-          const gift = document.createElement('div');
-          gift.className = 'reg-bg-gift';
-          gift.textContent = gifts[Math.floor(Math.random() * gifts.length)];
-          gift.style.left = Math.random() * 90 + '%';
-          gift.style.top = '-10vh';
-          gift.style.animationDuration = (8 + Math.random() * 7) + 's';
-          container.appendChild(gift);
-          setTimeout(() => { if (gift.parentNode) gift.remove(); }, 16000);
-        }, 2000);
-      }
-
-      function stopRegBgGifts() {
-        if (regBgGiftsInterval) { clearInterval(regBgGiftsInterval); regBgGiftsInterval = null; }
-        const container = $('regBgGifts');
-        if (container) container.innerHTML = '';
-      }
-
-      function handleRegGiftClick(e) {
-        const gift = e.target.closest('.reg-bg-gift');
-        if (!gift) return;
-        const container = $('regBgGifts');
-        const containerRect = container.getBoundingClientRect();
-        const clickX = e.clientX - containerRect.left;
-        const clickY = e.clientY - containerRect.top;
-        gift.remove();
-        const phrases = currentLanguage === 'ua' ? REG_PHRASES_UA : currentLanguage === 'en' ? REG_PHRASES_EN : REG_PHRASES_RU;
-        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-        const phraseEl = document.createElement('div');
-        phraseEl.className = 'reg-phrase-glow';
-        phraseEl.textContent = phrase;
-        phraseEl.style.left = clickX + 'px';
-        phraseEl.style.top = clickY + 'px';
-        container.appendChild(phraseEl);
-        setTimeout(() => { if (phraseEl.parentNode) phraseEl.remove(); }, 5000);
-      }
-
-      // ========== REGISTRATION WINDOW ==========
-      function showRegistrationPage() {
-        if (userData) return;
-        const win = $('registrationWindow');
-        if (!win) return;
-        win.classList.remove('hidden');
-        startRegBgGifts();
-        runLogoAnimation();
-      }
-
-      function hideRegistrationPage() {
-        stopRegBgGifts();
-        stopLogoAnimation();
-        $('registrationWindow').classList.add('hidden');
-      }
-
-      function runLogoAnimation() {
-        const letters = document.querySelectorAll('.logo-letter');
-        if (!letters.length) return;
-        letters.forEach(letter => {
-          letter.style.animation = 'none';
-          letter.offsetHeight;
-          letter.style.animation = '';
-        });
-        letters.forEach(letter => {
-          letter.classList.remove('logo-letter');
-          void letter.offsetWidth;
-          letter.classList.add('logo-letter');
-        });
-        const glow = document.querySelector('.logo-glow');
-        const btn = document.querySelector('.reg-google-btn');
-        if (glow) {
-          glow.style.animation = 'none';
-          glow.offsetHeight;
-          glow.style.animation = 'fadeInUp 1.2s ease-out 1.2s forwards';
-        }
-        if (btn) {
-          btn.style.animation = 'none';
-          btn.offsetHeight;
-          btn.style.animation = 'fadeInUp 1.2s ease-out 1.8s forwards';
-        }
-        clearTimeout(logoAnimationTimer);
-        logoAnimationTimer = setTimeout(() => {
-          if (!userData) runLogoAnimation();
-        }, 10000);
-      }
-
-      function stopLogoAnimation() {
-        clearTimeout(logoAnimationTimer);
-        logoAnimationTimer = null;
-      }
-
-      // ========== TYPING ANIMATION FOR WISH BUTTON ==========
-      function getWishPhrases() {
-        return TRANSLATIONS[currentLanguage]?.wishPhrases || TRANSLATIONS.ru.wishPhrases;
-      }
-
-      function startTypingAnimation() {
-        const btn = $('customRewardsBtn');
-        if (!btn) return;
-        stopTypingAnimation();
-        const phrases = getWishPhrases();
-        let currentPhraseIndex = Math.floor(Math.random() * phrases.length);
-        let charIndex = 0;
-        let typingForward = true;
-        const typingSpeed = 100;
-        const pauseBetween = 5000;
-
-        function typeNext() {
-          if (!btn) { stopTypingAnimation(); return; }
-          const phrases = getWishPhrases();
-          if (typingForward) {
-            if (charIndex <= phrases[currentPhraseIndex].length) {
-              const partial = phrases[currentPhraseIndex].substring(0, charIndex);
-              btn.innerHTML = '<span class="bracket-flash">[</span>' + partial + '<span class="bracket-flash">]</span>';
-              charIndex++;
-              typingInterval = setTimeout(typeNext, typingSpeed);
-            } else {
-              typingForward = false;
-              typingInterval = setTimeout(typeNext, pauseBetween);
-            }
-          } else {
-            currentPhraseIndex = Math.floor(Math.random() * phrases.length);
-            charIndex = 0;
-            typingForward = true;
-            btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>';
-            typingInterval = setTimeout(typeNext, 200);
-          }
-        }
-        typingInterval = setTimeout(typeNext, 200);
-      }
-
-      function stopTypingAnimation() {
-        if (typingInterval) { clearInterval(typingInterval); typingInterval = null; }
-        const btn = $('customRewardsBtn');
-        if (btn) btn.innerHTML = '<span class="bracket-flash">[</span><span class="bracket-flash">]</span>';
-      }
-
-      // ========== AUTH ==========
-      function onLoginSuccess(data) {
-        hideRegistrationPage();
-        userData = data;
-        nickname = data.nickname;
-        diamonds = data.diamonds;
-        treasureProgress = data.treasure_progress;
-        freeSpins = data.free_spins;
-        jackpotBoost = data.jackpot_boost;
-        // Загружаем спины из localStorage как резерв
-        const savedSpins = localStorage.getItem('wdVdsFreeSpins_' + nickname);
-        if (savedSpins !== null && freeSpins === 0) freeSpins = parseInt(savedSpins);
-        $('mainMenu').classList.remove('hidden');
-        $('userBar').classList.remove('hidden-bar');
-        $('nicknameDisplay').textContent = nickname;
-        $('userIdDisplay').textContent = 'ID: ' + data.user_uid;
-        if (data.picture) { $('userAvatar').src = data.picture; $('userAvatar').classList.remove('hidden'); }
-        $('logoutBtn').style.display = 'inline-block';
-        $('googleLoginBtn').style.display = 'none';
-        $('authError').style.display = 'none';
-        updateMainBalance();
-        updateDiamondsDisplay();
-        updateFreeSpinsBadge();
-        updateTreasureProgress(0);
-        loadJackpotHistory();
-        loadCustomRewards();
-        loadSupportHistory();
-        startSupportPolling();
-        loadCryptoRates();
-        startTypingAnimation();
-        startMenuFallingGifts();
-        updateAllTexts();
-      }
-
-      async function logout() {
-        autoSpinning = false;
-        spinning = false;
-        if ($('autoSpinBtn')) {
-          $('autoSpinBtn').classList.remove('active');
-          $('autoSpinBtn').innerHTML = '🔄<br>AUTO';
-        }
-        if (userData) await API.logOut(userData.user_uid, nickname);
-        userData = null; nickname = ''; diamonds = 100; treasureProgress = 0; freeSpins = 0; jackpotBoost = false;
-        jackpotHistory = []; customRewards = []; useCustomRewards = false; supportMessages = []; supportUnreadCount = 0;
-        $('mainMenu').classList.add('hidden'); $('slotUI').classList.add('hidden');
-        $('userBar').classList.add('hidden-bar');
-        $('userIdDisplay').textContent = ''; $('userAvatar').classList.add('hidden'); updateMainBalance();
-        $('logoutBtn').style.display = 'none';
-        $('googleLoginBtn').style.display = 'flex';
-        $('authError').style.display = 'none';
-        if (rateInterval) clearInterval(rateInterval);
-        if (supportPollingInterval) clearInterval(supportPollingInterval);
-        updateSupportBadge();
-        stopTypingAnimation();
-        stopMenuFallingGifts();
-        showRegistrationPage();
-      }
-
-      // ========== GAME FUNCTIONS ==========
-      function updateGiftSize(progress) {
-        if (!$('giftIcon')) return;
-        if (progress >= 100) { $('giftIcon').style.fontSize = '1.5rem'; }
-        else { var scale = 0.5 + (progress / 100) * 2.5; $('giftIcon').style.fontSize = (1.2 * scale) + 'rem'; }
-      }
-      function spawnParticles() {
-        if (!$('treasureSection') || !$('giftIcon')) return;
-        var container = $('treasureSection');
-        var giftRect = $('giftIcon').getBoundingClientRect();
-        var containerRect = container.getBoundingClientRect();
-        var centerX = giftRect.left + giftRect.width / 2 - containerRect.left;
-        var centerY = giftRect.top + giftRect.height / 2 - containerRect.top;
-        var colors = ['#ff3333', '#ff4444', '#cc0000', '#3333ff', '#4444ff', '#0000cc', '#ffdd00', '#ffcc00', '#ffaa00'];
-        for (var i = 0; i < 30; i++) {
-          var particle = document.createElement('div');
-          particle.className = 'particle';
-          particle.style.position = 'absolute';
-          particle.style.left = centerX + 'px';
-          particle.style.top = centerY + 'px';
-          particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-          particle.style.width = (4 + Math.random() * 8) + 'px';
-          particle.style.height = (4 + Math.random() * 8) + 'px';
-          particle.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-          var angle = Math.random() * Math.PI * 2;
-          var distance = 30 + Math.random() * 80;
-          particle.style.setProperty('--px', Math.cos(angle) * distance + 'px');
-          particle.style.setProperty('--py', Math.sin(angle) * distance + 'px');
-          particle.style.animationDuration = (0.8 + Math.random() * 1.5) + 's';
-          container.appendChild(particle);
-          setTimeout(function() { if (particle.parentNode) particle.remove(); }, 2000);
-        }
-      }
-      function animateGiftShakeAndExplosion() {
-        if (!$('giftIcon')) return;
-        $('giftIcon').style.fontSize = '1.5rem';
-        gamePaused = true;
-        $('spinButton').disabled = true;
-        $('giftIcon').classList.add('gift-shake');
-        var shakeInterval = setInterval(function() { playGiftShakeSound(); }, 150);
-        setTimeout(function() {
-          clearInterval(shakeInterval);
-          $('giftIcon').classList.remove('gift-shake');
-          spawnParticles();
-          playGiftExplosionSound();
-          $('giftIcon').classList.add('gift-explosion');
-          setTimeout(function() {
-            $('giftIcon').classList.remove('gift-explosion');
-            $('giftIcon').classList.add('gift-reappear');
-            $('giftIcon').style.fontSize = '1.2rem';
-            treasureProgress = 0;
-            $('progressFill').style.width = '0%';
-            var bonusWord = currentLanguage === 'ru' ? 'Бонус' : currentLanguage === 'ua' ? 'Бонус' : 'Bonus';
-            $('progressText').textContent = bonusWord + ': 0/100%';
-            freeSpins += 10;
-            jackpotBoost = true;
-            updateFreeSpinsBadge();
-            showMessage(t('bonusOpened'));
-            debouncedSave();
-            setTimeout(function() {
-              $('giftIcon').classList.remove('gift-reappear');
-              gamePaused = false;
-              $('spinButton').disabled = false;
-            }, 600);
-          }, 600);
-        }, 3000);
-      }
-
-      function showJackpotPrizes() {
-        var prizes = [];
-        if (useCustomRewards && customRewards.length >= 3) prizes = customRewards;
-        else prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
-        $('jackpotPrizesList').innerHTML = prizes.map(function(p) { return '<div style="padding:6px 0;border-bottom:1px solid rgba(212,175,55,0.3);">🎁 ' + p + '</div>'; }).join('');
-        $('jackpotPrizesModal').classList.remove('hidden');
-      }
-      function updateAllTexts() {
-        $('customRewardsBtn').innerHTML = '<span class="bracket-flash">[</span>' + t('customRewardsBtn') + '<span class="bracket-flash">]</span>';
-        $('historyBtn').textContent = t('historyBtn');
-        $('diamondsLabel').textContent = t('diamondsLabel');
-        $('donateButton').innerHTML = t('donateButton');
-        $('backToMenu').innerHTML = t('backToMenu');
-        $('spinButton').innerHTML = t('spinBtn');
-        $('logoutBtn').textContent = t('logoutBtn');
-        $('mainTopUpBtn').textContent = t('mainTopUpBtn');
-        $('jackpotTitle').textContent = t('jackpotTitle');
-        $('sendToPartnerBtn').innerHTML = t('sendToPartner');
-        $('closeWinBtn').textContent = t('closeBtn');
-        $('nameFormTitle').textContent = t('nameFormTitle');
-        $('userNameInput').placeholder = t('userNamePlaceholder');
-        $('partnerNameInput').placeholder = t('partnerNamePlaceholder');
-        $('downloadWithNamesBtn').innerHTML = t('downloadBtn');
-        $('closeNameFormBtn').textContent = t('cancelBtn');
-        $('paymentTitle').textContent = t('paymentTitle');
-        $('closePaymentBtn').textContent = t('closePayment');
-        $('historyTitle').textContent = t('historyTitle');
-        $('customRewardsTitle').textContent = t('customRewardsTitle');
-        $('customRewardsDesc').textContent = t('customRewardsDesc');
-        $('addCustomRewardBtn').textContent = t('addBtn');
-        $('saveAndPlayBtn').innerHTML = t('saveAndPlay');
-        $('closeCustomRewardsBtn').textContent = t('closeCustom');
-        $('closeHistoryBtn').textContent = t('closeBtn');
-        $('jackpotPrizesBtn').textContent = t('jackpotPrizesBtn');
-        $('closeJackpotPrizesBtn').textContent = t('closeBtn');
-        $('closeWinDetailBtn').textContent = t('closeBtn');
-        $('privacyPolicyLink').textContent = t('privacyLink');
-        $('termsOfUseLink').textContent = t('termsLink');
-        $('supportTitle').textContent = t('supportTitle');
-        $('chatInput').placeholder = t('supportPlaceholder');
-        $('sendChatBtn').textContent = t('sendBtn');
-        $('promoCodeBtn').textContent = t('promoCodeBtn');
-        $('promoCodeTitle').textContent = t('promoCodeTitle');
-        $('promoCodeInput').placeholder = t('promoCodePlaceholder');
-        $('promoCodeSubmitBtn').textContent = t('promoCodeActivate');
-        $('closePromoCodeBtn').textContent = t('promoCodeClose');
-        if ($('regGlowText')) $('regGlowText').textContent = t('regGlowText');
-        // Free diamonds button and modal
-        if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
-        if ($('freeDiamondsTitle')) $('freeDiamondsTitle').textContent = t('freeDiamondsTitle');
-        if ($('freeDiamondsIntro')) $('freeDiamondsIntro').innerHTML = t('freeDiamondsIntro');
-        if ($('freeDiamondsStep1')) $('freeDiamondsStep1').innerHTML = t('freeDiamondsStep1');
-        if ($('freeDiamondsStep2')) $('freeDiamondsStep2').innerHTML = t('freeDiamondsStep2');
-        if ($('freeDiamondsStep3')) $('freeDiamondsStep3').innerHTML = t('freeDiamondsStep3');
-        if ($('freeDiamondsTelegramBtn')) $('freeDiamondsTelegramBtn').textContent = t('freeDiamondsTelegramBtn');
-        if ($('freeDiamondsLink')) $('freeDiamondsLink').textContent = t('freeDiamondsLink');
-        // Google login button text
-        if ($('googleLoginBtnText')) $('googleLoginBtnText').textContent = t('googleLoginBtnText');
-        if ($('regGoogleBtnText')) $('regGoogleBtnText').textContent = t('regGoogleBtnText');
-        updateFreeSpinsBadge();
-        renderHistory();
-      }
-
-      function loadUserData() { /* ... unchanged ... */ }
-      function loadDiamonds() { var k = 'wdVdsDiamonds_' + nickname; diamonds = localStorage.getItem(k) ? parseInt(localStorage.getItem(k)) : 100; updateDiamondsDisplay(); updateMainBalance(); }
-      function saveDiamonds() { localStorage.setItem('wdVdsDiamonds_' + nickname, diamonds); updateDiamondsDisplay(); updateMainBalance(); }
-      function updateDiamondsDisplay() { if ($('diamondsCount')) $('diamondsCount').textContent = diamonds; }
-      function updateMainBalance() { if ($('mainBalanceDisplay')) $('mainBalanceDisplay').textContent = diamonds; }
-      async function loadJackpotHistory() {
-        if (userData) {
-          const data = await API.getJackpotHistory(userData.user_uid);
-          if (data && data.length > 0) {
-            jackpotHistory = data.map(item => ({ icon: item.icon, wish: item.wish, date: item.created_at ? new Date(item.created_at).toLocaleDateString() : '', time: item.created_at ? new Date(item.created_at).toLocaleTimeString() : '' }));
-          } else jackpotHistory = [];
-        } else loadHistory();
-        renderHistory();
-      }
-      function loadHistory() { var k = 'wdVdsHistory_' + nickname; jackpotHistory = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; renderHistory(); }
-      function saveHistory() { localStorage.setItem('wdVdsHistory_' + nickname, JSON.stringify(jackpotHistory)); renderHistory(); }
-      function addJackpotToHistory(icon, wish) { jackpotHistory.unshift({ icon: icon, wish: wish, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() }); if (jackpotHistory.length > 50) jackpotHistory.pop(); saveHistory(); }
-      function renderHistory() {
-        if (!$('historyList')) return;
-        $('historyList').innerHTML = jackpotHistory.length === 0 ? '<p style="text-align:center;">' + t('noJackpots') + '</p>' : jackpotHistory.map(function(item, i) { return '<div class="history-item"><span>' + item.icon + ' ' + item.wish.substring(0,20) + '...</span><span>' + item.date + '</span><div><button onclick="window.downloadHistory(' + i + ')">📥</button> <button class="view-btn" onclick="window.viewHistoryItem(' + i + ')">' + t('viewBtn') + '</button></div></div>'; }).join('');
-      }
-      window.downloadHistory = function(i) { var item = jackpotHistory[i]; if (!item) return; pendingJackpotIcon = item.icon; pendingJackpotWish = item.wish; $('nameFormModal').classList.remove('hidden'); };
-      window.viewHistoryItem = function(i) { var item = jackpotHistory[i]; if (!item) return; showWinDetail(item); };
-      function loadCustomRewards() { var k = 'wdVdsCustomRewards_' + (userData ? userData.user_uid : nickname); customRewards = localStorage.getItem(k) ? JSON.parse(localStorage.getItem(k)) : []; renderCustomRewards(); }
-      function saveCustomRewardsData() { var k = 'wdVdsCustomRewards_' + (userData ? userData.user_uid : nickname); localStorage.setItem(k, JSON.stringify(customRewards)); renderCustomRewards(); }
-      function renderCustomRewards() {
-        if (!$('customRewardsList')) return;
-        $('customRewardsList').innerHTML = customRewards.map(function(r, i) { return '<div style="display:flex;gap:5px;margin:4px 0;"><input class="custom-reward-input" value="' + r + '" onchange="window.updateCustomReward(' + i + ', this.value)" placeholder="' + t('customRewardsDesc') + '"><button onclick="window.removeCustomReward(' + i + ')" style="background:#b22222;color:white;border:none;border-radius:20px;padding:5px 10px;cursor:pointer;">✕</button></div>'; }).join('');
-      }
-      window.updateCustomReward = function(i, v) { customRewards[i] = v; };
-      window.removeCustomReward = function(i) { customRewards.splice(i, 1); renderCustomRewards(); };
-      async function loadSupportHistory() {
-        const uid = userData ? userData.user_uid : 'guest';
-        try {
-          const chats = await API.getSupportChats();
-          if (chats[uid] && chats[uid].messages) supportMessages = chats[uid].messages;
-          else supportMessages = [];
-        } catch (e) { supportMessages = []; }
-      }
-      async function saveSupportMessage() {
-        const uid = userData ? userData.user_uid : 'guest';
-        try {
-          const chats = await API.getSupportChats();
-          if (!chats[uid]) chats[uid] = { messages: [], userName: userData ? nickname : 'Гость' };
-          chats[uid].messages = supportMessages;
-          chats[uid].userName = userData ? nickname : 'Гость';
-          await API.saveSupportChats(chats);
-        } catch (e) { console.error('Save support error:', e); }
-      }
-      function renderSupportMessages() {
-        var container = $('chatMessages');
-        if (!container) return;
-        container.innerHTML = '';
-        var greeting = t('supportGreeting');
-        if (supportMessages.length === 0) {
-          var div = document.createElement('div');
-          div.className = 'chat-message admin';
-          div.textContent = greeting;
-          container.appendChild(div);
-          supportMessages.push({ from: 'admin', text: greeting, time: new Date().toISOString(), read: true });
-          saveSupportMessage();
+        if (isLoginMode) {
+            const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
+            if (error || !data || !data.success) { errorMessage.textContent = '❌ Данные неверны'; errorMessage.classList.add('visible'); return; }
+            localStorage.setItem('pirxmix_user', JSON.stringify({ id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid, referral_code: data.referral_code, balance: data.balance }));
+            window.location.href = 'https://vds-game.ink/home';
         } else {
-          supportMessages.forEach(function(msg) {
-            var div = document.createElement('div');
-            div.className = 'chat-message ' + (msg.from === 'admin' ? 'admin' : 'user');
-            div.textContent = msg.text;
-            container.appendChild(div);
-          });
+            const password2 = document.getElementById('password2').value;
+            if (password !== password2) { errorMessage.textContent = '❌ Пароли не совпадают'; errorMessage.classList.add('visible'); return; }
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref') || null;
+            const { data, error } = await supabase.rpc('register_user', { p_nickname: nickname, p_password: password, p_referral_code: refCode });
+            if (error || !data || !data.success) { errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации'); errorMessage.classList.add('visible'); return; }
+            localStorage.setItem('pirxmix_user', JSON.stringify({ id: data.user_id, nickname: data.nickname, vip_paid: false, referral_code: null, balance: 0 }));
+            window.location.href = 'https://vds-game.ink/home';
         }
-        container.scrollTop = container.scrollHeight;
-      }
-      function handleChatSend() {
-        var text = $('chatInput').value.trim();
-        if (!text) return;
-        var msg = { from: 'user', text: text, time: new Date().toISOString(), read: false };
-        supportMessages.push(msg);
-        var div = document.createElement('div');
-        div.className = 'chat-message user';
-        div.textContent = text;
-        $('chatMessages').appendChild(div);
-        $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
-        $('chatInput').value = '';
-        saveSupportMessage();
-      }
-      function showPolicy(type) {
-        var policies = POLICIES[currentLanguage] || POLICIES.ru;
-        alert(type === 'privacy' ? policies.privacy : policies.terms);
-      }
-      function setLanguage(lang) {
-        currentLanguage = lang;
-        document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
-        const langPrefix = lang.charAt(0).toUpperCase() + lang.slice(1);
-        document.querySelectorAll('[id^="lang' + langPrefix + '"]').forEach(function(b) { b.classList.add('active'); });
-        updateAllTexts();
-        updateFreeSpinsBadge();
-        if ($('freeDiamondsBtn')) $('freeDiamondsBtn').textContent = t('freeDiamondsBtn');
-        updateFreeDiamondsModalTexts();
-        if ($('googleLoginBtnText')) $('googleLoginBtnText').textContent = t('googleLoginBtnText');
-        if ($('regGoogleBtnText')) $('regGoogleBtnText').textContent = t('regGoogleBtnText');
-        if (userData) { stopTypingAnimation(); startTypingAnimation(); }
-      }
-      window.setLanguage = setLanguage;
-      function updateFreeSpinsBadge() {
-        if (freeSpins > 0) { $('freeSpinsBadge').classList.remove('hidden'); $('freeSpinsBadge').textContent = '🎁 ' + (currentLanguage === 'ru' ? 'Бесплатные спины' : currentLanguage === 'ua' ? 'Безкоштовні спини' : 'Free spins') + ': ' + freeSpins + ' (Шанс джекпота +50%)'; }
-        else { $('freeSpinsBadge').classList.add('hidden'); jackpotBoost = false; }
-      }
-      function updateTreasureProgress(add) {
-        treasureProgress = Math.min(100, treasureProgress + add);
-        $('progressFill').style.width = treasureProgress + '%';
-        var bonusWord = currentLanguage === 'ru' ? 'Бонус' : currentLanguage === 'ua' ? 'Бонус' : 'Bonus';
-        $('progressText').textContent = bonusWord + ': ' + treasureProgress.toFixed(1) + '/100%';
-        updateGiftSize(treasureProgress); debouncedSave();
-      }
-      function updateTreasure(add) { updateTreasureProgress(add); if (treasureProgress >= 100) animateGiftShakeAndExplosion(); }
-      function showMessage(text) { $('messageDisplay').textContent = text; setTimeout(function() { if ($('messageDisplay').textContent === text) $('messageDisplay').textContent = ''; }, 3000); }
-      function showSpinWin(amount) {
-        $('spinWinDisplay').textContent = '+' + amount + '💎';
-        $('spinWinDisplay').classList.remove('show');
-        void $('spinWinDisplay').offsetWidth;
-        $('spinWinDisplay').classList.add('show');
-        setTimeout(function() { $('spinWinDisplay').classList.remove('show'); }, 2000);
-      }
-      function startGiftRain() {
-        var giftTypes = ['🎁', '🎀', '💝', '🎊', '🎉', '✨', '💎', '🌟', '🎈', '🎪'];
-        for (var i = 0; i < 50; i++) {
-          setTimeout(function() {
-            var gift = document.createElement('div');
-            gift.className = 'falling-gift';
-            gift.textContent = giftTypes[Math.floor(Math.random() * giftTypes.length)];
-            gift.style.left = Math.random() * 100 + '%';
-            gift.style.animationDuration = (2 + Math.random() * 3) + 's';
-            gift.style.fontSize = (1.5 + Math.random() * 2) + 'rem';
-            document.body.appendChild(gift);
-            setTimeout(function() { if (gift.parentNode) gift.remove(); }, 5000);
-          }, i * 100);
+    });
+
+    document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
+
+    async function loadStats() {
+        const { data } = await supabase.rpc('get_platform_stats');
+        if (data) {
+            document.getElementById('totalUsers').textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            document.getElementById('todayUsers').textContent = data.today_users;
+            document.getElementById('totalWithdrawn').textContent = data.total_withdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
         }
-      }
-      function showJackpotBanner() {
-        var banner = document.createElement('div');
-        banner.className = 'jackpot-banner';
-        banner.textContent = '🎉 JACKPOT 🎉';
-        document.body.appendChild(banner);
-        setTimeout(function() { if (banner.parentNode) banner.remove(); }, 5000);
-      }
-      function getSymbolHeight() { var s = document.querySelector('.symbol'); return s ? parseFloat(getComputedStyle(s).height) || 40 : 40; }
-      function createReels() {
-        $('machine').innerHTML = ''; strips = [];
-        for (var c = 0; c < GRID; c++) {
-          var reel = document.createElement('div'); reel.className = 'reel';
-          var strip = document.createElement('div'); strip.className = 'strip';
-          for (var i = 0; i < 80; i++) { var sym = document.createElement('div'); sym.className = 'symbol'; sym.textContent = ICONS[Math.floor(Math.random() * ICONS.length)]; strip.appendChild(sym); }
-          reel.appendChild(strip); $('machine').appendChild(reel); strips.push(strip);
-        }
-      }
-      function buildGrid() { visibleGrid = []; for (var r = 0; r < GRID; r++) { visibleGrid[r] = []; for (var c = 0; c < GRID; c++) visibleGrid[r][c] = ICONS[Math.floor(Math.random() * ICONS.length)]; } }
-      function applyGrid() { for (var c = 0; c < GRID; c++) { var ch = strips[c].children; for (var r = 0; r < GRID; r++) ch[r + 6].textContent = visibleGrid[r][c]; strips[c].style.top = -(6 * getSymbolHeight()) + 'px'; } }
-      function findMatches() {
-        var matches = [], dirs = [[0,1],[1,0],[1,1],[1,-1]];
-        dirs.forEach(function(d) { var dr = d[0], dc = d[1]; for (var r = 0; r < GRID; r++) for (var c = 0; c < GRID; c++) { var sym = visibleGrid[r][c]; var match = [{ row: r, col: c }]; var nr = r + dr, nc = c + dc; while (nr >= 0 && nr < GRID && nc >= 0 && nc < GRID && visibleGrid[nr][nc] === sym) { match.push({ row: nr, col: nc }); nr += dr; nc += dc; } if (match.length >= 3) { var pr = r - dr, pc = c - dc; if (pr < 0 || pr >= GRID || pc < 0 || pc >= GRID || visibleGrid[pr][pc] !== sym) matches.push(match); } } });
-        return matches;
-      }
-      function clearLines() { $('winLines').innerHTML = ''; }
-      function drawLines(matches) {
-        clearLines();
-        var reels = [].slice.call(document.querySelectorAll('.reel'));
-        matches.forEach(function(match) { for (var i = 0; i < match.length - 1; i++) { var a = match[i], b = match[i + 1]; var ra = reels[a.col], rb = reels[b.col]; var rA = ra.getBoundingClientRect(), rB = rb.getBoundingClientRect(); var wr = $('winLines').getBoundingClientRect(); var sh = rA.height / 5; var x1 = rA.left + rA.width / 2 - wr.left, y1 = rA.top + (a.row * sh) + sh / 2 - wr.top; var x2 = rB.left + rB.width / 2 - wr.left, y2 = rB.top + (b.row * sh) + sh / 2 - wr.top; var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy), ang = Math.atan2(dy, dx) * 180 / Math.PI; var line = document.createElement('div'); line.className = 'win-line'; line.style.left = x1 + 'px'; line.style.top = y1 + 'px'; line.style.width = len + 'px'; line.style.transform = 'rotate(' + ang + 'deg)'; $('winLines').appendChild(line); } });
-        setTimeout(clearLines, 2800);
-      }
-      function getRandomWish(icon) {
-        if (useCustomRewards && customRewards.length >= 3) return customRewards[Math.floor(Math.random() * customRewards.length)];
-        var prizes = GENERIC_PRIZES[currentLanguage] || GENERIC_PRIZES.ru;
-        return prizes[Math.floor(Math.random() * prizes.length)];
-      }
-      function spin() {
-        if (spinning) return;
-        if (gamePaused) return;
-        if (!userData) return;
-        if (freeSpins > 0) { freeSpins--; updateFreeSpinsBadge(); if (freeSpins === 0) jackpotBoost = false; debouncedSave(); localStorage.setItem('wdVdsFreeSpins_' + nickname, freeSpins); }
-        else { if (diamonds < 5) { if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } showMessage(t('notEnoughDiamonds')); return; } diamonds -= 5; updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); }
-        spinning = true; clearLines(); $('spinButton').disabled = true; playSpinClickSound(); buildGrid();
-        if (jackpotBoost && Math.random() < 0.03) { var sym = ICONS[Math.floor(Math.random() * ICONS.length)]; var row = Math.floor(Math.random() * GRID); for (var c = 0; c < GRID; c++) visibleGrid[row][c] = sym; }
-        else if (Math.random() < 0.005) { var sym = ICONS[Math.floor(Math.random() * ICONS.length)]; var row = Math.floor(Math.random() * GRID); for (var c = 0; c < GRID; c++) visibleGrid[row][c] = sym; }
-        strips.forEach(function(strip, idx) { var pos = -getSymbolHeight(); var reelSoundInterval = setInterval(function() { playReelSpinSound(); }, 80); var loop = setInterval(function() { pos -= 28 + Math.random() * 7; if (pos < -3500) pos = -getSymbolHeight(); strip.style.top = pos + 'px'; }, 40); setTimeout(function() { clearInterval(loop); clearInterval(reelSoundInterval); playReelStopSound(); applyGrid(); if (idx === GRID - 1) setTimeout(finishSpin, 400); }, 1700 + idx * 400); });
-      }
-      async function finishSpin() {
-        spinning = false; $('spinButton').disabled = gamePaused ? true : false;
-        var matches = findMatches(); if (matches.length) drawLines(matches);
-        var totalWin = 0, jackpot = false, treasureAdd = 0;
-        matches.forEach(function(m) { if (m.length === 3) { totalWin += 1; treasureAdd += 0.5; } else if (m.length === 4) { totalWin += 3; treasureAdd += 1; } else if (m.length >= 5) { totalWin += 20; treasureAdd += 5; jackpot = true; } });
-        if (totalWin > 0) { diamonds += totalWin; updateDiamondsDisplay(); updateMainBalance(); updateTreasure(treasureAdd); showSpinWin(totalWin); debouncedSave(); }
-        if (jackpot) {
-          var match = matches.find(function(m) { return m.length >= 5; });
-          var icon = visibleGrid[match[0].row][match[0].col];
-          var wish = getRandomWish(icon);
-          addJackpotToHistory(icon, wish);
-          if (userData) API.saveJackpot(userData.user_uid, nickname, currentMode, icon, wish, 20);
-          playJackpotSound();
-          if (autoSpinning) { autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; }
-          showJackpotBanner();
-          startGiftRain();
-          setTimeout(function() { triggerJackpot(icon, wish); }, 5000);
-        } else if (totalWin > 0) { playWinSound(); showMessage(totalWin === 1 ? t('win3') : t('win4')); }
-        else { playLoseSound(); showMessage(t('tryAgain')); }
-        updateFreeSpinsBadge();
-        if (autoSpinning && !jackpot && !gamePaused) { setTimeout(function() { if (autoSpinning) spin(); }, 500); }
-      }
-      function triggerJackpot(icon, wish) {
-        $('winIcons').textContent = icon + icon + icon;
-        $('winMessage').textContent = wish;
-        $('winOverlay').classList.remove('hidden');
-        pendingJackpotIcon = icon;
-        pendingJackpotWish = wish;
-      }
-      function generateLuxuryCertificate(icon, wish, userName, partnerName) {
-        var canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 800; var ctx = canvas.getContext('2d');
-        var certTexts = CERTIFICATE_TEXTS[currentLanguage] || CERTIFICATE_TEXTS.ru;
-        var now = new Date();
-        var dateStr = now.toLocaleDateString();
-        var timeStr = now.toLocaleTimeString();
-        var bgGrad = ctx.createRadialGradient(600, 400, 100, 600, 400, 750);
-        bgGrad.addColorStop(0, '#1a1025');
-        bgGrad.addColorStop(1, '#0a0510');
-        ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, 1200, 800);
-        ctx.fillStyle = 'rgba(255,215,0,0.08)';
-        for (var i = 0; i < 1200; i += 30) { for (var j = 0; j < 800; j += 30) { if (Math.random() > 0.7) { ctx.beginPath(); ctx.arc(i, j, 2, 0, Math.PI * 2); ctx.fill(); } } }
-        ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 6; ctx.strokeRect(30, 30, 1140, 740);
-        ctx.strokeStyle = '#b49450'; ctx.lineWidth = 2; ctx.strokeRect(45, 45, 1110, 710);
-        [[45,45],[1155,45],[45,755],[1155,755]].forEach(function(p) { var x = p[0], y = p[1]; ctx.fillStyle = '#d4af37'; ctx.beginPath(); ctx.arc(x, y, 12, 0, Math.PI*2); ctx.fill(); ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.stroke(); });
-        ctx.fillStyle = '#ffd700'; ctx.font = 'bold 46px serif'; ctx.textAlign = 'center'; ctx.fillText(certTexts.title, 600, 135);
-        ctx.fillStyle = '#d4af37'; ctx.font = 'italic 26px serif'; ctx.fillText(certTexts.subtitle, 600, 175);
-        ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(150, 195); ctx.lineTo(1050, 195); ctx.stroke();
-        ctx.font = '90px sans-serif'; ctx.fillText(icon, 600, 300);
-        ctx.fillStyle = '#ffffff'; ctx.font = 'bold 32px sans-serif'; ctx.shadowColor = '#d4af37'; ctx.shadowBlur = 12;
-        ctx.fillText(certTexts.wonMsg(userName, partnerName), 600, 470);
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#ffd700'; ctx.font = 'bold 40px serif';
-        var wishText = icon + ' ' + wish + ' ' + icon;
-        var words = wishText.split(' '); var line = '', y = 540;
-        words.forEach(function(w) { var tl = line + w + ' '; if (ctx.measureText(tl).width > 850) { ctx.fillText(line, 600, y); line = w + ' '; y += 52; } else line = tl; });
-        ctx.fillText(line, 600, y);
-        ctx.fillStyle = '#d4af37'; ctx.font = 'bold 22px monospace'; ctx.fillText(certTexts.official, 600, 650);
-        ctx.fillStyle = '#b49450'; ctx.font = '18px monospace'; ctx.fillText(dateStr + '  ' + timeStr, 600, 680);
-        ctx.save(); ctx.translate(1080, 700); ctx.rotate(-0.15);
-        ctx.fillStyle = 'rgba(212, 175, 55, 0.2)'; ctx.beginPath(); ctx.arc(0, 0, 60, 0, Math.PI*2); ctx.fill();
-        ctx.strokeStyle = '#d4af37'; ctx.lineWidth = 5; ctx.stroke();
-        ctx.fillStyle = 'rgba(255, 215, 0, 0.35)'; ctx.font = 'bold 26px Times New Roman'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('VDS', 0, 0);
-        ctx.restore();
-        canvas.toBlob(function(b) { var u = URL.createObjectURL(b); var a = document.createElement('a'); a.href = u; a.download = 'VDS_Wish_' + icon + '.png'; a.click(); URL.revokeObjectURL(u); });
-      }
-      function openNameForm() { $('nameFormModal').classList.remove('hidden'); $('userNameInput').value = ''; $('partnerNameInput').value = ''; }
-      function showWinDetail(item) {
-        $('winDetailTitle').textContent = t('winDetailTitle');
-        $('winDetailContent').innerHTML = '<p><strong>Иконка:</strong> ' + item.icon + '</p><p><strong>Желание:</strong> ' + item.wish + '</p><p><strong>Дата:</strong> ' + item.date + '</p><p><strong>Время:</strong> ' + item.time + '</p>';
-        $('winDetailModal').classList.remove('hidden');
-      }
-      function enterSlot() { $('mainMenu').classList.add('hidden'); $('slotUI').classList.remove('hidden'); createReels(); buildGrid(); applyGrid(); $('messageDisplay').textContent = ''; gamePaused = false; $('spinButton').disabled = false; updateGiftSize(treasureProgress); updateTreasureProgress(0); autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; stopMenuFallingGifts(); }
-      function backToMenu() {
-        autoSpinning = false; $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; gamePaused = false;
-        $('slotUI').classList.add('hidden'); $('mainMenu').classList.remove('hidden');
-        $('winOverlay').classList.add('hidden'); $('paymentModal').classList.add('hidden'); $('historyModal').classList.add('hidden');
-        $('nameFormModal').classList.add('hidden'); $('customRewardsModal').classList.add('hidden'); $('jackpotPrizesModal').classList.add('hidden');
-        $('winDetailModal').classList.add('hidden'); $('supportModal').classList.add('hidden');
-        $('cryptoPaymentModal').classList.add('hidden'); $('profileModal').classList.add('hidden'); $('promoCodeModal').classList.add('hidden');
-        $('freeDiamondsModal').classList.add('hidden');
-        if (rateInterval) clearInterval(rateInterval);
-        useCustomRewards = false; updateMainBalance(); debouncedSave();
-        startMenuFallingGifts();
-      }
-      async function debouncedSave() { if (!userData) { saveDiamonds(); return; } localStorage.setItem('wdVdsFreeSpins_' + nickname, freeSpins); if (saveTimeout) clearTimeout(saveTimeout); saveTimeout = setTimeout(async function() { await API.saveUserData(userData.user_uid, { diamonds: diamonds, treasure_progress: treasureProgress, free_spins: freeSpins, jackpot_boost: jackpotBoost ? 1 : 0 }); }, 2000); }
-              // Promo code
-      function openPromoCode() {
-        if (!userData) return;
-        $('promoCodeInput').value = '';
-        $('promoCodeMsg').textContent = '';
-        $('promoCodeModal').classList.remove('hidden');
-      }
-      window.openPromoCode = openPromoCode;
+    }
+    loadStats();
+    setInterval(loadStats, 30000);
+})();
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
+    <title>Пирамикс • Главная</title>
+    <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Получайте доход от приглашённых пользователей. Регистрируйтесь и зарабатывайте!">
+    <meta name="keywords" content="Пирамикс, реферальная программа, заработок, пирамида, рефералы, VIP статус, криптовалюта, вывод средств">
+    <meta property="og:title" content="Пирамикс — Реферальная программа">
+    <meta property="og:description" content="Зарабатывайте на рефералах с 5 уровнями глубины. Присоединяйтесь к Пирамикс!">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; position: relative; overflow-x: hidden; }
+        body::before { content: ""; position: fixed; top: -30%; left: -10%; width: 70%; height: 70%; background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%); border-radius: 50%; z-index: 0; pointer-events: none; }
+        .header { width: 100%; max-width: 1300px; display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(255, 215, 150, 0.2); margin-bottom: 2rem; position: relative; z-index: 2; flex-wrap: wrap; gap: 1rem; }
+        .logo { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #f9d56e, #e6a861); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header-right { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+        .user-greeting { color: #f5efe0; font-weight: 500; }
+        .btn-outline { background: transparent; border: 1px solid #c9a357; color: #e9c274; font-weight: 600; font-size: 0.9rem; padding: 0.5rem 1.5rem; border-radius: 2rem; cursor: pointer; transition: 0.25s; text-decoration: none; }
+        .btn-outline:hover { background: #f3b95b20; border-color: #f3b95b; color: #ffe6b3; box-shadow: 0 0 15px rgba(243, 185, 91, 0.3); }
+        .dashboard { width: 100%; max-width: 1300px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; position: relative; z-index: 2; margin-bottom: 2rem; }
+        .card { background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 1.8rem; padding: 1.8rem; border: 1px solid rgba(255, 215, 150, 0.15); color: #f5efe0; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); border-color: rgba(243, 185, 91, 0.4); }
+        .card h3 { font-size: 1.3rem; font-weight: 600; margin-bottom: 1rem; color: #e9c274; }
+        .balance { font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-row { display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0; font-size: 0.95rem; }
+        .stat-label { color: #9b927a; flex: 1; }
+        .stat-value { color: #f5d78c; font-weight: 600; text-align: right; min-width: 60px; }
+        .stat-earn { color: #4caf50; font-weight: 600; text-align: right; min-width: 60px; font-size: 0.85rem; }
+        .btn-primary { background: linear-gradient(135deg, #e2a542, #c7851e); border: none; color: #0f0e0a; font-weight: 700; font-size: 1rem; padding: 0.8rem 2rem; border-radius: 2.5rem; cursor: pointer; transition: 0.25s; box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35); width: 100%; margin-top: 0.5rem; }
+        .btn-primary:hover { background: linear-gradient(135deg, #f3b95b, #da9729); box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6); }
+        .btn-vip { background: linear-gradient(135deg, #c084fc, #7c3aed); border: none; color: #fff; font-weight: 700; font-size: 1rem; padding: 0.8rem 2rem; border-radius: 2.5rem; cursor: pointer; transition: 0.25s; box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); width: 100%; margin-top: 0.5rem; animation: glowPulse 2s infinite; }
+        @keyframes glowPulse { 0%, 100% { box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); } 50% { box-shadow: 0 8px 30px rgba(192, 132, 252, 0.7); } }
+        .btn-vip:hover { background: linear-gradient(135deg, #d8b4fe, #9333ea); }
+        .ref-link-box { display: none; }
+        .live-feed { width: 100%; max-width: 1300px; background: rgba(10, 12, 15, 0.8); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 2rem; border: 1px solid rgba(230, 180, 70, 0.25); padding: 1.2rem 1.5rem; display: flex; gap: 1.5rem; z-index: 3; position: relative; }
+        .feed-half { flex: 1; min-width: 0; }
+        .feed-title { font-size: 0.9rem; font-weight: 600; color: #c9ad7a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.8rem; }
+        .feed-list { display: flex; flex-direction: column; gap: 0.3rem; height: 220px; overflow: hidden; }
+        .feed-item { background: rgba(25, 22, 17, 0.6); border-radius: 1rem; padding: 0.5rem 1rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border: 1px solid rgba(212, 165, 60, 0.2); animation: fadeInUp 0.4s ease-out; }
+        @keyframes fadeInUp { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } }
+        .feed-user { font-weight: 600; color: #f5d78c; }
+        .feed-time { color: #8b8a7a; font-size: 0.7rem; margin-left: 0.5rem; }
+        .feed-amount { font-weight: 700; }
+        .deposit .feed-amount { color: #4caf50; }
+        .withdraw .feed-amount { color: #ff7043; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal { background: rgba(20, 22, 27, 0.95); border: 1px solid rgba(255, 215, 150, 0.3); border-radius: 2rem; padding: 2rem; width: 90%; max-width: 450px; color: #f5efe0; animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1); }
+        @keyframes modalSlideIn { 0% { opacity: 0; transform: scale(0.85) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .modal h2 { margin-bottom: 1.5rem; color: #e9c274; }
+        .modal .input-group { margin-bottom: 1.2rem; }
+        .modal .input-group label { display: block; font-size: 0.8rem; color: #b9b09a; margin-bottom: 0.3rem; }
+        .modal .input-group input, .modal .input-group select { width: 100%; background: rgba(15, 16, 20, 0.8); border: 1px solid rgba(220, 180, 100, 0.25); border-radius: 1rem; padding: 0.8rem 1rem; color: #f5e7cc; outline: none; font-family: 'Inter', sans-serif; }
+        .modal .input-group select { appearance: none; cursor: pointer; }
+        .modal .input-group select option { background: #1a1c22; color: #f5e7cc; }
+        .modal .input-group input:focus, .modal .input-group select:focus { border-color: #f3b95b; }
+        .modal-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .vip-info-box { background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1.2rem; margin: 1rem 0; text-align: center; border: 1px solid rgba(192, 132, 252, 0.3); }
+        .vip-price { font-size: 2rem; font-weight: 700; color: #c084fc; margin: 0.5rem 0; }
+        .vip-id { font-size: 1.4rem; font-weight: 600; color: #f5d78c; letter-spacing: 3px; margin: 0.5rem 0; }
+        .hidden { display: none !important; }
+        .footer { width: 100%; max-width: 1300px; text-align: center; padding: 1.5rem; margin-top: 1rem; z-index: 2; position: relative; }
+        .footer-link { color: #9b927a; font-size: 0.8rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+        .footer-link:hover { color: #f3b95b; }
+        .policy-modal { max-width: 700px; max-height: 80vh; overflow-y: auto; text-align: left; line-height: 1.7; }
+        .policy-modal h2 { text-align: center; margin-bottom: 1.5rem; }
+        .policy-modal h3 { color: #e9c274; margin: 1.2rem 0 0.5rem; font-size: 1.1rem; }
+        .policy-modal p { color: #b9b09a; font-size: 0.85rem; margin-bottom: 0.8rem; }
+        .optional-label { color: #6b6352; font-size: 0.75rem; font-style: italic; }
+        @media (max-width: 768px) { .live-feed { flex-direction: column; } .feed-list { height: 150px; } .header { flex-direction: column; text-align: center; } .header-right { justify-content: center; } .balance { font-size: 2rem; } }
+    </style>
+</head>
+<body>
 
-      async function submitPromoCode() {
-        if (!userData) return;
-        var code = $('promoCodeInput').value.trim().toUpperCase();
-        if (!code) { $('promoCodeMsg').textContent = t('promoCodeInvalid'); return; }
-        $('promoCodeMsg').textContent = '⏳ Проверка...';
-        try {
-          const result = await API.redeemPromoCode(userData.user_uid, code);
-          if (result.success) {
-            if (result.type === 'spins') {
-              freeSpins += result.amount;
-              updateFreeSpinsBadge();
-              localStorage.setItem('wdVdsFreeSpins_' + nickname, freeSpins);
-            } else if (result.type === 'diamonds') {
-              diamonds += result.amount;
-              updateDiamondsDisplay();
-              updateMainBalance();
-            }
-            debouncedSave();
-            $('promoCodeMsg').textContent = result.message || t('promoCodeSuccess');
-            setTimeout(function() { $('promoCodeModal').classList.add('hidden'); }, 2500);
-          } else {
-            $('promoCodeMsg').textContent = result.error || t('promoCodeInvalid');
-          }
-        } catch (e) {
-          $('promoCodeMsg').textContent = t('promoCodeInvalid');
-        }
-      }
+<header class="header">
+    <div class="logo">✨ Пирамикс</div>
+    <div class="header-right">
+        <span class="user-greeting" id="userGreeting">Привет, Пользователь</span>
+        <button class="btn-outline" id="profileBtn">👤 Профиль</button>
+        <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
+    </div>
+</header>
 
-      // Crypto payment
-      const WALLETS = {
-        USDT: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
-        TRX: 'TA2Xkb37kDdL8GuvnWJhsGPFP7SwRPVEam',
-        BNB: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
-        ETH: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f',
-        BTC: '0x98a1fa09c7636872d871d22c0c3240d2e51c0e5f'
-      };
-      async function loadCryptoRates() {
-        const rates = await API.getCryptoRates();
-        if (rates) {
-          cryptoRates = rates;
-          if (!cryptoRates['USDT']) {
-            cryptoRates['USDT'] = { symbol: 'USDTUSDT', price_usd: 1.00, last_update: new Date().toISOString() };
-          }
-          updateRateDisplay();
-        }
-      }
-      function updateRateDisplay() {
-        const rate = cryptoRates[selectedCrypto];
-        if (rate) {
-          const cryptoAmount = (selectedUSD / rate.price_usd).toFixed(8);
-          $('rateDisplay').textContent = `1 ${selectedCrypto} ≈ $${rate.price_usd.toFixed(2)} | К отправке: ${cryptoAmount} ${selectedCrypto}`;
-        } else {
-          $('rateDisplay').textContent = 'Курс загружается...';
-        }
-      }
-      function generateQRCode(text) {
-        const container = $('qrContainer');
-        container.innerHTML = '';
-        if (!text) return;
-        const img = document.createElement('img');
-        img.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(text)}`;
-        img.style.borderRadius = '12px';
-        img.style.border = '2px solid #d4af37';
-        img.onload = () => { container.innerHTML = ''; container.appendChild(img); };
-        img.onerror = () => { container.innerHTML = '<p style="color:#888;font-size:0.7rem;">QR-код недоступен</p>'; };
-      }
-      async function openCryptoPayment() {
-        if (!userData) return;
-        $('cryptoPaymentModal').classList.remove('hidden');
-        loadCryptoRates();
-        updateRateDisplay();
-        updateQRAndAddress();
-        if (rateInterval) clearInterval(rateInterval);
-        rateInterval = setInterval(loadCryptoRates, 30000);
-      }
-      function updateQRAndAddress() {
-        const rate = cryptoRates[selectedCrypto];
-        const cryptoAmount = rate ? (selectedUSD / rate.price_usd).toFixed(8) : '0';
-        const address = WALLETS[selectedCrypto] || '';
-        $('walletAddress').innerHTML = `<strong>Адрес ${selectedCrypto}:</strong><br>${address}`;
-        const paymentText = `${selectedCrypto.toLowerCase()}:${address}?amount=${cryptoAmount}`;
-        generateQRCode(paymentText);
-      }
-      async function simulatePayment() {
-        if (!userData) return;
-        $('simulatePaymentBtn').disabled = true;
-        $('simulatePaymentBtn').textContent = '⏳ Проверяем платёж...';
-        await new Promise(r => setTimeout(r, 2000));
-        diamonds += selectedDiamonds;
-        updateDiamondsDisplay();
-        updateMainBalance();
-        localStorage.setItem('wdVdsFreeSpins_' + nickname, freeSpins);
-        await API.saveUserData(userData.user_uid, { diamonds, treasure_progress, free_spins, jackpot_boost: jackpotBoost?1:0 });
-        await API.createCryptoDonation({
-          user_uid: userData.user_uid, nickname, email: userData.email,
-          amount_usd: selectedUSD, diamonds: selectedDiamonds,
-          crypto_currency: selectedCrypto,
-          crypto_amount: parseFloat((selectedUSD / (cryptoRates[selectedCrypto]?.price_usd || 1)).toFixed(8)),
-          status: 'completed'
-        });
-        showMessage(`✨ +${selectedDiamonds}💎 зачислено!`);
-        $('cryptoPaymentModal').classList.add('hidden');
-        $('simulatePaymentBtn').disabled = false;
-        $('simulatePaymentBtn').textContent = '💰 Я оплатил — получить алмазы';
-        if (rateInterval) clearInterval(rateInterval);
-      }
+<div class="dashboard">
+    <div class="card">
+        <h3>💰 Мой баланс</h3>
+        <div class="balance" id="balance">0.00 $</div>
+        <div class="stat-row"><span class="stat-label">Заработано всего</span><span class="stat-value" id="totalEarned">0.00 $</span></div>
+        <button class="btn-primary" id="withdrawBtn">💸 Вывести средства</button>
+    </div>
+    <div class="card">
+        <h3>👥 Мои рефералы</h3>
+        <div class="stat-row"><span class="stat-label">1 уровень (1%)</span><span class="stat-value" id="lvl1">0 чел.</span><span class="stat-earn" id="earn1">0.00 $</span></div>
+        <div class="stat-row"><span class="stat-label">2 уровень (2%)</span><span class="stat-value" id="lvl2">0 чел.</span><span class="stat-earn" id="earn2">0.00 $</span></div>
+        <div class="stat-row"><span class="stat-label">3 уровень (3%)</span><span class="stat-value" id="lvl3">0 чел.</span><span class="stat-earn" id="earn3">0.00 $</span></div>
+        <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0 чел.</span><span class="stat-earn" id="earn4">0.00 $</span></div>
+        <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0 чел.</span><span class="stat-earn" id="earn5">0.00 $</span></div>
+        <div class="ref-link-box"><input type="text" id="refLink" readonly><button class="copy-btn" id="copyRefBtn">📋 Копировать</button></div>
+    </div>
+    <div class="card">
+        <h3>📊 Статистика платформы</h3>
+        <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">146.353</span></div>
+        <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">127</span></div>
+        <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">18.500 $</span></div>
+        <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
+    </div>
+</div>
 
-      // Event listeners
-      $('logoutBtn').addEventListener('click', logout);
-      $('mainTopUpBtn').addEventListener('click', function() { openCryptoPayment(); });
-      $('spinButton').addEventListener('click', spin);
-      $('backToMenu').addEventListener('click', backToMenu);
-      $('donateButton').addEventListener('click', function() { openCryptoPayment(); });
-      $('closeWinBtn').addEventListener('click', function() { $('winOverlay').classList.add('hidden'); });
-      $('closePaymentBtn').addEventListener('click', function() { $('paymentModal').classList.add('hidden'); });
-      document.querySelectorAll('.diamond-option').forEach(function(o) { o.addEventListener('click', function() { diamonds += parseInt(this.dataset.diamonds); updateDiamondsDisplay(); updateMainBalance(); debouncedSave(); $('paymentModal').classList.add('hidden'); showMessage('✨ +' + this.dataset.diamonds + '💎'); }); });
-      $('historyBtn').addEventListener('click', function() { if (userData) loadJackpotHistory(); else { loadHistory(); renderHistory(); } $('historyModal').classList.remove('hidden'); });
-      $('closeHistoryBtn').addEventListener('click', function() { $('historyModal').classList.add('hidden'); });
-      $('autoSpinBtn').addEventListener('click', function() { if (gamePaused) return; autoSpinning = !autoSpinning; if (autoSpinning) { $('autoSpinBtn').classList.add('active'); $('autoSpinBtn').innerHTML = '🔄<br>STOP'; if (!spinning) spin(); } else { $('autoSpinBtn').classList.remove('active'); $('autoSpinBtn').innerHTML = '🔄<br>AUTO'; } });
-      $('sendToPartnerBtn').addEventListener('click', openNameForm);
-      $('downloadWithNamesBtn').addEventListener('click', function() { var un = $('userNameInput').value.trim() || 'User', pn = $('partnerNameInput').value.trim() || 'Partner'; if (pendingJackpotIcon && pendingJackpotWish) generateLuxuryCertificate(pendingJackpotIcon, pendingJackpotWish, un, pn); $('nameFormModal').classList.add('hidden'); });
-      $('closeNameFormBtn').addEventListener('click', function() { $('nameFormModal').classList.add('hidden'); });
-      $('closeWinDetailBtn').addEventListener('click', function() { $('winDetailModal').classList.add('hidden'); });
-      $('customRewardsBtn').addEventListener('click', function() { renderCustomRewards(); $('customRewardsModal').classList.remove('hidden'); });
-      $('closeCustomRewardsBtn').addEventListener('click', function() { $('customRewardsModal').classList.add('hidden'); });
-      $('addCustomRewardBtn').addEventListener('click', function() { if (customRewards.length >= 10) return; customRewards.push(''); renderCustomRewards(); });
-      $('saveAndPlayBtn').addEventListener('click', function() { var valid = customRewards.filter(function(r) { return r.trim() !== ''; }); if (valid.length < 3) { alert(currentLanguage === 'ru' ? 'Нужно минимум 3 желания!' : currentLanguage === 'ua' ? 'Потрібно мінімум 3 бажання!' : 'Need at least 3 wishes!'); return; } customRewards = valid; saveCustomRewardsData(); useCustomRewards = true; $('customRewardsModal').classList.add('hidden'); enterSlot(); showMessage('🎁 ' + (currentLanguage === 'ru' ? 'Игра с вашими желаниями!' : currentLanguage === 'ua' ? 'Гра з вашими бажаннями!' : 'Playing with your wishes!')); });
-      $('jackpotPrizesBtn').addEventListener('click', showJackpotPrizes);
-      $('closeJackpotPrizesBtn').addEventListener('click', function() { $('jackpotPrizesModal').classList.add('hidden'); });
-      $('supportBtn').addEventListener('click', function() {
-        supportUnreadCount = 0;
-        updateSupportBadge();
-        loadSupportHistory().then(function() { renderSupportMessages(); $('supportModal').classList.remove('hidden'); });
-      });
-      $('sendChatBtn').addEventListener('click', handleChatSend);
-      $('chatInput').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleChatSend(); });
-      $('closeSupportBtn').addEventListener('click', function() { $('supportModal').classList.add('hidden'); });
-      $('privacyPolicyLink').addEventListener('click', function() { showPolicy('privacy'); });
-      $('termsOfUseLink').addEventListener('click', function() { showPolicy('terms'); });
-      $('promoCodeSubmitBtn').addEventListener('click', submitPromoCode);
-      $('closePromoCodeBtn').addEventListener('click', function() { $('promoCodeModal').classList.add('hidden'); });
-      $('promoCodeModal').addEventListener('click', function(e) { if (e.target === $('promoCodeModal')) $('promoCodeModal').classList.add('hidden'); });
+<div class="live-feed">
+    <div class="feed-half deposit-feed"><div class="feed-title">🟢 Последние пополнения</div><div class="feed-list" id="depositList"></div></div>
+    <div class="feed-half withdraw-feed"><div class="feed-title">🔴 Последние выводы</div><div class="feed-list" id="withdrawList"></div></div>
+</div>
 
-      $('diamondAmounts').addEventListener('click', function(e) { var opt = e.target.closest('.diamond-amount-option'); if (!opt) return; document.querySelectorAll('.diamond-amount-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedUSD = parseFloat(opt.dataset.usd); selectedDiamonds = parseInt(opt.dataset.diamonds); updateRateDisplay(); updateQRAndAddress(); });
-      $('cryptoList').addEventListener('click', function(e) { var opt = e.target.closest('.crypto-option'); if (!opt) return; document.querySelectorAll('.crypto-option').forEach(function(o) { o.classList.remove('selected'); }); opt.classList.add('selected'); selectedCrypto = opt.dataset.currency; updateRateDisplay(); updateQRAndAddress(); });
-      $('copyAddressBtn').addEventListener('click', function() { var addr = ($('walletAddress').textContent || '').replace(/.*:\s*/, '').trim(); navigator.clipboard.writeText(addr).then(function() { $('copiedMsg').classList.remove('hidden'); setTimeout(function() { $('copiedMsg').classList.add('hidden'); }, 2000); }); });
-      $('simulatePaymentBtn').addEventListener('click', simulatePayment);
-      $('closeCryptoPaymentBtn').addEventListener('click', function() { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); });
-      $('cryptoPaymentModal').addEventListener('click', function(e) { if (e.target === $('cryptoPaymentModal')) { $('cryptoPaymentModal').classList.add('hidden'); if (rateInterval) clearInterval(rateInterval); } });
+<div class="footer"><span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span></div>
 
-      $('closeProfileBtn').addEventListener('click', function() { $('profileModal').classList.add('hidden'); });
-      $('profileModal').addEventListener('click', function(e) { if (e.target === $('profileModal')) $('profileModal').classList.add('hidden'); });
+<div class="modal-overlay hidden" id="withdrawModal">
+    <div class="modal">
+        <h2>💸 Вывод средств</h2>
+        <p style="color:#b9b09a;font-size:0.85rem;margin-bottom:1.2rem;">Минимальная сумма вывода: <strong style="color:#f5d78c;">1$</strong></p>
+        <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
+        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="Минимум 1$" min="1" step="0.01"></div>
+        <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий..."></div>
+        <div class="modal-buttons"><button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button><button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button></div>
+    </div>
+</div>
 
-      [$('winOverlay'), $('paymentModal'), $('historyModal'), $('nameFormModal'), $('customRewardsModal'), $('jackpotPrizesModal'), $('winDetailModal'), $('cryptoPaymentModal'), $('profileModal'), $('promoCodeModal')].forEach(function(m) { m.addEventListener('click', function(e) { if (e.target === m) m.classList.add('hidden'); }); });
+<div class="modal-overlay hidden" id="profileModal">
+    <div class="modal">
+        <h2>👤 Профиль пользователя</h2>
+        <div class="input-group"><label>Никнейм</label><input type="text" id="profileNickname"></div>
+        <div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Оставьте пустым"></div>
+        <div class="input-group"><label>Повторите новый пароль</label><input type="password" id="profilePassword2" placeholder="Оставьте пустым"></div>
+        <div class="modal-buttons"><button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button><button class="btn-outline" id="closeProfileBtn">❌ Отмена</button></div>
+    </div>
+</div>
 
-      $('regBgGifts').addEventListener('click', handleRegGiftClick);
+<div class="modal-overlay hidden" id="vipModal">
+    <div class="modal">
+        <h2>👑 VIP статус</h2>
+        <div class="vip-info-box" id="vipInfoBox"><p style="color:#b9b09a;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color:#9b927a;font-size:0.85rem;margin-top:0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p></div>
+        <div class="modal-buttons"><button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button><button class="btn-outline" id="closeVipBtn">❌ Отмена</button></div>
+    </div>
+</div>
 
-      // ========== НОВАЯ КНОПКА БЕСПЛАТНЫХ АЛМАЗОВ ==========
-      $('freeDiamondsBtn').addEventListener('click', function() {
-        updateFreeDiamondsModalTexts();
-        $('freeDiamondsModal').classList.remove('hidden');
-      });
-      $('closeFreeDiamondsBtn').addEventListener('click', function() {
-        $('freeDiamondsModal').classList.add('hidden');
-      });
-      $('freeDiamondsModal').addEventListener('click', function(e) {
-        if (e.target === $('freeDiamondsModal')) $('freeDiamondsModal').classList.add('hidden');
-      });
+<div class="modal-overlay hidden" id="policyModal">
+    <div class="modal policy-modal">
+        <h2>📄 Политика конфиденциальности и правила пользования</h2>
+        <h3>1. Общие положения</h3><p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
+        <h3>2. Термины и определения</h3><p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
+        <h3>3. Регистрация и аккаунт</h3><p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p>
+        <h3>4. Реферальная программа</h3><p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>4.2. Реферальная программа имеет 5 уровней глубины.<br>4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p>
+        <h3>5. VIP статус</h3><p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
+        <h3>6. Вывод средств</h3><p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
+        <h3>7. Конфиденциальность</h3><p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
+        <h3>8. Ответственность</h3><p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>8.2. Пользователь обязуется использовать Платформу в законных целях.<br>8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
+        <h3>9. Изменения и дополнения</h3><p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>9.2. Изменения вступают в силу с момента публикации на Платформе.<br>9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
+        <h3>10. Контакты</h3><p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
+        <p style="text-align:center;color:#c9ad7a;margin-top:1.5rem;"><em>Последнее обновление: 2026 год</em></p>
+        <div class="modal-buttons" style="justify-content:center;"><button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button></div>
+    </div>
+</div>
 
-      function updateFreeDiamondsModalTexts() {
-        if ($('freeDiamondsTitle')) $('freeDiamondsTitle').textContent = t('freeDiamondsTitle');
-        if ($('freeDiamondsIntro')) $('freeDiamondsIntro').innerHTML = t('freeDiamondsIntro');
-        if ($('freeDiamondsStep1')) $('freeDiamondsStep1').innerHTML = t('freeDiamondsStep1');
-        if ($('freeDiamondsStep2')) $('freeDiamondsStep2').innerHTML = t('freeDiamondsStep2');
-        if ($('freeDiamondsStep3')) $('freeDiamondsStep3').innerHTML = t('freeDiamondsStep3');
-        if ($('freeDiamondsTelegramBtn')) $('freeDiamondsTelegramBtn').textContent = t('freeDiamondsTelegramBtn');
-        if ($('freeDiamondsLink')) $('freeDiamondsLink').textContent = t('freeDiamondsLink');
-      }
+<script>
+(function() {
+    const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+    const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-      function openProfile() {
-        if (!userData) return;
-        $('profileUID').textContent = userData.user_uid;
-        $('profileEmail').textContent = userData.email || '-';
-        $('profileDiamonds').textContent = diamonds;
-        $('profileJackpots').textContent = jackpotHistory.length;
-        $('profileNicknameInput').value = nickname;
-        $('profileMsg').textContent = '';
-        $('profileModal').classList.remove('hidden');
-      }
-      window.openProfile = openProfile;
+    const userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+    if (!userData || !userData.id) { window.location.href = 'https://vds-game.ink/reg'; return; }
 
-      function copyUID() {
-        if (!userData) return;
-        navigator.clipboard.writeText(userData.user_uid).then(() => {
-          $('profileMsg').textContent = 'ID скопирован!';
-          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
-        }).catch(() => { $('profileMsg').textContent = 'Ошибка копирования'; });
-      }
-      window.copyUID = copyUID;
+    document.getElementById('userGreeting').textContent = 'Привет, ' + userData.nickname;
+    document.getElementById('lvl1').textContent = '0 чел.'; document.getElementById('lvl2').textContent = '0 чел.';
+    document.getElementById('lvl3').textContent = '0 чел.'; document.getElementById('lvl4').textContent = '0 чел.';
+    document.getElementById('lvl5').textContent = '0 чел.';
+    document.getElementById('earn1').textContent = '0.00 $'; document.getElementById('earn2').textContent = '0.00 $';
+    document.getElementById('earn3').textContent = '0.00 $'; document.getElementById('earn4').textContent = '0.00 $';
+    document.getElementById('earn5').textContent = '0.00 $';
 
-      async function changeNickname() {
-        if (!userData) return;
-        const newNick = $('profileNicknameInput').value.trim();
-        if (!newNick || newNick.length < 2) { $('profileMsg').textContent = 'Никнейм должен быть от 2 символов'; return; }
-        if (newNick === nickname) { $('profileMsg').textContent = 'Это ваш текущий никнейм'; return; }
-        const result = await API.updateNickname(userData.user_uid, newNick);
-        if (result === true) {
-          nickname = newNick;
-          userData.nickname = newNick;
-          $('nicknameDisplay').textContent = newNick;
-          localStorage.setItem('wdVdsNickname', newNick);
-          $('profileMsg').textContent = 'Никнейм изменён!';
-          setTimeout(() => { $('profileMsg').textContent = ''; }, 2000);
-        } else if (result === 'taken') {
-          $('profileMsg').textContent = 'Этот никнейм уже занят';
-        } else {
-          $('profileMsg').textContent = 'Ошибка изменения';
-        }
-      }
-      window.changeNickname = changeNickname;
+    // Никнеймы
+    const allNicks = ['Алексей','Мария','Дмитрий','Елена','Сергей','Ольга','Андрей','Татьяна','Николай','Анна','Владимир','Ирина','Павел','Наталья','Максим','Светлана','Роман','Юлия','Артём','Виктория','Иван петров','Мария сидорова','Пётр кузнецов','Екатерина смирнова','Александр попов','дарья Васильева','ольга Зайцева','никита Морозов','арина Соколова','тимофей Лебедев','Кристина волкова','Артур козлов','Диана новикова','Глеб егоров','Алиса фёдорова','сокол','волк','медведь','лиса','орёл','ястреб','барс','тигр','филин','ворон','Лунный Свет','Белый Клык','Чёрный Ворон','Золотой Орёл','Серебряный Лис','Красный Дракон','Синий Кит','Быстрый Ветер','Тихий Шёпот','Громкий Зов','Alexander','Victoria','Maxim','Svetlana','Dmitry','Natalie','Sergey','Ekaterina','Roman','Yulia','shadow','phoenix','dragon','wolf','eagle','hawk','tiger','raven','fox','bear','Dark Knight','Silver Fox','Golden Eagle','White Wolf','Black Raven','Red Phoenix','Blue Dragon','Swift Wind','Silent Shadow','Lucky Star','john smith','mary jones','peter brown','anna white','tom black','alice Green','bob Taylor','kate Wilson','mike Davis','lisa Moore'];
+    function rNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
+    function gTime() { return new Date().toLocaleTimeString('ru-RU', { hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+    function fNum(n) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
 
-      function updateSupportBadge() {
-        const badge = $('supportBadge');
-        const btn = $('supportBtn');
-        if (!badge || !btn) return;
-        if (supportUnreadCount > 0) {
-          badge.textContent = supportUnreadCount > 99 ? '99' : supportUnreadCount;
-          badge.classList.remove('hidden');
-          btn.classList.add('unread');
-        } else {
-          badge.classList.add('hidden');
-          btn.classList.remove('unread');
-        }
-      }
+    // Счётчики
+    let tUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 146353;
+    let tToday = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
+    let tWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
+    const tUsersEl = document.getElementById('totalUsers');
+    const tTodayEl = document.getElementById('todayUsers');
+    const tWithdrawnEl = document.getElementById('totalWithdrawn');
+    tUsersEl.textContent = fNum(tUsers); tTodayEl.textContent = tToday; tWithdrawnEl.textContent = fNum(tWithdrawn) + ' $';
 
-      function startSupportPolling() {
-        if (supportPollingInterval) clearInterval(supportPollingInterval);
-        supportPollingInterval = setInterval(async () => {
-          if (!userData) return;
-          try {
-            const chats = await API.getSupportChats();
-            const uid = userData.user_uid;
-            if (chats[uid] && chats[uid].messages) {
-              const oldCount = supportMessages.length;
-              supportMessages = chats[uid].messages;
-              const newAdminMessages = supportMessages.filter((m, i) => m.from === 'admin' && i >= oldCount && !m.read);
-              if (newAdminMessages.length > 0) {
-                supportUnreadCount += newAdminMessages.length;
-                updateSupportBadge();
-                if ($('supportModal').classList.contains('hidden')) { playNotificationSound(); }
-                if (!$('supportModal').classList.contains('hidden')) {
-                  renderSupportMessages();
-                  newAdminMessages.forEach(m => m.read = true);
-                  await saveSupportMessage();
-                }
-              }
-            }
-          } catch (e) {}
-        }, 10000);
-      }
+    function aVal(el, s, e, d, sf) { sf=sf||''; d=d||400; if(s===e){el.textContent=e+sf;return;} var r=e-s, inc=r>0?1:-1, st=Math.abs(Math.floor(d/Math.abs(r))), c=s; var t=setInterval(function(){c+=inc; el.textContent=(el===tUsersEl||el===tWithdrawnEl?fNum(c):c)+sf; if(c===e)clearInterval(t);}, st); }
+    function incU() { var o=tUsers; tUsers++; tToday++; localStorage.setItem('pirxmix_totalUsers',tUsers); localStorage.setItem('pirxmix_todayUsers',tToday); aVal(tUsersEl,o,tUsers,400); aVal(tTodayEl,tToday-1,tToday,400); }
+    function sInc() { setTimeout(function(){incU();sInc();}, Math.floor(Math.random()*20000)+5000); } sInc();
+    function mReset() { var n=new Date(), m=new Date(n); m.setHours(24,0,0,0); setTimeout(function(){tToday=0; localStorage.setItem('pirxmix_todayUsers','0'); tTodayEl.textContent='0'; mReset();}, m-n); } mReset();
 
-      // ========== INITIALIZATION ==========
-      setLanguage('ru');
-      updateAllTexts();
-      $('mainMenu').classList.add('hidden');
-      $('slotUI').classList.add('hidden');
-      $('logoutBtn').style.display = 'none';
-      $('googleLoginBtn').style.display = 'flex';
-      updateSupportBadge();
-      showRegistrationPage();
-    })();
+    // Транзакции (генерируются в коде)
+    const depList = document.getElementById('depositList');
+    const witList = document.getElementById('withdrawList');
+    const MAX = 10;
+    function addDep() { var it=document.createElement('div'); it.className='feed-item deposit'; it.innerHTML='<span><span class="feed-user">'+rNick()+'</span><span class="feed-time">'+gTime()+'</span></span><span class="feed-amount">10$</span>'; depList.prepend(it); while(depList.children.length>MAX)depList.removeChild(depList.lastChild); }
+    function addWit() { var amt=Math.floor(Math.random()*168)+1; var it=document.createElement('div'); it.className='feed-item withdraw'; it.innerHTML='<span><span class="feed-user">'+rNick()+'</span><span class="feed-time">'+gTime()+'</span></span><span class="feed-amount">'+amt+'$</span>'; witList.prepend(it); while(witList.children.length>MAX)witList.removeChild(witList.lastChild); var ow=tWithdrawn; tWithdrawn+=amt; localStorage.setItem('pirxmix_totalWithdrawn',tWithdrawn); aVal(tWithdrawnEl,ow,tWithdrawn,500,' $'); }
+    for(var i=0;i<MAX;i++){addDep();addWit();}
+    function gTx(){if(Math.random()<0.5)addDep();else addWit();setTimeout(gTx,Math.floor(Math.random()*105000)+25000);}
+    setTimeout(gTx,25000);
+
+    // Загрузка из БД
+    async function lUD(){var d=await supabase.rpc('get_user_by_id',{p_user_id:userData.id});if(d.data&&d.data.success){document.getElementById('balance').textContent=parseFloat(d.data.balance).toFixed(2)+' $';document.getElementById('totalEarned').textContent=(parseFloat(d.data.balance)*1.2).toFixed(2)+' $';localStorage.setItem('pirxmix_balance',d.data.balance);if(d.data.vip_paid){localStorage.setItem('pirxmix_vip','true');if(d.data.referral_code)localStorage.setItem('pirxmix_vip_id',d.data.referral_code);}}}
+    async function lRef(){var d=await supabase.rpc('get_user_referrals',{p_user_id:userData.id});if(d.data){document.getElementById('lvl1').textContent=(d.data.level_1?.count||0)+' чел.';document.getElementById('lvl2').textContent=(d.data.level_2?.count||0)+' чел.';document.getElementById('lvl3').textContent=(d.data.level_3?.count||0)+' чел.';document.getElementById('lvl4').textContent=(d.data.level_4?.count||0)+' чел.';document.getElementById('lvl5').textContent=(d.data.level_5?.count||0)+' чел.';}}
+    lUD();lRef();setInterval(function(){lUD();lRef();},30000);
+
+    // Вывод
+    var wModal=document.getElementById('withdrawModal');
+    document.getElementById('withdrawBtn').addEventListener('click',function(){document.getElementById('withdrawCrypto').value='';document.getElementById('withdrawAmount').value='';document.getElementById('withdrawComment').value='';wModal.classList.remove('hidden');});
+    document.getElementById('closeWithdrawBtn').addEventListener('click',function(){wModal.classList.add('hidden');});
+    wModal.addEventListener('click',function(e){if(e.target===wModal)wModal.classList.add('hidden');});
+    document.getElementById('confirmWithdrawBtn').addEventListener('click',async function(){var cr=document.getElementById('withdrawCrypto').value,am=parseFloat(document.getElementById('withdrawAmount').value),cm=document.getElementById('withdrawComment').value.trim();if(!cr||!am||am<1)return;var bal=parseFloat(localStorage.getItem('pirxmix_balance'))||0;if(am>bal)return;var r=await supabase.rpc('withdraw_funds',{p_user_id:userData.id,p_amount:am,p_crypto_type:cr,p_comment:cm||null});if(!r.error&&r.data&&r.data.success){await lUD();}wModal.classList.add('hidden');});
+
+    // VIP
+    var vModal=document.getElementById('vipModal'),vBox=document.getElementById('vipInfoBox'),vBtn=document.getElementById('confirmVipBtn');
+    function uVip(id){vBox.innerHTML='<p style="color:#4caf50;font-weight:600;">✅ VIP статус активирован!</p><p style="color:#b9b09a;font-size:0.85rem;">Ваш уникальный ID:</p><div class="vip-id">'+id+'</div><p style="color:#b9b09a;font-size:0.85rem;margin-top:0.5rem;">Реферальная ссылка:</p><p style="color:#f5d78c;font-size:0.8rem;word-break:break-all;">https://vds-game.ink/reg?ref='+id+'</p>';}
+    document.getElementById('vipBtn').addEventListener('click',async function(){var d=await supabase.rpc('get_user_by_id',{p_user_id:userData.id});if(d.data&&d.data.vip_paid){uVip(d.data.referral_code);vBtn.style.display='none';}else{vBox.innerHTML='<p style="color:#b9b09a;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color:#9b927a;font-size:0.85rem;margin-top:0.8rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';vBtn.style.display='inline-block';}vModal.classList.remove('hidden');});
+    document.getElementById('closeVipBtn').addEventListener('click',function(){vModal.classList.add('hidden');});
+    vModal.addEventListener('click',function(e){if(e.target===vModal)vModal.classList.add('hidden');});
+    vBtn.addEventListener('click',async function(){var r=await supabase.rpc('purchase_vip',{p_user_id:userData.id});if(!r.error&&r.data&&r.data.success){uVip(r.data.referral_code);vBtn.style.display='none';await lUD();}});
+
+    // Профиль
+    var pModal=document.getElementById('profileModal');
+    document.getElementById('profileBtn').addEventListener('click',function(){document.getElementById('profileNickname').value=userData.nickname;document.getElementById('profilePassword').value='';document.getElementById('profilePassword2').value='';pModal.classList.remove('hidden');});
+    document.getElementById('closeProfileBtn').addEventListener('click',function(){pModal.classList.add('hidden');});
+    pModal.addEventListener('click',function(e){if(e.target===pModal)pModal.classList.add('hidden');});
+    document.getElementById('saveProfileBtn').addEventListener('click',function(){var nn=document.getElementById('profileNickname').value.trim();if(!nn)return;userData.nickname=nn;localStorage.setItem('pirxmix_user',JSON.stringify(userData));document.getElementById('userGreeting').textContent='Привет, '+nn;pModal.classList.add('hidden');});
+
+    // Выход
+    document.getElementById('logoutBtn').addEventListener('click',function(){localStorage.removeItem('pirxmix_user');window.location.href='https://vds-game.ink/reg';});
+
+    // Политика
+    var polModal=document.getElementById('policyModal');
+    document.getElementById('policyLink').addEventListener('click',function(){polModal.classList.remove('hidden');});
+    document.getElementById('closePolicyBtn').addEventListener('click',function(){polModal.classList.add('hidden');});
+    polModal.addEventListener('click',function(e){if(e.target===polModal)polModal.classList.add('hidden');});
+
+})();
 </script>
 </body>
 </html>
