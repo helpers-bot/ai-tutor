@@ -472,7 +472,7 @@
     <div class="stats-panel">
         <div class="stat-item">
             <div class="stat-label">👥 Всего пользователей</div>
-            <div class="stat-value" id="totalUsers">24344</div>
+            <div class="stat-value" id="totalUsers">146.353</div>
         </div>
         <div class="stat-item">
             <div class="stat-label">📅 Сегодня зарегистрировано</div>
@@ -480,7 +480,7 @@
         </div>
         <div class="stat-item">
             <div class="stat-label">💰 Всего выведено</div>
-            <div class="stat-value" id="totalWithdrawn">18500 $</div>
+            <div class="stat-value" id="totalWithdrawn">18.500 $</div>
         </div>
     </div>
 
@@ -524,6 +524,14 @@
         const switchTextBlock = document.getElementById('switchTextBlock');
         let isLoginMode = false;
 
+        // Проверяем, есть ли уже зарегистрированный пользователь
+        const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
+        if (savedUser && savedUser.nickname) {
+            // Если пользователь уже зарегистрирован, сразу переходим в его профиль
+            window.location.href = 'https://vds-game.ink/home';
+            return;
+        }
+
         function updateUIForMode() {
             if (isLoginMode) {
                 password2Group.classList.remove('visible-password');
@@ -551,13 +559,16 @@
             if (!nickname || !password1) return;
 
             if (isLoginMode) {
+                // При входе проверяем, совпадает ли никнейм с сохранённым
                 const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
                 if (!savedUser || savedUser.nickname !== nickname) return;
+                // Если никнейм совпадает, входим в профиль
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 window.location.href = 'https://vds-game.ink/home';
             } else {
                 const password2 = document.getElementById('password2').value;
                 if (password1 !== password2) return;
+                // Сохраняем нового пользователя
                 localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
                 localStorage.setItem('pirxmix_balance', '0');
                 window.location.href = 'https://vds-game.ink/home';
@@ -567,7 +578,7 @@
         document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
 
         // ---------- Счётчики с сохранением в localStorage ----------
-        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 24344;
+        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 146353;
         let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
         let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
 
@@ -575,10 +586,15 @@
         const todayUsersEl = document.getElementById('todayUsers');
         const totalWithdrawnEl = document.getElementById('totalWithdrawn');
 
-        // Отображаем сохранённые значения
-        totalUsersEl.textContent = totalUsers;
+        // Функция форматирования чисел с точкой
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        // Отображаем сохранённые значения с форматированием
+        totalUsersEl.textContent = formatNumber(totalUsers);
         todayUsersEl.textContent = todayUsers;
-        totalWithdrawnEl.textContent = totalWithdrawn + ' $';
+        totalWithdrawnEl.textContent = formatNumber(totalWithdrawn) + ' $';
 
         function animateValue(element, start, end, duration, suffix = '') {
             if (start === end) return;
@@ -588,7 +604,12 @@
             let current = start;
             const timer = setInterval(() => {
                 current += increment;
-                element.textContent = current + suffix;
+                // Если элемент totalUsers или totalWithdrawn, форматируем с точкой
+                if (element === totalUsersEl || element === totalWithdrawnEl) {
+                    element.textContent = formatNumber(current) + suffix;
+                } else {
+                    element.textContent = current + suffix;
+                }
                 if (current === end) clearInterval(timer);
             }, stepTime);
         }
