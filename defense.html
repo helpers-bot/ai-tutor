@@ -60,11 +60,11 @@ canvas{display:block;position:absolute;top:0;left:0}
 .admin-toolbar button{padding:clamp(3px,0.6vw,5px) clamp(6px,1.2vw,10px);background:#4a3028;border:1px solid #d4af37;color:#ffd966;border-radius:5px;cursor:pointer;font-size:clamp(8px,1.5vw,11px);white-space:nowrap}
 .admin-toolbar button.active{background:#d4af37;color:#000}
 .admin-toolbar select{padding:clamp(3px,0.6vw,5px);background:#4a3028;border:1px solid #d4af37;color:#ffd966;border-radius:5px;font-size:clamp(8px,1.5vw,11px)}
-.admin-canvas-wrap{flex:1;overflow:hidden;position:relative}
+.admin-canvas-wrap{flex:1;overflow:hidden;position:relative;background:#333}
 .admin-info{color:#ffd966;font-size:clamp(8px,1.5vw,10px);padding:2px 5px}
 .admin-new-map-btn{background:#2e7d32!important;border-color:#4caf50!important;margin-left:5px}
 .admin-delete-btn{background:#8b0000!important;border-color:#ff4444!important}
-.green-size-select{margin-left:8px;background:#2c2c3a;color:#ffd966;border:1px solid #d4af37;padding:2px 4px;border-radius:5px;font-size:clamp(8px,1.5vw,11px)}
+.tile-size-select{margin-left:8px;background:#2c2c3a;color:#ffd966;border:1px solid #d4af37;padding:2px 4px;border-radius:5px;font-size:clamp(8px,1.5vw,11px)}
 </style>
 </head>
 <body>
@@ -141,29 +141,29 @@ canvas{display:block;position:absolute;top:0;left:0}
 <!-- Админ панель -->
 <div class="admin-panel hidden" id="adminPanel">
   <div class="admin-toolbar">
-    <button id="adminToolSpawn">📍S</button>
-    <button id="adminToolCastle">🏰C</button>
-    <button id="adminToolTree">🌳</button>
-    <button id="adminToolRock">🪨</button>
-    <button id="adminToolWater">💧</button>
-    <button id="adminToolTower">🗼</button>
-    <button id="adminToolRoad">🛤</button>
-    <button id="adminToolErase">🧹</button>
+    <button id="adminToolSpawn" title="Точка спавна">📍 S</button>
+    <button id="adminToolCastle" title="Замок">🏰 C</button>
+    <button id="adminToolTree" title="Дерево">🌳 Д</button>
+    <button id="adminToolRock" title="Камень">🪨 К</button>
+    <button id="adminToolWater" title="Вода">💧 В</button>
+    <button id="adminToolTower" title="Место для башни">🗼 Б</button>
+    <button id="adminToolRoad" title="Дорога">🛤 ДР</button>
+    <button id="adminToolErase" title="Стереть">🧹 Х</button>
     <select id="adminMapSelect"></select>
-    <button id="adminNewMap" class="admin-new-map-btn">+</button>
-    <button id="adminDeleteMap" class="admin-delete-btn">🗑</button>
-    <button id="adminSave">💾</button>
-    <button id="adminTest">▶</button>
-    <button id="adminExit" style="background:#8b0000;">✕</button>
-    <!-- Выбор размера зелёных блоков (тайлов) -->
-    <select id="greenTileSizeSelect" class="green-size-select">
-      <option value="10">10x10</option>
-      <option value="12" selected>12x12</option>
-      <option value="15">15x15</option>
+    <button id="adminNewMap" class="admin-new-map-btn" title="Новая карта">+ Новая</button>
+    <button id="adminDeleteMap" class="admin-delete-btn" title="Удалить карту">🗑 Удалить</button>
+    <button id="adminSave" title="Сохранить">💾 Сохранить</button>
+    <button id="adminTest" title="Тест игры">▶ Тест</button>
+    <button id="adminExit" style="background:#8b0000;" title="Выход">✕ Выход</button>
+    <!-- Выбор размера тайлов -->
+    <select id="tileSizeSelect" class="tile-size-select">
+      <option value="32">32x32</option>
+      <option value="48" selected>48x48</option>
+      <option value="64">64x64</option>
     </select>
-    <span style="color:#ffd966;font-size:10px;">Зелёный блок</span>
+    <span style="color:#ffd966;font-size:10px;">Размер блока</span>
   </div>
-  <div class="admin-info" id="adminInfo">Спавн | К1</div>
+  <div class="admin-info" id="adminInfo">Спавн | Карта 1</div>
   <div class="admin-canvas-wrap" id="adminCanvasWrap">
     <canvas id="adminCanvas"></canvas>
   </div>
@@ -180,7 +180,8 @@ function sfx(f=400,t='square',d=0.04,v=0.02){if(!audioCtx)return;try{const o=aud
 
 let saveData={bestWave:1,totalGold:200,gems:0,unlockedMaps:[0],selectedMap:0,lang:'ru'};
 const TOTAL_WAVES=300;
-const NEXT_WAVE_DELAY=180; // 3 секунды при 60fps
+const NEXT_WAVE_DELAY=180;
+const COLS=28,ROWS=38;
 
 let adminMaps=[{spawn:{c:2,r:35},castle:{c:25,r:5},trees:[],rocks:[],water:[],towerSpots:[],roads:[]}];
 
@@ -233,80 +234,43 @@ document.querySelectorAll('.lang-btn').forEach(btn=>{
   btn.addEventListener('click',()=>{lang=btn.dataset.langBtn;saveData.lang=lang;saveProgress();applyLanguage();document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.langBtn===lang))});
 });
 
-const COLS=28,ROWS=38;
-
-// Размер тайла с учётом панелей и выбранного в админке размера зелёного блока
-let forcedTileSize = 12; // по умолчанию 12x12 (10,12,15)
-function getAdminTileSizeSetting(){
-  const sel = document.getElementById('greenTileSizeSelect');
-  if(sel) return parseInt(sel.value);
-  return 12;
-}
-function calcTileSize(){
-  const desired = forcedTileSize;
-  const topPanelH=35;
-  const bottomPanelH=document.getElementById('bottomPanel').offsetHeight||60;
-  const availW=window.innerWidth-10;
-  const availH=window.innerHeight-topPanelH-bottomPanelH-5;
-  const maxFit = Math.floor(Math.min(availW/COLS, availH/ROWS));
-  // Используем желаемый размер, но не больше максимального, чтобы всё помещалось
-  return Math.min(desired, maxFit);
-}
-
-let TILE=calcTileSize();
+let currentTileSize = 48; // базовый размер тайла (48x48)
+let TILE = 48;
 let gx=0,gy=0;
 
-const game={
-  mode:'menu',
-  gold:saveData.totalGold,
-  gems:saveData.gems,
-  lives:25,
-  wave:1,
-  waveActive:false,
-  autoMode:false,
-  enemiesLeft:0,
-  spawnTimer:0,
-  spawnDelay:55,
-  speed:1,
-  selectedTower:'archer',
-  towers:[],
-  enemies:[],
-  projectiles:[],
-  particles:[],
-  texts:[],
-  grid:[],
-  path:[],
-  spawn:null,
-  end:null,
-  selectedTowerObj:null,
-  currentMap:0,
-  selectedMap:saveData.selectedMap||0,
-  nextWaveAvailable:false,
-  nextWaveTimer:0,
-  nextWaveBonus:0
-};
+function calcTileSizeFromSetting(){
+  const sel = document.getElementById('tileSizeSelect');
+  if(sel) currentTileSize = parseInt(sel.value);
+  return currentTileSize;
+}
 
 function resizeFullscreen(){
   canvas.width=window.innerWidth;
   canvas.height=window.innerHeight;
-  TILE=calcTileSize();
-  const bottomH=document.getElementById('bottomPanel').offsetHeight||60;
-  gx=Math.floor((canvas.width-COLS*TILE)/2);
-  gy=35+Math.floor((canvas.height-35-bottomH-ROWS*TILE)/2);
-  if(gy<35)gy=35;
-  if(gx<5)gx=5;
-  if(gx+COLS*TILE>canvas.width-5)gx=Math.max(5,canvas.width-COLS*TILE-5);
-  if(gy+ROWS*TILE>canvas.height-bottomH-5)gy=Math.max(35,canvas.height-bottomH-ROWS*TILE-5);
-  if(game.mode==='playing')rebuildGameGrid();
+  TILE = calcTileSizeFromSetting();
+  
+  const topPanelH=35;
+  const bottomPanelH=document.getElementById('bottomPanel').offsetHeight||60;
+  
+  const totalWidth = COLS * TILE;
+  const totalHeight = ROWS * TILE;
+  
+  gx = Math.floor((canvas.width - totalWidth) / 2);
+  gy = 35 + Math.floor((canvas.height - 35 - bottomPanelH - totalHeight) / 2);
+  
+  if(gy < 35) gy = 35;
+  if(gx < 5) gx = 5;
+  if(gx + totalWidth > canvas.width - 5) gx = Math.max(5, canvas.width - totalWidth - 5);
+  if(gy + totalHeight > canvas.height - bottomPanelH - 5) gy = Math.max(35, canvas.height - bottomPanelH - totalHeight - 5);
+  
+  if(game.mode==='playing') rebuildGameGrid();
 }
-window.addEventListener('resize',()=>{
-  resizeFullscreen();
-});
+window.addEventListener('resize',()=>{resizeFullscreen();});
 resizeFullscreen();
 
 function buildGrid(){
   game.grid=[];game.path=[];
-  TILE=calcTileSize();
+  TILE = calcTileSizeFromSetting();
   
   const am=adminMaps[game.currentMap]||adminMaps[0];
   
@@ -546,6 +510,13 @@ class Particle{
   draw(ctx){ctx.globalAlpha=this.l/20;ctx.fillStyle=this.c;ctx.beginPath();ctx.arc(this.x,this.y,this.s,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;}
 }
 
+const game={
+  mode:'menu',gold:saveData.totalGold,gems:saveData.gems,lives:25,wave:1,waveActive:false,
+  autoMode:false,enemiesLeft:0,spawnTimer:0,spawnDelay:55,speed:1,selectedTower:'archer',
+  towers:[],enemies:[],projectiles:[],particles:[],texts:[],grid:[],path:[],spawn:null,end:null,
+  selectedTowerObj:null,currentMap:0,selectedMap:saveData.selectedMap||0,nextWaveAvailable:false,nextWaveTimer:0,nextWaveBonus:0
+};
+
 function startWave(){if(game.waveActive||game.wave>=TOTAL_WAVES)return;game.waveActive=true;game.nextWaveAvailable=false;game.nextWaveTimer=0;game.nextWaveBonus=Math.floor(20+game.wave*3);game.enemiesLeft=5+game.wave*2+Math.floor(game.wave/5)*3;game.spawnTimer=game.spawnDelay;document.getElementById('nextWaveBtn').style.display='none';spawnOne();game.enemiesLeft--;}
 function startNextWave(){if(!game.waveActive)return;game.gold+=game.nextWaveBonus;game.gems+=Math.floor(game.nextWaveBonus/20);game.wave++;game.enemiesLeft=5+game.wave*2+Math.floor(game.wave/5)*3;game.spawnTimer=game.spawnDelay;game.nextWaveAvailable=false;game.nextWaveTimer=0;game.nextWaveBonus=Math.floor(20+game.wave*3);document.getElementById('nextWaveBtn').style.display='none';spawnOne();game.enemiesLeft--;if(game.wave>saveData.bestWave){saveData.bestWave=game.wave;saveData.totalGold=Math.max(saveData.totalGold,game.gold);saveData.gems=game.gems;saveProgress();}}
 function spawnOne(){game.enemies.push(new Enemy(game.wave));}
@@ -631,13 +602,13 @@ let adminCurrentMap=0;
 
 const adminCanvas=document.getElementById('adminCanvas');
 const adminCtx=adminCanvas.getContext('2d');
-let adminTILE=25;
+let adminTILE=48;
 let adminGX=0,adminGY=0;
 
 function initAdminCanvas(){
   adminCanvas.width=document.getElementById('adminCanvasWrap').clientWidth;
   adminCanvas.height=document.getElementById('adminCanvasWrap').clientHeight;
-  adminTILE=Math.floor(Math.min(adminCanvas.width/COLS,adminCanvas.height/ROWS));
+  adminTILE = calcTileSizeFromSetting();
   adminGX=Math.floor((adminCanvas.width-COLS*adminTILE)/2);
   adminGY=Math.floor((adminCanvas.height-ROWS*adminTILE)/2);
   if(adminGY<2)adminGY=2;
@@ -650,7 +621,7 @@ function adminScreenToTile(sx,sy){
 
 function drawAdminGrid(){
   adminCtx.clearRect(0,0,adminCanvas.width,adminCanvas.height);
-  adminCtx.fillStyle='#0a0f1e';
+  adminCtx.fillStyle='#2a2a2a';
   adminCtx.fillRect(0,0,adminCanvas.width,adminCanvas.height);
   
   const am=adminMaps[adminCurrentMap]||adminMaps[0];
@@ -658,16 +629,16 @@ function drawAdminGrid(){
   for(let r=0;r<ROWS;r++){
     for(let c=0;c<COLS;c++){
       const x=adminGX+c*adminTILE,y=adminGY+r*adminTILE;
-      adminCtx.fillStyle='#7ec850';
+      adminCtx.fillStyle='#555';
       adminCtx.fillRect(x,y,adminTILE,adminTILE);
-      adminCtx.strokeStyle='rgba(255,255,255,0.1)';
+      adminCtx.strokeStyle='#888';
       adminCtx.strokeRect(x,y,adminTILE,adminTILE);
     }
   }
   
   if(am.roads)am.roads.forEach(p=>{
     const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='#c4a882';adminCtx.fillRect(x,y,adminTILE,adminTILE);
+    adminCtx.fillStyle='#8B7355';adminCtx.fillRect(x,y,adminTILE,adminTILE);
   });
   
   if(am.water)am.water.forEach(p=>{
@@ -677,7 +648,7 @@ function drawAdminGrid(){
   
   if(am.towerSpots)am.towerSpots.forEach(p=>{
     const x=adminGX+p.c*adminTILE,y=adminGY+p.r*adminTILE;
-    adminCtx.fillStyle='rgba(255,215,0,0.3)';adminCtx.fillRect(x,y,adminTILE,adminTILE);
+    adminCtx.fillStyle='rgba(255,215,0,0.25)';adminCtx.fillRect(x,y,adminTILE,adminTILE);
     adminCtx.strokeStyle='rgba(255,215,0,0.8)';adminCtx.setLineDash([2,2]);
     adminCtx.strokeRect(x,y,adminTILE,adminTILE);adminCtx.setLineDash([]);
   });
@@ -702,17 +673,17 @@ function drawAdminGrid(){
     const x=adminGX+am.spawn.c*adminTILE,y=adminGY+am.spawn.r*adminTILE;
     adminCtx.fillStyle='#8b0000';adminCtx.beginPath();
     adminCtx.arc(x+adminTILE/2,y+adminTILE/2,adminTILE*0.4,0,Math.PI*2);adminCtx.fill();
-    adminCtx.fillStyle='#fff';adminCtx.font='10px Arial';adminCtx.textAlign='center';
-    adminCtx.fillText('S',x+adminTILE/2,y+adminTILE/2+3);
+    adminCtx.fillStyle='#fff';adminCtx.font='bold '+(adminTILE*0.5)+'px Arial';adminCtx.textAlign='center';
+    adminCtx.fillText('S',x+adminTILE/2,y+adminTILE/2+adminTILE*0.15);
   }
   
   if(am.castle){
     const x=adminGX+am.castle.c*adminTILE,y=adminGY+am.castle.r*adminTILE;
-    adminCtx.font=adminTILE+'px Arial';adminCtx.textAlign='center';
+    adminCtx.font=adminTILE*0.8+'px Arial';adminCtx.textAlign='center';
     adminCtx.fillText('🏰',x+adminTILE/2,y+adminTILE*0.8);
   }
   
-  adminCtx.strokeStyle='#5c2e0a';adminCtx.lineWidth=2;
+  adminCtx.strokeStyle='#ffd700';adminCtx.lineWidth=3;
   adminCtx.strokeRect(adminGX,adminGY,COLS*adminTILE,ROWS*adminTILE);
 }
 
@@ -734,6 +705,9 @@ function adminAddAt(c,r){
     case'erase':
       if(am.spawn&&am.spawn.c===c&&am.spawn.r===r)am.spawn=null;
       if(am.castle&&am.castle.c===c&&am.castle.r===r)am.castle=null;
+      for(let k of ['trees','rocks','water','towerSpots','roads']){
+        if(am[k])am[k]=am[k].filter(p=>!(p.c===c&&p.r===r));
+      }
       break;
   }
   adminMaps[adminCurrentMap]=am;
@@ -747,7 +721,7 @@ function refreshAdminSelect(){
   for(let i=0;i<adminMaps.length;i++){
     const opt=document.createElement('option');
     opt.value=i;
-    opt.textContent='К'+(i+1);
+    opt.textContent='Карта '+(i+1);
     sel.appendChild(opt);
   }
   sel.value=adminCurrentMap;
@@ -774,7 +748,7 @@ function closeAdminPanel(){
 }
 
 function updateAdminInfo(){
-  document.getElementById('adminInfo').textContent=`${adminTool} | К${adminCurrentMap+1}/${adminMaps.length}`;
+  document.getElementById('adminInfo').textContent=`${adminTool} | Карта ${adminCurrentMap+1}/${adminMaps.length}`;
   document.querySelectorAll('.admin-toolbar button').forEach(b=>b.classList.remove('active'));
   const btn=document.getElementById('adminTool'+adminTool.charAt(0).toUpperCase()+adminTool.slice(1));
   if(btn)btn.classList.add('active');
@@ -783,10 +757,9 @@ function updateAdminInfo(){
 document.getElementById('adminBtn').addEventListener('click',openAdminPanel);
 document.getElementById('adminExit').addEventListener('click',closeAdminPanel);
 
-// Сохраняем выбранный размер зелёного блока и пересчитываем тайлы
-const greenSizeSelect = document.getElementById('greenTileSizeSelect');
-greenSizeSelect.addEventListener('change', (e) => {
-  forcedTileSize = parseInt(e.target.value);
+const tileSizeSelect = document.getElementById('tileSizeSelect');
+tileSizeSelect.addEventListener('change', (e) => {
+  currentTileSize = parseInt(e.target.value);
   if(game.mode === 'playing') {
     resizeFullscreen();
     rebuildGameGrid();
@@ -1021,13 +994,6 @@ function draw(){
     else if(cell.type==='rock'){ctx.fillStyle='#7ec850';ctx.fillRect(x,y,TILE,TILE);ctx.fillStyle='#808080';ctx.beginPath();ctx.moveTo(x+TILE*0.2,y+TILE*0.7);ctx.lineTo(x+TILE*0.5,y+TILE*0.15);ctx.lineTo(x+TILE*0.8,y+TILE*0.7);ctx.closePath();ctx.fill();}
     else if(cell.type==='water'){ctx.fillStyle='#4a90d9';ctx.fillRect(x,y,TILE,TILE);}
   }
-  for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(game.grid[r][c].type==='water'){
-    const x=gx+c*TILE,y=gy+r*TILE;
-    if(r>0&&game.grid[r-1][c].type==='water'){ctx.fillStyle='#4a90d9';ctx.fillRect(x,y-1,TILE,3);}
-    if(r<ROWS-1&&game.grid[r+1][c].type==='water'){ctx.fillStyle='#4a90d9';ctx.fillRect(x,y+TILE-2,TILE,3);}
-    if(c>0&&game.grid[r][c-1].type==='water'){ctx.fillStyle='#4a90d9';ctx.fillRect(x-1,y,3,TILE);}
-    if(c<COLS-1&&game.grid[r][c+1].type==='water'){ctx.fillStyle='#4a90d9';ctx.fillRect(x+TILE-2,y,3,TILE);}
-  }
   for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++)if(game.grid[r][c].canBuild&&!game.grid[r][c].tower){
     const x=gx+c*TILE,y=gy+r*TILE;
     ctx.fillStyle='rgba(255,215,0,0.15)';ctx.fillRect(x,y,TILE,TILE);
@@ -1054,7 +1020,6 @@ document.getElementById('totalGold').textContent=saveData.totalGold;
 applyLanguage();
 updateUI();
 requestAnimationFrame(loop);
-console.log('✅ Исправлена расстановка башен, добавлен выбор размера зелёных блоков, подписи кнопок админки, унифицированный размер тайла.');
 })();
 </script>
 </body>
