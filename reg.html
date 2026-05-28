@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -531,7 +532,16 @@
 
 <script>
     (function() {
-        // ---------- Форма ----------
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ SUPABASE
+        // ============================================
+        const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+        const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        // ============================================
+        // ФОРМА
+        // ============================================
         const password2Group = document.getElementById('password2Group');
         const actionButton = document.getElementById('actionButton');
         const toggleModeLink = document.getElementById('toggleModeLink');
@@ -540,7 +550,6 @@
         let isLoginMode = false;
 
         function updateUIForMode() {
-            // Скрываем ошибку при переключении режима
             errorMessage.classList.remove('visible');
             
             if (isLoginMode) {
@@ -570,224 +579,151 @@
         
         updateUIForMode();
 
-        actionButton.addEventListener('click', function(e) {
+        // ============================================
+        // ОБРАБОТЧИК КНОПКИ (РЕГИСТРАЦИЯ / ВХОД)
+        // ============================================
+        actionButton.addEventListener('click', async function(e) {
             e.preventDefault();
             const nickname = document.getElementById('nickname').value.trim();
-            const password1 = document.getElementById('password1').value;
+            const password = document.getElementById('password1').value;
             
-            // Скрываем ошибку при новом клике
             errorMessage.classList.remove('visible');
             
-            if (!nickname || !password1) return;
+            if (!nickname || !password) return;
 
             if (isLoginMode) {
-                // Режим входа: проверяем, существует ли пользователь в localStorage
-                const savedUser = JSON.parse(localStorage.getItem('pirxmix_user'));
-                
-                if (!savedUser || savedUser.nickname !== nickname) {
-                    // Пользователь не найден — показываем ошибку
+                // ====== ВХОД ЧЕРЕЗ SUPABASE ======
+                const { data, error } = await supabase.rpc('login_user', {
+                    p_nickname: nickname,
+                    p_password: password
+                });
+
+                if (error || !data || !data.success) {
+                    errorMessage.textContent = '❌ Данные неверны';
                     errorMessage.classList.add('visible');
                     return;
                 }
                 
-                // Пользователь найден — входим
-                localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
+                // Сохраняем данные пользователя в localStorage
+                localStorage.setItem('pirxmix_user', JSON.stringify({
+                    id: data.user_id,
+                    nickname: data.nickname,
+                    vip_paid: data.vip_paid,
+                    referral_code: data.referral_code,
+                    balance: data.balance
+                }));
+                
                 window.location.href = 'https://vds-game.ink/home';
             } else {
-                // Режим регистрации
+                // ====== РЕГИСТРАЦИЯ ЧЕРЕЗ SUPABASE ======
                 const password2 = document.getElementById('password2').value;
-                if (password1 !== password2) return;
+                if (password !== password2) {
+                    errorMessage.textContent = '❌ Пароли не совпадают';
+                    errorMessage.classList.add('visible');
+                    return;
+                }
+
+                // Получаем реферальный код из URL если есть
+                const urlParams = new URLSearchParams(window.location.search);
+                const refCode = urlParams.get('ref') || null;
+
+                const { data, error } = await supabase.rpc('register_user', {
+                    p_nickname: nickname,
+                    p_password: password,
+                    p_referral_code: refCode
+                });
+
+                if (error || !data || !data.success) {
+                    errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
+                    errorMessage.classList.add('visible');
+                    return;
+                }
                 
-                // Сохраняем нового пользователя
-                localStorage.setItem('pirxmix_user', JSON.stringify({ nickname, password: password1 }));
-                localStorage.setItem('pirxmix_balance', '0');
+                // Сохраняем данные нового пользователя в localStorage
+                localStorage.setItem('pirxmix_user', JSON.stringify({
+                    id: data.user_id,
+                    nickname: data.nickname,
+                    vip_paid: false,
+                    referral_code: null,
+                    balance: 0
+                }));
+                
                 window.location.href = 'https://vds-game.ink/home';
             }
         });
 
         document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
 
-        // ---------- Счётчики с сохранением в localStorage ----------
-        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 146353;
-        let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
-        let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
-
-        const totalUsersEl = document.getElementById('totalUsers');
-        const todayUsersEl = document.getElementById('todayUsers');
-        const totalWithdrawnEl = document.getElementById('totalWithdrawn');
-
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        // ============================================
+        // ЗАГРУЗКА СТАТИСТИКИ ИЗ SUPABASE
+        // ============================================
+        async function loadStats() {
+            const { data, error } = await supabase.rpc('get_platform_stats');
+            if (data && !error) {
+                const totalUsersEl = document.getElementById('totalUsers');
+                const todayUsersEl = document.getElementById('todayUsers');
+                const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+                
+                totalUsersEl.textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                todayUsersEl.textContent = data.today_users;
+                totalWithdrawnEl.textContent = data.total_withdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+            }
         }
 
-        totalUsersEl.textContent = formatNumber(totalUsers);
-        todayUsersEl.textContent = todayUsers;
-        totalWithdrawnEl.textContent = formatNumber(totalWithdrawn) + ' $';
-
-        function animateValue(element, start, end, duration, suffix = '') {
-            if (start === end) return;
-            const range = end - start;
-            const increment = range > 0 ? 1 : -1;
-            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
-            let current = start;
-            const timer = setInterval(() => {
-                current += increment;
-                if (element === totalUsersEl || element === totalWithdrawnEl) {
-                    element.textContent = formatNumber(current) + suffix;
-                } else {
-                    element.textContent = current + suffix;
-                }
-                if (current === end) clearInterval(timer);
-            }, stepTime);
-        }
-
-        function incrementUsers() {
-            const oldTotal = totalUsers;
-            totalUsers++;
-            todayUsers++;
-            localStorage.setItem('pirxmix_totalUsers', totalUsers);
-            localStorage.setItem('pirxmix_todayUsers', todayUsers);
-            animateValue(totalUsersEl, oldTotal, totalUsers, 400);
-            animateValue(todayUsersEl, todayUsers - 1, todayUsers, 400);
-        }
-
-        function scheduleNextIncrement() {
-            const delay = Math.floor(Math.random() * 20000) + 5000;
-            setTimeout(() => {
-                incrementUsers();
-                scheduleNextIncrement();
-            }, delay);
-        }
-        scheduleNextIncrement();
-
-        function scheduleMidnightReset() {
-            const now = new Date();
-            const midnight = new Date(now);
-            midnight.setHours(24, 0, 0, 0);
-            const msToMidnight = midnight - now;
-            setTimeout(() => {
-                todayUsers = 0;
-                localStorage.setItem('pirxmix_todayUsers', '0');
-                todayUsersEl.textContent = '0';
-                scheduleMidnightReset();
-            }, msToMidnight);
-        }
-        scheduleMidnightReset();
-
-        // ---------- Лента транзакций с сохранением ----------
-        const depositList = document.getElementById('depositList');
-        const withdrawList = document.getElementById('withdrawList');
-        const MAX_ITEMS = 10;
-
-        const allNicks = [
-            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
-            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
-            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
-            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
-            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
-            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
-            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
-            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
-            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
-            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
-            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
-            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore'
-        ];
-
-        function randomNick() {
-            return allNicks[Math.floor(Math.random() * allNicks.length)];
-        }
-
-        function getCurrentTime() {
-            return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        function getRandomWithdrawAmount() {
-            return Math.floor(Math.random() * 168) + 1;
-        }
-
-        function saveTransactions() {
-            const deposits = [];
-            const withdraws = [];
-            depositList.querySelectorAll('.feed-item').forEach(item => {
-                deposits.push(item.innerHTML);
-            });
-            withdrawList.querySelectorAll('.feed-item').forEach(item => {
-                withdraws.push(item.innerHTML);
-            });
-            localStorage.setItem('pirxmix_deposits', JSON.stringify(deposits));
-            localStorage.setItem('pirxmix_withdraws', JSON.stringify(withdraws));
-        }
-
-        function loadTransactions() {
-            const savedDeposits = JSON.parse(localStorage.getItem('pirxmix_deposits') || '[]');
-            const savedWithdraws = JSON.parse(localStorage.getItem('pirxmix_withdraws') || '[]');
+        // ============================================
+        // ЗАГРУЗКА ТРАНЗАКЦИЙ ИЗ SUPABASE
+        // ============================================
+        async function loadTransactions() {
+            const depositList = document.getElementById('depositList');
+            const withdrawList = document.getElementById('withdrawList');
             
-            savedDeposits.forEach(html => {
-                const item = document.createElement('div');
-                item.className = 'feed-item deposit';
-                item.innerHTML = html;
-                depositList.appendChild(item);
+            // Очищаем списки
+            depositList.innerHTML = '';
+            withdrawList.innerHTML = '';
+            
+            // Загружаем пополнения
+            const { data: deposits } = await supabase.rpc('get_recent_transactions', {
+                p_type: 'deposit',
+                p_limit: 10
             });
             
-            savedWithdraws.forEach(html => {
-                const item = document.createElement('div');
-                item.className = 'feed-item withdraw';
-                item.innerHTML = html;
-                withdrawList.appendChild(item);
+            if (deposits) {
+                deposits.forEach(t => {
+                    const item = document.createElement('div');
+                    item.className = 'feed-item deposit';
+                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    item.innerHTML = '<span><span class="feed-user">' + t.nickname + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">' + t.amount + '$</span>';
+                    depositList.appendChild(item);
+                });
+            }
+            
+            // Загружаем выводы
+            const { data: withdrawals } = await supabase.rpc('get_recent_transactions', {
+                p_type: 'withdraw',
+                p_limit: 10
             });
-
-            while (depositList.children.length > MAX_ITEMS) {
-                depositList.removeChild(depositList.lastChild);
-            }
-            while (withdrawList.children.length > MAX_ITEMS) {
-                withdrawList.removeChild(withdrawList.lastChild);
-            }
-        }
-
-        function addTransaction(container, type) {
-            const item = document.createElement('div');
-            item.className = `feed-item ${type}`;
             
-            const amount = type === 'deposit' ? 10 : getRandomWithdrawAmount();
-            
-            item.innerHTML = `<span><span class="feed-user">${randomNick()}</span><span class="feed-time">${getCurrentTime()}</span></span><span class="feed-amount">${amount}$</span>`;
-            container.prepend(item);
-            while (container.children.length > MAX_ITEMS) {
-                container.removeChild(container.lastChild);
-            }
-
-            if (type === 'withdraw') {
-                const oldWithdrawn = totalWithdrawn;
-                totalWithdrawn += amount;
-                localStorage.setItem('pirxmix_totalWithdrawn', totalWithdrawn);
-                animateValue(totalWithdrawnEl, oldWithdrawn, totalWithdrawn, 500, ' $');
-            }
-            
-            saveTransactions();
-        }
-
-        const savedDeposits = localStorage.getItem('pirxmix_deposits');
-        const savedWithdraws = localStorage.getItem('pirxmix_withdraws');
-
-        if (savedDeposits && savedWithdraws) {
-            loadTransactions();
-        } else {
-            for (let i = 0; i < MAX_ITEMS; i++) {
-                addTransaction(depositList, 'deposit');
-                addTransaction(withdrawList, 'withdraw');
+            if (withdrawals) {
+                withdrawals.forEach(t => {
+                    const item = document.createElement('div');
+                    item.className = 'feed-item withdraw';
+                    const time = new Date(t.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    item.innerHTML = '<span><span class="feed-user">' + t.nickname + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">' + t.amount + '$</span>';
+                    withdrawList.appendChild(item);
+                });
             }
         }
 
-        function randomTransaction() {
-            const type = Math.random() < 0.5 ? 'deposit' : 'withdraw';
-            const container = type === 'deposit' ? depositList : withdrawList;
-            addTransaction(container, type);
-            setTimeout(randomTransaction, Math.floor(Math.random() * 3000) + 2000);
-        }
-        setTimeout(randomTransaction, 2000);
+        // ============================================
+        // ЗАГРУЗКА ПРИ ОТКРЫТИИ СТРАНИЦЫ
+        // ============================================
+        loadStats();
+        loadTransactions();
+        
+        // Обновляем статистику каждые 30 секунд
+        setInterval(loadStats, 30000);
+        // Обновляем транзакции каждые 60 секунд
+        setInterval(loadTransactions, 60000);
 
     })();
 </script>
