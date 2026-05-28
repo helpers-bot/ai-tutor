@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
     <title>Пирамикс • Главная</title>
+    <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Получайте доход от приглашённых пользователей. Регистрируйтесь и зарабатывайте!">
+    <meta name="keywords" content="Пирамикс, реферальная программа, заработок, пирамида, рефералы, VIP статус, криптовалюта, вывод средств">
+    <meta property="og:title" content="Пирамикс — Реферальная программа">
+    <meta property="og:description" content="Зарабатывайте на рефералах с 5 уровнями глубины. Присоединяйтесь к Пирамикс!">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -328,7 +334,8 @@
             margin-bottom: 0.3rem;
         }
 
-        .modal .input-group input {
+        .modal .input-group input,
+        .modal .input-group select {
             width: 100%;
             background: rgba(15, 16, 20, 0.8);
             border: 1px solid rgba(220, 180, 100, 0.25);
@@ -339,7 +346,18 @@
             font-family: 'Inter', sans-serif;
         }
 
-        .modal .input-group input:focus {
+        .modal .input-group select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .modal .input-group select option {
+            background: #1a1c22;
+            color: #f5e7cc;
+        }
+
+        .modal .input-group input:focus,
+        .modal .input-group select:focus {
             border-color: #f3b95b;
         }
 
@@ -423,6 +441,12 @@
             color: #b9b09a;
             font-size: 0.85rem;
             margin-bottom: 0.8rem;
+        }
+
+        .optional-label {
+            color: #6b6352;
+            font-size: 0.75rem;
+            font-style: italic;
         }
 
         @media (max-width: 768px) {
@@ -522,6 +546,43 @@
     <span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span>
 </div>
 
+<!-- Модальное окно вывода средств -->
+<div class="modal-overlay hidden" id="withdrawModal">
+    <div class="modal">
+        <h2>💸 Вывод средств</h2>
+        <p style="color: #b9b09a; font-size: 0.85rem; margin-bottom: 1.2rem;">Минимальная сумма вывода: <strong style="color: #f5d78c;">1$</strong></p>
+        
+        <div class="input-group">
+            <label>💎 Выберите криптовалюту *</label>
+            <select id="withdrawCrypto">
+                <option value="">-- Выберите криптовалюту --</option>
+                <option value="BTC">Bitcoin (BTC)</option>
+                <option value="ETH">Ethereum (ETH)</option>
+                <option value="USDT">Tether (USDT TRC20)</option>
+                <option value="LTC">Litecoin (LTC)</option>
+                <option value="TRX">Tron (TRX)</option>
+                <option value="BCH">Bitcoin Cash (BCH)</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label>💲 Сумма вывода *</label>
+            <input type="number" id="withdrawAmount" placeholder="Минимум 1$" min="1" step="0.01">
+        </div>
+        
+        <div class="input-group">
+            <label>📝 Комментарий <span class="optional-label">(по желанию)</span></label>
+            <input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв...">
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
+            <button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно профиля -->
 <div class="modal-overlay hidden" id="profileModal">
     <div class="modal">
         <h2>👤 Профиль пользователя</h2>
@@ -544,6 +605,7 @@
     </div>
 </div>
 
+<!-- Модальное окно VIP -->
 <div class="modal-overlay hidden" id="vipModal">
     <div class="modal">
         <h2>👑 VIP статус</h2>
@@ -561,6 +623,7 @@
     </div>
 </div>
 
+<!-- Модальное окно политики -->
 <div class="modal-overlay hidden" id="policyModal">
     <div class="modal policy-modal">
         <h2>📄 Политика конфиденциальности и правила пользования</h2>
@@ -586,10 +649,10 @@
         5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>
         5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
         <h3>6. Вывод средств</h3>
-        <p>6.1. Минимальная сумма вывода составляет 10$.<br>
+        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>
         6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>
         6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>
-        6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем.</p>
+        6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
         <h3>7. Конфиденциальность</h3>
         <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>
         7.2. Персональные данные используются исключительно для функционирования Платформы.<br>
@@ -623,7 +686,6 @@
 
         document.getElementById('userGreeting').textContent = `Привет, ${userData.nickname}`;
 
-        // Рефералы — все по 0, заработок тоже 0
         document.getElementById('lvl1').textContent = '0 чел.';
         document.getElementById('lvl2').textContent = '0 чел.';
         document.getElementById('lvl3').textContent = '0 чел.';
@@ -639,13 +701,41 @@
         document.getElementById('balance').textContent = savedBalance.toFixed(2) + ' $';
         document.getElementById('totalEarned').textContent = (savedBalance * 1.2).toFixed(2) + ' $';
 
+        // Вывод средств — модальное окно
+        const withdrawModal = document.getElementById('withdrawModal');
+        
         document.getElementById('withdrawBtn').addEventListener('click', function() {
+            document.getElementById('withdrawCrypto').value = '';
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('withdrawComment').value = '';
+            withdrawModal.classList.remove('hidden');
+        });
+
+        document.getElementById('closeWithdrawBtn').addEventListener('click', function() {
+            withdrawModal.classList.add('hidden');
+        });
+
+        withdrawModal.addEventListener('click', function(e) {
+            if (e.target === withdrawModal) withdrawModal.classList.add('hidden');
+        });
+
+        document.getElementById('confirmWithdrawBtn').addEventListener('click', function() {
+            const crypto = document.getElementById('withdrawCrypto').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const comment = document.getElementById('withdrawComment').value.trim();
+            
+            if (!crypto) return;
+            if (!amount || amount < 1) return;
+            
             const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
-            if (balance < 10) return;
-            const newBalance = balance - 10;
+            if (amount > balance) return;
+            
+            const newBalance = balance - amount;
             localStorage.setItem('pirxmix_balance', newBalance.toString());
             document.getElementById('balance').textContent = newBalance.toFixed(2) + ' $';
             document.getElementById('totalEarned').textContent = (newBalance * 1.2).toFixed(2) + ' $';
+            
+            withdrawModal.classList.add('hidden');
         });
 
         // VIP модальное окно
@@ -758,9 +848,14 @@
             if (e.target === policyModal) policyModal.classList.add('hidden');
         });
 
-        // Счётчики
-        let totalUsers = 24344;
-        let todayUsers = 127;
+        // Счётчики с сохранением в localStorage
+        let totalUsers = parseInt(localStorage.getItem('pirxmix_totalUsers')) || 24344;
+        let todayUsers = parseInt(localStorage.getItem('pirxmix_todayUsers')) || 127;
+        let totalWithdrawn = parseInt(localStorage.getItem('pirxmix_totalWithdrawn')) || 18500;
+
+        document.getElementById('totalUsers').textContent = totalUsers;
+        document.getElementById('todayUsers').textContent = todayUsers;
+        document.getElementById('totalWithdrawn').textContent = totalWithdrawn + ' $';
 
         function animateValue(element, start, end, duration, suffix = '') {
             duration = duration || 600;
@@ -780,6 +875,8 @@
             const oldTotal = totalUsers;
             totalUsers++;
             todayUsers++;
+            localStorage.setItem('pirxmix_totalUsers', totalUsers);
+            localStorage.setItem('pirxmix_todayUsers', todayUsers);
             animateValue(document.getElementById('totalUsers'), oldTotal, totalUsers, 400);
             animateValue(document.getElementById('todayUsers'), todayUsers - 1, todayUsers, 400);
         }
@@ -800,17 +897,17 @@
             const msToMidnight = midnight.getTime() - now.getTime();
             setTimeout(function() {
                 todayUsers = 0;
+                localStorage.setItem('pirxmix_todayUsers', '0');
                 document.getElementById('todayUsers').textContent = '0';
                 scheduleMidnightReset();
             }, msToMidnight);
         }
         scheduleMidnightReset();
 
-        // Лента транзакций
+        // Лента транзакций с сохранением в localStorage
         const depositList = document.getElementById('depositList');
         const withdrawList = document.getElementById('withdrawList');
         const MAX_ITEMS = 10;
-        let totalWithdrawn = 18500;
 
         const allNicks = [
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
@@ -841,6 +938,45 @@
             return Math.floor(Math.random() * 168) + 1;
         }
 
+        function saveTransactions() {
+            const deposits = [];
+            const withdraws = [];
+            depositList.querySelectorAll('.feed-item').forEach(item => {
+                deposits.push(item.innerHTML);
+            });
+            withdrawList.querySelectorAll('.feed-item').forEach(item => {
+                withdraws.push(item.innerHTML);
+            });
+            localStorage.setItem('pirxmix_deposits', JSON.stringify(deposits));
+            localStorage.setItem('pirxmix_withdraws', JSON.stringify(withdraws));
+        }
+
+        function loadTransactions() {
+            const savedDeposits = JSON.parse(localStorage.getItem('pirxmix_deposits') || '[]');
+            const savedWithdraws = JSON.parse(localStorage.getItem('pirxmix_withdraws') || '[]');
+            
+            savedDeposits.forEach(html => {
+                const item = document.createElement('div');
+                item.className = 'feed-item deposit';
+                item.innerHTML = html;
+                depositList.appendChild(item);
+            });
+            
+            savedWithdraws.forEach(html => {
+                const item = document.createElement('div');
+                item.className = 'feed-item withdraw';
+                item.innerHTML = html;
+                withdrawList.appendChild(item);
+            });
+
+            while (depositList.children.length > MAX_ITEMS) {
+                depositList.removeChild(depositList.lastChild);
+            }
+            while (withdrawList.children.length > MAX_ITEMS) {
+                withdrawList.removeChild(withdrawList.lastChild);
+            }
+        }
+
         function addTransaction(container, type) {
             const item = document.createElement('div');
             item.className = 'feed-item ' + type;
@@ -853,13 +989,23 @@
             if (type === 'withdraw') {
                 const oldWithdrawn = totalWithdrawn;
                 totalWithdrawn += amount;
+                localStorage.setItem('pirxmix_totalWithdrawn', totalWithdrawn);
                 animateValue(document.getElementById('totalWithdrawn'), oldWithdrawn, totalWithdrawn, 500, ' $');
             }
+            saveTransactions();
         }
 
-        for (let i = 0; i < MAX_ITEMS; i++) {
-            addTransaction(depositList, 'deposit');
-            addTransaction(withdrawList, 'withdraw');
+        // Загружаем сохранённые транзакции или создаём новые
+        const savedDeposits = localStorage.getItem('pirxmix_deposits');
+        const savedWithdraws = localStorage.getItem('pirxmix_withdraws');
+
+        if (savedDeposits && savedWithdraws) {
+            loadTransactions();
+        } else {
+            for (let i = 0; i < MAX_ITEMS; i++) {
+                addTransaction(depositList, 'deposit');
+                addTransaction(withdrawList, 'withdraw');
+            }
         }
 
         function randomTransaction() {
@@ -868,7 +1014,6 @@
             } else {
                 addTransaction(withdrawList, 'withdraw');
             }
-            // Интервал 25-130 секунд (25000-130000 мс)
             const delay = Math.floor(Math.random() * 105000) + 25000;
             setTimeout(randomTransaction, delay);
         }
