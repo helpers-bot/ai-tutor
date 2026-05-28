@@ -1,661 +1,743 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
-  <title>Пирамикс • Главная</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
+    <title>Пирамикс • Главная</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      position: relative;
-      overflow-x: hidden;
-    }
+        body {
+            background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: -30%;
-      left: -10%;
-      width: 70%;
-      height: 70%;
-      background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%);
-      border-radius: 50%;
-      z-index: 0;
-      pointer-events: none;
-    }
+        body::before {
+            content: "";
+            position: fixed;
+            top: -30%;
+            left: -10%;
+            width: 70%;
+            height: 70%;
+            background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%);
+            border-radius: 50%;
+            z-index: 0;
+            pointer-events: none;
+        }
 
-    /* Шапка */
-    .header {
-      width: 100%;
-      max-width: 1300px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 2rem;
-      background: rgba(20, 22, 27, 0.8);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 2rem;
-      border: 1px solid rgba(255, 215, 150, 0.2);
-      margin-bottom: 2rem;
-      position: relative;
-      z-index: 2;
-    }
+        /* Шапка */
+        .header {
+            width: 100%;
+            max-width: 1300px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-    .logo {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #f9d56e, #e6a861);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f9d56e, #e6a861);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
 
-    .user-greeting {
-      color: #f5efe0;
-      font-weight: 500;
-    }
+        .user-greeting {
+            color: #f5efe0;
+            font-weight: 500;
+        }
 
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #c9a357;
-      color: #e9c274;
-      font-weight: 600;
-      font-size: 0.9rem;
-      padding: 0.5rem 1.5rem;
-      border-radius: 2rem;
-      cursor: pointer;
-      transition: 0.25s;
-      text-decoration: none;
-    }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #c9a357;
+            color: #e9c274;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            text-decoration: none;
+        }
 
-    .btn-outline:hover {
-      background: #f3b95b20;
-      border-color: #f3b95b;
-      color: #ffe6b3;
-      box-shadow: 0 0 15px rgba(243, 185, 91, 0.3);
-    }
+        .btn-outline:hover {
+            background: #f3b95b20;
+            border-color: #f3b95b;
+            color: #ffe6b3;
+            box-shadow: 0 0 15px rgba(243, 185, 91, 0.3);
+        }
 
-    /* Основной контент */
-    .dashboard {
-      width: 100%;
-      max-width: 1300px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      position: relative;
-      z-index: 2;
-      margin-bottom: 2rem;
-    }
+        /* Основной контент */
+        .dashboard {
+            width: 100%;
+            max-width: 1300px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 2rem;
+        }
 
-    .card {
-      background: rgba(20, 22, 27, 0.8);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 1.8rem;
-      padding: 1.8rem;
-      border: 1px solid rgba(255, 215, 150, 0.15);
-      color: #f5efe0;
-      transition: transform 0.2s;
-    }
+        .card {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.8rem;
+            padding: 1.8rem;
+            border: 1px solid rgba(255, 215, 150, 0.15);
+            color: #f5efe0;
+            transition: transform 0.2s;
+        }
 
-    .card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(243, 185, 91, 0.4);
-    }
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(243, 185, 91, 0.4);
+        }
 
-    .card h3 {
-      font-size: 1.3rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      color: #e9c274;
-    }
+        .card h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #e9c274;
+        }
 
-    .balance {
-      font-size: 2.5rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #fad974, #ebaa5e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+        .balance {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      margin: 0.5rem 0;
-      font-size: 0.95rem;
-    }
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.5rem 0;
+            font-size: 0.95rem;
+        }
 
-    .stat-label {
-      color: #9b927a;
-    }
+        .stat-label {
+            color: #9b927a;
+        }
 
-    .stat-value {
-      color: #f5d78c;
-      font-weight: 600;
-    }
+        .stat-value {
+            color: #f5d78c;
+            font-weight: 600;
+        }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #e2a542, #c7851e);
-      border: none;
-      color: #0f0e0a;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.8rem 2rem;
-      border-radius: 2.5rem;
-      cursor: pointer;
-      transition: 0.25s;
-      box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35);
-      width: 100%;
-      margin-top: 0.5rem;
-    }
+        .btn-primary {
+            background: linear-gradient(135deg, #e2a542, #c7851e);
+            border: none;
+            color: #0f0e0a;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.8rem 2rem;
+            border-radius: 2.5rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 8px 18px rgba(226, 165, 66, 0.35);
+            width: 100%;
+            margin-top: 0.5rem;
+        }
 
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #f3b95b, #da9729);
-      box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6);
-    }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f3b95b, #da9729);
+            box-shadow: 0 10px 24px rgba(243, 185, 91, 0.6);
+        }
 
-    .btn-vip {
-      background: linear-gradient(135deg, #c084fc, #7c3aed);
-      border: none;
-      color: #fff;
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.8rem 2rem;
-      border-radius: 2.5rem;
-      cursor: pointer;
-      transition: 0.25s;
-      box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4);
-      width: 100%;
-      margin-top: 0.5rem;
-      animation: glowPulse 2s infinite;
-    }
+        .btn-vip {
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.8rem 2rem;
+            border-radius: 2.5rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4);
+            width: 100%;
+            margin-top: 0.5rem;
+            animation: glowPulse 2s infinite;
+        }
 
-    @keyframes glowPulse {
-      0%, 100% { box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); }
-      50% { box-shadow: 0 8px 30px rgba(192, 132, 252, 0.7); }
-    }
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 8px 18px rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 8px 30px rgba(192, 132, 252, 0.7); }
+        }
 
-    .btn-vip:hover {
-      background: linear-gradient(135deg, #d8b4fe, #9333ea);
-    }
+        .btn-vip:hover {
+            background: linear-gradient(135deg, #d8b4fe, #9333ea);
+        }
 
-    /* Реферальная ссылка */
-    .ref-link-box {
-      background: rgba(0,0,0,0.4);
-      border-radius: 1rem;
-      padding: 0.8rem 1rem;
-      display: flex;
-      gap: 0.5rem;
-      margin: 1rem 0;
-    }
+        /* Реферальная ссылка */
+        .ref-link-box {
+            background: rgba(0,0,0,0.4);
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
 
-    .ref-link-box input {
-      flex: 1;
-      background: transparent;
-      border: none;
-      color: #f5d78c;
-      font-size: 0.9rem;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-    }
+        .ref-link-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #f5d78c;
+            font-size: 0.9rem;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
 
-    .copy-btn {
-      background: rgba(243, 185, 91, 0.2);
-      border: 1px solid #c9a357;
-      color: #e9c274;
-      padding: 0.3rem 1rem;
-      border-radius: 1rem;
-      cursor: pointer;
-      font-size: 0.8rem;
-    }
+        .copy-btn {
+            background: rgba(243, 185, 91, 0.2);
+            border: 1px solid #c9a357;
+            color: #e9c274;
+            padding: 0.3rem 1rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
 
-    /* Нижняя лента */
-    .live-feed {
-      width: 100%;
-      max-width: 1300px;
-      background: rgba(10, 12, 15, 0.8);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      border-radius: 2rem;
-      border: 1px solid rgba(230, 180, 70, 0.25);
-      padding: 1.2rem 1.5rem;
-      display: flex;
-      gap: 1.5rem;
-      z-index: 3;
-    }
+        .copy-btn:hover {
+            background: rgba(243, 185, 91, 0.4);
+        }
 
-    .feed-half {
-      flex: 1;
-      min-width: 0;
-    }
+        /* Нижняя лента */
+        .live-feed {
+            width: 100%;
+            max-width: 1300px;
+            background: rgba(10, 12, 15, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 2rem;
+            border: 1px solid rgba(230, 180, 70, 0.25);
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            z-index: 3;
+            position: relative;
+        }
 
-    .feed-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #c9ad7a;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 0.8rem;
-    }
+        .feed-half {
+            flex: 1;
+            min-width: 0;
+        }
 
-    .feed-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      height: 220px;
-      overflow: hidden;
-    }
+        .feed-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #c9ad7a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.8rem;
+        }
 
-    .feed-item {
-      background: rgba(25, 22, 17, 0.6);
-      border-radius: 1rem;
-      padding: 0.5rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.85rem;
-      border: 1px solid rgba(212, 165, 60, 0.2);
-      animation: fadeInUp 0.4s ease-out;
-    }
+        .feed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            height: 220px;
+            overflow: hidden;
+        }
 
-    @keyframes fadeInUp {
-      0% { opacity: 0; transform: translateY(15px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
+        .feed-item {
+            background: rgba(25, 22, 17, 0.6);
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            border: 1px solid rgba(212, 165, 60, 0.2);
+            animation: fadeInUp 0.4s ease-out;
+        }
 
-    .feed-user { font-weight: 600; color: #f5d78c; }
-    .feed-time { color: #8b8a7a; font-size: 0.7rem; margin-left: 0.5rem; }
-    .feed-amount { font-weight: 700; }
-    .deposit .feed-amount { color: #4caf50; }
-    .withdraw .feed-amount { color: #ff7043; }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
 
-    /* Модальное окно профиля */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      animation: fadeIn 0.3s;
-    }
+        .feed-user { font-weight: 600; color: #f5d78c; }
+        .feed-time { color: #8b8a7a; font-size: 0.7rem; margin-left: 0.5rem; }
+        .feed-amount { font-weight: 700; }
+        .deposit .feed-amount { color: #4caf50; }
+        .withdraw .feed-amount { color: #ff7043; }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+        /* Модальное окно профиля */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s;
+        }
 
-    .modal {
-      background: rgba(20, 22, 27, 0.95);
-      border: 1px solid rgba(255, 215, 150, 0.3);
-      border-radius: 2rem;
-      padding: 2rem;
-      width: 90%;
-      max-width: 450px;
-      color: #f5efe0;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-    .modal h2 {
-      margin-bottom: 1.5rem;
-      color: #e9c274;
-    }
+        .modal {
+            background: rgba(20, 22, 27, 0.95);
+            border: 1px solid rgba(255, 215, 150, 0.3);
+            border-radius: 2rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            color: #f5efe0;
+        }
 
-    .modal .input-group {
-      margin-bottom: 1.2rem;
-    }
+        .modal h2 {
+            margin-bottom: 1.5rem;
+            color: #e9c274;
+        }
 
-    .modal .input-group label {
-      display: block;
-      font-size: 0.8rem;
-      color: #b9b09a;
-      margin-bottom: 0.3rem;
-    }
+        .modal .input-group {
+            margin-bottom: 1.2rem;
+        }
 
-    .modal .input-group input {
-      width: 100%;
-      background: rgba(15, 16, 20, 0.8);
-      border: 1px solid rgba(220, 180, 100, 0.25);
-      border-radius: 1rem;
-      padding: 0.8rem 1rem;
-      color: #f5e7cc;
-      outline: none;
-      font-family: 'Inter', sans-serif;
-    }
+        .modal .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: #b9b09a;
+            margin-bottom: 0.3rem;
+        }
 
-    .modal-buttons {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
+        .modal .input-group input {
+            width: 100%;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.8rem 1rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
 
-    .hidden {
-      display: none !important;
-    }
+        .modal .input-group input:focus {
+            border-color: #f3b95b;
+        }
 
-    @media (max-width: 768px) {
-      .live-feed { flex-direction: column; }
-      .feed-list { height: 150px; }
-      .header { flex-direction: column; gap: 1rem; text-align: center; }
-    }
-  </style>
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .live-feed { flex-direction: column; }
+            .feed-list { height: 150px; }
+            .header { flex-direction: column; text-align: center; }
+            .header-right { justify-content: center; }
+            .balance { font-size: 2rem; }
+        }
+    </style>
 </head>
 <body>
 
 <!-- Шапка -->
 <header class="header">
-  <div class="logo">✨ Пирамикс</div>
-  <div class="header-right">
-    <span class="user-greeting" id="userGreeting">Привет, Пользователь</span>
-    <button class="btn-outline" id="profileBtn">👤 Профиль</button>
-    <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
-  </div>
+    <div class="logo">✨ Пирамикс</div>
+    <div class="header-right">
+        <span class="user-greeting" id="userGreeting">Привет, Пользователь</span>
+        <button class="btn-outline" id="profileBtn">👤 Профиль</button>
+        <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
+    </div>
 </header>
 
 <!-- Дашборд -->
 <div class="dashboard">
-  <!-- Баланс -->
-  <div class="card">
-    <h3>💰 Мой баланс</h3>
-    <div class="balance" id="balance">0.00 $</div>
-    <div class="stat-row">
-      <span class="stat-label">Заработано всего</span>
-      <span class="stat-value" id="totalEarned">0.00 $</span>
+    <!-- Баланс -->
+    <div class="card">
+        <h3>💰 Мой баланс</h3>
+        <div class="balance" id="balance">0.00 $</div>
+        <div class="stat-row">
+            <span class="stat-label">Заработано всего</span>
+            <span class="stat-value" id="totalEarned">0.00 $</span>
+        </div>
+        <button class="btn-primary" id="withdrawBtn">💸 Вывести средства</button>
     </div>
-    <button class="btn-primary" id="withdrawBtn">💸 Вывести средства</button>
-  </div>
 
-  <!-- Рефералы -->
-  <div class="card">
-    <h3>👥 Мои рефералы</h3>
-    <div class="stat-row">
-      <span class="stat-label">1 уровень (1%)</span>
-      <span class="stat-value" id="lvl1">0 чел.</span>
+    <!-- Рефералы -->
+    <div class="card">
+        <h3>👥 Мои рефералы</h3>
+        <div class="stat-row">
+            <span class="stat-label">1 уровень (1%)</span>
+            <span class="stat-value" id="lvl1">0 чел.</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">2 уровень (2%)</span>
+            <span class="stat-value" id="lvl2">0 чел.</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">3 уровень (3%)</span>
+            <span class="stat-value" id="lvl3">0 чел.</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">4 уровень (4%)</span>
+            <span class="stat-value" id="lvl4">0 чел.</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">5 уровень (5%)</span>
+            <span class="stat-value" id="lvl5">0 чел.</span>
+        </div>
+        <div class="ref-link-box">
+            <input type="text" id="refLink" readonly>
+            <button class="copy-btn" id="copyRefBtn">📋 Копировать</button>
+        </div>
     </div>
-    <div class="stat-row">
-      <span class="stat-label">2 уровень (2%)</span>
-      <span class="stat-value" id="lvl2">0 чел.</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">3 уровень (3%)</span>
-      <span class="stat-value" id="lvl3">0 чел.</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">4 уровень (4%)</span>
-      <span class="stat-value" id="lvl4">0 чел.</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">5 уровень (5%)</span>
-      <span class="stat-value" id="lvl5">0 чел.</span>
-    </div>
-    <div class="ref-link-box">
-      <input type="text" id="refLink" readonly>
-      <button class="copy-btn" id="copyRefBtn">📋 Копировать</button>
-    </div>
-  </div>
 
-  <!-- Статистика -->
-  <div class="card">
-    <h3>📊 Статистика платформы</h3>
-    <div class="stat-row">
-      <span class="stat-label">Всего пользователей</span>
-      <span class="stat-value" id="totalUsers">24344</span>
+    <!-- Статистика и VIP -->
+    <div class="card">
+        <h3>📊 Статистика платформы</h3>
+        <div class="stat-row">
+            <span class="stat-label">Всего пользователей</span>
+            <span class="stat-value" id="totalUsers">24344</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Сегодня зарегистрировано</span>
+            <span class="stat-value" id="todayUsers">127</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Всего вывели денег</span>
+            <span class="stat-value" id="totalWithdrawn">18500 $</span>
+        </div>
+        <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
     </div>
-    <div class="stat-row">
-      <span class="stat-label">Сегодня зарегистрировано</span>
-      <span class="stat-value" id="todayUsers">127</span>
-    </div>
-    <div class="stat-row">
-      <span class="stat-label">Всего вывели денег</span>
-      <span class="stat-value" id="totalWithdrawn">18500 $</span>
-    </div>
-    <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
-  </div>
 </div>
 
 <!-- Лента транзакций -->
 <div class="live-feed">
-  <div class="feed-half deposit-feed">
-    <div class="feed-title">🟢 Пополнения (10$)</div>
-    <div class="feed-list" id="depositList"></div>
-  </div>
-  <div class="feed-half withdraw-feed">
-    <div class="feed-title">🔴 Выводы (10$)</div>
-    <div class="feed-list" id="withdrawList"></div>
-  </div>
+    <div class="feed-half deposit-feed">
+        <div class="feed-title">🟢 Пополнения (10$)</div>
+        <div class="feed-list" id="depositList"></div>
+    </div>
+    <div class="feed-half withdraw-feed">
+        <div class="feed-title">🔴 Выводы (10$)</div>
+        <div class="feed-list" id="withdrawList"></div>
+    </div>
 </div>
 
 <!-- Модальное окно профиля -->
 <div class="modal-overlay hidden" id="profileModal">
-  <div class="modal">
-    <h2>👤 Профиль пользователя</h2>
-    <div class="input-group">
-      <label>Никнейм</label>
-      <input type="text" id="profileNickname">
+    <div class="modal">
+        <h2>👤 Профиль пользователя</h2>
+        <div class="input-group">
+            <label>Никнейм</label>
+            <input type="text" id="profileNickname">
+        </div>
+        <div class="input-group">
+            <label>Новый пароль</label>
+            <input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете">
+        </div>
+        <div class="input-group">
+            <label>Повторите новый пароль</label>
+            <input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
+            <button class="btn-outline" id="closeProfileBtn">❌ Отмена</button>
+        </div>
     </div>
-    <div class="input-group">
-      <label>Новый пароль</label>
-      <input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете">
-    </div>
-    <div class="input-group">
-      <label>Повторите новый пароль</label>
-      <input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете">
-    </div>
-    <div class="modal-buttons">
-      <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
-      <button class="btn-outline" id="closeProfileBtn">❌ Отмена</button>
-    </div>
-  </div>
 </div>
 
 <script>
-  (function() {
-    // Загрузка данных пользователя из localStorage
-    const userData = JSON.parse(localStorage.getItem('pirxmix_user')) || { nickname: 'Пользователь', password: '' };
-    
-    // Отображение приветствия
-    document.getElementById('userGreeting').textContent = `Привет, ${userData.nickname}`;
-    
-    // Реферальная ссылка
-    const refCode = btoa(userData.nickname || 'user').substring(0, 10);
-    const refLink = `https://vds-game.ink/reg?ref=${refCode}`;
-    document.getElementById('refLink').value = refLink;
+    (function() {
+        // Проверка авторизации
+        const userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+        
+        if (!userData || !userData.nickname) {
+            // Если нет данных пользователя, перенаправляем на страницу регистрации
+            window.location.href = 'https://vds-game.ink/reg';
+            return;
+        }
 
-    // Копирование реферальной ссылки
-    document.getElementById('copyRefBtn').addEventListener('click', () => {
-      navigator.clipboard.writeText(refLink).then(() => {
-        alert('Реферальная ссылка скопирована!');
-      });
-    });
+        // Отображение приветствия
+        document.getElementById('userGreeting').textContent = `Привет, ${userData.nickname}`;
 
-    // Имитация данных рефералов
-    document.getElementById('lvl1').textContent = Math.floor(Math.random() * 10) + ' чел.';
-    document.getElementById('lvl2').textContent = Math.floor(Math.random() * 5) + ' чел.';
-    document.getElementById('lvl3').textContent = Math.floor(Math.random() * 3) + ' чел.';
-    document.getElementById('lvl4').textContent = Math.floor(Math.random() * 2) + ' чел.';
-    document.getElementById('lvl5').textContent = Math.floor(Math.random() * 1) + ' чел.';
+        // Реферальная ссылка
+        const refCode = btoa(userData.nickname || 'user').replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+        const refLink = `https://vds-game.ink/reg?ref=${refCode}`;
+        document.getElementById('refLink').value = refLink;
 
-    // Баланс
-    const savedBalance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
-    document.getElementById('balance').textContent = savedBalance.toFixed(2) + ' $';
-    document.getElementById('totalEarned').textContent = (savedBalance * 1.2).toFixed(2) + ' $';
+        // Копирование реферальной ссылки
+        document.getElementById('copyRefBtn').addEventListener('click', function() {
+            const refInput = document.getElementById('refLink');
+            refInput.select();
+            refInput.setSelectionRange(0, 99999);
+            
+            try {
+                navigator.clipboard.writeText(refLink).then(function() {
+                    alert('Реферальная ссылка скопирована!');
+                }).catch(function() {
+                    // Fallback для старых браузеров
+                    document.execCommand('copy');
+                    alert('Реферальная ссылка скопирована!');
+                });
+            } catch (e) {
+                document.execCommand('copy');
+                alert('Реферальная ссылка скопирована!');
+            }
+        });
 
-    // Кнопка вывода
-    document.getElementById('withdrawBtn').addEventListener('click', () => {
-      const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
-      if (balance < 10) {
-        alert('Минимальная сумма вывода: 10$');
-        return;
-      }
-      localStorage.setItem('pirxmix_balance', '0');
-      document.getElementById('balance').textContent = '0.00 $';
-      alert('Заявка на вывод 10$ принята! Средства поступят в течение 24 часов.');
-    });
+        // Имитация данных рефералов
+        document.getElementById('lvl1').textContent = Math.floor(Math.random() * 10) + ' чел.';
+        document.getElementById('lvl2').textContent = Math.floor(Math.random() * 5) + ' чел.';
+        document.getElementById('lvl3').textContent = Math.floor(Math.random() * 3) + ' чел.';
+        document.getElementById('lvl4').textContent = Math.floor(Math.random() * 2) + ' чел.';
+        document.getElementById('lvl5').textContent = Math.floor(Math.random() * 1) + ' чел.';
 
-    // Кнопка VIP
-    document.getElementById('vipBtn').addEventListener('click', () => {
-      alert('👑 VIP статус активирован! Доход увеличен на 50% на всех уровнях рефералов.');
-      localStorage.setItem('pirxmix_vip', 'true');
-    });
+        // Загрузка баланса
+        const savedBalance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
+        document.getElementById('balance').textContent = savedBalance.toFixed(2) + ' $';
+        document.getElementById('totalEarned').textContent = (savedBalance * 1.2).toFixed(2) + ' $';
 
-    // Профиль
-    const profileModal = document.getElementById('profileModal');
-    document.getElementById('profileBtn').addEventListener('click', () => {
-      document.getElementById('profileNickname').value = userData.nickname;
-      document.getElementById('profilePassword').value = '';
-      document.getElementById('profilePassword2').value = '';
-      profileModal.classList.remove('hidden');
-    });
+        // Кнопка вывода
+        document.getElementById('withdrawBtn').addEventListener('click', function() {
+            const balance = parseFloat(localStorage.getItem('pirxmix_balance')) || 0;
+            if (balance < 10) {
+                alert('❌ Минимальная сумма вывода: 10$. Продолжайте приглашать рефералов!');
+                return;
+            }
+            if (confirm('Вы уверены, что хотите вывести 10$?')) {
+                const newBalance = balance - 10;
+                localStorage.setItem('pirxmix_balance', newBalance.toString());
+                document.getElementById('balance').textContent = newBalance.toFixed(2) + ' $';
+                document.getElementById('totalEarned').textContent = (newBalance * 1.2).toFixed(2) + ' $';
+                alert('✅ Заявка на вывод 10$ принята! Средства поступят в течение 24 часов.');
+            }
+        });
 
-    document.getElementById('closeProfileBtn').addEventListener('click', () => {
-      profileModal.classList.add('hidden');
-    });
+        // Кнопка VIP
+        document.getElementById('vipBtn').addEventListener('click', function() {
+            const isVip = localStorage.getItem('pirxmix_vip') === 'true';
+            if (isVip) {
+                alert('👑 У вас уже есть VIP статус! Доход увеличен на 50% на всех уровнях.');
+                return;
+            }
+            if (confirm('👑 Получить VIP статус? Доход с рефералов увеличится на 50%!')) {
+                localStorage.setItem('pirxmix_vip', 'true');
+                alert('🎉 VIP статус активирован! Доход увеличен на 50% на всех уровнях рефералов.');
+            }
+        });
 
-    document.getElementById('saveProfileBtn').addEventListener('click', () => {
-      const newNickname = document.getElementById('profileNickname').value.trim();
-      const newPass = document.getElementById('profilePassword').value;
-      const newPass2 = document.getElementById('profilePassword2').value;
+        // Профиль
+        const profileModal = document.getElementById('profileModal');
 
-      if (!newNickname) {
-        alert('Никнейм не может быть пустым.');
-        return;
-      }
+        document.getElementById('profileBtn').addEventListener('click', function() {
+            document.getElementById('profileNickname').value = userData.nickname;
+            document.getElementById('profilePassword').value = '';
+            document.getElementById('profilePassword2').value = '';
+            profileModal.classList.remove('hidden');
+        });
 
-      if (newPass && newPass !== newPass2) {
-        alert('Пароли не совпадают.');
-        return;
-      }
+        document.getElementById('closeProfileBtn').addEventListener('click', function() {
+            profileModal.classList.add('hidden');
+        });
 
-      const updatedUser = {
-        nickname: newNickname,
-        password: newPass || userData.password
-      };
+        // Закрытие модального окна по клику вне его
+        profileModal.addEventListener('click', function(e) {
+            if (e.target === profileModal) {
+                profileModal.classList.add('hidden');
+            }
+        });
 
-      localStorage.setItem('pirxmix_user', JSON.stringify(updatedUser));
-      userData.nickname = newNickname;
-      document.getElementById('userGreeting').textContent = `Привет, ${newNickname}`;
-      profileModal.classList.add('hidden');
-      alert('Профиль обновлён!');
-    });
+        document.getElementById('saveProfileBtn').addEventListener('click', function() {
+            const newNickname = document.getElementById('profileNickname').value.trim();
+            const newPass = document.getElementById('profilePassword').value;
+            const newPass2 = document.getElementById('profilePassword2').value;
 
-    // Выход
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      localStorage.removeItem('pirxmix_user');
-      window.location.href = 'https://vds-game.ink/reg';
-    });
+            if (!newNickname) {
+                alert('❌ Никнейм не может быть пустым.');
+                return;
+            }
 
-    // ---------- Счётчики ----------
-    let totalUsers = 24344;
-    let todayUsers = 127;
+            if (newPass && newPass !== newPass2) {
+                alert('❌ Пароли не совпадают.');
+                return;
+            }
 
-    function animateValue(element, start, end, duration = 600) {
-      if (start === end) return;
-      const range = end - start;
-      const increment = range > 0 ? 1 : -1;
-      const stepTime = Math.abs(Math.floor(duration / range));
-      let current = start;
-      const timer = setInterval(() => {
-        current += increment;
-        element.textContent = current;
-        if (current === end) clearInterval(timer);
-      }, stepTime);
-    }
+            const updatedUser = {
+                nickname: newNickname,
+                password: newPass || userData.password
+            };
 
-    function incrementUsers() {
-      const oldTotal = totalUsers;
-      totalUsers++;
-      todayUsers++;
-      animateValue(document.getElementById('totalUsers'), oldTotal, totalUsers, 400);
-      animateValue(document.getElementById('todayUsers'), todayUsers - 1, todayUsers, 400);
-    }
+            localStorage.setItem('pirxmix_user', JSON.stringify(updatedUser));
+            userData.nickname = newNickname;
+            document.getElementById('userGreeting').textContent = `Привет, ${newNickname}`;
+            
+            // Обновляем реферальную ссылку
+            const newRefCode = btoa(newNickname).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+            const newRefLink = `https://vds-game.ink/reg?ref=${newRefCode}`;
+            document.getElementById('refLink').value = newRefLink;
+            
+            profileModal.classList.add('hidden');
+            alert('✅ Профиль успешно обновлён!');
+        });
 
-    function scheduleNextIncrement() {
-      const delay = Math.floor(Math.random() * 4000) + 3000;
-      setTimeout(() => {
-        incrementUsers();
+        // Выход
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            if (confirm('Вы уверены, что хотите выйти?')) {
+                localStorage.removeItem('pirxmix_user');
+                window.location.href = 'https://vds-game.ink/reg';
+            }
+        });
+
+        // ---------- Счётчики ----------
+        let totalUsers = 24344;
+        let todayUsers = 127;
+
+        function animateValue(element, start, end, duration) {
+            duration = duration || 600;
+            if (start === end) {
+                element.textContent = end;
+                return;
+            }
+            const range = end - start;
+            const increment = range > 0 ? 1 : -1;
+            const stepTime = Math.abs(Math.floor(duration / Math.abs(range)));
+            let current = start;
+            const timer = setInterval(function() {
+                current += increment;
+                element.textContent = current;
+                if (current === end) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        function incrementUsers() {
+            const oldTotal = totalUsers;
+            totalUsers++;
+            todayUsers++;
+            animateValue(document.getElementById('totalUsers'), oldTotal, totalUsers, 400);
+            animateValue(document.getElementById('todayUsers'), todayUsers - 1, todayUsers, 400);
+        }
+
+        function scheduleNextIncrement() {
+            const delay = Math.floor(Math.random() * 4000) + 3000; // 3-7 секунд
+            setTimeout(function() {
+                incrementUsers();
+                scheduleNextIncrement();
+            }, delay);
+        }
         scheduleNextIncrement();
-      }, delay);
-    }
-    scheduleNextIncrement();
 
-    function scheduleMidnightReset() {
-      const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0);
-      setTimeout(() => {
-        todayUsers = 0;
-        document.getElementById('todayUsers').textContent = '0';
+        // Сброс сегодняшних регистраций в полночь
+        function scheduleMidnightReset() {
+            const now = new Date();
+            const midnight = new Date(now);
+            midnight.setHours(24, 0, 0, 0);
+            const msToMidnight = midnight.getTime() - now.getTime();
+            setTimeout(function() {
+                todayUsers = 0;
+                document.getElementById('todayUsers').textContent = '0';
+                scheduleMidnightReset();
+            }, msToMidnight);
+        }
         scheduleMidnightReset();
-      }, midnight - now);
-    }
-    scheduleMidnightReset();
 
-    // ---------- Лента транзакций ----------
-    const depositList = document.getElementById('depositList');
-    const withdrawList = document.getElementById('withdrawList');
-    const MAX_ITEMS = 10;
+        // ---------- Лента транзакций ----------
+        const depositList = document.getElementById('depositList');
+        const withdrawList = document.getElementById('withdrawList');
+        const MAX_ITEMS = 10;
 
-    const firstNames = ['Alex', 'Mira', 'Jon', 'Lena', 'Max', 'Sara', 'Tom', 'Anna', 'Leo', 'Kate'];
-    const lastNames = ['Gold', 'Fox', 'Star', 'Moon', 'Wolf', 'Sky', 'Rose', 'Hill', 'Byte', 'Coin'];
+        const firstNames = ['Alex', 'Mira', 'Jon', 'Lena', 'Max', 'Sara', 'Tom', 'Anna', 'Leo', 'Kate', 'Ivan', 'Olga', 'Petr', 'Nika', 'Roma'];
+        const lastNames = ['Gold', 'Fox', 'Star', 'Moon', 'Wolf', 'Sky', 'Rose', 'Hill', 'Byte', 'Coin', 'Fire', 'Ice', 'Wind', 'Dark', 'Light'];
 
-    function randomNick() {
-      return firstNames[Math.floor(Math.random() * firstNames.length)] + 
-             lastNames[Math.floor(Math.random() * lastNames.length)] + 
-             Math.floor(Math.random() * 100);
-    }
+        function randomNick() {
+            const first = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const last = lastNames[Math.floor(Math.random() * lastNames.length)];
+            const num = Math.floor(Math.random() * 100);
+            return first + last + num;
+        }
 
-    function getCurrentTime() {
-      return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    }
+        function getCurrentTime() {
+            const d = new Date();
+            return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
 
-    function addTransaction(container, type) {
-      const item = document.createElement('div');
-      item.className = `feed-item ${type}`;
-      item.innerHTML = `<span><span class="feed-user">${randomNick()}</span><span class="feed-time">${getCurrentTime()}</span></span><span class="feed-amount">10$</span>`;
-      container.prepend(item);
-      while (container.children.length > MAX_ITEMS) {
-        container.removeChild(container.lastChild);
-      }
-    }
+        function addTransaction(container, type) {
+            const item = document.createElement('div');
+            item.className = 'feed-item ' + type;
+            const nick = randomNick();
+            const time = getCurrentTime();
+            item.innerHTML = '<span><span class="feed-user">' + nick + '</span><span class="feed-time">' + time + '</span></span><span class="feed-amount">10$</span>';
+            
+            container.insertBefore(item, container.firstChild);
+            
+            // Удаляем лишние элементы
+            while (container.children.length > MAX_ITEMS) {
+                container.removeChild(container.lastChild);
+            }
+        }
 
-    for (let i = 0; i < MAX_ITEMS; i++) {
-      addTransaction(depositList, 'deposit');
-      addTransaction(withdrawList, 'withdraw');
-    }
+        // Заполняем начальные данные
+        for (let i = 0; i < MAX_ITEMS; i++) {
+            addTransaction(depositList, 'deposit');
+            addTransaction(withdrawList, 'withdraw');
+        }
 
-    function randomTransaction() {
-      const container = Math.random() < 0.5 ? depositList : withdrawList;
-      const type = container === depositList ? 'deposit' : 'withdraw';
-      addTransaction(container, type);
-      setTimeout(randomTransaction, Math.floor(Math.random() * 3000) + 2000);
-    }
-    setTimeout(randomTransaction, 2000);
+        // Добавляем новые транзакции каждые 2-5 секунд
+        function randomTransaction() {
+            if (Math.random() < 0.5) {
+                addTransaction(depositList, 'deposit');
+            } else {
+                addTransaction(withdrawList, 'withdraw');
+            }
+            
+            const nextDelay = Math.floor(Math.random() * 3000) + 2000;
+            setTimeout(randomTransaction, nextDelay);
+        }
+        setTimeout(randomTransaction, 2000);
 
-  })();
+    })();
 </script>
 </body>
 </html>
