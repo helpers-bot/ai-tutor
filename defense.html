@@ -64,6 +64,7 @@ canvas{display:block;position:absolute;top:0;left:0}
 .admin-info{color:#ffd966;font-size:clamp(8px,1.5vw,10px);padding:2px 5px}
 .admin-new-map-btn{background:#2e7d32!important;border-color:#4caf50!important;margin-left:5px}
 .admin-delete-btn{background:#8b0000!important;border-color:#ff4444!important}
+.green-size-select{margin-left:8px;background:#2c2c3a;color:#ffd966;border:1px solid #d4af37;padding:2px 4px;border-radius:5px;font-size:clamp(8px,1.5vw,11px)}
 </style>
 </head>
 <body>
@@ -154,6 +155,13 @@ canvas{display:block;position:absolute;top:0;left:0}
     <button id="adminSave">💾</button>
     <button id="adminTest">▶</button>
     <button id="adminExit" style="background:#8b0000;">✕</button>
+    <!-- Выбор размера зелёных блоков (тайлов) -->
+    <select id="greenTileSizeSelect" class="green-size-select">
+      <option value="10">10x10</option>
+      <option value="12" selected>12x12</option>
+      <option value="15">15x15</option>
+    </select>
+    <span style="color:#ffd966;font-size:10px;">Зелёный блок</span>
   </div>
   <div class="admin-info" id="adminInfo">Спавн | К1</div>
   <div class="admin-canvas-wrap" id="adminCanvasWrap">
@@ -227,13 +235,22 @@ document.querySelectorAll('.lang-btn').forEach(btn=>{
 
 const COLS=28,ROWS=38;
 
-// Размер тайла с учётом панелей
+// Размер тайла с учётом панелей и выбранного в админке размера зелёного блока
+let forcedTileSize = 12; // по умолчанию 12x12 (10,12,15)
+function getAdminTileSizeSetting(){
+  const sel = document.getElementById('greenTileSizeSelect');
+  if(sel) return parseInt(sel.value);
+  return 12;
+}
 function calcTileSize(){
+  const desired = forcedTileSize;
   const topPanelH=35;
   const bottomPanelH=document.getElementById('bottomPanel').offsetHeight||60;
   const availW=window.innerWidth-10;
   const availH=window.innerHeight-topPanelH-bottomPanelH-5;
-  return Math.floor(Math.min(availW/COLS,availH/ROWS));
+  const maxFit = Math.floor(Math.min(availW/COLS, availH/ROWS));
+  // Используем желаемый размер, но не больше максимального, чтобы всё помещалось
+  return Math.min(desired, maxFit);
 }
 
 let TILE=calcTileSize();
@@ -766,6 +783,20 @@ function updateAdminInfo(){
 document.getElementById('adminBtn').addEventListener('click',openAdminPanel);
 document.getElementById('adminExit').addEventListener('click',closeAdminPanel);
 
+// Сохраняем выбранный размер зелёного блока и пересчитываем тайлы
+const greenSizeSelect = document.getElementById('greenTileSizeSelect');
+greenSizeSelect.addEventListener('change', (e) => {
+  forcedTileSize = parseInt(e.target.value);
+  if(game.mode === 'playing') {
+    resizeFullscreen();
+    rebuildGameGrid();
+  }
+  if(adminMode) {
+    initAdminCanvas();
+    drawAdminGrid();
+  }
+});
+
 document.querySelectorAll('.admin-toolbar button[id^="adminTool"]').forEach(btn=>{
   btn.addEventListener('click',()=>{
     adminTool=btn.id.replace('adminTool','').toLowerCase();
@@ -1013,7 +1044,6 @@ function draw(){
   for(let ft of game.texts){ctx.fillStyle=`rgba(255,221,87,${ft.l/18})`;ctx.fillText(ft.t,ft.x,ft.y);}
 }
 
-// Показать нижнюю панель только в игре
 document.getElementById('bottomPanel').style.display='none';
 
 buildGrid();
@@ -1024,7 +1054,7 @@ document.getElementById('totalGold').textContent=saveData.totalGold;
 applyLanguage();
 updateUI();
 requestAnimationFrame(loop);
-console.log('✅ Нижняя панель, золото 200, язык в меню, выход, 3 сек.');
+console.log('✅ Исправлена расстановка башен, добавлен выбор размера зелёных блоков, подписи кнопок админки, унифицированный размер тайла.');
 })();
 </script>
 </body>
