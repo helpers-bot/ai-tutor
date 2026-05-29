@@ -87,15 +87,9 @@
         }
 
         @keyframes slideFromTop {
-            0% { opacity: 0; transform: translateY(-300px) scale(0.9); }
+            0% { opacity: 0; transform: translateY(-300px) scale(0.95); }
+            60% { opacity: 0.8; transform: translateY(-30px) scale(0.98); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes slideFromTopRight {
-            0% { opacity: 0; transform: translate(60px, -160px) scale(0.92); }
-            30% { opacity: 0.9; transform: translate(30px, -40px) scale(0.98); }
-            70% { opacity: 1; transform: translate(8px, 5px) scale(1.01); }
-            100% { opacity: 1; transform: translate(0, 0) scale(1); }
         }
 
         .auth-card h3 {
@@ -567,7 +561,6 @@
             background: linear-gradient(135deg, #d8b4fe, #9333ea);
         }
 
-        /* Новая карточка заработка */
         .earn-info-text {
             color: #b9b09a;
             font-size: 0.75rem;
@@ -600,7 +593,6 @@
             box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
         }
 
-        /* Калькулятор */
         .calc-row {
             display: flex;
             align-items: center;
@@ -1120,41 +1112,41 @@
         <div class="calc-row">
             <span class="calc-label">1 уровень (1% = 0.10$)</span>
             <div class="calc-controls">
-                <button class="calc-btn" onclick="changeCalcValue('calc1', -1)">−</button>
+                <button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button>
                 <span class="calc-value" id="calc1">0</span>
-                <button class="calc-btn" onclick="changeCalcValue('calc1', 1)">+</button>
+                <button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button>
             </div>
         </div>
         <div class="calc-row">
             <span class="calc-label">2 уровень (2% = 0.20$)</span>
             <div class="calc-controls">
-                <button class="calc-btn" onclick="changeCalcValue('calc2', -1)">−</button>
+                <button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button>
                 <span class="calc-value" id="calc2">0</span>
-                <button class="calc-btn" onclick="changeCalcValue('calc2', 1)">+</button>
+                <button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button>
             </div>
         </div>
         <div class="calc-row">
             <span class="calc-label">3 уровень (3% = 0.30$)</span>
             <div class="calc-controls">
-                <button class="calc-btn" onclick="changeCalcValue('calc3', -1)">−</button>
+                <button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button>
                 <span class="calc-value" id="calc3">0</span>
-                <button class="calc-btn" onclick="changeCalcValue('calc3', 1)">+</button>
+                <button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button>
             </div>
         </div>
         <div class="calc-row">
             <span class="calc-label">4 уровень (4% = 0.40$)</span>
             <div class="calc-controls">
-                <button class="calc-btn" onclick="changeCalcValue('calc4', -1)">−</button>
+                <button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button>
                 <span class="calc-value" id="calc4">0</span>
-                <button class="calc-btn" onclick="changeCalcValue('calc4', 1)">+</button>
+                <button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button>
             </div>
         </div>
         <div class="calc-row">
             <span class="calc-label">5 уровень (5% = 0.50$)</span>
             <div class="calc-controls">
-                <button class="calc-btn" onclick="changeCalcValue('calc5', -1)">−</button>
+                <button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button>
                 <span class="calc-value" id="calc5">0</span>
-                <button class="calc-btn" onclick="changeCalcValue('calc5', 1)">+</button>
+                <button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button>
             </div>
         </div>
         
@@ -1325,7 +1317,7 @@
 
             document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
             loadRegStats();
-            initRegTransactions();
+            initTransactions('reg');
         }
 
         async function loadRegStats() {
@@ -1337,10 +1329,13 @@
             }
         }
 
-        function initRegTransactions() {
-            const depositList = document.getElementById('regDepositList');
-            const withdrawList = document.getElementById('regWithdrawList');
+        // Универсальная функция для транзакций
+        function initTransactions(stage) {
+            const depositList = document.getElementById(stage === 'reg' ? 'regDepositList' : 'depositList');
+            const withdrawList = document.getElementById(stage === 'reg' ? 'regWithdrawList' : 'withdrawList');
             const MAX_ITEMS = 10;
+
+            if (!depositList || !withdrawList) return;
 
             depositList.innerHTML = '';
             withdrawList.innerHTML = '';
@@ -1383,7 +1378,6 @@
                     while (withdrawList.children.length > MAX_ITEMS) {
                         withdrawList.removeChild(withdrawList.lastChild);
                     }
-                    // Обновляем статистику вывода на странице регистрации
                     updateWithdrawnStats(amount);
                     scheduleWithdraw();
                 }, delay);
@@ -1395,13 +1389,11 @@
 
         // Обновление статистики "Всего выведено"
         function updateWithdrawnStats(amount) {
-            // Для страницы регистрации
             const regWithdrawnEl = document.getElementById('regTotalWithdrawn');
             if (regWithdrawnEl && regWithdrawnEl.textContent) {
                 const current = parseFloat(regWithdrawnEl.textContent.replace(/[^0-9.]/g, '')) || 0;
                 regWithdrawnEl.textContent = (current + amount).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
             }
-            // Для главной страницы
             const homeWithdrawnEl = document.getElementById('totalWithdrawn');
             if (homeWithdrawnEl && homeWithdrawnEl.textContent) {
                 const current = parseFloat(homeWithdrawnEl.textContent.replace(/[^0-9.]/g, '')) || 0;
@@ -1422,7 +1414,7 @@
 
             loadUserData();
             loadReferrals();
-            initHomeTransactions();
+            initTransactions('home');
             initCounters();
             initModals();
             initCalculator();
@@ -1458,62 +1450,6 @@
             }
         }
 
-        function initHomeTransactions() {
-            const depositList = document.getElementById('depositList');
-            const withdrawList = document.getElementById('withdrawList');
-            const MAX_ITEMS = 10;
-
-            depositList.innerHTML = '';
-            withdrawList.innerHTML = '';
-
-            for (let i = 0; i < MAX_ITEMS; i++) {
-                const depItem = document.createElement('div');
-                depItem.className = 'feed-item deposit';
-                depItem.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">10$</span>';
-                depositList.appendChild(depItem);
-
-                const witAmount = Math.floor(Math.random() * 168) + 1;
-                const witItem = document.createElement('div');
-                witItem.className = 'feed-item withdraw';
-                witItem.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + witAmount + '$</span>';
-                withdrawList.appendChild(witItem);
-            }
-
-            function scheduleDeposit() {
-                const delay = Math.floor(Math.random() * (150000 - 45000) + 45000);
-                setTimeout(() => {
-                    const item = document.createElement('div');
-                    item.className = 'feed-item deposit';
-                    item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">10$</span>';
-                    depositList.prepend(item);
-                    while (depositList.children.length > MAX_ITEMS) {
-                        depositList.removeChild(depositList.lastChild);
-                    }
-                    scheduleDeposit();
-                }, delay);
-            }
-
-            function scheduleWithdraw() {
-                const delay = Math.floor(Math.random() * (240000 - 65000) + 65000);
-                setTimeout(() => {
-                    const amount = Math.floor(Math.random() * 168) + 1;
-                    const item = document.createElement('div');
-                    item.className = 'feed-item withdraw';
-                    item.innerHTML = '<span><span class="feed-user">' + randomNick() + '</span><span class="feed-time">' + getCurrentTime() + '</span></span><span class="feed-amount">' + amount + '$</span>';
-                    withdrawList.prepend(item);
-                    while (withdrawList.children.length > MAX_ITEMS) {
-                        withdrawList.removeChild(withdrawList.lastChild);
-                    }
-                    // Обновляем статистику вывода
-                    updateWithdrawnStats(amount);
-                    scheduleWithdraw();
-                }, delay);
-            }
-
-            scheduleDeposit();
-            scheduleWithdraw();
-        }
-
         function initCounters() {
             const totalUsersEl = document.getElementById('totalUsers');
             const todayUsersEl = document.getElementById('todayUsers');
@@ -1536,8 +1472,9 @@
             const calcLevels = ['calc1', 'calc2', 'calc3', 'calc4', 'calc5'];
             const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
 
-            window.changeCalcValue = function(id, delta) {
+            window.calcChange = function(id, delta) {
                 const el = document.getElementById(id);
+                if (!el) return;
                 let val = parseInt(el.textContent) || 0;
                 val = Math.max(0, val + delta);
                 el.textContent = val;
@@ -1547,27 +1484,44 @@
             function updateCalcTotal() {
                 let total = 0;
                 calcLevels.forEach((id, i) => {
-                    const val = parseInt(document.getElementById(id).textContent) || 0;
-                    total += val * percents[i];
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const val = parseInt(el.textContent) || 0;
+                        total += val * percents[i];
+                    }
                 });
-                document.getElementById('calcTotal').textContent = total.toFixed(2) + ' $';
+                const totalEl = document.getElementById('calcTotal');
+                if (totalEl) totalEl.textContent = total.toFixed(2) + ' $';
             }
 
-            document.getElementById('calculatorBtn').onclick = function() {
-                calcLevels.forEach(id => { document.getElementById(id).textContent = '0'; });
-                document.getElementById('calcTotal').textContent = '0.00 $';
-                document.getElementById('calculatorModal').classList.remove('hidden');
-            };
+            const calculatorBtn = document.getElementById('calculatorBtn');
+            if (calculatorBtn) {
+                calculatorBtn.onclick = function() {
+                    calcLevels.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = '0';
+                    });
+                    const totalEl = document.getElementById('calcTotal');
+                    if (totalEl) totalEl.textContent = '0.00 $';
+                    document.getElementById('calculatorModal').classList.remove('hidden');
+                };
+            }
 
-            document.getElementById('closeCalculatorBtn').onclick = function() {
-                document.getElementById('calculatorModal').classList.add('hidden');
-            };
-
-            document.getElementById('calculatorModal').onclick = function(e) {
-                if (e.target === document.getElementById('calculatorModal')) {
+            const closeCalculatorBtn = document.getElementById('closeCalculatorBtn');
+            if (closeCalculatorBtn) {
+                closeCalculatorBtn.onclick = function() {
                     document.getElementById('calculatorModal').classList.add('hidden');
-                }
-            };
+                };
+            }
+
+            const calculatorModal = document.getElementById('calculatorModal');
+            if (calculatorModal) {
+                calculatorModal.onclick = function(e) {
+                    if (e.target === calculatorModal) {
+                        calculatorModal.classList.add('hidden');
+                    }
+                };
+            }
         }
 
         function initModals() {
