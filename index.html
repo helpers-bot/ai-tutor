@@ -742,13 +742,17 @@
             align-items: center;
             font-size: 0.78rem;
             border: 1px solid rgba(212, 165, 60, 0.2);
-            animation: fadeInUp 0.4s ease-out;
             flex-shrink: 0;
         }
 
+        .feed-item.new-item {
+            animation: fadeInUp 0.5s cubic-bezier(0.22, 0.98, 0.41, 1.1) forwards;
+        }
+
         @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(15px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+            60% { opacity: 0.8; transform: translateY(-3px) scale(1.01); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
@@ -1271,6 +1275,27 @@
 
         let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
         
+        // Никнеймы для анимации транзакций
+        const allNicks = [
+            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
+            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
+            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
+            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
+            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
+            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
+            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
+            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
+            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry', 'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
+            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
+            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
+            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
+            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
+            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore'
+        ];
+
+        function randomNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
+        function getCurrentTime() { return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+
         // Единое хранилище транзакций (синхронизировано между страницами)
         let transactionsCache = {
             deposits: [],
@@ -1379,7 +1404,7 @@
                 regLiveFeed.style.display = 'flex';
                 initRegStage();
             }
-            // Всегда обновляем ленту при смене сцены, чтобы она была актуальной
+            // Всегда обновляем ленту при смене сцены
             renderAllFeeds();
         }
 
@@ -1393,16 +1418,17 @@
         async function loadTransactionsFromDB() {
             try {
                 const { data: allTransactions, error } = await supabase
-                    .rpc('get_recent_transactions', { p_limit: 40 });
+                    .rpc('get_recent_transactions', { p_limit: 20 });
                     
                 if (error) {
                     console.error('Ошибка загрузки транзакций:', error);
                     return;
                 }
                 
-                if (allTransactions) {
+                if (allTransactions && allTransactions.length > 0) {
                     transactionsCache.deposits = allTransactions
                         .filter(t => t.type === 'deposit')
+                        .slice(0, 10)
                         .map(t => ({
                             nickname: t.nickname,
                             amount: 10,
@@ -1411,14 +1437,110 @@
                         
                     transactionsCache.withdrawals = allTransactions
                         .filter(t => t.type === 'withdraw')
+                        .slice(0, 10)
                         .map(t => ({
                             nickname: t.nickname,
                             amount: t.amount,
                             time: formatTime(t.created_at)
                         }));
                 }
+                
+                // Если транзакций нет, заполняем начальными данными
+                if (transactionsCache.deposits.length === 0) {
+                    for (let i = 0; i < 10; i++) {
+                        transactionsCache.deposits.push({
+                            nickname: randomNick(),
+                            amount: 10,
+                            time: getCurrentTime()
+                        });
+                    }
+                }
+                if (transactionsCache.withdrawals.length === 0) {
+                    for (let i = 0; i < 10; i++) {
+                        transactionsCache.withdrawals.push({
+                            nickname: randomNick(),
+                            amount: Math.floor(Math.random() * 110) + 1,
+                            time: getCurrentTime()
+                        });
+                    }
+                }
             } catch (err) {
                 console.error('Ошибка:', err);
+                // Заполняем начальными данными при ошибке
+                if (transactionsCache.deposits.length === 0) {
+                    for (let i = 0; i < 10; i++) {
+                        transactionsCache.deposits.push({
+                            nickname: randomNick(),
+                            amount: 10,
+                            time: getCurrentTime()
+                        });
+                    }
+                }
+                if (transactionsCache.withdrawals.length === 0) {
+                    for (let i = 0; i < 10; i++) {
+                        transactionsCache.withdrawals.push({
+                            nickname: randomNick(),
+                            amount: Math.floor(Math.random() * 110) + 1,
+                            time: getCurrentTime()
+                        });
+                    }
+                }
+            }
+        }
+
+        // Функция добавления новой транзакции с анимацией
+        function addNewTransaction(type, containerIds, nickname, amount) {
+            const newItem = {
+                nickname: nickname,
+                amount: amount,
+                time: getCurrentTime()
+            };
+            
+            // Добавляем в кеш
+            if (type === 'deposit') {
+                transactionsCache.deposits.unshift(newItem);
+                if (transactionsCache.deposits.length > 10) {
+                    transactionsCache.deposits = transactionsCache.deposits.slice(0, 10);
+                }
+            } else {
+                transactionsCache.withdrawals.unshift(newItem);
+                if (transactionsCache.withdrawals.length > 10) {
+                    transactionsCache.withdrawals = transactionsCache.withdrawals.slice(0, 10);
+                }
+            }
+            
+            // Обновляем все контейнеры
+            containerIds.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                
+                const items = type === 'deposit' ? transactionsCache.deposits : transactionsCache.withdrawals;
+                
+                // Очищаем и перестраиваем
+                container.innerHTML = '';
+                items.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = `feed-item ${type}`;
+                    div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
+                    
+                    // Анимируем только первый (новый) элемент
+                    if (index === 0) {
+                        div.classList.add('new-item');
+                    }
+                    
+                    container.appendChild(div);
+                });
+                
+                // Удаляем лишние элементы если их больше 10
+                while (container.children.length > 10) {
+                    container.removeChild(container.lastChild);
+                }
+            });
+            
+            // Обновляем статистику выведенных средств
+            if (type === 'withdraw') {
+                currentWithdrawnTotal += amount;
+                updateAllStatsDisplay();
             }
         }
 
@@ -1433,8 +1555,7 @@
                 const item = items[i];
                 const div = document.createElement('div');
                 div.className = `feed-item ${containerId.includes('Deposit') ? 'deposit' : 'withdraw'}`;
-                const amount = containerId.includes('Deposit') ? '10' : item.amount;
-                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${amount}$</span>`;
+                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
                 container.appendChild(div);
             }
         }
@@ -1446,14 +1567,40 @@
             renderFeed('withdrawList', transactionsCache.withdrawals);
         }
 
+        // Функция планирования пополнений (каждые 30-95 секунд)
+        function scheduleDeposit() {
+            const delay = Math.floor(Math.random() * (95000 - 30000) + 30000);
+            
+            setTimeout(() => {
+                const depositContainers = ['regDepositList', 'depositList'];
+                addNewTransaction('deposit', depositContainers, randomNick(), 10);
+                scheduleDeposit();
+            }, delay);
+        }
+
+        // Функция планирования выводов (каждые 45-140 секунд)
+        function scheduleWithdraw() {
+            const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
+            
+            setTimeout(() => {
+                const amount = Math.floor(Math.random() * 110) + 1;
+                const withdrawContainers = ['regWithdrawList', 'withdrawList'];
+                addNewTransaction('withdraw', withdrawContainers, randomNick(), amount);
+                scheduleWithdraw();
+            }, delay);
+        }
+
         // Инициализация
         scheduleUserGrowth();
         updateAllStatsDisplay();
         setInterval(updateAllStatsDisplay, 60000);
         
-        // Первичная загрузка транзакций
+        // Первичная загрузка транзакций и запуск планировщиков
         loadTransactionsFromDB().then(() => {
             renderAllFeeds();
+            // Запускаем планировщики после загрузки
+            scheduleDeposit();
+            scheduleWithdraw();
         });
 
         // ============================================
@@ -1562,12 +1709,6 @@
                 loadReferrals();
                 updateAllStatsDisplay();
             }, 30000);
-            
-            // Периодическое обновление ленты из БД
-            setInterval(async () => {
-                await loadTransactionsFromDB();
-                renderAllFeeds();
-            }, 15000);
         }
 
         async function loadUserData() {
@@ -1741,9 +1882,6 @@
                 
                 if (!error && data && data.success) {
                     await loadUserData();
-                    // Обновляем ленту после вывода
-                    await loadTransactionsFromDB();
-                    renderAllFeeds();
                     showToast('Заявка на вывод создана!', 'success');
                 }
                 document.getElementById('withdrawModal').classList.add('hidden');
