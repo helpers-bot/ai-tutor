@@ -923,11 +923,11 @@
         </div>
         <div class="stat-item">
             <div class="stat-label">📅 Сегодня зарегистрировано</div>
-            <div class="stat-value" id="regTodayUsers">127</div>
+            <div class="stat-value" id="regTodayUsers">0</div>
         </div>
         <div class="stat-item">
             <div class="stat-label">💰 Всего выведено</div>
-            <div class="stat-value" id="regTotalWithdrawn">18.500 $</div>
+            <div class="stat-value" id="regTotalWithdrawn">17.864 $</div>
         </div>
     </div>
     <div class="info-section">
@@ -993,8 +993,8 @@
         <div class="card">
             <h3>📊 Статистика платформы</h3>
             <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">146.353</span></div>
-            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">127</span></div>
-            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">18.500 $</span></div>
+            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">0</span></div>
+            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">17.864 $</span></div>
             <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
         </div>
 
@@ -1177,6 +1177,65 @@
 
         let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
 
+        // Фейковые счётчики
+        let fakeTotalUsers = parseInt(localStorage.getItem('fakeTotalUsers')) || 146353;
+        let fakeTodayUsers = parseInt(localStorage.getItem('fakeTodayUsers')) || 0;
+        let fakeTotalWithdrawn = parseInt(localStorage.getItem('fakeTotalWithdrawn')) || 17864;
+        let lastResetDate = localStorage.getItem('lastResetDate') || new Date().toDateString();
+
+        // Сброс сегодняшних регистраций в полночь
+        function checkMidnightReset() {
+            const today = new Date().toDateString();
+            if (today !== lastResetDate) {
+                fakeTodayUsers = 0;
+                lastResetDate = today;
+                localStorage.setItem('fakeTodayUsers', '0');
+                localStorage.setItem('lastResetDate', today);
+                updateAllStats();
+            }
+        }
+
+        // Обновление всех счётчиков на всех страницах
+        function updateAllStats() {
+            const regTotalUsersEl = document.getElementById('regTotalUsers');
+            const regTodayUsersEl = document.getElementById('regTodayUsers');
+            const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
+            const totalUsersEl = document.getElementById('totalUsers');
+            const todayUsersEl = document.getElementById('todayUsers');
+            const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+
+            if (regTotalUsersEl) regTotalUsersEl.textContent = fakeTotalUsers.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            if (regTodayUsersEl) regTodayUsersEl.textContent = fakeTodayUsers;
+            if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = fakeTotalWithdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+            if (totalUsersEl) totalUsersEl.textContent = fakeTotalUsers.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            if (todayUsersEl) todayUsersEl.textContent = fakeTodayUsers;
+            if (totalWithdrawnEl) totalWithdrawnEl.textContent = fakeTotalWithdrawn.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
+
+            localStorage.setItem('fakeTotalUsers', fakeTotalUsers);
+            localStorage.setItem('fakeTodayUsers', fakeTodayUsers);
+            localStorage.setItem('fakeTotalWithdrawn', fakeTotalWithdrawn);
+        }
+
+        // Добавление пользователя
+        function addFakeUser() {
+            checkMidnightReset();
+            fakeTotalUsers++;
+            fakeTodayUsers++;
+            updateAllStats();
+            scheduleNextUser();
+        }
+
+        function scheduleNextUser() {
+            const delay = Math.floor(Math.random() * (160000 - 45000) + 45000);
+            setTimeout(addFakeUser, delay);
+        }
+
+        // Добавление вывода
+        function addFakeWithdraw(amount) {
+            fakeTotalWithdrawn += amount;
+            updateAllStats();
+        }
+
         // Никнеймы для анимации транзакций
         const allNicks = [
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
@@ -1234,6 +1293,12 @@
         } else {
             showStage('register');
         }
+
+        // Запуск таймеров
+        checkMidnightReset();
+        updateAllStats();
+        scheduleNextUser();
+        setInterval(checkMidnightReset, 60000);
 
         // ============================================
         // ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД
@@ -1316,17 +1381,8 @@
             };
 
             document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
-            loadRegStats();
+            updateAllStats();
             initTransactions('reg');
-        }
-
-        async function loadRegStats() {
-            const { data, error } = await supabase.rpc('get_platform_stats');
-            if (data && !error) {
-                document.getElementById('regTotalUsers').textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                document.getElementById('regTodayUsers').textContent = data.today_users;
-                document.getElementById('regTotalWithdrawn').textContent = parseFloat(data.total_withdrawn).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
-            }
         }
 
         // Универсальная функция для транзакций
@@ -1378,27 +1434,13 @@
                     while (withdrawList.children.length > MAX_ITEMS) {
                         withdrawList.removeChild(withdrawList.lastChild);
                     }
-                    updateWithdrawnStats(amount);
+                    addFakeWithdraw(amount);
                     scheduleWithdraw();
                 }, delay);
             }
 
             scheduleDeposit();
             scheduleWithdraw();
-        }
-
-        // Обновление статистики "Всего выведено"
-        function updateWithdrawnStats(amount) {
-            const regWithdrawnEl = document.getElementById('regTotalWithdrawn');
-            if (regWithdrawnEl && regWithdrawnEl.textContent) {
-                const current = parseFloat(regWithdrawnEl.textContent.replace(/[^0-9.]/g, '')) || 0;
-                regWithdrawnEl.textContent = (current + amount).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
-            }
-            const homeWithdrawnEl = document.getElementById('totalWithdrawn');
-            if (homeWithdrawnEl && homeWithdrawnEl.textContent) {
-                const current = parseFloat(homeWithdrawnEl.textContent.replace(/[^0-9.]/g, '')) || 0;
-                homeWithdrawnEl.textContent = (current + amount).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
-            }
         }
 
         // ============================================
@@ -1415,9 +1457,10 @@
             loadUserData();
             loadReferrals();
             initTransactions('home');
-            initCounters();
             initModals();
             initCalculator();
+
+            updateAllStats();
 
             setInterval(() => {
                 loadUserData();
@@ -1448,23 +1491,6 @@
                 document.getElementById('lvl4').textContent = (data.level_4?.count || 0);
                 document.getElementById('lvl5').textContent = (data.level_5?.count || 0);
             }
-        }
-
-        function initCounters() {
-            const totalUsersEl = document.getElementById('totalUsers');
-            const todayUsersEl = document.getElementById('todayUsers');
-            const totalWithdrawnEl = document.getElementById('totalWithdrawn');
-
-            async function updateStats() {
-                const { data, error } = await supabase.rpc('get_platform_stats');
-                if (data && !error) {
-                    totalUsersEl.textContent = data.total_users.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-                    todayUsersEl.textContent = data.today_users;
-                    totalWithdrawnEl.textContent = parseFloat(data.total_withdrawn).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ' $';
-                }
-            }
-            updateStats();
-            setInterval(updateStats, 30000);
         }
 
         // Калькулятор
@@ -1629,10 +1655,6 @@
                 }
             };
         }
-
-        setInterval(() => {
-            if (stageRegister.style.display !== 'none') loadRegStats();
-        }, 30000);
 
     })();
 </script>
