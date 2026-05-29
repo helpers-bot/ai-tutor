@@ -757,6 +757,7 @@
         .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
         .feed-time { color: #8b8a7a; font-size: 0.68rem; margin-left: 0.4rem; }
         .feed-amount { font-weight: 700; font-size: 0.78rem; }
+        /* ЗЕЛЁНЫЙ ЦВЕТ ДЛЯ ДЕПОЗИТОВ НА ГЛАВНОЙ СТРАНИЦЕ */
         .deposit .feed-amount { color: #4caf50; }
         .withdraw .feed-amount { color: #ff7043; }
 
@@ -1275,7 +1276,7 @@
         let feedCache = { deposits: [], withdrawals: [] };
         // Временные метки последнего обновления
         let lastFeedUpdate = 0;
-        const FEED_UPDATE_INTERVAL = 3000; // 3 секунды
+        const FEED_UPDATE_INTERVAL = 3000;
 
         const allNicks = [
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
@@ -1305,13 +1306,17 @@
         }
 
         function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            if (num >= 1000) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+            return num.toString();
         }
 
         // ===== ЗАГРУЗКА СТАТИСТИКИ ИЗ БД =====
         async function loadPlatformStats() {
             const { data, error } = await supabase.rpc('get_platform_stats');
             if (data) {
+                // Обновляем статистику на странице регистрации
                 const regTotalUsersEl = document.getElementById('regTotalUsers');
                 const regTodayUsersEl = document.getElementById('regTodayUsers');
                 const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
@@ -1320,6 +1325,7 @@
                 if (regTodayUsersEl) regTodayUsersEl.textContent = data.today_users;
                 if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
 
+                // Обновляем статистику на главной странице
                 const totalUsersEl = document.getElementById('totalUsers');
                 const todayUsersEl = document.getElementById('todayUsers');
                 const totalWithdrawnEl = document.getElementById('totalWithdrawn');
@@ -1342,7 +1348,6 @@
             });
             
             if (data && data.success) {
-                console.log('Новый пользователь добавлен:', nickname);
                 loadPlatformStats();
             }
         }
@@ -1356,9 +1361,8 @@
             });
             
             if (data && data.success) {
-                if (type === 'withdraw') {
-                    loadPlatformStats();
-                }
+                // Обновляем статистику после каждого вывода
+                loadPlatformStats();
                 loadFeedFromDB();
             }
         }
@@ -1465,6 +1469,7 @@
                 initRegStage();
             }
             loadFeedFromDB();
+            loadPlatformStats();
         }
 
         // ===== ИНИЦИАЛИЗАЦИЯ =====
@@ -1478,7 +1483,7 @@
             scheduleWithdraw();
             
             // Периодическое обновление
-            setInterval(loadPlatformStats, 30000);
+            setInterval(loadPlatformStats, 10000);
             setInterval(loadFeedFromDB, 5000);
 
             if (userData && userData.id) {
