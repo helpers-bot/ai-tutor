@@ -505,7 +505,7 @@
             width: 100%;
             max-width: 1200px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.2rem;
             position: relative;
             z-index: 2;
@@ -742,22 +742,45 @@
             font-size: 0.78rem;
             border: 1px solid rgba(212, 165, 60, 0.2);
             flex-shrink: 0;
+            transition: all 0.3s ease;
         }
 
-        .feed-item.new-item {
-            animation: fadeInUp 0.5s cubic-bezier(0.22, 0.98, 0.41, 1.1) forwards;
+        /* НОВАЯ АНИМАЦИЯ: красивое выделение новой строки на 2 секунды */
+        .feed-item.new-item-highlight {
+            animation: highlightNewItem 2s ease-out forwards;
         }
 
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(20px) scale(0.95); }
-            60% { opacity: 0.8; transform: translateY(-3px) scale(1.01); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes highlightNewItem {
+            0% { 
+                background: rgba(76, 175, 80, 0.4);
+                border-color: rgba(76, 175, 80, 0.8);
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+                transform: scale(1.03);
+            }
+            30% {
+                background: rgba(76, 175, 80, 0.3);
+                border-color: rgba(76, 175, 80, 0.7);
+                box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+                transform: scale(1.02);
+            }
+            60% {
+                background: rgba(76, 175, 80, 0.15);
+                border-color: rgba(76, 175, 80, 0.4);
+                box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+                transform: scale(1.01);
+            }
+            100% {
+                background: rgba(25, 22, 17, 0.6);
+                border-color: rgba(212, 165, 60, 0.2);
+                box-shadow: none;
+                transform: scale(1);
+            }
         }
 
         .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
         .feed-time { color: #8b8a7a; font-size: 0.68rem; margin-left: 0.4rem; }
         .feed-amount { font-weight: 700; font-size: 0.78rem; }
-        /* ЗЕЛЁНЫЙ ЦВЕТ ДЛЯ ДЕПОЗИТОВ НА ГЛАВНОЙ СТРАНИЦЕ */
+        /* ЗЕЛЁНЫЙ ЦВЕТ ДЛЯ ДЕПОЗИТОВ НА ВСЕХ СТРАНИЦАХ */
         .deposit .feed-amount { color: #4caf50; }
         .withdraw .feed-amount { color: #ff7043; }
 
@@ -960,10 +983,16 @@
             .stat-row .stat-value { font-size: 0.75rem; }
             .stat-earn { font-size: 0.7rem; }
             .dashboard {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
+        @media (max-width: 580px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 480px) {
             body {
                 padding: 8px;
@@ -982,6 +1011,15 @@
             }
             .feed-list {
                 height: 140px;
+            }
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .dashboard {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1274,6 +1312,9 @@
 
         // Кэш для хранения последних данных ленты
         let feedCache = { deposits: [], withdrawals: [] };
+        // ID последних записей для отслеживания новых
+        let lastDepositId = null;
+        let lastWithdrawId = null;
         // Временные метки последнего обновления
         let lastFeedUpdate = 0;
         const FEED_UPDATE_INTERVAL = 3000;
@@ -1316,7 +1357,6 @@
         async function loadPlatformStats() {
             const { data, error } = await supabase.rpc('get_platform_stats');
             if (data) {
-                // Обновляем статистику на странице регистрации
                 const regTotalUsersEl = document.getElementById('regTotalUsers');
                 const regTodayUsersEl = document.getElementById('regTodayUsers');
                 const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
@@ -1325,7 +1365,6 @@
                 if (regTodayUsersEl) regTodayUsersEl.textContent = data.today_users;
                 if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
 
-                // Обновляем статистику на главной странице
                 const totalUsersEl = document.getElementById('totalUsers');
                 const todayUsersEl = document.getElementById('todayUsers');
                 const totalWithdrawnEl = document.getElementById('totalWithdrawn');
@@ -1361,8 +1400,9 @@
             });
             
             if (data && data.success) {
-                // Обновляем статистику после каждого вывода
                 loadPlatformStats();
+                // Принудительно загружаем новые данные
+                lastFeedUpdate = 0;
                 loadFeedFromDB();
             }
         }
@@ -1380,7 +1420,16 @@
                 supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
             ]);
 
-            if (depositResult.data) {
+            let hasNewDeposit = false;
+            let hasNewWithdraw = false;
+
+            if (depositResult.data && depositResult.data.length > 0) {
+                const newFirstId = depositResult.data[0].nickname + '_' + depositResult.data[0].created_at;
+                if (newFirstId !== lastDepositId) {
+                    hasNewDeposit = true;
+                    lastDepositId = newFirstId;
+                }
+                
                 feedCache.deposits = depositResult.data.map(item => ({
                     nickname: item.nickname,
                     amount: item.amount,
@@ -1388,7 +1437,13 @@
                 }));
             }
 
-            if (withdrawResult.data) {
+            if (withdrawResult.data && withdrawResult.data.length > 0) {
+                const newFirstId = withdrawResult.data[0].nickname + '_' + withdrawResult.data[0].created_at;
+                if (newFirstId !== lastWithdrawId) {
+                    hasNewWithdraw = true;
+                    lastWithdrawId = newFirstId;
+                }
+                
                 feedCache.withdrawals = withdrawResult.data.map(item => ({
                     nickname: item.nickname,
                     amount: item.amount,
@@ -1396,11 +1451,11 @@
                 }));
             }
 
-            renderAllFeeds();
+            renderAllFeeds(hasNewDeposit, hasNewWithdraw);
         }
 
-        // ===== ОТРИСОВКА ЛЕНТЫ =====
-        function renderFeedList(containerId, items) {
+        // ===== ОТРИСОВКА ЛЕНТЫ С АНИМАЦИЕЙ ТОЛЬКО ДЛЯ НОВЫХ =====
+        function renderFeedList(containerId, items, isNew) {
             const container = document.getElementById(containerId);
             if (!container) return;
             
@@ -1409,19 +1464,22 @@
                 const div = document.createElement('div');
                 const isDeposit = containerId.includes('Deposit');
                 div.className = `feed-item ${isDeposit ? 'deposit' : 'withdraw'}`;
-                if (index === 0) {
-                    div.classList.add('new-item');
+                
+                // Анимируем только первый элемент и только если есть новые данные
+                if (index === 0 && isNew) {
+                    div.classList.add('new-item-highlight');
                 }
+                
                 div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
                 container.appendChild(div);
             });
         }
         
-        function renderAllFeeds() {
-            renderFeedList('regDepositList', feedCache.deposits);
-            renderFeedList('depositList', feedCache.deposits);
-            renderFeedList('regWithdrawList', feedCache.withdrawals);
-            renderFeedList('withdrawList', feedCache.withdrawals);
+        function renderAllFeeds(hasNewDeposit = false, hasNewWithdraw = false) {
+            renderFeedList('regDepositList', feedCache.deposits, hasNewDeposit);
+            renderFeedList('depositList', feedCache.deposits, hasNewDeposit);
+            renderFeedList('regWithdrawList', feedCache.withdrawals, hasNewWithdraw);
+            renderFeedList('withdrawList', feedCache.withdrawals, hasNewWithdraw);
         }
 
         // ===== РАСПИСАНИЕ: НОВЫЕ ПОЛЬЗОВАТЕЛИ (45-140 секунд) =====
@@ -1477,14 +1535,12 @@
             await loadPlatformStats();
             await loadFeedFromDB();
             
-            // Запускаем расписания
             scheduleNewUser();
             scheduleDeposit();
             scheduleWithdraw();
             
-            // Периодическое обновление
             setInterval(loadPlatformStats, 10000);
-            setInterval(loadFeedFromDB, 5000);
+            setInterval(() => loadFeedFromDB(), 5000);
 
             if (userData && userData.id) {
                 showStage('home');
