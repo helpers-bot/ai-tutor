@@ -3,459 +3,640 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель VDS Game</title>
+    <title>Пирамикс • Админ-панель</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a1a; color: #e0e0e0; min-height: 100vh; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        h1 { color: #ffd700; text-align: center; margin: 20px 0; font-size: 2rem; text-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        h2 { color: #d4af37; margin: 20px 0 10px; border-bottom: 1px solid #333; padding-bottom: 8px; }
-        .login-form { max-width: 400px; margin: 100px auto; background: #1a1a2e; padding: 30px; border-radius: 16px; border: 2px solid #d4af37; }
-        .login-form input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 1rem; }
-        .login-form button { width: 100%; padding: 12px; background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; border-radius: 8px; color: #000; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 12px; }
-        .error { color: #ff4444; margin: 8px 0; }
-        .success { color: #44ff44; margin: 8px 0; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 16px 0; }
-        .stat-card { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; text-align: center; }
-        .stat-card .value { font-size: 2rem; color: #ffd700; font-weight: bold; }
-        .stat-card .label { color: #888; font-size: 0.9rem; }
-        table { width: 100%; border-collapse: collapse; margin: 12px 0; background: #1a1a2e; border-radius: 8px; }
-        th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #333; font-size: 0.85rem; }
-        th { background: #2a2a3e; color: #ffd700; }
-        tr:hover { background: #222236; }
-        .btn-logout { background: #dc3545; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; margin: 10px 0; display: inline-block; }
-        .btn-refresh { background: #28a745; color: #fff; padding: 8px 20px; border-radius: 8px; cursor: pointer; border: none; font-size: 0.9rem; margin: 10px 0; display: inline-block; }
-        .search-form { display: flex; gap: 8px; margin: 12px 0; }
-        .search-form input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.9rem; }
-        .search-form button { padding: 10px 20px; background: #d4af37; border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; }
-        .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-        .actions input { width: 70px; padding: 6px; border-radius: 6px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.8rem; }
-        .actions button { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: bold; }
-        .btn-add { background: #28a745; color: #fff; }
-        .btn-remove { background: #dc3545; color: #fff; }
-        .btn-edit { background: #007bff; color: #fff; }
-        .btn-delete { background: #ff4444; color: #fff; }
-        .tabs { display: flex; gap: 4px; margin: 12px 0; flex-wrap: wrap; }
-        .tab-btn { padding: 10px 20px; background: #1a1a2e; border: 1px solid #444; color: #888; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; }
-        .tab-btn.active { background: #2a2a3e; color: #ffd700; border-color: #d4af37; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .chat-message { padding: 10px; margin: 5px 0; border-radius: 12px; font-size: 0.85rem; }
-        .chat-message.from-user { background: rgba(75,44,110,0.4); border: 1px solid #cfaa4a; }
-        .chat-message.from-admin { background: rgba(212,175,55,0.2); border: 1px solid #d4af37; }
-        .reply-box { display: flex; gap: 8px; margin-top: 8px; }
-        .reply-box input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.85rem; }
-        .reply-box button { padding: 8px 16px; background: #007bff; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .unread-badge { background: #ff4444; color: #fff; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; margin-left: 6px; }
-        .promo-form { background: #1a1a2e; padding: 20px; border-radius: 12px; border: 1px solid #333; margin: 12px 0; display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-        .promo-form label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 4px; }
-        .promo-form input, .promo-form select { padding: 10px; border-radius: 8px; border: 1px solid #444; background: #0a0a1a; color: #fff; font-size: 0.9rem; }
-        .promo-form button { padding: 10px 20px; background: #d4af37; border: none; border-radius: 8px; color: #000; font-weight: bold; cursor: pointer; }
-        .edit-mode { background: #2a2a3e !important; border-color: #ffd700 !important; }
+        
+        body {
+            background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            color: #f5efe0;
+            font-size: 14px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .header {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(18px);
+            border-radius: 1.8rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(255, 215, 150, 0.15);
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #b9b09a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .panel {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 215, 150, 0.15);
+            margin-bottom: 1.5rem;
+        }
+
+        .panel h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #e9c274;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #b9b09a;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input:focus {
+            border-color: #c084fc;
+            box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .input-row .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.65rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #d8b4fe, #9333ea);
+            box-shadow: 0 8px 20px rgba(192, 132, 252, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff7043, #d32f2f);
+            box-shadow: 0 6px 15px rgba(255, 112, 67, 0.4);
+        }
+
+        .btn-danger:hover {
+            background: linear-gradient(135deg, #ff8a65, #e53935);
+            box-shadow: 0 8px 20px rgba(255, 112, 67, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .btn-sm {
+            padding: 0.4rem 1rem;
+            font-size: 0.75rem;
+        }
+
+        .user-info {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+
+        .user-info p {
+            margin: 0.3rem 0;
+            font-size: 0.85rem;
+        }
+
+        .user-info .label {
+            color: #b9b09a;
+        }
+
+        .user-info .value {
+            color: #f5d78c;
+            font-weight: 600;
+        }
+
+        .message-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .message-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            border: 1px solid rgba(212, 165, 60, 0.2);
+        }
+
+        .message-item.unread {
+            border-color: rgba(192, 132, 252, 0.5);
+            background: rgba(192, 132, 252, 0.1);
+        }
+
+        .message-text {
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            color: #f5efe0;
+        }
+
+        .message-meta {
+            font-size: 0.7rem;
+            color: #8b8a7a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .message-response {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 0.8rem;
+            padding: 0.7rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            color: #4caf50;
+        }
+
+        .response-area {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .response-area input {
+            flex: 1;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.8rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .response-area input:focus {
+            border-color: #c084fc;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 350px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .toast-success { background: rgba(76, 175, 80, 0.9); border: 1px solid #4caf50; }
+        .toast-error { background: rgba(255, 112, 67, 0.9); border: 1px solid #ff7043; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .badge {
+            background: #ff7043;
+            color: #fff;
+            border-radius: 50%;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 0.3rem;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 600px) {
+            .input-row { flex-direction: column; }
+            .btn { width: 100%; }
+            .header { flex-direction: column; text-align: center; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="loginBlock" class="login-form">
-            <h1>🔐 Админ-панель VDS</h1>
-            <p style="color:#888;font-size:0.8rem;text-align:center;">Админ</p>
-            <input type="password" id="adminPassword" placeholder="Пароль админа">
-            <button onclick="adminLogin()">Войти</button>
-            <p class="error" id="loginError"></p>
+        <div class="header">
+            <div class="logo">👑 Пирамикс • Админ-панель</div>
+            <button class="btn btn-danger btn-sm" onclick="logout()">🚪 Выход</button>
         </div>
 
-        <div id="adminPanel" style="display:none;">
-            <h1>🎮 Админ-панель VDS Game</h1>
-            <button class="btn-logout" onclick="logout()">🚪 Выйти</button>
-            <button class="btn-refresh" onclick="loadAllData()">🔄 Обновить</button>
-            <p class="success" id="successMsg"></p>
-            <p class="error" id="errorMsg"></p>
-
-            <div class="stats-grid">
-                <div class="stat-card"><div class="value" id="totalUsers">0</div><div class="label">Всего пользователей</div></div>
-                <div class="stat-card"><div class="value" id="onlineNow">0</div><div class="label">Онлайн (15 мин)</div></div>
-                <div class="stat-card"><div class="value" id="onlineToday">0</div><div class="label">За сегодня</div></div>
-                <div class="stat-card"><div class="value" id="unreadMessages">0</div><div class="label">Новых сообщений</div></div>
+        <!-- Статистика -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-label">👥 Всего пользователей</div>
+                <div class="stat-value" id="statTotalUsers">0</div>
             </div>
-
-            <div class="tabs">
-                <button class="tab-btn active" onclick="switchTab('users', event)">👥 Пользователи</button>
-                <button class="tab-btn" onclick="switchTab('support', event)">💬 Поддержка <span class="unread-badge hidden" id="unreadBadge">0</span></button>
-                <button class="tab-btn" onclick="switchTab('jackpots', event)">🎰 Джекпоты</button>
-                <button class="tab-btn" onclick="switchTab('transactions', event)">💳 Транзакции</button>
-                <button class="tab-btn" onclick="switchTab('promo', event)">🎫 Промокоды</button>
-                <button class="tab-btn" onclick="switchTab('stats', event)">📊 Статистика</button>
+            <div class="stat-card">
+                <div class="stat-label">📅 Сегодня</div>
+                <div class="stat-value" id="statTodayUsers">0</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">💰 Выведено всего</div>
+                <div class="stat-value" id="statTotalWithdrawn">0 $</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">💬 Новых сообщений</div>
+                <div class="stat-value" id="statUnread">0</div>
+            </div>
+        </div>
 
-            <div id="tab-users" class="tab-content active">
-                <h2>🔍 Поиск пользователя</h2>
-                <div class="search-form">
-                    <input type="text" id="searchQuery" placeholder="ID, email или имя...">
-                    <button onclick="searchUsers()">Найти</button>
-                    <button onclick="loadAllUsers()" style="background:#555;">Все</button>
+        <!-- Поиск пользователя -->
+        <div class="panel">
+            <h2>🔍 Поиск пользователя</h2>
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Никнейм пользователя</label>
+                    <input type="text" id="searchNickname" placeholder="Введите никнейм...">
                 </div>
-                <table><thead><tr><th>ID</th><th>Имя</th><th>Email</th><th>💎 Алмазы</th><th>Прогресс</th><th>Фриспины</th><th>Регистрация</th><th>Действия</th></tr></thead><tbody id="usersTable"></tbody></table>
+                <div class="input-group" style="justify-content: flex-end; display: flex; align-items: flex-end;">
+                    <button class="btn" onclick="searchUser()">🔍 Найти</button>
+                </div>
             </div>
-
-            <div id="tab-support" class="tab-content">
-                <h2>💬 Обращения в поддержку</h2>
-                <p style="color:#888;font-size:0.8rem;">Выберите пользователя для просмотра переписки</p>
-                <div id="supportUsersList"></div>
-                <div id="chatArea" style="display:none; margin-top:16px;">
-                    <h3>Переписка с <span id="chatUserName"></span></h3>
-                    <div id="chatMessages" style="max-height:300px;overflow-y:auto;padding:10px;background:#111;border-radius:8px;margin:8px 0;"></div>
-                    <div class="reply-box">
-                        <input type="text" id="replyInput" placeholder="Введите ответ...">
-                        <button onclick="sendReply()">📤 Отправить</button>
+            <div id="userInfo" class="hidden">
+                <div class="user-info" id="userInfoContent"></div>
+                <div class="input-row" style="margin-top: 1rem;">
+                    <div class="input-group">
+                        <label>Сумма ($)</label>
+                        <input type="number" id="balanceAmount" placeholder="Введите сумму" min="0.01" step="0.01">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                        <button class="btn btn-success btn-sm" onclick="addBalance()">➕ Начислить</button>
+                        <button class="btn btn-danger btn-sm" onclick="removeBalance()">➖ Списать</button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div id="tab-jackpots" class="tab-content">
-                <h2>🎰 Последние джекпоты</h2>
-                <table><thead><tr><th>ID</th><th>Время</th><th>UID</th><th>Имя</th><th>Режим</th><th>Желание</th><th>Выигрыш</th><th>Действия</th></tr></thead><tbody id="jackpotsTable"></tbody></table>
-            </div>
-
-            <div id="tab-transactions" class="tab-content">
-                <h2>💳 Последние транзакции</h2>
-                <table><thead><tr><th>ID</th><th>Время</th><th>UID</th><th>Имя</th><th>Сумма</th><th>Тип</th><th>Причина</th><th>Действия</th></tr></thead><tbody id="transactionsTable"></tbody></table>
-            </div>
-
-            <div id="tab-promo" class="tab-content">
-                <h2>🎫 Создать промокод</h2>
-                <div class="promo-form" id="promoForm">
-                    <div><label>Код (пусто = автогенерация)</label><input type="text" id="promoCode" placeholder="напр: WELCOME20" maxlength="20"></div>
-                    <div><label>Тип</label><select id="promoType"><option value="spins">🎰 Фриспины</option><option value="diamonds">💎 Алмазы</option></select></div>
-                    <div><label>Количество</label><input type="number" id="promoAmount" value="10" min="1"></div>
-                    <div><label>Макс. использований</label><input type="number" id="promoMaxUses" value="1" min="1"></div>
-                    <div><label>Действует до</label><input type="datetime-local" id="promoExpires"></div>
-                    <button onclick="createPromoCode()" id="createPromoBtn">🎫 Создать</button>
-                    <button onclick="cancelEdit()" id="cancelEditBtn" style="display:none; background:#888;">Отмена</button>
-                </div>
-                <input type="hidden" id="editingCode" value="">
-                <h2>📋 Все промокоды</h2>
-                <table><thead><tr><th>Код</th><th>Тип</th><th>Кол-во</th><th>Исп.</th><th>Лимит</th><th>Активен</th><th>Действует до</th><th>Действия</th></tr></thead><tbody id="promoTable"></tbody></table>
-            </div>
-
-            <div id="tab-stats" class="tab-content">
-                <h2>📊 Статистика: потрачено алмазов по пользователям</h2>
-                <table><thead><tr><th>Никнейм</th><th>Потрачено алмазов</th><th>Дата/время последней операции</th></tr></thead><tbody id="statsSpentTable"></tbody></table>
+        <!-- Сообщения поддержки -->
+        <div class="panel">
+            <h2>💬 Сообщения поддержки <span class="badge" id="unreadBadge" style="display:none;">0</span></h2>
+            <div class="message-list" id="messageList">
+                <p style="color: #b9b09a; text-align: center;">Загрузка сообщений...</p>
             </div>
         </div>
     </div>
 
-    <script src="api.js"></script>
     <script>
-        let currentChatUID = null;
-        let supportChats = {};
+        (function() {
+            const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+            const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+            const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function sha256(message) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+            let currentUser = null;
+            let currentUserId = null;
 
-        async function adminLogin() {
-            const password = document.getElementById('adminPassword').value;
-            const errorEl = document.getElementById('loginError');
-            if (!password) { errorEl.textContent = 'Введите пароль'; return; }
-            const passwordHash = await sha256(password);
-            const validHash = await sha256('a135710Aa!в');
-            if (passwordHash !== validHash) { errorEl.textContent = 'Неверный пароль'; return; }
-            localStorage.setItem('vds_admin_logged_in', 'true');
-            document.getElementById('loginBlock').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadAllData();
-        }
-
-        function logout() { localStorage.removeItem('vds_admin_logged_in'); location.reload(); }
-        function showError(msg) { const el = document.getElementById('errorMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
-        function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; setTimeout(() => el.textContent = '', 4000); }
-
-        function switchTab(name, evt) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('tab-' + name).classList.add('active');
-            if (evt && evt.target) evt.target.classList.add('active');
-            if (name === 'support') loadSupportChats();
-            if (name === 'jackpots') loadJackpots();
-            if (name === 'transactions') loadTransactions();
-            if (name === 'promo') loadPromoCodes();
-            if (name === 'stats') loadUserSpentStats();
-        }
-
-        async function loadAllData() {
-            await Promise.all([loadStats(), loadAllUsers(), loadSupportChats(), loadJackpots(), loadTransactions(), loadPromoCodes(), loadUserSpentStats()]);
-        }
-
-        async function loadStats() {
-            try {
-                const users = await API.getAllUsers();
-                const online = await API.getOnlineStats();
-                const chats = await API.getSupportChats();
-                document.getElementById('totalUsers').textContent = users.length;
-                document.getElementById('onlineNow').textContent = online.online_now;
-                document.getElementById('onlineToday').textContent = online.online_today;
-                let unread = 0;
-                Object.values(chats).forEach(chat => {
-                    if (chat.messages && chat.messages.some(m => !m.read && m.from === 'user')) unread++;
-                });
-                document.getElementById('unreadMessages').textContent = unread;
-                const badge = document.getElementById('unreadBadge');
-                if (unread > 0) {
-                    badge.textContent = unread;
-                    badge.classList.remove('hidden');
+            // ===== ПРОВЕРКА ДОСТУПА =====
+            function checkAuth() {
+                const adminAuth = sessionStorage.getItem('piramix_admin_auth');
+                if (adminAuth !== 'true') {
+                    showLoginForm();
                 } else {
-                    badge.classList.add('hidden');
+                    document.querySelector('.container').classList.remove('hidden');
+                    loadStats();
+                    loadMessages();
+                    setInterval(loadStats, 30000);
+                    setInterval(loadMessages, 15000);
                 }
-            } catch (e) { console.error('Load stats error:', e); }
-        }
+            }
 
-        async function loadAllUsers() {
-            try { const users = await API.getAllUsers(); renderUsers(users); } catch (e) { console.error('Load users error:', e); }
-        }
+            function showLoginForm() {
+                document.querySelector('.container').classList.add('hidden');
+                const overlay = document.createElement('div');
+                overlay.id = 'loginOverlay';
+                overlay.style.cssText = `
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(0,0,0,0.8); display: flex; align-items: center;
+                    justify-content: center; z-index: 1000;
+                `;
+                overlay.innerHTML = `
+                    <div style="background: rgba(20,22,27,0.95); border: 1px solid rgba(255,215,150,0.3);
+                        border-radius: 1.8rem; padding: 2rem; width: 90%; max-width: 380px; color: #f5efe0;
+                        animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1);">
+                        <h2 style="color: #e9c274; margin-bottom: 1.5rem; text-align: center;">👑 Админ-панель</h2>
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; font-size: 0.75rem; color: #b9b09a; margin-bottom: 0.25rem;">Пароль</label>
+                            <input type="password" id="adminPassword" placeholder="Введите пароль"
+                                style="width: 100%; background: rgba(15,16,20,0.8); border: 1px solid rgba(220,180,100,0.25);
+                                border-radius: 1rem; padding: 0.75rem 1rem; font-size: 0.9rem; color: #f5e7cc; outline: none;">
+                        </div>
+                        <p id="loginError" style="color: #ff7043; font-size: 0.75rem; text-align: center; margin-bottom: 0.5rem; display: none;">❌ Неверный пароль</p>
+                        <button onclick="verifyAdmin()" style="width: 100%; background: linear-gradient(135deg, #c084fc, #7c3aed);
+                            border: none; color: #fff; font-weight: 700; font-size: 0.9rem; padding: 0.7rem;
+                            border-radius: 2rem; cursor: pointer;">🔓 Войти</button>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+            }
 
-        async function searchUsers() {
-            const query = document.getElementById('searchQuery').value.trim();
-            if (!query) { loadAllUsers(); return; }
-            try { const users = await API.searchUsers(query); renderUsers(users); } catch (e) { console.error('Search users error:', e); }
-        }
-
-        function renderUsers(users) {
-            const html = users.map(u => 
-                '<tr><td><strong>' + u.user_uid + '</strong></td><td>' + (u.nickname || '-') + '</td><td>' + (u.email || '-') + '</td><td>' + (u.diamonds || 0) + ' 💎</td><td>' + (u.treasure_progress || 0) + '%</td><td>' + (u.free_spins || 0) + '</td><td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '-') + '</td><td class="actions"><input type="number" id="amt_' + u.user_uid + '" placeholder="Сумма" value="100" min="1" style="width:60px;"><button class="btn-add" onclick="addDiamonds(\'' + u.user_uid + '\')">+</button><button class="btn-remove" onclick="removeDiamonds(\'' + u.user_uid + '\')">-</button></td></tr>'
-            ).join('') || '<tr><td colspan="8">Нет пользователей</td></tr>';
-            document.getElementById('usersTable').innerHTML = html;
-        }
-
-        async function addDiamonds(uid) {
-            const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
-            if (!amount || amount <= 0) { showError('Введите сумму'); return; }
-            const result = await API.addDiamonds(uid, amount, 'admin');
-            if (result.success) { showSuccess('+' + amount + '💎 → ' + uid); loadAllData(); } else showError(result.error);
-        }
-
-        async function removeDiamonds(uid) {
-            const amount = parseInt(document.getElementById('amt_' + uid)?.value || 0);
-            if (!amount || amount <= 0) { showError('Введите сумму'); return; }
-            const result = await API.removeDiamonds(uid, amount, 'admin');
-            if (result.success) { showSuccess('-' + amount + '💎 → ' + uid); loadAllData(); } else showError(result.error);
-        }
-
-        // ===== ПРОМОКОДЫ =====
-        async function createPromoCode() {
-            const editingCode = document.getElementById('editingCode').value;
-            let code = document.getElementById('promoCode').value.trim();
-            const type = document.getElementById('promoType').value;
-            const amount = parseInt(document.getElementById('promoAmount').value);
-            const maxUses = parseInt(document.getElementById('promoMaxUses').value);
-            const expires = document.getElementById('promoExpires').value;
-
-            if (!amount || amount <= 0) { showError('Введите количество'); return; }
-            if (!maxUses || maxUses < 1) { showError('Введите лимит использований'); return; }
-
-            if (editingCode) {
-                const result = await API.updatePromoCode(editingCode, { type, amount, max_uses: maxUses, expires_at: expires || null });
-                if (result) { showSuccess('Промокод ' + editingCode + ' обновлён!'); cancelEdit(); loadPromoCodes(); }
-                else showError('Ошибка обновления');
-            } else {
-                if (!code) {
-                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                    code = '';
-                    for (let i = 0; i < 10; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                code = code.toUpperCase();
+            window.verifyAdmin = async function() {
+                const password = document.getElementById('adminPassword').value;
+                // Проверка пароля через Supabase Edge Function (скрытая логика)
+                const { data, error } = await supabase.rpc('admin_verify_password', { p_password: password });
                 
-                const result = await API.createPromoCode({ code, type, amount, max_uses: maxUses, expires_at: expires || null });
-                
-                if (result === 'exists') {
-                    showError('Промокод ' + code + ' уже существует!');
-                } else if (result && Array.isArray(result) && result.length > 0) {
-                    showSuccess('Промокод ' + code + ' создан!');
-                    document.getElementById('promoCode').value = '';
-                    document.getElementById('promoAmount').value = '10';
-                    document.getElementById('promoMaxUses').value = '1';
-                    document.getElementById('promoExpires').value = '';
-                    loadPromoCodes();
+                if (data && data.success) {
+                    sessionStorage.setItem('piramix_admin_auth', 'true');
+                    const overlay = document.getElementById('loginOverlay');
+                    if (overlay) overlay.remove();
+                    document.querySelector('.container').classList.remove('hidden');
+                    loadStats();
+                    loadMessages();
                 } else {
-                    showError('Ошибка создания промокода');
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            };
+
+            // Создаём функцию проверки пароля в БД (скрытая логика)
+            async function createVerifyFunction() {
+                // Эта функция должна быть создана вручную в SQL Editor:
+                // CREATE OR REPLACE FUNCTION admin_verify_password(p_password TEXT)
+                // RETURNS JSONB LANGUAGE plpgsql AS $$
+                // BEGIN
+                //     IF p_password = '135710Aa!' THEN
+                //         RETURN jsonb_build_object('success', true);
+                //     END IF;
+                //     RETURN jsonb_build_object('success', false);
+                // END; $$;
+            }
+
+            window.logout = function() {
+                sessionStorage.removeItem('piramix_admin_auth');
+                location.reload();
+            };
+
+            function showToast(message, type = 'success') {
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                toast.textContent = message;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            function formatNumber(num) {
+                if (num >= 1000) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return num.toString();
+            }
+
+            // ===== ЗАГРУЗКА СТАТИСТИКИ =====
+            async function loadStats() {
+                const { data, error } = await supabase.rpc('admin_get_full_stats');
+                if (data) {
+                    document.getElementById('statTotalUsers').textContent = formatNumber(data.total_users);
+                    document.getElementById('statTodayUsers').textContent = data.today_users;
+                    document.getElementById('statTotalWithdrawn').textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
+                    document.getElementById('statUnread').textContent = data.unread_messages;
+                    
+                    const badge = document.getElementById('unreadBadge');
+                    if (data.unread_messages > 0) {
+                        badge.style.display = 'inline';
+                        badge.textContent = data.unread_messages;
+                    } else {
+                        badge.style.display = 'none';
+                    }
                 }
             }
-        }
 
-        function editPromoCode(pcode, ptype, pamount, pmaxUses, pexpires) {
-            document.getElementById('editingCode').value = pcode;
-            document.getElementById('promoCode').value = pcode;
-            document.getElementById('promoCode').disabled = true;
-            document.getElementById('promoType').value = ptype;
-            document.getElementById('promoAmount').value = pamount;
-            document.getElementById('promoMaxUses').value = pmaxUses;
-            document.getElementById('promoExpires').value = pexpires ? new Date(pexpires).toISOString().slice(0, 16) : '';
-            document.getElementById('createPromoBtn').textContent = '💾 Сохранить';
-            document.getElementById('cancelEditBtn').style.display = 'inline-block';
-            document.getElementById('promoForm').classList.add('edit-mode');
-        }
+            // ===== ПОИСК ПОЛЬЗОВАТЕЛЯ =====
+            window.searchUser = async function() {
+                const nickname = document.getElementById('searchNickname').value.trim();
+                if (!nickname) return;
+                
+                const { data, error } = await supabase.rpc('admin_find_user', { p_nickname: nickname });
+                
+                if (data && data.success) {
+                    currentUser = data;
+                    currentUserId = data.id;
+                    document.getElementById('userInfo').classList.remove('hidden');
+                    document.getElementById('userInfoContent').innerHTML = `
+                        <p><span class="label">ID:</span> <span class="value">${data.id}</span></p>
+                        <p><span class="label">Никнейм:</span> <span class="value">${data.nickname}</span></p>
+                        <p><span class="label">VIP статус:</span> <span class="value">${data.vip_paid ? '✅ Активирован' : '❌ Не активирован'}</span></p>
+                        <p><span class="label">Баланс:</span> <span class="value">${parseFloat(data.balance).toFixed(2)} $</span></p>
+                        <p><span class="label">Реферальный код:</span> <span class="value">${data.referral_code}</span></p>
+                        <p><span class="label">Дата регистрации:</span> <span class="value">${new Date(data.created_at).toLocaleString('ru-RU')}</span></p>
+                    `;
+                } else {
+                    showToast('Пользователь не найден', 'error');
+                    document.getElementById('userInfo').classList.add('hidden');
+                }
+            };
 
-        function cancelEdit() {
-            document.getElementById('editingCode').value = '';
-            document.getElementById('promoCode').value = '';
-            document.getElementById('promoCode').disabled = false;
-            document.getElementById('promoType').value = 'spins';
-            document.getElementById('promoAmount').value = '10';
-            document.getElementById('promoMaxUses').value = '1';
-            document.getElementById('promoExpires').value = '';
-            document.getElementById('createPromoBtn').textContent = '🎫 Создать';
-            document.getElementById('cancelEditBtn').style.display = 'none';
-            document.getElementById('promoForm').classList.remove('edit-mode');
-        }
-
-        async function loadPromoCodes() {
-            try {
-                const promos = await API.getAllPromoCodes();
-                const html = promos.map(p =>
-                    '<tr><td><strong>' + p.code + '</strong></td><td>' + (p.type === 'spins' ? '🎰 Фриспины' : '💎 Алмазы') + '</td><td>' + p.amount + '</td><td>' + p.current_uses + '</td><td>' + p.max_uses + '</td><td>' + (p.is_active ? '✅' : '❌') + '</td><td>' + (p.expires_at ? new Date(p.expires_at).toLocaleDateString() : 'Бессрочно') + '</td><td class="actions"><button class="btn-edit" onclick="editPromoCode(\'' + p.code + '\',\'' + p.type + '\',' + p.amount + ',' + p.max_uses + ',\'' + (p.expires_at || '') + '\')">✏️</button><button class="btn-delete" onclick="deletePromoCode(\'' + p.code + '\')">🗑</button></td></tr>'
-                ).join('') || '<tr><td colspan="8">Нет промокодов</td></tr>';
-                document.getElementById('promoTable').innerHTML = html;
-            } catch (e) { console.error('Load promos error:', e); }
-        }
-
-        async function deletePromoCode(code) {
-            if (!confirm('Удалить промокод ' + code + '?')) return;
-            await API.deletePromoCode(code);
-            showSuccess('Промокод ' + code + ' удалён');
-            loadPromoCodes();
-        }
-
-        // ===== ПОДДЕРЖКА =====
-        async function loadSupportChats() {
-            try { supportChats = await API.getSupportChats(); } catch (e) { supportChats = {}; }
-            const usersList = document.getElementById('supportUsersList');
-            if (Object.keys(supportChats).length === 0) { usersList.innerHTML = '<p style="color:#888;">Нет обращений</p>'; return; }
-            let html = '<table><thead><tr><th>ID</th><th>Имя</th><th>Последнее сообщение</th><th>Статус</th></tr></thead><tbody>';
-            for (const [uid, chat] of Object.entries(supportChats)) {
-                if (!chat || !chat.messages || chat.messages.length === 0) continue;
-                const lastMsg = chat.messages[chat.messages.length - 1];
-                const hasUnread = chat.messages.some(m => !m.read && m.from === 'user');
-                const preview = lastMsg ? lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '...' : '') : 'Нет сообщений';
-                html += '<tr onclick="openChat(\'' + uid + '\')" style="cursor:pointer;' + (hasUnread ? 'background:rgba(255,215,0,0.1);' : '') + '"><td>' + uid + '</td><td>' + (chat.userName || '-') + '</td><td>' + preview + '</td><td>' + (hasUnread ? '🔴 Новое' : '✅ Прочитано') + '</td></tr>';
-            }
-            html += '</tbody></table>';
-            usersList.innerHTML = html;
-        }
-
-        function openChat(uid) {
-            currentChatUID = uid;
-            const chat = supportChats[uid];
-            if (!chat) return;
-            document.getElementById('chatArea').style.display = 'block';
-            document.getElementById('chatUserName').textContent = chat.userName || uid;
-            const messagesDiv = document.getElementById('chatMessages');
-            messagesDiv.innerHTML = '';
-            if (chat.messages) {
-                chat.messages.forEach(msg => {
-                    const div = document.createElement('div');
-                    div.className = 'chat-message ' + (msg.from === 'user' ? 'from-user' : 'from-admin');
-                    div.innerHTML = '<strong>' + (msg.from === 'user' ? (chat.userName || 'Пользователь') : 'Админ') + ':</strong> ' + msg.text + '<br><small style="color:#888;">' + new Date(msg.time).toLocaleString() + '</small>';
-                    messagesDiv.appendChild(div);
+            // ===== НАЧИСЛЕНИЕ БАЛАНСА =====
+            window.addBalance = async function() {
+                if (!currentUserId) return;
+                const amount = parseFloat(document.getElementById('balanceAmount').value);
+                if (!amount || amount <= 0) return;
+                
+                const { data, error } = await supabase.rpc('admin_add_balance', {
+                    p_user_id: currentUserId,
+                    p_amount: amount
                 });
-                chat.messages.forEach(m => m.read = true);
+                
+                if (data && data.success) {
+                    showToast(data.message);
+                    document.getElementById('balanceAmount').value = '';
+                    searchUser();
+                    loadStats();
+                } else {
+                    showToast(data?.error || 'Ошибка', 'error');
+                }
+            };
+
+            // ===== СПИСАНИЕ БАЛАНСА =====
+            window.removeBalance = async function() {
+                if (!currentUserId) return;
+                const amount = parseFloat(document.getElementById('balanceAmount').value);
+                if (!amount || amount <= 0) return;
+                
+                const { data, error } = await supabase.rpc('admin_remove_balance', {
+                    p_user_id: currentUserId,
+                    p_amount: amount
+                });
+                
+                if (data && data.success) {
+                    showToast(data.message);
+                    document.getElementById('balanceAmount').value = '';
+                    searchUser();
+                    loadStats();
+                } else {
+                    showToast(data?.error || 'Ошибка', 'error');
+                }
+            };
+
+            // ===== ЗАГРУЗКА СООБЩЕНИЙ =====
+            async function loadMessages() {
+                const { data, error } = await supabase.rpc('get_support_messages');
+                const container = document.getElementById('messageList');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color: #b9b09a; text-align: center;">Нет сообщений</p>';
+                    return;
+                }
+                
+                container.innerHTML = data.map(msg => `
+                    <div class="message-item ${msg.is_read ? '' : 'unread'}">
+                        <div class="message-text">${msg.user_message}</div>
+                        <div class="message-meta">
+                            <span>📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
+                            <span>${msg.is_read ? '✅ Прочитано' : '🆕 Новое'}</span>
+                        </div>
+                        ${msg.admin_response ? `
+                            <div class="message-response">✉️ Ответ: ${msg.admin_response}</div>
+                        ` : `
+                            <div class="response-area">
+                                <input type="text" placeholder="Ответить..." id="response_${msg.id}">
+                                <button class="btn btn-success btn-sm" onclick="respondMessage(${msg.id})">📤</button>
+                            </div>
+                        `}
+                        <div style="margin-top: 0.5rem;">
+                            <button class="btn btn-danger btn-sm" onclick="deleteMessage(${msg.id})">🗑 Удалить</button>
+                        </div>
+                    </div>
+                `).join('');
             }
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            API.saveSupportChats(supportChats);
-            loadSupportChats();
-        }
 
-        async function sendReply() {
-            if (!currentChatUID) return;
-            const text = document.getElementById('replyInput').value.trim();
-            if (!text) return;
-            if (!supportChats[currentChatUID]) supportChats[currentChatUID] = { messages: [], userName: 'Пользователь' };
-            supportChats[currentChatUID].messages.push({ from: 'admin', text, time: new Date().toISOString(), read: true });
-            await API.saveSupportChats(supportChats);
-            document.getElementById('replyInput').value = '';
-            openChat(currentChatUID);
-            showSuccess('Ответ отправлен');
-        }
+            // ===== ОТВЕТ НА СООБЩЕНИЕ =====
+            window.respondMessage = async function(messageId) {
+                const input = document.getElementById(`response_${messageId}`);
+                const response = input.value.trim();
+                if (!response) return;
+                
+                const { data, error } = await supabase.rpc('admin_respond_support', {
+                    p_message_id: messageId,
+                    p_response: response
+                });
+                
+                if (data && data.success) {
+                    showToast('Ответ отправлен');
+                    loadMessages();
+                    loadStats();
+                } else {
+                    showToast(data?.error || 'Ошибка', 'error');
+                }
+            };
 
-        // ===== ДЖЕКПОТЫ =====
-        async function loadJackpots() {
-            try {
-                const jackpots = await API.getAllJackpots();
-                const modeNames = { '18+': '🔞 18+', 'home': '🏠 Дом', 'party': '🎉 Вечеринка', 'young': '💑 Пара', 'family': '👨‍👩‍👧 Семья', 'friends': '👫 Друзья' };
-                const html = (jackpots || []).slice(0, 100).map(j => 
-                    '<tr>' +
-                    '<td>' + j.id + '</td>' +
-                    '<td>' + (j.created_at ? new Date(j.created_at).toLocaleString() : '-') + '</td>' +
-                    '<td>' + j.user_uid + '</td>' +
-                    '<td>' + (j.nickname || '-') + '</td>' +
-                    '<td>' + (modeNames[j.mode_key] || j.mode_key) + '</td>' +
-                    '<td>' + (j.wish || '').substring(0, 30) + '...</td>' +
-                    '<td>' + j.diamonds_won + ' 💎</td>' +
-                    '<td class="actions"><button class="btn-delete" onclick="deleteJackpot(' + j.id + ')">🗑️</button></td>' +
-                    '</tr>'
-                ).join('') || '<tr><td colspan="8">Нет джекпотов</td></tr>';
-                document.getElementById('jackpotsTable').innerHTML = html;
-            } catch (e) { console.error('Load jackpots error:', e); }
-        }
+            // ===== УДАЛЕНИЕ СООБЩЕНИЯ =====
+            window.deleteMessage = async function(messageId) {
+                if (!confirm('Удалить сообщение?')) return;
+                
+                const { data, error } = await supabase.rpc('admin_delete_support_message', {
+                    p_message_id: messageId
+                });
+                
+                if (data && data.success) {
+                    showToast('Сообщение удалено');
+                    loadMessages();
+                    loadStats();
+                } else {
+                    showToast(data?.error || 'Ошибка', 'error');
+                }
+            };
 
-        async function deleteJackpot(id) {
-            if (!confirm('Удалить джекпот #' + id + '?')) return;
-            try {
-                await API.deleteJackpot(id);
-                showSuccess('Джекпот удалён');
-                loadJackpots();
-            } catch (e) { showError('Ошибка удаления джекпота'); }
-        }
-
-        // ===== ТРАНЗАКЦИИ =====
-        async function loadTransactions() {
-            try {
-                const transactions = await API.getTransactions();
-                const html = (transactions || []).slice(0, 100).map(t => 
-                    '<tr>' +
-                    '<td>' + t.id + '</td>' +
-                    '<td>' + (t.created_at ? new Date(t.created_at).toLocaleString() : '-') + '</td>' +
-                    '<td>' + t.user_uid + '</td>' +
-                    '<td>' + (t.nickname || '-') + '</td>' +
-                    '<td>' + t.amount + ' 💎</td>' +
-                    '<td>' + (t.type === 'add' ? '✅ Начислено' : '❌ Списано') + '</td>' +
-                    '<td>' + (t.reason || '') + '</td>' +
-                    '<td class="actions"><button class="btn-delete" onclick="deleteTransaction(' + t.id + ')">🗑️</button></td>' +
-                    '</tr>'
-                ).join('') || '<tr><td colspan="8">Нет транзакций</td></tr>';
-                document.getElementById('transactionsTable').innerHTML = html;
-            } catch (e) { console.error('Load transactions error:', e); }
-        }
-
-        async function deleteTransaction(id) {
-            if (!confirm('Удалить транзакцию #' + id + '?')) return;
-            try {
-                await API.deleteTransaction(id);
-                showSuccess('Транзакция удалена');
-                loadTransactions();
-            } catch (e) { showError('Ошибка удаления транзакции'); }
-        }
-
-        // ===== СТАТИСТИКА ПОЛЬЗОВАТЕЛЕЙ =====
-        async function loadUserSpentStats() {
-            try {
-                const stats = await API.getUserSpentStats();
-                const html = (stats || []).map(s => 
-                    '<tr><td>' + (s.nickname || '-') + '</td><td>' + (s.total_spent || 0) + ' 💎</td><td>' + (s.last_transaction_time ? new Date(s.last_transaction_time).toLocaleString() : '—') + '</td></tr>'
-                ).join('') || '<tr><td colspan="3">Нет данных</td></tr>';
-                document.getElementById('statsSpentTable').innerHTML = html;
-            } catch (e) {
-                console.error('Load user spent stats error:', e);
-                document.getElementById('statsSpentTable').innerHTML = '<tr><td colspan="3">Ошибка загрузки</td></tr>';
-            }
-        }
-
-        if (localStorage.getItem('vds_admin_logged_in') === 'true') {
-            document.getElementById('loginBlock').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            loadAllData();
-        }
+            // ===== ИНИЦИАЛИЗАЦИЯ =====
+            checkAuth();
+        })();
     </script>
 </body>
 </html>
