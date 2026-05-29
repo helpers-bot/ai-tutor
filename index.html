@@ -79,6 +79,11 @@
             border: 1px solid #4caf50;
         }
 
+        .toast-info {
+            background: rgba(192, 132, 252, 0.9);
+            border: 1px solid #c084fc;
+        }
+
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -959,9 +964,20 @@
             box-shadow: 0 8px 30px rgba(192, 132, 252, 0.8);
         }
 
+        .support-btn.has-response {
+            animation: pulseNotification 1s infinite;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.7);
+        }
+
         @keyframes pulseSupport {
             0%, 100% { box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
             50% { box-shadow: 0 6px 35px rgba(192, 132, 252, 0.9); }
+        }
+
+        @keyframes pulseNotification {
+            0%, 100% { box-shadow: 0 6px 20px rgba(76, 175, 80, 0.7); transform: scale(1); }
+            50% { box-shadow: 0 6px 35px rgba(76, 175, 80, 1); transform: scale(1.08); }
         }
 
         /* ===== ЧАТ ПОДДЕРЖКИ ===== */
@@ -1052,6 +1068,20 @@
             color: #f5efe0;
             align-self: flex-end;
             border-bottom-right-radius: 0.3rem;
+        }
+
+        .support-message.admin-response {
+            background: rgba(76, 175, 80, 0.25);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            color: #81c784;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.3rem;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .support-message-time {
@@ -1194,15 +1224,15 @@
     <div class="stats-panel">
         <div class="stat-item">
             <div class="stat-label">👥 Всего пользователей</div>
-            <div class="stat-value" id="regTotalUsers">146.353</div>
+            <div class="stat-value" id="regTotalUsers">143.334</div>
         </div>
         <div class="stat-item">
             <div class="stat-label">📅 Сегодня зарегистрировано</div>
-            <div class="stat-value" id="regTodayUsers">127</div>
+            <div class="stat-value" id="regTodayUsers">0</div>
         </div>
         <div class="stat-item">
             <div class="stat-label">💰 Всего выведено</div>
-            <div class="stat-value" id="regTotalWithdrawn">18.500 $</div>
+            <div class="stat-value" id="regTotalWithdrawn">0 $</div>
         </div>
     </div>
     <div class="info-section">
@@ -1268,9 +1298,9 @@
 
         <div class="card">
             <h3>📊 Статистика платформы</h3>
-            <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">146.353</span></div>
-            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">127</span></div>
-            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">18.500 $</span></div>
+            <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">143.334</span></div>
+            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">0</span></div>
+            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">0 $</span></div>
             <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
         </div>
 
@@ -1498,7 +1528,7 @@
             toast.className = `toast toast-${type}`;
             toast.textContent = message;
             toastContainer.appendChild(toast);
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
         }
 
         function formatNumber(num) {
@@ -1508,7 +1538,29 @@
             return num.toString();
         }
 
-        // ===== ПОДДЕРЖКА =====
+        // ===== ЗВУКОВОЕ УВЕДОМЛЕНИЕ =====
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
+                    osc.start(audioCtx.currentTime + i * 0.15);
+                    osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+                });
+            } catch(e) {}
+        }
+
+        // ===== ПОДДЕРЖКА ЧЕРЕЗ БД =====
+        let supportCheckInterval = null;
+
         function initSupport() {
             const supportBtn = document.getElementById('supportBtn');
             const supportChat = document.getElementById('supportChat');
@@ -1517,20 +1569,7 @@
             const supportInput = document.getElementById('supportInput');
             const supportSendBtn = document.getElementById('supportSendBtn');
 
-            // Генерация случайного времени ожидания
-            function getRandomWaitTime() {
-                const minutes = Math.floor(Math.random() * (1430) + 10); // от 10 до 1440 минут (24 часа)
-                if (minutes < 60) {
-                    return `${minutes} минут`;
-                } else {
-                    const hours = Math.floor(minutes / 60);
-                    const mins = minutes % 60;
-                    if (mins === 0) return `${hours} час(ов)`;
-                    return `${hours} час(ов) ${mins} минут`;
-                }
-            }
-
-            function addMessage(text, type) {
+            function addMessageToChat(text, type) {
                 const msgDiv = document.createElement('div');
                 msgDiv.className = `support-message ${type}`;
                 const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
@@ -1539,28 +1578,64 @@
                 supportMessages.scrollTop = supportMessages.scrollHeight;
             }
 
-            function sendMessage() {
+            async function sendMessageToDB() {
                 const text = supportInput.value.trim();
                 if (!text) return;
-                addMessage(text, 'user');
+                
+                addMessageToChat(text, 'user');
                 supportInput.value = '';
+                supportInput.style.height = 'auto';
 
-                // Автоответ через 1-3 секунды
-                setTimeout(() => {
-                    const waitTime = getRandomWaitTime();
-                    addMessage(`Здравствуйте! Изложите пожалуйста свою проблему в одном сообщении! Время ответа оператора зависит от загруженности. Приблизительное время ожидания: ${waitTime}.`, 'operator');
-                }, Math.random() * 2000 + 1000);
+                const { data, error } = await supabase.rpc('send_support_message', { 
+                    p_message: text 
+                });
+                
+                if (error) {
+                    console.error('Ошибка отправки сообщения:', error);
+                }
+            }
+
+            async function checkForAdminResponse() {
+                try {
+                    const { data, error } = await supabase.rpc('get_support_messages');
+                    
+                    if (error) return;
+                    
+                    if (data && data.length > 0) {
+                        supportMessages.innerHTML = '';
+                        
+                        const reversedMessages = [...data].reverse();
+                        
+                        reversedMessages.forEach(msg => {
+                            addMessageToChat(msg.user_message, 'user');
+                            
+                            if (msg.admin_response) {
+                                addMessageToChat(msg.admin_response, 'admin-response');
+                            }
+                        });
+                        
+                        const lastMsg = data[0];
+                        if (lastMsg.admin_response && lastMsg.is_read === false) {
+                            playNotificationSound();
+                            if (supportChat.classList.contains('hidden')) {
+                                showToast('🔔 Получен ответ от поддержки!', 'info');
+                                supportBtn.classList.add('has-response');
+                            }
+                        }
+                        
+                        supportMessages.scrollTop = supportMessages.scrollHeight;
+                    }
+                } catch(e) {
+                    console.error('Ошибка проверки:', e);
+                }
             }
 
             supportBtn.onclick = function() {
                 const isHidden = supportChat.classList.contains('hidden');
                 if (isHidden) {
                     supportChat.classList.remove('hidden');
-                    // Если чат пуст, показываем приветственное сообщение
-                    if (supportMessages.children.length === 0) {
-                        const waitTime = getRandomWaitTime();
-                        addMessage(`Здравствуйте! Изложите пожалуйста свою проблему в одном сообщении! Время ответа оператора зависит от загруженности. Приблизительное время ожидания: ${waitTime}.`, 'operator');
-                    }
+                    supportBtn.classList.remove('has-response');
+                    checkForAdminResponse();
                 } else {
                     supportChat.classList.add('hidden');
                 }
@@ -1570,20 +1645,22 @@
                 supportChat.classList.add('hidden');
             };
 
-            supportSendBtn.onclick = sendMessage;
+            supportSendBtn.onclick = sendMessageToDB;
 
             supportInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
-                    sendMessage();
+                    sendMessageToDB();
                 }
             });
 
-            // Автоматическое изменение высоты textarea
             supportInput.addEventListener('input', function() {
                 this.style.height = 'auto';
                 this.style.height = Math.min(this.scrollHeight, 100) + 'px';
             });
+
+            supportCheckInterval = setInterval(checkForAdminResponse, 5000);
+            checkForAdminResponse();
         }
 
         async function loadPlatformStats() {
@@ -1758,7 +1835,6 @@
             await loadPlatformStats();
             await loadFeedFromDB();
             
-            // Инициализация поддержки
             initSupport();
             
             scheduleNewUser();
