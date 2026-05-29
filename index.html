@@ -1096,7 +1096,7 @@
         </div>
 
         <div class="card">
-            <h3>📈 Как работает заработок</h3>
+            <h3>📈 Система заработка</h3>
             <p class="earn-info-text">
                 Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях.
                 Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.
@@ -1291,23 +1291,21 @@
         function randomNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
         function getCurrentTime() { return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
-        // Генерация времени в прошлом (от 30 до 140 секунд назад)
         function getRandomPastTime(index, total) {
             const now = new Date();
-            // Равномерно распределяем время в прошлом от 30 до 140 секунд
             const secondsAgo = 30 + Math.floor((140 - 30) * (index / Math.max(total - 1, 1)));
-            // Добавляем небольшую случайность ±5 секунд
             const randomOffset = Math.floor(Math.random() * 10) - 5;
             const finalSecondsAgo = Math.max(5, secondsAgo + randomOffset);
             now.setSeconds(now.getSeconds() - finalSecondsAgo);
             return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         }
 
+        // ===== ИЗМЕНЕНИЕ: localStorage вместо sessionStorage =====
         const FEED_STORAGE_KEY = 'pirxmix_feed_data';
         
         function loadFeedData() {
             try {
-                const saved = sessionStorage.getItem(FEED_STORAGE_KEY);
+                const saved = localStorage.getItem(FEED_STORAGE_KEY);
                 if (saved) {
                     const parsed = JSON.parse(saved);
                     if (parsed && parsed.deposits && parsed.withdrawals && 
@@ -1319,7 +1317,6 @@
                 console.error('Ошибка загрузки фида:', e);
             }
             
-            // Создаем начальные данные с разным временем
             const initial = { deposits: [], withdrawals: [] };
             const totalItems = 10;
             
@@ -1342,7 +1339,7 @@
         
         function saveFeedData(data) {
             try {
-                sessionStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(data));
+                localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(data));
             } catch(e) {
                 console.error('Ошибка сохранения фида:', e);
             }
