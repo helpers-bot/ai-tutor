@@ -47,7 +47,6 @@
             pointer-events: none;
         }
 
-        /* Стили для уведомлений (toast) */
         .toast-container {
             position: fixed;
             top: 20px;
@@ -1260,9 +1259,6 @@
 
 <script>
     (function() {
-        // ============================================
-        // ИНИЦИАЛИЗАЦИЯ SUPABASE
-        // ============================================
         const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
         const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -1275,7 +1271,6 @@
 
         let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
 
-        // Никнеймы для анимации транзакций
         const allNicks = [
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
             'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
@@ -1296,9 +1291,18 @@
         function randomNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
         function getCurrentTime() { return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
 
-        // ============================================
-        // ХРАНИЛИЩЕ ТРАНЗАКЦИЙ (СОХРАНЯЕТСЯ В SESSION STORAGE)
-        // ============================================
+        // Генерация времени в прошлом (от 30 до 140 секунд назад)
+        function getRandomPastTime(index, total) {
+            const now = new Date();
+            // Равномерно распределяем время в прошлом от 30 до 140 секунд
+            const secondsAgo = 30 + Math.floor((140 - 30) * (index / Math.max(total - 1, 1)));
+            // Добавляем небольшую случайность ±5 секунд
+            const randomOffset = Math.floor(Math.random() * 10) - 5;
+            const finalSecondsAgo = Math.max(5, secondsAgo + randomOffset);
+            now.setSeconds(now.getSeconds() - finalSecondsAgo);
+            return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
         const FEED_STORAGE_KEY = 'pirxmix_feed_data';
         
         function loadFeedData() {
@@ -1306,7 +1310,8 @@
                 const saved = sessionStorage.getItem(FEED_STORAGE_KEY);
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    if (parsed && parsed.deposits && parsed.withdrawals) {
+                    if (parsed && parsed.deposits && parsed.withdrawals && 
+                        parsed.deposits.length === 10 && parsed.withdrawals.length === 10) {
                         return parsed;
                     }
                 }
@@ -1314,20 +1319,23 @@
                 console.error('Ошибка загрузки фида:', e);
             }
             
-            // Если данных нет - создаем начальные
+            // Создаем начальные данные с разным временем
             const initial = { deposits: [], withdrawals: [] };
-            for (let i = 0; i < 10; i++) {
+            const totalItems = 10;
+            
+            for (let i = 0; i < totalItems; i++) {
                 initial.deposits.push({
                     nickname: randomNick(),
                     amount: 10,
-                    time: getCurrentTime()
+                    time: getRandomPastTime(i, totalItems)
                 });
                 initial.withdrawals.push({
                     nickname: randomNick(),
                     amount: Math.floor(Math.random() * 110) + 1,
-                    time: getCurrentTime()
+                    time: getRandomPastTime(i, totalItems)
                 });
             }
+            
             saveFeedData(initial);
             return initial;
         }
@@ -1342,35 +1350,24 @@
         
         let feedData = loadFeedData();
 
-        // ============================================
-        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ДЛЯ СТАТИСТИКИ
-        // ============================================
         const BASE_WITHDRAWN = 17864;
         let currentWithdrawnTotal = BASE_WITHDRAWN;
         let totalUsersCount = 146353;
         let todayUsersCount = 127;
-
         let lastMidnightReset = new Date().setHours(0, 0, 0, 0);
 
-        // Функция для показа уведомлений
         function showToast(message, type = 'error') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.textContent = message;
             toastContainer.appendChild(toast);
-            
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.remove();
-                }
-            }, 3000);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
         }
 
         function formatNumber(num) {
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        // Обновление всех элементов статистики на всех экранах
         function updateAllStatsDisplay() {
             const now = new Date();
             const todayMidnight = new Date();
@@ -1398,10 +1395,8 @@
             if (totalWithdrawnEl) totalWithdrawnEl.textContent = formatNumber(currentWithdrawnTotal) + ' $';
         }
 
-        // Функция добавления нового пользователя (каждые 45-160 секунд)
         function scheduleUserGrowth() {
             const delay = Math.floor(Math.random() * (160000 - 45000) + 45000);
-            
             setTimeout(() => {
                 totalUsersCount += 1;
                 todayUsersCount += 1;
@@ -1410,7 +1405,6 @@
             }, delay);
         }
 
-        // Анимация букв для никнейма
         function setAnimatedNickname(element, nickname) {
             element.innerHTML = '';
             const letters = nickname.split('');
@@ -1423,9 +1417,6 @@
             });
         }
 
-        // ============================================
-        // ФУНКЦИИ ДЛЯ ЛЕНТЫ ТРАНЗАКЦИЙ
-        // ============================================
         function addTransaction(type, nickname, amount) {
             const item = { nickname, amount, time: getCurrentTime() };
             
@@ -1471,7 +1462,6 @@
             renderFeedList('withdrawList', feedData.withdrawals);
         }
 
-        // Планировщик пополнений (каждые 30-95 секунд)
         function scheduleDeposit() {
             const delay = Math.floor(Math.random() * (95000 - 30000) + 30000);
             setTimeout(() => {
@@ -1480,7 +1470,6 @@
             }, delay);
         }
         
-        // Планировщик выводов (каждые 45-140 секунд)
         function scheduleWithdraw() {
             const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
             setTimeout(() => {
@@ -1515,7 +1504,6 @@
             showStage('register');
         }
 
-        // Инициализация
         scheduleUserGrowth();
         updateAllStatsDisplay();
         setInterval(updateAllStatsDisplay, 60000);
@@ -1523,9 +1511,6 @@
         scheduleDeposit();
         scheduleWithdraw();
 
-        // ============================================
-        // ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД
-        // ============================================
         function initRegStage() {
             const password2Group = document.getElementById('password2Group');
             const actionButton = document.getElementById('actionButton');
@@ -1607,9 +1592,6 @@
             document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
         }
 
-        // ============================================
-        // ЭТАП 2: ГЛАВНАЯ СТРАНИЦА
-        // ============================================
         function initHomeStage() {
             if (!userData || !userData.id) {
                 showStage('register');
@@ -1617,7 +1599,6 @@
             }
 
             setAnimatedNickname(document.getElementById('userGreeting'), userData.nickname);
-
             loadUserData();
             loadReferrals();
             updateAllStatsDisplay();
@@ -1715,7 +1696,6 @@
         }
 
         function initModals() {
-            // Кнопка "Копировать реферальную ссылку"
             const copyRefBtn = document.getElementById('copyRefBtn');
             if (copyRefBtn) {
                 copyRefBtn.onclick = function() {
