@@ -730,19 +730,7 @@
             flex-direction: column;
             gap: 0.25rem;
             height: 210px;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-        
-        .feed-list::-webkit-scrollbar {
-            width: 4px;
-        }
-        .feed-list::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .feed-list::-webkit-scrollbar-thumb {
-            background: rgba(243, 185, 91, 0.3);
-            border-radius: 4px;
+            overflow: hidden;
         }
 
         .feed-item {
@@ -1417,7 +1405,7 @@
                         .filter(t => t.type === 'deposit')
                         .map(t => ({
                             nickname: t.nickname,
-                            amount: t.amount,
+                            amount: 10,
                             time: formatTime(t.created_at)
                         }));
                         
@@ -1445,7 +1433,8 @@
                 const item = items[i];
                 const div = document.createElement('div');
                 div.className = `feed-item ${containerId.includes('Deposit') ? 'deposit' : 'withdraw'}`;
-                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
+                const amount = containerId.includes('Deposit') ? '10' : item.amount;
+                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${amount}$</span>`;
                 container.appendChild(div);
             }
         }
