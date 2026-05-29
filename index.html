@@ -505,7 +505,7 @@
             width: 100%;
             max-width: 1200px;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.2rem;
             position: relative;
             z-index: 2;
@@ -780,8 +780,8 @@
         .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
         .feed-time { color: #8b8a7a; font-size: 0.68rem; margin-left: 0.4rem; }
         .feed-amount { font-weight: 700; font-size: 0.78rem; }
-        /* ЗЕЛЁНЫЙ ЦВЕТ ДЛЯ ДЕПОЗИТОВ НА ВСЕХ СТРАНИЦАХ */
-        .deposit .feed-amount { color: #4caf50; }
+        /* ЗЕЛЁНЫЙ ЦВЕТ ДЛЯ ВСЕХ ДЕПОЗИТОВ НА ВСЕХ СТРАНИЦАХ */
+        .deposit .feed-amount { color: #4caf50 !important; }
         .withdraw .feed-amount { color: #ff7043; }
 
         .modal-overlay {
@@ -983,16 +983,10 @@
             .stat-row .stat-value { font-size: 0.75rem; }
             .stat-earn { font-size: 0.7rem; }
             .dashboard {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 580px) {
-            .dashboard {
                 grid-template-columns: 1fr;
             }
         }
-
+        
         @media (max-width: 480px) {
             body {
                 padding: 8px;
@@ -1011,15 +1005,6 @@
             }
             .feed-list {
                 height: 140px;
-            }
-            .dashboard {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .dashboard {
-                grid-template-columns: 1fr;
             }
         }
     </style>
