@@ -1271,6 +1271,12 @@
 
         let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
 
+        // Кэш для хранения последних данных ленты
+        let feedCache = { deposits: [], withdrawals: [] };
+        // Временные метки последнего обновления
+        let lastFeedUpdate = 0;
+        const FEED_UPDATE_INTERVAL = 3000; // 3 секунды
+
         const allNicks = [
             'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
             'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
@@ -1289,69 +1295,6 @@
         ];
 
         function randomNick() { return allNicks[Math.floor(Math.random() * allNicks.length)]; }
-        function getCurrentTime() { return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
-
-        function getRandomPastTime(index, total) {
-            const now = new Date();
-            const secondsAgo = 30 + Math.floor((140 - 30) * (index / Math.max(total - 1, 1)));
-            const randomOffset = Math.floor(Math.random() * 10) - 5;
-            const finalSecondsAgo = Math.max(5, secondsAgo + randomOffset);
-            now.setSeconds(now.getSeconds() - finalSecondsAgo);
-            return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        }
-
-        // ===== ИЗМЕНЕНИЕ: localStorage вместо sessionStorage =====
-        const FEED_STORAGE_KEY = 'pirxmix_feed_data';
-        
-        function loadFeedData() {
-            try {
-                const saved = localStorage.getItem(FEED_STORAGE_KEY);
-                if (saved) {
-                    const parsed = JSON.parse(saved);
-                    if (parsed && parsed.deposits && parsed.withdrawals && 
-                        parsed.deposits.length === 10 && parsed.withdrawals.length === 10) {
-                        return parsed;
-                    }
-                }
-            } catch(e) {
-                console.error('Ошибка загрузки фида:', e);
-            }
-            
-            const initial = { deposits: [], withdrawals: [] };
-            const totalItems = 10;
-            
-            for (let i = 0; i < totalItems; i++) {
-                initial.deposits.push({
-                    nickname: randomNick(),
-                    amount: 10,
-                    time: getRandomPastTime(i, totalItems)
-                });
-                initial.withdrawals.push({
-                    nickname: randomNick(),
-                    amount: Math.floor(Math.random() * 110) + 1,
-                    time: getRandomPastTime(i, totalItems)
-                });
-            }
-            
-            saveFeedData(initial);
-            return initial;
-        }
-        
-        function saveFeedData(data) {
-            try {
-                localStorage.setItem(FEED_STORAGE_KEY, JSON.stringify(data));
-            } catch(e) {
-                console.error('Ошибка сохранения фида:', e);
-            }
-        }
-        
-        let feedData = loadFeedData();
-
-        const BASE_WITHDRAWN = 17864;
-        let currentWithdrawnTotal = BASE_WITHDRAWN;
-        let totalUsersCount = 146353;
-        let todayUsersCount = 127;
-        let lastMidnightReset = new Date().setHours(0, 0, 0, 0);
 
         function showToast(message, type = 'error') {
             const toast = document.createElement('div');
@@ -1365,76 +1308,94 @@
             return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         }
 
-        function updateAllStatsDisplay() {
-            const now = new Date();
-            const todayMidnight = new Date();
-            todayMidnight.setHours(0, 0, 0, 0);
-            
-            if (todayMidnight.getTime() > lastMidnightReset) {
-                todayUsersCount = 0;
-                lastMidnightReset = todayMidnight.getTime();
+        // ===== ЗАГРУЗКА СТАТИСТИКИ ИЗ БД =====
+        async function loadPlatformStats() {
+            const { data, error } = await supabase.rpc('get_platform_stats');
+            if (data) {
+                const regTotalUsersEl = document.getElementById('regTotalUsers');
+                const regTodayUsersEl = document.getElementById('regTodayUsers');
+                const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
+                
+                if (regTotalUsersEl) regTotalUsersEl.textContent = formatNumber(data.total_users);
+                if (regTodayUsersEl) regTodayUsersEl.textContent = data.today_users;
+                if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
+
+                const totalUsersEl = document.getElementById('totalUsers');
+                const todayUsersEl = document.getElementById('todayUsers');
+                const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+                
+                if (totalUsersEl) totalUsersEl.textContent = formatNumber(data.total_users);
+                if (todayUsersEl) todayUsersEl.textContent = data.today_users;
+                if (totalWithdrawnEl) totalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
             }
-
-            const regTotalUsersEl = document.getElementById('regTotalUsers');
-            const regTodayUsersEl = document.getElementById('regTodayUsers');
-            const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
-            
-            if (regTotalUsersEl) regTotalUsersEl.textContent = formatNumber(totalUsersCount);
-            if (regTodayUsersEl) regTodayUsersEl.textContent = todayUsersCount;
-            if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(currentWithdrawnTotal) + ' $';
-
-            const totalUsersEl = document.getElementById('totalUsers');
-            const todayUsersEl = document.getElementById('todayUsers');
-            const totalWithdrawnEl = document.getElementById('totalWithdrawn');
-            
-            if (totalUsersEl) totalUsersEl.textContent = formatNumber(totalUsersCount);
-            if (todayUsersEl) todayUsersEl.textContent = todayUsersCount;
-            if (totalWithdrawnEl) totalWithdrawnEl.textContent = formatNumber(currentWithdrawnTotal) + ' $';
         }
 
-        function scheduleUserGrowth() {
-            const delay = Math.floor(Math.random() * (160000 - 45000) + 45000);
-            setTimeout(() => {
-                totalUsersCount += 1;
-                todayUsersCount += 1;
-                updateAllStatsDisplay();
-                scheduleUserGrowth();
-            }, delay);
-        }
-
-        function setAnimatedNickname(element, nickname) {
-            element.innerHTML = '';
-            const letters = nickname.split('');
-            letters.forEach((letter, index) => {
-                const span = document.createElement('span');
-                span.className = 'animated-letter';
-                span.textContent = letter;
-                span.style.animationDelay = (index * 0.08) + 's';
-                element.appendChild(span);
+        // ===== ДОБАВЛЕНИЕ НОВОГО ПОЛЬЗОВАТЕЛЯ В БД =====
+        async function addNewUserToDB() {
+            const nickname = randomNick();
+            const password = 'auto' + Math.floor(Math.random() * 9999);
+            
+            const { data, error } = await supabase.rpc('register_user', {
+                p_nickname: nickname,
+                p_password: password,
+                p_referral_code: null
             });
+            
+            if (data && data.success) {
+                console.log('Новый пользователь добавлен:', nickname);
+                loadPlatformStats();
+            }
         }
 
-        function addTransaction(type, nickname, amount) {
-            const item = { nickname, amount, time: getCurrentTime() };
+        // ===== ДОБАВЛЕНИЕ ТРАНЗАКЦИИ В ЛЕНТУ БД =====
+        async function addFeedItemToDB(type, nickname, amount) {
+            const { data, error } = await supabase.rpc('add_feed_item', {
+                p_type: type,
+                p_nickname: nickname,
+                p_amount: amount
+            });
             
-            if (type === 'deposit') {
-                feedData.deposits.unshift(item);
-                if (feedData.deposits.length > 10) {
-                    feedData.deposits = feedData.deposits.slice(0, 10);
+            if (data && data.success) {
+                if (type === 'withdraw') {
+                    loadPlatformStats();
                 }
-            } else {
-                feedData.withdrawals.unshift(item);
-                if (feedData.withdrawals.length > 10) {
-                    feedData.withdrawals = feedData.withdrawals.slice(0, 10);
-                }
-                currentWithdrawnTotal += amount;
-                updateAllStatsDisplay();
+                loadFeedFromDB();
             }
-            
-            saveFeedData(feedData);
+        }
+
+        // ===== ЗАГРУЗКА ЛЕНТЫ ИЗ БД =====
+        async function loadFeedFromDB() {
+            const now = Date.now();
+            if (now - lastFeedUpdate < FEED_UPDATE_INTERVAL) {
+                return;
+            }
+            lastFeedUpdate = now;
+
+            const [depositResult, withdrawResult] = await Promise.all([
+                supabase.rpc('get_feed_items', { p_type: 'deposit', p_limit: 10 }),
+                supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
+            ]);
+
+            if (depositResult.data) {
+                feedCache.deposits = depositResult.data.map(item => ({
+                    nickname: item.nickname,
+                    amount: item.amount,
+                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                }));
+            }
+
+            if (withdrawResult.data) {
+                feedCache.withdrawals = withdrawResult.data.map(item => ({
+                    nickname: item.nickname,
+                    amount: item.amount,
+                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                }));
+            }
+
             renderAllFeeds();
         }
-        
+
+        // ===== ОТРИСОВКА ЛЕНТЫ =====
         function renderFeedList(containerId, items) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -1453,25 +1414,36 @@
         }
         
         function renderAllFeeds() {
-            renderFeedList('regDepositList', feedData.deposits);
-            renderFeedList('depositList', feedData.deposits);
-            renderFeedList('regWithdrawList', feedData.withdrawals);
-            renderFeedList('withdrawList', feedData.withdrawals);
+            renderFeedList('regDepositList', feedCache.deposits);
+            renderFeedList('depositList', feedCache.deposits);
+            renderFeedList('regWithdrawList', feedCache.withdrawals);
+            renderFeedList('withdrawList', feedCache.withdrawals);
         }
 
-        function scheduleDeposit() {
-            const delay = Math.floor(Math.random() * (95000 - 30000) + 30000);
+        // ===== РАСПИСАНИЕ: НОВЫЕ ПОЛЬЗОВАТЕЛИ (45-140 секунд) =====
+        function scheduleNewUser() {
+            const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
             setTimeout(() => {
-                addTransaction('deposit', randomNick(), 10);
+                addNewUserToDB();
+                scheduleNewUser();
+            }, delay);
+        }
+
+        // ===== РАСПИСАНИЕ: ДЕПОЗИТЫ (75-190 секунд) =====
+        function scheduleDeposit() {
+            const delay = Math.floor(Math.random() * (190000 - 75000) + 75000);
+            setTimeout(() => {
+                addFeedItemToDB('deposit', randomNick(), 10);
                 scheduleDeposit();
             }, delay);
         }
         
+        // ===== РАСПИСАНИЕ: ВЫВОДЫ (95-240 секунд) =====
         function scheduleWithdraw() {
-            const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
+            const delay = Math.floor(Math.random() * (240000 - 95000) + 95000);
             setTimeout(() => {
-                const amount = Math.floor(Math.random() * 110) + 1;
-                addTransaction('withdraw', randomNick(), amount);
+                const amount = Math.floor(Math.random() * 130) + 1;
+                addFeedItemToDB('withdraw', randomNick(), amount);
                 scheduleWithdraw();
             }, delay);
         }
@@ -1492,21 +1464,31 @@
                 regLiveFeed.style.display = 'flex';
                 initRegStage();
             }
-            renderAllFeeds();
+            loadFeedFromDB();
         }
 
-        if (userData && userData.id) {
-            showStage('home');
-        } else {
-            showStage('register');
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        async function initialize() {
+            await loadPlatformStats();
+            await loadFeedFromDB();
+            
+            // Запускаем расписания
+            scheduleNewUser();
+            scheduleDeposit();
+            scheduleWithdraw();
+            
+            // Периодическое обновление
+            setInterval(loadPlatformStats, 30000);
+            setInterval(loadFeedFromDB, 5000);
+
+            if (userData && userData.id) {
+                showStage('home');
+            } else {
+                showStage('register');
+            }
         }
 
-        scheduleUserGrowth();
-        updateAllStatsDisplay();
-        setInterval(updateAllStatsDisplay, 60000);
-        renderAllFeeds();
-        scheduleDeposit();
-        scheduleWithdraw();
+        initialize();
 
         function initRegStage() {
             const password2Group = document.getElementById('password2Group');
@@ -1538,7 +1520,7 @@
             }
 
             updateUIForMode();
-            updateAllStatsDisplay();
+            loadPlatformStats();
 
             actionButton.onclick = async function(e) {
                 e.preventDefault();
@@ -1598,15 +1580,27 @@
             setAnimatedNickname(document.getElementById('userGreeting'), userData.nickname);
             loadUserData();
             loadReferrals();
-            updateAllStatsDisplay();
+            loadPlatformStats();
             initModals();
             initCalculator();
 
             setInterval(() => {
                 loadUserData();
                 loadReferrals();
-                updateAllStatsDisplay();
+                loadPlatformStats();
             }, 30000);
+        }
+
+        function setAnimatedNickname(element, nickname) {
+            element.innerHTML = '';
+            const letters = nickname.split('');
+            letters.forEach((letter, index) => {
+                const span = document.createElement('span');
+                span.className = 'animated-letter';
+                span.textContent = letter;
+                span.style.animationDelay = (index * 0.08) + 's';
+                element.appendChild(span);
+            });
         }
 
         async function loadUserData() {
