@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пирамикс • Никнеймы</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            color: #f5efe0;
+            font-size: 14px;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.8rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.7);
+        }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #f9d56e, #e6a861);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+        }
+        .subtitle {
+            color: #b7a16c;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+        }
+        .stat-label {
+            font-size: 0.7rem;
+            color: #b9b09a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nickname-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .nickname-item {
+            background: rgba(25, 22, 17, 0.6);
+            border-radius: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.78rem;
+            border: 1px solid rgba(212, 165, 60, 0.2);
+            color: #f5d78c;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .nickname-item:hover {
+            background: rgba(243, 185, 91, 0.2);
+            border-color: #f3b95b;
+            transform: translateY(-2px);
+        }
+        .btn {
+            background: linear-gradient(135deg, #e2a542, #c7851e);
+            border: none;
+            color: #0f0e0a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.6rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 15px rgba(226, 165, 66, 0.35);
+            margin: 0.5rem;
+        }
+        .btn:hover {
+            background: linear-gradient(135deg, #f3b95b, #da9729);
+            box-shadow: 0 8px 20px rgba(243, 185, 91, 0.6);
+            color: #000;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #c9a357;
+            color: #e9c274;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.45rem 1.2rem;
+            border-radius: 1.8rem;
+            cursor: pointer;
+            transition: 0.25s;
+            text-decoration: none;
+            margin: 0.5rem;
+        }
+        .btn-outline:hover {
+            background: #f3b95b20;
+            border-color: #f3b95b;
+            color: #ffe6b3;
+            box-shadow: 0 0 12px rgba(243, 185, 91, 0.3);
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            margin: 0 auto 1rem;
+            display: block;
+        }
+        .search-box:focus {
+            border-color: #f3b95b;
+            box-shadow: 0 0 12px rgba(243, 185, 91, 0.4);
+        }
+        .info-text {
+            color: #b9b09a;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .highlight {
+            color: #4caf50;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 База никнеймов Пирамикс</h1>
+        <p class="subtitle">1000 уникальных никнеймов для генерации транзакций</p>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Всего никнеймов</div>
+                <div class="stat-value" id="totalNicks">1000</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Русские</div>
+                <div class="stat-value" id="russianNicks">500</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Английские</div>
+                <div class="stat-value" id="englishNicks">500</div>
+            </div>
+        </div>
+
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Поиск никнейма...">
+        
+        <div class="controls">
+            <button class="btn" onclick="copyAllNicks()">📋 Копировать все</button>
+            <button class="btn" onclick="downloadNicks()">💾 Скачать TXT</button>
+            <button class="btn-outline" onclick="showRandomTransactions()">🎲 Показать случайные транзакции</button>
+        </div>
+
+        <div class="nickname-grid" id="nicknameGrid"></div>
+
+        <div class="info-text">
+            Никнеймы используются для отображения в ленте <span class="highlight">Последние пополнения</span> и <span class="highlight">Последние выводы</span>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // 1000 НИКНЕЙМОВ
+        // ============================================
+        const allNicks = [
+            // === РУССКИЕ ОДНО СЛОВО (200) ===
+            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
+            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
+            'Михаил', 'Евгения', 'Александр', 'Дарья', 'Игорь', 'Ксения', 'Василий', 'Алёна', 'Григорий', 'Полина',
+            'Денис', 'Валерия', 'Олег', 'Марина', 'Станислав', 'Вероника', 'Виктор', 'Анастасия', 'Константин', 'Людмила',
+            'Борис', 'Галина', 'Тимур', 'Надежда', 'Артур', 'Лариса', 'Георгий', 'Екатерина', 'Ярослав', 'Маргарита',
+            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
+            'рысь', 'соболь', 'бурый', 'гризли', 'панда', 'лев', 'гепард', 'пума', 'шакал', 'койот',
+            'коршун', 'кречет', 'сова', 'дятел', 'журавль', 'аист', 'лебедь', 'цапля', 'чайка', 'буревестник',
+            'дельфин', 'касатка', 'акула', 'скат', 'осьминог', 'краб', 'креветка', 'медуза', 'коала', 'кенгуру',
+            'шерхан', 'багира', 'балу', 'рики', 'тики', 'тави', 'факир', 'шаман', 'воин', 'жрец',
+            'странник', 'пилигрим', 'монах', 'отшельник', 'охотник', 'рыбак', 'земледелец', 'кузнец', 'гончар', 'ткач',
+            'рейдер', 'пират', 'викинг', 'гладиатор', 'рыцарь', 'самурай', 'ниндзя', 'монах', 'друид', 'маг',
+            'алхимик', 'артефактор', 'заклинатель', 'чародей', 'волшебник', 'колдун', 'ведун', 'знахарь', 'травник', 'целитель',
+            'стрелок', 'лучник', 'копейщик', 'мечник', 'щитоносец', 'разведчик', 'следопыт', 'егерь', 'лесник', 'пастух',
+            'рудокоп', 'старатель', 'золотодобытчик', 'серебряник', 'ювелир', 'огранщик', 'каменотёс', 'плотник', 'столяр', 'бондарь',
+            'пекарь', 'повар', 'кондитер', 'винодел', 'пивовар', 'сыродел', 'мясник', 'рыботорговец', 'меняла', 'ростовщик',
+            'зодчий', 'ваятель', 'живописец', 'иконописец', 'летописец', 'сказитель', 'гусляр', 'скоморох', 'шут', 'паяц',
+            'феникс', 'дракон', 'единорог', 'пегас', 'грифон', 'кентавр', 'минотавр', 'циклоп', 'титан', 'атлант',
+            'зевс', 'арес', 'аполлон', 'посейдон', 'аид', 'гермес', 'гефест', 'дионис', 'персей', 'геракл',
+            'ахиллес', 'одиссей', 'язон', 'тесей', 'орфей', 'прометей', 'дедал', 'икар', 'нарцисс', 'адонис',
+            // === РУССКИЕ ДВА СЛОВА (200) ===
+            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
+            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
+            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
+            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
+            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
+            'Стальной Кулак', 'Железный Воин', 'Медный Всадник', 'Каменный Гость', 'Деревянный Меч',
+            'Огненный Шар', 'Водяной Знак', 'Земляной Червь', 'Воздушный Змей', 'Ледяной Взгляд',
+            'Тёмный Рыцарь', 'Светлый Ангел', 'Серый Волк', 'Бурый Медведь', 'Рыжая Лиса',
+            'Синяя Птица', 'Жёлтый Дракон', 'Зелёный Змий', 'Красный Петух', 'Белый Голубь',
+            'Ночной Дозор', 'Дневной Патруль', 'Вечерний Звон', 'Утренний Туман', 'Полуденный Зной',
+            'Северный Ветер', 'Южное Солнце', 'Восточный Путь', 'Западный Край', 'Центральный Парк',
+            'Первый Снег', 'Последний Дождь', 'Ранний Рассвет', 'Поздний Закат', 'Весенний Гром',
+            'Летний Зной', 'Осенний Лист', 'Зимний Сон', 'Горный Орёл', 'Лесной Царь',
+            'Морской Волк', 'Речной Поток', 'Озёрный Гладь', 'Болотный Огонь', 'Степной Ветер',
+            'Тайный Знак', 'Скрытый Смысл', 'Явный След', 'Тонкий Лёд', 'Острый Ум',
+            'Добрый Знак', 'Злой Рок', 'Слепой Случай', 'Верный Путь', 'Ложный След',
+            'Большой Брат', 'Малый Дом', 'Средний Путь', 'Крайний Срок', 'Полный Объём',
+            'Старый Друг', 'Новый Свет', 'Молодой Месяц', 'Старая Гвардия', 'Юный Натуралист',
+            'Дикий Запад', 'Дальний Восток', 'Ближний Круг', 'Высший Свет', 'Нижний Мир',
+            'Верхний Ярус', 'Средний Класс', 'Рабочий Момент', 'Творческий Путь', 'Научный Подход',
+            'Алексей Соколов', 'Дмитрий Орлов', 'Сергей Ястребов', 'Андрей Воробьёв', 'Максим Голубев',
+            'Елена Снегирёва', 'Ольга Воронова', 'Татьяна Синицина', 'Анна Коршунова', 'Мария Совина',
+            'Владимир Ласточкин', 'Ирина Стрижова', 'Павел Дроздов', 'Наталья Журавлёва', 'Роман Аистов',
+            'Юлия Лебедева', 'Артём Цаплин', 'Виктория Чайкина', 'Михаил Буревестников', 'Дарья Альбатросова',
+            // === РУССКИЕ С ЦИФРАМИ (100) ===
+            'Alex1985', 'Max777', 'Olga2020', 'Dima123', 'Kate99',
+            'Ivan2000', 'Masha88', 'Pasha007', 'Dasha111', 'Sasha555',
+            'Vova322', 'Lena228', 'Tanya1337', 'Kolya1488', 'Sveta007',
+            'Nina2023', 'Vitya1999', 'Nadya777', 'Lyuda666', 'Grisha1234',
+            'Serega1980', 'Dimon1991', 'Vadim2022', 'Ilya007', 'Misha2005',
+            'Gena1967', 'Tolya1975', 'Vasya1983', 'Petya1995', 'Kostya2001',
+            'Zhenya2010', 'Yura2008', 'Vika2015', 'Nastya2018', 'Lera2024',
+            'Mila1993', 'Liza1987', 'Sonya1998', 'Ulya2003', 'Dina2012',
+            'Rita1989', 'Inna1994', 'Alla2006', 'Galya2019', 'Tonya2021',
+            'Roma777', 'Den777', 'Borya555', 'Vlad555', 'Stas999',
+            'nikita47', 'arina52', 'gleb89', 'timofey33', 'varvara17',
+            'matvey61', 'sofia28', 'elisey73', 'veronika44', 'miroslav55',
+            'yaroslav11', 'vasilisa22', 'svyatopolk66', 'dobrynya77', 'rostislav88',
+            'vsevolod99', 'predslava12', 'izyaslav34', 'mstislav56', 'yuri78',
+            'andrey90', 'aleksandra23', 'konstantin45', 'anastasia67', 'alexander89',
+            'xXx_Wolf_xXx', 'Pro_Gamer_123', 'Dark_Lord_666', 'Light_King_777', 'Fire_Mage_88',
+            'Ice_Queen_55', 'Thunder_God_44', 'Shadow_Hunter_33', 'Ghost_Rider_22', 'Night_Walker_11',
+            'Razor_Edge_99', 'Blade_Runner_77', 'Star_Lord_66', 'Moon_Knight_44', 'Sun_Warrior_22',
+            'Crazy_Fox_55', 'Wild_Cat_88', 'Brave_Lion_77', 'Wise_Owl_66', 'Fast_Eagle_44',
+            'Big_Boss_33', 'Top_Gun_22', 'Master_Chief_11', 'Doctor_Who_99', 'Captain_Jack_88',
+            // === АНГЛИЙСКИЕ ОДНО СЛОВО (200) ===
+            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry',
+            'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
+            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle',
+            'hawk', 'tiger', 'raven', 'fox', 'bear',
+            'lion', 'shark', 'whale', 'snake', 'spider',
+            'falcon', 'panther', 'jaguar', 'cobra', 'viper',
+            'storm', 'thunder', 'lightning', 'blizzard', 'tornado',
+            'earthquake', 'volcano', 'tsunami', 'hurricane', 'cyclone',
+            'nebula', 'galaxy', 'cosmos', 'meteor', 'comet',
+            'asteroid', 'quasar', 'pulsar', 'supernova', 'blackhole',
+            'warrior', 'knight', 'paladin', 'rogue', 'wizard',
+            'sorcerer', 'mage', 'cleric', 'druid', 'monk',
+            'hunter', 'archer', 'sniper', 'commando', 'trooper',
+            'captain', 'major', 'colonel', 'general', 'admiral',
+            'emperor', 'king', 'prince', 'duke', 'count',
+            'baron', 'viscount', 'marquis', 'earl', 'khan',
+            'swift', 'brave', 'mighty', 'noble', 'fierce',
+            'cunning', 'loyal', 'honest', 'bold', 'gentle',
+            'silver', 'golden', 'crystal', 'ruby', 'sapphire',
+            'emerald', 'diamond', 'platinum', 'titanium', 'bronze',
+            'obsidian', 'jade', 'amber', 'coral', 'pearl',
+            'aurora', 'borealis', 'eclipse', 'solstice', 'equinox',
+            'horizon', 'zenith', 'nadir', 'summit', 'abyss',
+            'inferno', 'glacier', 'oasis', 'mirage', 'phantom',
+            'spirit', 'ghost', 'wraith', 'spectre', 'shade',
+            'blade', 'steel', 'iron', 'bronze', 'silver',
+            'frost', 'flame', 'ember', 'spark', 'cinder',
+            'smoke', 'mist', 'fog', 'haze', 'vapor',
+            'ocean', 'river', 'lake', 'pond', 'stream',
+            'cascade', 'rapids', 'falls', 'spring', 'well',
+            'throne', 'crown', 'scepter', 'orb', 'chalice',
+            'torch', 'lantern', 'beacon', 'flare', 'signal',
+            'vertex', 'matrix', 'vector', 'cipher', 'codex',
+            'nexus', 'axis', 'prism', 'lens', 'focus',
+            'cypher', 'crypt', 'vault', 'tower', 'castle',
+            'fortress', 'citadel', 'bastion', 'keep', 'hold',
+            'ravenclaw', 'gryffindor', 'slytherin', 'hufflepuff', 'durmstrang',
+            'tempest', 'zephyr', 'cyclone', 'typhoon', 'monsoon',
+            'ember', 'blaze', 'inferno', 'pyre', 'flame',
+            'frostbite', 'icicle', 'glacier', 'avalanche', 'blizzard',
+            // === АНГЛИЙСКИЕ ДВА СЛОВА (200) ===
+            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
+            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
+            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
+            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore',
+            'james Clark', 'sarah Hall', 'david Young', 'emma King', 'chris Scott',
+            'laura Baker', 'steve Adams', 'julia Wright', 'robert Green', 'helen Wood',
+            'martin Hill', 'olivia Turner', 'kevin Baker', 'sophia Collins', 'frank Stewart',
+            'grace Morris', 'harry Rogers', 'diana Reed', 'george Cook', 'irene Morgan',
+            'jack Cooper', 'linda Bell', 'mason Murphy', 'nancy Bailey', 'oscar Howard',
+            'patricia Ward', 'quinn Torres', 'ruth Sanders', 'samuel Price', 'tina Bennett',
+            'storm chaser', 'fire starter', 'ice breaker', 'wind walker', 'earth shaker',
+            'moon light', 'star dust', 'sun beam', 'rain bow', 'snow flake',
+            'iron man', 'steel heart', 'gold mind', 'silver tongue', 'bronze medal',
+            'quick draw', 'sharp shooter', 'fast runner', 'high jumper', 'long walker',
+            'deep diver', 'sky walker', 'mountain climber', 'sea farer', 'land rover',
+            'dream weaver', 'soul keeper', 'mind reader', 'heart breaker', 'peace maker',
+            'trouble maker', 'game changer', 'rule breaker', 'record setter', 'history maker',
+            'night hawk', 'day breaker', 'dawn bringer', 'dusk tiller', 'midnight runner',
+            'silent whisper', 'loud speaker', 'quiet thinker', 'fast talker', 'slow mover',
+            'big thinker', 'small wonder', 'tall order', 'short story', 'long tale',
+            'wise owl', 'sly fox', 'brave heart', 'cool hand', 'hot shot',
+            'cold steel', 'warm embrace', 'hot temper', 'cool breeze', 'warm smile',
+            'rich man', 'poor boy', 'lucky charm', 'bad luck', 'good fortune',
+            'high tide', 'low blow', 'fast lane', 'slow burn', 'quick fix',
+            'lost soul', 'found treasure', 'hidden gem', 'open book', 'closed case',
+            'alpha dog', 'beta test', 'gamma ray', 'delta force', 'omega man',
+            'first light', 'last stand', 'final hour', 'second chance', 'third eye',
+            'north star', 'south pole', 'east wind', 'west coast', 'center stage',
+            'blue moon', 'red sun', 'green light', 'yellow card', 'pink slip',
+            'black list', 'white lie', 'grey area', 'gold standard', 'silver lining',
+            'double trouble', 'single shot', 'triple threat', 'double cross', 'single file',
+            'happy hour', 'sad song', 'angry bird', 'calm sea', 'brave new',
+            'wild thing', 'crazy horse', 'mad dog', 'lazy cat', 'busy bee',
+            'sweet dreams', 'bitter sweet', 'sour grapes', 'spicy food', 'salty tears',
+            'early bird', 'night owl', 'morning star', 'evening sun', 'afternoon delight',
+            'spring break', 'summer breeze', 'autumn leaves', 'winter storm', 'season finale',
+            'rock star', 'pop idol', 'movie buff', 'book worm', 'art lover',
+            'data miner', 'code breaker', 'web master', 'system admin', 'network guru',
+            'pixel pusher', 'bit shifter', 'byte eater', 'data cruncher', 'script kiddie',
+            'tech guru', 'cyber punk', 'digital ghost', 'analog soul', 'virtual reality',
+            // === АНГЛИЙСКИЕ С ЦИФРАМИ (100) ===
+            'Player001', 'Gamer999', 'Hunter777', 'Killer666', 'Master555',
+            'ProGamer88', 'NoScope77', 'HeadShot66', 'QuickDraw55', 'FastAim44',
+            'Shadow007', 'Ghost1337', 'Phantom2024', 'Spectre1988', 'Wraith2020',
+            'CyberWolf99', 'NeonCat88', 'PixelFox77', 'DataShark66', 'CodeBear55',
+            'xShadowx', 'oFantomo', 'iPhoenixi', 'zDragonz', 'vEaglev',
+            'DarkLord1', 'LightKing2', 'FireMage3', 'IceQueen4', 'StormGod5',
+            'BladeMaster6', 'BowExpert7', 'SwordSaint8', 'SpearKing9', 'AxeLord10',
+            'Dreamer23', 'Thinker42', 'Maker56', 'Taker78', 'Giver91',
+            'Runner11', 'Jumper22', 'Swimmer33', 'Diver44', 'Climber55',
+            'AlphaDog66', 'BetaCat77', 'GammaRat88', 'DeltaBat99', 'OmegaOwl100',
+            'DemonSlayer11', 'GodEater22', 'WorldEnder33', 'LifeGiver44', 'SoulTaker55',
+            'NightKing66', 'DayQueen77', 'DawnPrince88', 'DuskPrincess99', 'SunEmperor100',
+            'MoneyMaker2000', 'CashFlow1999', 'GoldDigger1988', 'DiamondHands1977', 'CryptoKing1966',
+            'BitMaster1955', 'CoinLord1944', 'TokenKing1933', 'ChainMaster1922', 'BlockBuilder1911',
+            'MemeLord1888', 'TrollKing1877', 'JokeMaster1866', 'FunMaker1855', 'LaughKing1844',
+            'StormBorn1833', 'FireKissed1822', 'IceTouched1811', 'WindBlessed1800', 'EarthBound1799',
+            'StarChild1788', 'MoonBorn1777', 'SunKissed1766', 'SkyWalker1755', 'SeaSpirit1744',
+            'BattleAxe1733', 'WarHammer1722', 'PeaceMaker1711', 'TroubleShooter1700', 'ProblemSolver1699',
+            'QuantumLeap1688', 'StringTheory1677', 'ChaosTheory1666', 'GameTheory1655', 'NumberTheory1644',
+            'PixelArt1633', 'VectorGraph1622', 'BitmapImage1611', 'JpegMaster1600', 'PngKing1599'
+        ];
+
+        // ============================================
+        // ФУНКЦИИ ДЛЯ РАБОТЫ С НИКНЕЙМАМИ
+        // ============================================
+        
+        // Получить случайный никнейм
+        function randomNick() {
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
+
+        // Получить случайный никнейм для депозита
+        function randomDepositNick() {
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
+
+        // Получить случайный никнейм для вывода
+        function randomWithdrawNick() {
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
+
+        // Получить случайную сумму вывода (1-130$)
+        function randomWithdrawAmount() {
+            return Math.floor(Math.random() * 130) + 1;
+        }
+
+        // Получить текущее время в формате ЧЧ:ММ:СС
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // Получить случайное время в прошлом
+        function getRandomPastTime(index, total) {
+            const now = new Date();
+            const secondsAgo = 30 + Math.floor((140 - 30) * (index / Math.max(total - 1, 1)));
+            const randomOffset = Math.floor(Math.random() * 10) - 5;
+            const finalSecondsAgo = Math.max(5, secondsAgo + randomOffset);
+            now.setSeconds(now.getSeconds() - finalSecondsAgo);
+            return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // ============================================
+        // ОТОБРАЖЕНИЕ НА СТРАНИЦЕ
+        // ============================================
+        
+        function renderNicknames(filter = '') {
+            const grid = document.getElementById('nicknameGrid');
+            const filtered = filter ? allNicks.filter(n => n.toLowerCase().includes(filter.toLowerCase())) : allNicks;
+            
+            grid.innerHTML = filtered.map(nick => 
+                `<div class="nickname-item" onclick="copyNick('${nick.replace(/'/g, "\\'")}')" title="Нажмите чтобы скопировать">${nick}</div>`
+            ).join('');
+            
+            document.getElementById('totalNicks').textContent = allNicks.length;
+            document.getElementById('russianNicks').textContent = allNicks.filter(n => /[а-яё]/i.test(n)).length;
+            document.getElementById('englishNicks').textContent = allNicks.filter(n => !/[а-яё]/i.test(n)).length;
+        }
+
+        function copyNick(nick) {
+            navigator.clipboard.writeText(nick).then(() => {
+                showToast('Скопировано: ' + nick);
+            });
+        }
+
+        function copyAllNicks() {
+            navigator.clipboard.writeText(allNicks.join('\n')).then(() => {
+                showToast('Все 1000 никнеймов скопированы!');
+            });
+        }
+
+        function downloadNicks() {
+            const blob = new Blob([allNicks.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'piramix_nicknames.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Файл скачан!');
+        }
+
+        function showRandomTransactions() {
+            const deposits = [];
+            const withdrawals = [];
+            
+            for (let i = 0; i < 5; i++) {
+                deposits.push({
+                    nickname: randomDepositNick(),
+                    amount: 10,
+                    time: getRandomPastTime(i, 5)
+                });
+                withdrawals.push({
+                    nickname: randomWithdrawNick(),
+                    amount: randomWithdrawAmount(),
+                    time: getRandomPastTime(i, 5)
+                });
+            }
+            
+            let html = '<div style="margin-top:1rem;padding:1rem;background:rgba(0,0,0,0.3);border-radius:1rem;">';
+            html += '<h3 style="color:#e9c274;margin-bottom:0.5rem;">🟢 Пример пополнений (10$)</h3>';
+            deposits.forEach(d => {
+                html += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;">
+                    <span><span style="color:#f5d78c">${d.nickname}</span> <span style="color:#8b8a7a">${d.time}</span></span>
+                    <span style="color:#4caf50;font-weight:700">${d.amount}$</span></div>`;
+            });
+            html += '<h3 style="color:#e9c274;margin:0.8rem 0 0.5rem;">🔴 Пример выводов (1-130$)</h3>';
+            withdrawals.forEach(w => {
+                html += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;">
+                    <span><span style="color:#f5d78c">${w.nickname}</span> <span style="color:#8b8a7a">${w.time}</span></span>
+                    <span style="color:#ff7043;font-weight:700">${w.amount}$</span></div>`;
+            });
+            html += '</div>';
+            
+            const existing = document.getElementById('randomTransactions');
+            if (existing) existing.remove();
+            
+            const div = document.createElement('div');
+            div.id = 'randomTransactions';
+            div.innerHTML = html;
+            document.querySelector('.info-text').before(div);
+        }
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:12px;
+                color:#fff;font-weight:500;font-size:0.9rem;z-index:9999;
+                background:rgba(76,175,80,0.9);border:1px solid #4caf50;
+                backdrop-filter:blur(10px);box-shadow:0 8px 20px rgba(0,0,0,0.3);
+                animation:slideInRight 0.3s ease-out, fadeOut 0.3s 2.7s ease-out forwards;
+                max-width:350px;
+            `;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+        }
+
+        // Поиск
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            renderNicknames(e.target.value);
+        });
+
+        // Инициализация
+        renderNicknames();
+
+        // Добавляем стили для анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Экспорт функций в глобальную область
+        window.randomNick = randomNick;
+        window.randomDepositNick = randomDepositNick;
+        window.randomWithdrawNick = randomWithdrawNick;
+        window.randomWithdrawAmount = randomWithdrawAmount;
+        window.getCurrentTime = getCurrentTime;
+        window.getRandomPastTime = getRandomPastTime;
+        window.allNicks = allNicks;
+
+        console.log('✅ База никнеймов загружена. Всего:', allNicks.length);
+        console.log('Функции доступны: randomNick(), randomDepositNick(), randomWithdrawNick(), randomWithdrawAmount()');
+    </script>
+</body>
+</html>
