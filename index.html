@@ -1294,6 +1294,7 @@
             <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0</span><span class="stat-earn" id="earn4">0.00 $</span></div>
             <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0</span><span class="stat-earn" id="earn5">0.00 $</span></div>
             <button class="btn-outline" id="copyRefBtn" style="width:100%; margin-top: 0.8rem; border-color: #c084fc; color: #c084fc;">📋 Копировать реферальную ссылку</button>
+            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Мануал по привлечению</button>
         </div>
 
         <div class="card">
@@ -1339,9 +1340,9 @@
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
-        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма вывода: <strong style="color: #f5d78c;">1$</strong></p>
+        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма: <strong style="color: #f5d78c;">1$</strong> | Максимальная сумма: <strong style="color: #f5d78c;">25$</strong></p>
         <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите криптовалюту --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
-        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="Минимум 1$" min="1" step="0.01"></div>
+        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="От 1$ до 25$" min="1" max="25" step="0.01"></div>
         <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв..."></div>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
@@ -1370,6 +1371,7 @@
             <p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p>
             <div class="vip-price">10$</div>
             <p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>
+            <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>
         </div>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button>
@@ -1392,7 +1394,7 @@
         <h3>5. VIP статус</h3>
         <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
         <h3>6. Вывод средств</h3>
-        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
+        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США), максимальная — 25$ (двадцать пять долларов США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
         <h3>7. Конфиденциальность</h3>
         <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
         <h3>8. Ответственность</h3>
@@ -1504,21 +1506,13 @@
                 }
             } catch(e) {
                 console.error('Ошибка загрузки никнеймов:', e);
-                allNicks = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-                    'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-                    'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
-                    'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
-                    'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
-                    'Player001', 'Gamer999', 'Hunter777', 'Killer666', 'Master555'];
                 namesLoaded = true;
             }
         }
 
         function randomNick() {
             if (!namesLoaded || allNicks.length === 0) {
-                const fallback = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-                    'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear'];
-                return fallback[Math.floor(Math.random() * fallback.length)];
+                return 'User';
             }
             return allNicks[Math.floor(Math.random() * allNicks.length)];
         }
@@ -1809,7 +1803,7 @@
         function scheduleWithdraw() {
             const delay = Math.floor(Math.random() * (240000 - 95000) + 95000);
             setTimeout(() => {
-                const amount = Math.floor(Math.random() * 130) + 1;
+                const amount = Math.floor(Math.random() * 25) + 1;
                 addFeedItemToDB('withdraw', randomNick(), amount);
                 scheduleWithdraw();
             }, delay);
@@ -2051,21 +2045,29 @@
         }
 
         function initModals() {
+            // Общая функция для копирования реф ссылки
+            function copyReferralLink() {
+                if (!userData || !userData.vip_paid) {
+                    showToast('Мануал доступен пользователям с VIP статусом', 'error');
+                    return;
+                }
+                
+                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
+                navigator.clipboard.writeText(refLink).then(() => {
+                    showToast('Реферальная ссылка скопирована!', 'success');
+                }).catch(() => {
+                    showToast('Не удалось скопировать ссылку', 'error');
+                });
+            }
+
             const copyRefBtn = document.getElementById('copyRefBtn');
             if (copyRefBtn) {
-                copyRefBtn.onclick = function() {
-                    if (!userData || !userData.vip_paid) {
-                        showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error');
-                        return;
-                    }
-                    
-                    const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
-                    navigator.clipboard.writeText(refLink).then(() => {
-                        showToast('Реферальная ссылка скопирована!', 'success');
-                    }).catch(() => {
-                        showToast('Не удалось скопировать ссылку', 'error');
-                    });
-                };
+                copyRefBtn.onclick = copyReferralLink;
+            }
+
+            const manualBtn = document.getElementById('manualBtn');
+            if (manualBtn) {
+                manualBtn.onclick = copyReferralLink;
             }
 
             document.getElementById('logoutBtn').onclick = function() {
@@ -2120,7 +2122,7 @@
             document.getElementById('confirmWithdrawBtn').onclick = async function() {
                 const crypto = document.getElementById('withdrawCrypto').value;
                 const amount = parseFloat(document.getElementById('withdrawAmount').value);
-                if (!crypto || !amount || amount < 1) return;
+                if (!crypto || !amount || amount < 1 || amount > 25) return;
                 
                 const { data, error } = await supabase.rpc('withdraw_funds', {
                     p_user_id: userData.id,
@@ -2142,10 +2144,10 @@
                 const confirmVipBtn = document.getElementById('confirmVipBtn');
                 
                 if (data && data.vip_paid) {
-                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p>';
+                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
                     confirmVipBtn.style.display = 'none';
                 } else {
-                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';
+                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
                     confirmVipBtn.style.display = 'inline-block';
                 }
                 document.getElementById('vipModal').classList.remove('hidden');
@@ -2159,7 +2161,7 @@
             document.getElementById('confirmVipBtn').onclick = async function() {
                 const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
                 if (!error && data && data.success) {
-                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p>';
+                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
                     document.getElementById('confirmVipBtn').style.display = 'none';
                     await loadUserData();
                     showToast('VIP статус успешно активирован!', 'success');
