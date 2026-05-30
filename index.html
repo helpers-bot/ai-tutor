@@ -1503,16 +1503,17 @@
                     allNicks = eval(match[1]);
                     namesLoaded = true;
                     console.log('✅ Загружено никнеймов из names.html:', allNicks.length);
+                } else {
+                    console.error('❌ Не удалось найти массив allNicks в names.html');
                 }
             } catch(e) {
                 console.error('Ошибка загрузки никнеймов:', e);
-                namesLoaded = true;
             }
         }
 
         function randomNick() {
             if (!namesLoaded || allNicks.length === 0) {
-                return 'User';
+                return 'Player';
             }
             return allNicks[Math.floor(Math.random() * allNicks.length)];
         }
