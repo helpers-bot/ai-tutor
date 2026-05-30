@@ -1586,8 +1586,10 @@
                 supportInput.value = '';
                 supportInput.style.height = 'auto';
 
+                const nickname = (userData && userData.nickname) ? userData.nickname : 'User';
                 const { data, error } = await supabase.rpc('send_support_message', { 
-                    p_message: text 
+                    p_message: text,
+                    p_nickname: nickname 
                 });
                 
                 if (error) {
@@ -1604,22 +1606,25 @@
                     if (data && data.length > 0) {
                         supportMessages.innerHTML = '';
                         
-                        const reversedMessages = [...data].reverse();
+                        const currentNickname = (userData && userData.nickname) ? userData.nickname : 'User';
+                        const userMessages = data.filter(msg => msg.nickname === currentNickname);
+                        const displayMessages = userMessages.length > 0 ? userMessages : data.filter(msg => msg.nickname === 'User');
                         
-                        reversedMessages.forEach(msg => {
+                        [...displayMessages].reverse().forEach(msg => {
                             addMessageToChat(msg.user_message, 'user');
-                            
                             if (msg.admin_response) {
                                 addMessageToChat(msg.admin_response, 'admin-response');
                             }
                         });
                         
-                        const lastMsg = data[0];
-                        if (lastMsg.admin_response && lastMsg.is_read === false) {
-                            playNotificationSound();
-                            if (supportChat.classList.contains('hidden')) {
-                                showToast('🔔 Получен ответ от поддержки!', 'info');
-                                supportBtn.classList.add('has-response');
+                        if (displayMessages.length > 0) {
+                            const lastMsg = displayMessages[0];
+                            if (lastMsg.admin_response && lastMsg.is_read === false) {
+                                playNotificationSound();
+                                if (supportChat.classList.contains('hidden')) {
+                                    showToast('🔔 Получен ответ от поддержки!', 'info');
+                                    supportBtn.classList.add('has-response');
+                                }
                             }
                         }
                         
