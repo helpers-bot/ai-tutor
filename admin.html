@@ -848,12 +848,9 @@
                     document.getElementById('userInfoContent').innerHTML = `
                         <p><span class="label">ID:</span> <span class="value">${data.id}</span></p>
                         <p><span class="label">Никнейм:</span> <span class="value">${data.nickname}</span></p>
-                        <p><span class="label">Пароль:</span> <span class="value">${data.password}</span></p>
                         <p><span class="label">VIP статус:</span> <span class="value">${data.vip_paid ? '✅ Активирован' : '❌ Не активирован'}</span></p>
                         <p><span class="label">Баланс:</span> <span class="value">${parseFloat(data.balance).toFixed(2)} $</span></p>
                         <p><span class="label">Реферальный код:</span> <span class="value">${data.referral_code}</span></p>
-                        <p><span class="label">IP при регистрации:</span> <span class="value">${data.registration_ip}</span></p>
-                        <p><span class="label">Текущий IP:</span> <span class="value">${data.current_ip}</span></p>
                         <p><span class="label">Дата регистрации:</span> <span class="value">${new Date(data.created_at).toLocaleString('ru-RU')}</span></p>
                     `;
                 } else {
