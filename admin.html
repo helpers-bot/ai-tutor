@@ -219,6 +219,14 @@
             border-radius: 1rem;
             padding: 1rem;
             border: 1px solid rgba(212, 165, 60, 0.2);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .message-item:hover {
+            border-color: rgba(192, 132, 252, 0.5);
+            background: rgba(192, 132, 252, 0.1);
         }
 
         .message-item.unread {
@@ -274,6 +282,137 @@
             border-color: #c084fc;
         }
 
+        /* ===== ПЕРЕТАСКИВАЕМОЕ ОКНО СООБЩЕНИЯ ===== */
+        .message-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-modal {
+            position: absolute;
+            background: rgba(20, 22, 27, 0.97);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 132, 252, 0.5);
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            min-width: 380px;
+            max-width: 700px;
+            width: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .message-modal-header {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.3), rgba(124, 58, 237, 0.2));
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+            border-bottom: 1px solid rgba(192, 132, 252, 0.3);
+        }
+
+        .message-modal-header h3 {
+            font-size: 0.9rem;
+            color: #e9c274;
+            margin: 0;
+            pointer-events: none;
+        }
+
+        .message-modal-close {
+            background: transparent;
+            border: none;
+            color: #b9b09a;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .message-modal-close:hover {
+            color: #ff7043;
+        }
+
+        .message-modal-body {
+            padding: 1.2rem;
+            overflow-y: auto;
+            max-height: 400px;
+            flex: 1;
+        }
+
+        .message-modal-body .user-msg {
+            background: rgba(243, 185, 91, 0.2);
+            border: 1px solid rgba(243, 185, 91, 0.3);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+            color: #f5efe0;
+        }
+
+        .message-modal-body .admin-msg {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.85rem;
+            color: #81c784;
+        }
+
+        .message-modal-body .msg-time {
+            font-size: 0.65rem;
+            color: #8b8a7a;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+
+        .message-modal-footer {
+            padding: 0.8rem 1.2rem;
+            border-top: 1px solid rgba(192, 132, 252, 0.2);
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .message-modal-footer .response-input {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.8rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .message-modal-footer .response-input:focus {
+            border-color: #c084fc;
+        }
+
+        /* Ресайз-хендл */
+        .resize-handle {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 20px;
+            height: 20px;
+            cursor: nwse-resize;
+            background: linear-gradient(135deg, transparent 50%, rgba(192, 132, 252, 0.5) 50%);
+            border-radius: 0 0 1.5rem 0;
+        }
+
         .toast {
             position: fixed;
             top: 20px;
@@ -313,6 +452,11 @@
             .input-row { flex-direction: column; }
             .btn { width: 100%; }
             .header { flex-direction: column; text-align: center; }
+            .message-modal {
+                width: 95vw !important;
+                min-width: auto !important;
+                max-width: 95vw !important;
+            }
         }
     </style>
 </head>
@@ -387,6 +531,7 @@
 
             let currentUser = null;
             let currentUserId = null;
+            let currentMessageModal = null;
 
             // ===== ПРОВЕРКА ДОСТУПА =====
             function checkAuth() {
@@ -433,7 +578,6 @@
 
             window.verifyAdmin = async function() {
                 const password = document.getElementById('adminPassword').value;
-                // Проверка пароля через Supabase Edge Function (скрытая логика)
                 const { data, error } = await supabase.rpc('admin_verify_password', { p_password: password });
                 
                 if (data && data.success) {
@@ -447,19 +591,6 @@
                     document.getElementById('loginError').style.display = 'block';
                 }
             };
-
-            // Создаём функцию проверки пароля в БД (скрытая логика)
-            async function createVerifyFunction() {
-                // Эта функция должна быть создана вручную в SQL Editor:
-                // CREATE OR REPLACE FUNCTION admin_verify_password(p_password TEXT)
-                // RETURNS JSONB LANGUAGE plpgsql AS $$
-                // BEGIN
-                //     IF p_password = '135710Aa!' THEN
-                //         RETURN jsonb_build_object('success', true);
-                //     END IF;
-                //     RETURN jsonb_build_object('success', false);
-                // END; $$;
-            }
 
             window.logout = function() {
                 sessionStorage.removeItem('piramix_admin_auth');
@@ -477,6 +608,167 @@
             function formatNumber(num) {
                 if (num >= 1000) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
                 return num.toString();
+            }
+
+            // ===== ПЕРЕТАСКИВАЕМОЕ ОКНО СООБЩЕНИЯ =====
+            function openMessageModal(msg) {
+                // Закрываем предыдущее окно
+                if (currentMessageModal) {
+                    currentMessageModal.remove();
+                    currentMessageModal = null;
+                }
+
+                const overlay = document.createElement('div');
+                overlay.className = 'message-modal-overlay';
+                
+                const modal = document.createElement('div');
+                modal.className = 'message-modal';
+                modal.style.top = '50px';
+                modal.style.left = '50px';
+                
+                modal.innerHTML = `
+                    <div class="message-modal-header" id="modalHeader">
+                        <h3>💬 Сообщение #${msg.id}</h3>
+                        <button class="message-modal-close" id="modalClose">✕</button>
+                    </div>
+                    <div class="message-modal-body">
+                        <div class="user-msg">
+                            ${msg.user_message}
+                            <div class="msg-time">📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</div>
+                        </div>
+                        ${msg.admin_response ? `
+                            <div class="admin-msg">
+                                ${msg.admin_response}
+                                <div class="msg-time">✅ Отвечено</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="message-modal-footer">
+                        ${!msg.admin_response ? `
+                            <input type="text" class="response-input" id="modalResponseInput" placeholder="Введите ответ...">
+                            <button class="btn btn-success btn-sm" id="modalSendBtn">📤 Ответить</button>
+                        ` : ''}
+                        <button class="btn btn-danger btn-sm" id="modalDeleteBtn">🗑 Удалить</button>
+                    </div>
+                    <div class="resize-handle" id="resizeHandle"></div>
+                `;
+                
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+                currentMessageModal = overlay;
+
+                // Закрытие по клику на оверлей
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        currentMessageModal = null;
+                    }
+                });
+
+                // Закрытие по кнопке
+                modal.querySelector('#modalClose').addEventListener('click', function() {
+                    overlay.remove();
+                    currentMessageModal = null;
+                });
+
+                // Перетаскивание
+                const header = modal.querySelector('#modalHeader');
+                let isDragging = false;
+                let startX, startY, startLeft, startTop;
+
+                header.addEventListener('mousedown', function(e) {
+                    isDragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    startLeft = parseInt(modal.style.left) || 50;
+                    startTop = parseInt(modal.style.top) || 50;
+                    document.body.style.userSelect = 'none';
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (!isDragging || !currentMessageModal) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    modal.style.left = Math.max(0, startLeft + dx) + 'px';
+                    modal.style.top = Math.max(0, startTop + dy) + 'px';
+                });
+
+                document.addEventListener('mouseup', function() {
+                    isDragging = false;
+                    document.body.style.userSelect = '';
+                });
+
+                // Изменение размера
+                const resizeHandle = modal.querySelector('#resizeHandle');
+                let isResizing = false;
+                let startWidth, startHeight, resizeStartX, resizeStartY;
+
+                resizeHandle.addEventListener('mousedown', function(e) {
+                    isResizing = true;
+                    resizeStartX = e.clientX;
+                    resizeStartY = e.clientY;
+                    startWidth = modal.offsetWidth;
+                    startHeight = modal.offsetHeight;
+                    e.stopPropagation();
+                    document.body.style.userSelect = 'none';
+                });
+
+                document.addEventListener('mousemove', function(e) {
+                    if (!isResizing || !currentMessageModal) return;
+                    const newWidth = Math.max(380, startWidth + (e.clientX - resizeStartX));
+                    const newHeight = Math.max(200, startHeight + (e.clientY - resizeStartY));
+                    modal.style.width = newWidth + 'px';
+                    modal.style.minHeight = newHeight + 'px';
+                });
+
+                document.addEventListener('mouseup', function() {
+                    isResizing = false;
+                    document.body.style.userSelect = '';
+                });
+
+                // Отправка ответа
+                const sendBtn = modal.querySelector('#modalSendBtn');
+                if (sendBtn) {
+                    sendBtn.addEventListener('click', async function() {
+                        const input = modal.querySelector('#modalResponseInput');
+                        const response = input.value.trim();
+                        if (!response) return;
+                        
+                        const { data, error } = await supabase.rpc('admin_respond_support', {
+                            p_message_id: msg.id,
+                            p_response: response
+                        });
+                        
+                        if (data && data.success) {
+                            showToast('Ответ отправлен');
+                            overlay.remove();
+                            currentMessageModal = null;
+                            loadMessages();
+                            loadStats();
+                        } else {
+                            showToast(data?.error || 'Ошибка', 'error');
+                        }
+                    });
+                }
+
+                // Удаление сообщения
+                modal.querySelector('#modalDeleteBtn').addEventListener('click', async function() {
+                    if (!confirm('Удалить это сообщение?')) return;
+                    
+                    const { data, error } = await supabase.rpc('admin_delete_support_message', {
+                        p_message_id: msg.id
+                    });
+                    
+                    if (data && data.success) {
+                        showToast('Сообщение удалено');
+                        overlay.remove();
+                        currentMessageModal = null;
+                        loadMessages();
+                        loadStats();
+                    } else {
+                        showToast(data?.error || 'Ошибка', 'error');
+                    }
+                });
             }
 
             // ===== ЗАГРУЗКА СТАТИСТИКИ =====
@@ -576,61 +868,24 @@
                 }
                 
                 container.innerHTML = data.map(msg => `
-                    <div class="message-item ${msg.is_read ? '' : 'unread'}">
+                    <div class="message-item ${msg.is_read ? '' : 'unread'}" onclick="openMessageModalById(${msg.id})">
                         <div class="message-text">${msg.user_message}</div>
                         <div class="message-meta">
                             <span>📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
-                            <span>${msg.is_read ? '✅ Прочитано' : '🆕 Новое'}</span>
-                        </div>
-                        ${msg.admin_response ? `
-                            <div class="message-response">✉️ Ответ: ${msg.admin_response}</div>
-                        ` : `
-                            <div class="response-area">
-                                <input type="text" placeholder="Ответить..." id="response_${msg.id}">
-                                <button class="btn btn-success btn-sm" onclick="respondMessage(${msg.id})">📤</button>
-                            </div>
-                        `}
-                        <div style="margin-top: 0.5rem;">
-                            <button class="btn btn-danger btn-sm" onclick="deleteMessage(${msg.id})">🗑 Удалить</button>
+                            <span>${msg.is_read ? '✅ Прочитано' : '🆕 Новое'} ${msg.admin_response ? '| ✉️ Отвечено' : ''}</span>
                         </div>
                     </div>
                 `).join('');
             }
 
-            // ===== ОТВЕТ НА СООБЩЕНИЕ =====
-            window.respondMessage = async function(messageId) {
-                const input = document.getElementById(`response_${messageId}`);
-                const response = input.value.trim();
-                if (!response) return;
-                
-                const { data, error } = await supabase.rpc('admin_respond_support', {
-                    p_message_id: messageId,
-                    p_response: response
-                });
-                
-                if (data && data.success) {
-                    showToast('Ответ отправлен');
-                    loadMessages();
-                    loadStats();
-                } else {
-                    showToast(data?.error || 'Ошибка', 'error');
-                }
-            };
-
-            // ===== УДАЛЕНИЕ СООБЩЕНИЯ =====
-            window.deleteMessage = async function(messageId) {
-                if (!confirm('Удалить сообщение?')) return;
-                
-                const { data, error } = await supabase.rpc('admin_delete_support_message', {
-                    p_message_id: messageId
-                });
-                
-                if (data && data.success) {
-                    showToast('Сообщение удалено');
-                    loadMessages();
-                    loadStats();
-                } else {
-                    showToast(data?.error || 'Ошибка', 'error');
+            // ===== ОТКРЫТИЕ ОКНА СООБЩЕНИЯ =====
+            window.openMessageModalById = async function(messageId) {
+                const { data, error } = await supabase.rpc('get_support_messages');
+                if (data) {
+                    const msg = data.find(m => m.id === messageId);
+                    if (msg) {
+                        openMessageModal(msg);
+                    }
                 }
             };
 
