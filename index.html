@@ -2045,8 +2045,23 @@
         }
 
         function initModals() {
-            // Общая функция для копирования реф ссылки
+            // Функция для копирования реферальной ссылки
             function copyReferralLink() {
+                if (!userData || !userData.vip_paid) {
+                    showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error');
+                    return;
+                }
+                
+                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
+                navigator.clipboard.writeText(refLink).then(() => {
+                    showToast('Реферальная ссылка скопирована!', 'success');
+                }).catch(() => {
+                    showToast('Не удалось скопировать ссылку', 'error');
+                });
+            }
+
+            // Функция для открытия мануала
+            function openManual() {
                 if (!userData || !userData.vip_paid) {
                     showToast('Мануал доступен пользователям с VIP статусом', 'error');
                     return;
@@ -2067,7 +2082,7 @@
 
             const manualBtn = document.getElementById('manualBtn');
             if (manualBtn) {
-                manualBtn.onclick = copyReferralLink;
+                manualBtn.onclick = openManual;
             }
 
             document.getElementById('logoutBtn').onclick = function() {
