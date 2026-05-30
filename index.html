@@ -156,7 +156,6 @@
             transform: translateY(0);
         }
 
-        /* Капча */
         .captcha-group {
             margin-bottom: 1.2rem;
             display: none;
@@ -506,7 +505,6 @@
             background: linear-gradient(135deg, #f3b95b, #da9729);
         }
 
-        /* Живая лента */
         .live-feed {
             width: 100%;
             max-width: 1200px;
@@ -527,13 +525,11 @@
             padding: 0.8rem;
         }
 
-        /* Зелёный блок для пополнений */
         .deposit-feed-block {
             background: rgba(76, 175, 80, 0.08);
             border: 1px solid rgba(76, 175, 80, 0.3);
         }
 
-        /* Красный блок для выводов */
         .withdraw-feed-block {
             background: rgba(255, 112, 67, 0.08);
             border: 1px solid rgba(255, 112, 67, 0.3);
@@ -586,7 +582,6 @@
         .deposit .feed-amount { color: #4caf50 !important; }
         .withdraw .feed-amount { color: #ff7043; }
 
-        /* Модальные окна */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -867,7 +862,6 @@
     </div>
 </div>
 
-<!-- ЭКРАН РЕГИСТРАЦИИ -->
 <div id="stageRegister" class="reg-container">
     <div class="form-wrapper">
         <div class="auth-card" id="authCard">
@@ -884,7 +878,6 @@
                 <label>Повторите пароль</label>
                 <input type="password" id="password2" placeholder="••••••••">
             </div>
-            <!-- КАПЧА -->
             <div class="captcha-group" id="captchaGroup">
                 <div class="captcha-box">
                     <div class="captcha-question" id="captchaQuestion">5 + 3 = ?</div>
@@ -933,7 +926,6 @@
     </div>
 </div>
 
-<!-- ЛЕНТА НА ЭКРАНЕ РЕГИСТРАЦИИ -->
 <div class="live-feed" id="regLiveFeed" style="max-width: 1200px;">
     <div class="feed-half deposit-feed-block">
         <div class="feed-title">🟢 Последние пополнения</div>
@@ -945,7 +937,6 @@
     </div>
 </div>
 
-<!-- ЭКРАН ЛИЧНОГО КАБИНЕТА -->
 <div id="stageHome" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="header">
         <div class="logo">✨ Пирамикс</div>
@@ -982,7 +973,6 @@
         </div>
     </div>
 
-    <!-- ЛЕНТА В КАБИНЕТЕ -->
     <div class="live-feed" id="homeLiveFeed">
         <div class="feed-half deposit-feed-block">
             <div class="feed-title">🟢 Последние пополнения</div>
@@ -999,7 +989,6 @@
     </div>
 </div>
 
-<!-- МОДАЛЬНЫЕ ОКНА -->
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
@@ -1070,25 +1059,24 @@
         let lastWithdrawId = null;
         let lastFeedUpdate = 0;
         let captchaAnswer = 0;
-        let captchaSolved = false;
 
-        // ===== ЗАГРУЗКА НИКНЕЙМОВ =====
+        // ===== ЗАГРУЗКА НИКНЕЙМОВ ИЗ name.html =====
         let allNicks = [];
         let namesLoaded = false;
 
         async function loadNames() {
             if (namesLoaded) return;
             try {
-                const response = await fetch('names.html');
+                const response = await fetch('name.html');
                 const text = await response.text();
                 const match = text.match(/const allNicks = (\[[\s\S]*?\]);/);
                 if (match && match[1]) {
                     allNicks = eval(match[1]);
                     namesLoaded = true;
-                    console.log('✅ Загружено никнеймов:', allNicks.length);
+                    console.log('✅ Загружено никнеймов из name.html:', allNicks.length);
                 }
             } catch(e) {
-                console.error('Ошибка загрузки никнеймов:', e);
+                console.error('Ошибка загрузки никнеймов из name.html:', e);
                 namesLoaded = true;
             }
         }
@@ -1105,7 +1093,6 @@
             captchaAnswer = a + b;
             document.getElementById('captchaQuestion').textContent = `${a} + ${b} = ?`;
             document.getElementById('captchaAnswer').value = '';
-            captchaSolved = false;
         }
 
         function showToast(message, type = 'error') {
@@ -1378,7 +1365,6 @@
 
                 if (!nickname || !password) return;
 
-                // Проверка капчи при регистрации
                 if (!isLoginMode) {
                     const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
                     if (userAnswer !== captchaAnswer) {
@@ -1387,7 +1373,6 @@
                         generateCaptcha();
                         return;
                     }
-                    captchaSolved = true;
                 }
 
                 if (isLoginMode) {
@@ -1482,12 +1467,10 @@
                 navigator.clipboard.writeText(refLink).then(() => showToast('Ссылка скопирована!', 'success'));
             };
 
-            // Политика
             document.getElementById('policyLink').onclick = () => document.getElementById('policyModal').classList.remove('hidden');
             document.getElementById('closePolicyBtn').onclick = () => document.getElementById('policyModal').classList.add('hidden');
             document.getElementById('policyModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
 
-            // Профиль
             document.getElementById('profileBtn').onclick = function() {
                 document.getElementById('profileNickname').value = userData.nickname;
                 document.getElementById('profileModal').classList.remove('hidden');
@@ -1502,7 +1485,6 @@
                 document.getElementById('profileModal').classList.add('hidden');
             };
 
-            // Вывод
             document.getElementById('withdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.remove('hidden');
             document.getElementById('closeWithdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.add('hidden');
             document.getElementById('confirmWithdrawBtn').onclick = async function() {
@@ -1517,7 +1499,6 @@
                 document.getElementById('withdrawModal').classList.add('hidden');
             };
 
-            // VIP
             document.getElementById('vipBtn').onclick = async function() {
                 const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
                 const vipInfoBox = document.getElementById('vipInfoBox');
