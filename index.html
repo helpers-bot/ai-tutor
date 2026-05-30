@@ -15,7 +15,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -28,6 +33,7 @@
             overflow-x: hidden;
             font-size: 14px;
         }
+
         body::before {
             content: "";
             position: fixed;
@@ -40,248 +46,1246 @@
             z-index: 0;
             pointer-events: none;
         }
-        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .toast {
-            padding: 12px 20px; border-radius: 12px; color: #fff; font-weight: 500; font-size: 0.9rem;
-            backdrop-filter: blur(10px); animation: slideInRight 0.3s ease-out, fadeOut 0.3s 2.7s ease-out forwards;
-            max-width: 350px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.9rem;
+            backdrop-filter: blur(10px);
+            animation: slideInRight 0.3s ease-out, fadeOut 0.3s 2.7s ease-out forwards;
+            max-width: 350px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         }
-        .toast-error { background: rgba(255, 112, 67, 0.9); border: 1px solid #ff7043; }
-        .toast-success { background: rgba(76, 175, 80, 0.9); border: 1px solid #4caf50; }
-        .toast-info { background: rgba(192, 132, 252, 0.9); border: 1px solid #c084fc; }
-        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-        .reg-container { width: 100%; max-width: 1200px; display: flex; flex-direction: row; flex-wrap: wrap; align-items: flex-start; justify-content: center; gap: 1.5rem; position: relative; z-index: 2; margin-bottom: 24px; }
-        .form-wrapper { flex: 0 0 320px; display: flex; justify-content: center; align-items: flex-start; }
+
+        .toast-error {
+            background: rgba(255, 112, 67, 0.9);
+            border: 1px solid #ff7043;
+        }
+
+        .toast-success {
+            background: rgba(76, 175, 80, 0.9);
+            border: 1px solid #4caf50;
+        }
+
+        .toast-info {
+            background: rgba(192, 132, 252, 0.9);
+            border: 1px solid #c084fc;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .reg-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 24px;
+        }
+
+        .form-wrapper {
+            flex: 0 0 320px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
         .auth-card {
-            background: rgba(20, 22, 27, 0.9); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255, 215, 150, 0.18); border-radius: 2rem; padding: 1.8rem 1.8rem 1.5rem;
-            width: 100%; max-width: 340px; box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15);
-            color: #f5efe0; transition: all 0.3s ease; animation: slideFromTop 2s ease-out forwards;
-            transform-origin: top center; margin-top: 8px;
+            background: rgba(20, 22, 27, 0.9);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 215, 150, 0.18);
+            border-radius: 2rem;
+            padding: 1.8rem 1.8rem 1.5rem;
+            width: 100%;
+            max-width: 340px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15);
+            color: #f5efe0;
+            transition: all 0.3s ease;
+            animation: slideFromTop 2s ease-out forwards;
+            transform-origin: top center;
+            margin-top: 8px;
         }
+
         @keyframes slideFromTop {
             0% { opacity: 0; transform: translateY(-300px) scale(0.95); }
             60% { opacity: 0.8; transform: translateY(-30px) scale(0.98); }
             100% { opacity: 1; transform: translateY(0) scale(1); }
         }
-        .auth-card h3 { font-size: 1.5rem; font-weight: 600; margin-bottom: 1.5rem; letter-spacing: -0.3px; background: linear-gradient(135deg, #f9d56e, #e6a861); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; }
-        .input-group { margin-bottom: 1.2rem; }
-        .input-group label { display: block; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.4px; color: #b9b09a; margin-bottom: 0.25rem; text-transform: uppercase; }
+
+        .auth-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #f9d56e, #e6a861);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.4px;
+            color: #b9b09a;
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+        }
+
         .input-group input, .input-group select {
-            width: 100%; background: rgba(15, 16, 20, 0.8); border: 1px solid rgba(220, 180, 100, 0.25);
-            border-radius: 1rem; padding: 0.75rem 1rem; font-size: 0.9rem; color: #f5e7cc;
-            outline: none; transition: all 0.25s; font-family: 'Inter', sans-serif; backdrop-filter: blur(4px);
+            width: 100%;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: #f5e7cc;
+            outline: none;
+            transition: all 0.25s;
+            font-family: 'Inter', sans-serif;
+            backdrop-filter: blur(4px);
         }
-        .input-group select { appearance: none; cursor: pointer; }
-        .input-group select option { background: #1a1c22; color: #f5e7cc; }
-        .input-group input:focus, .input-group select:focus { border-color: #f3b95b; box-shadow: 0 0 12px rgba(243, 185, 91, 0.4); background: rgba(22, 22, 28, 0.9); }
-        .input-group input::placeholder { color: #5e5a4f; font-weight: 400; font-size: 0.85rem; }
-        .password-field { transition: all 0.35s ease; overflow: hidden; }
-        .hidden-password { max-height: 0; opacity: 0; margin-bottom: 0; pointer-events: none; transform: translateY(-8px); }
-        .visible-password { max-height: 70px; opacity: 1; margin-bottom: 1.2rem; transform: translateY(0); }
+
+        .input-group select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .input-group select option {
+            background: #1a1c22;
+            color: #f5e7cc;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #f3b95b;
+            box-shadow: 0 0 12px rgba(243, 185, 91, 0.4);
+            background: rgba(22, 22, 28, 0.9);
+        }
+
+        .input-group input::placeholder {
+            color: #5e5a4f;
+            font-weight: 400;
+            font-size: 0.85rem;
+        }
+
+        .password-field {
+            transition: all 0.35s ease;
+            overflow: hidden;
+        }
+
+        .hidden-password {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0;
+            pointer-events: none;
+            transform: translateY(-8px);
+        }
+
+        .visible-password {
+            max-height: 70px;
+            opacity: 1;
+            margin-bottom: 1.2rem;
+            transform: translateY(0);
+        }
+
         .action-btn, .btn-primary {
-            background: linear-gradient(135deg, #e2a542, #c7851e); border: none; color: #0f0e0a;
-            font-weight: 700; font-size: 0.9rem; padding: 0.7rem 1.6rem; border-radius: 2rem;
-            cursor: pointer; backdrop-filter: blur(8px); transition: 0.25s; margin-top: 0.2rem;
-            margin-bottom: 0.6rem; letter-spacing: 0.5px; display: inline-block;
-            box-shadow: 0 6px 15px rgba(226, 165, 66, 0.35); width: auto; min-width: 160px;
+            background: linear-gradient(135deg, #e2a542, #c7851e);
+            border: none;
+            color: #0f0e0a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.6rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: 0.25s;
+            margin-top: 0.2rem;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            box-shadow: 0 6px 15px rgba(226, 165, 66, 0.35);
+            width: auto;
+            min-width: 160px;
         }
-        .action-btn:hover, .btn-primary:hover { background: linear-gradient(135deg, #f3b95b, #da9729); box-shadow: 0 8px 20px rgba(243, 185, 91, 0.6); color: #000; }
-        .switch-text { font-size: 0.8rem; color: #b9b09a; margin-top: 0.4rem; display: block; }
-        .switch-text span { color: #f3b95b; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; margin-left: 4px; }
-        .switch-text span:hover { color: #ffd966; }
-        .error-message { color: #ff7043; font-size: 0.75rem; text-align: center; margin-bottom: 0.6rem; display: none; }
-        .error-message.visible { display: block; }
+
+        .action-btn:hover, .btn-primary:hover {
+            background: linear-gradient(135deg, #f3b95b, #da9729);
+            box-shadow: 0 8px 20px rgba(243, 185, 91, 0.6);
+            color: #000;
+        }
+
+        .switch-text {
+            font-size: 0.8rem;
+            color: #b9b09a;
+            margin-top: 0.4rem;
+            display: block;
+        }
+
+        .switch-text span {
+            color: #f3b95b;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+            margin-left: 4px;
+        }
+
+        .switch-text span:hover {
+            color: #ffd966;
+        }
+
+        .error-message {
+            color: #ff7043;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-bottom: 0.6rem;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
         .stats-panel {
-            flex: 0 0 230px; background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px); border-radius: 1.8rem; padding: 1.4rem 1.2rem;
-            border: 1px solid rgba(255, 215, 150, 0.2); color: #f5efe0; box-shadow: 0 18px 30px rgba(0,0,0,0.7);
-            display: flex; flex-direction: column; gap: 1rem;
+            flex: 0 0 230px;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.8rem;
+            padding: 1.4rem 1.2rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            color: #f5efe0;
+            box-shadow: 0 18px 30px rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
-        .stat-item { background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 0.8rem; text-align: center; }
-        .stat-label { font-size: 0.7rem; color: #b9b09a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
-        .stat-value { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; transition: all 0.2s; }
+
+        .stat-item {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: #b9b09a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.2s;
+        }
+
         .info-section {
-            flex: 1 1 360px; background: rgba(12, 14, 18, 0.65); backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px); border-radius: 2.5rem; padding: 1.8rem 1.8rem;
-            border: 1px solid rgba(230, 180, 70, 0.2); box-shadow: 0 22px 40px rgba(0,0,0,0.8);
-            color: #ece3d5; animation: fadeInInfo 1s ease-out;
+            flex: 1 1 360px;
+            background: rgba(12, 14, 18, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 2.5rem;
+            padding: 1.8rem 1.8rem;
+            border: 1px solid rgba(230, 180, 70, 0.2);
+            box-shadow: 0 22px 40px rgba(0,0,0,0.8);
+            color: #ece3d5;
+            animation: fadeInInfo 1s ease-out;
         }
-        @keyframes fadeInInfo { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .info-section h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.3rem; background: linear-gradient(to right, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -0.5px; }
-        .subtitle { color: #b7a16c; font-weight: 500; margin-bottom: 1.5rem; font-size: 0.85rem; border-left: 3px solid #e3a94d; padding-left: 0.8rem; }
-        .chart-container { margin: 1.4rem 0 1.6rem; }
-        .chart-bars { display: flex; align-items: flex-end; justify-content: space-around; height: 150px; padding: 0 0.4rem; border-bottom: 2px solid rgba(230, 180, 70, 0.4); margin-bottom: 0.6rem; }
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 60px; }
-        .bar { width: 35px; background: linear-gradient(180deg, #f3b95b, #d18e2c); border-radius: 18px 18px 5px 5px; box-shadow: 0 -4px 12px rgba(243, 185, 91, 0.5); margin-bottom: 5px; }
-        .bar-percent { font-weight: 700; font-size: 0.95rem; color: #efc468; margin-bottom: 3px; }
-        .bar-label { font-weight: 600; font-size: 0.85rem; color: #f5d78c; margin-top: 3px; }
-        .legend { display: flex; justify-content: center; gap: 1.5rem; margin-top: 0.3rem; color: #cfbc8b; font-size: 0.8rem; }
-        .legend span::before { content: "●"; margin-right: 5px; color: #f3b95b; font-size: 0.9rem; }
-        .graph-note { margin-top: 1.2rem; font-size: 0.8rem; color: #c9ad7a; text-align: center; border-top: 1px dashed #b49450; padding-top: 1rem; }
+
+        @keyframes fadeInInfo {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(to right, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: #b7a16c;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            border-left: 3px solid #e3a94d;
+            padding-left: 0.8rem;
+        }
+
+        .chart-container {
+            margin: 1.4rem 0 1.6rem;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 150px;
+            padding: 0 0.4rem;
+            border-bottom: 2px solid rgba(230, 180, 70, 0.4);
+            margin-bottom: 0.6rem;
+        }
+
+        .bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 60px;
+        }
+
+        .bar {
+            width: 35px;
+            background: linear-gradient(180deg, #f3b95b, #d18e2c);
+            border-radius: 18px 18px 5px 5px;
+            box-shadow: 0 -4px 12px rgba(243, 185, 91, 0.5);
+            margin-bottom: 5px;
+        }
+
+        .bar-percent {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #efc468;
+            margin-bottom: 3px;
+        }
+
+        .bar-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #f5d78c;
+            margin-top: 3px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 0.3rem;
+            color: #cfbc8b;
+            font-size: 0.8rem;
+        }
+
+        .legend span::before {
+            content: "●";
+            margin-right: 5px;
+            color: #f3b95b;
+            font-size: 0.9rem;
+        }
+
+        .graph-note {
+            margin-top: 1.2rem;
+            font-size: 0.8rem;
+            color: #c9ad7a;
+            text-align: center;
+            border-top: 1px dashed #b49450;
+            padding-top: 1rem;
+        }
+
         .header {
-            width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center;
-            padding: 0.8rem 1.5rem; background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px); border-radius: 1.8rem; border: 1px solid rgba(255, 215, 150, 0.2);
-            margin-bottom: 1.5rem; position: relative; z-index: 2; flex-wrap: wrap; gap: 0.8rem;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 1.8rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
+            flex-wrap: wrap;
+            gap: 0.8rem;
         }
-        .logo { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #f9d56e, #e6a861); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .header-right { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-        .user-greeting { font-weight: 600; font-size: 0.9rem; }
-        .user-greeting .animated-letter { display: inline-block; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: letterGlow 2s ease-in-out infinite; }
-        @keyframes letterGlow { 0%, 100% { filter: brightness(1); transform: translateY(0); } 50% { filter: brightness(1.5); transform: translateY(-2px); } }
-        .btn-outline { background: transparent; border: 1px solid #c9a357; color: #e9c274; font-weight: 600; font-size: 0.8rem; padding: 0.45rem 1.2rem; border-radius: 1.8rem; cursor: pointer; transition: 0.25s; text-decoration: none; }
-        .btn-outline:hover { background: #f3b95b20; border-color: #f3b95b; color: #ffe6b3; box-shadow: 0 0 12px rgba(243, 185, 91, 0.3); }
-        .dashboard { width: 100%; max-width: 1200px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; position: relative; z-index: 2; margin-bottom: 1.5rem; }
-        .card { background: rgba(20, 22, 27, 0.8); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 1.5rem; padding: 1.4rem; border: 1px solid rgba(255, 215, 150, 0.15); color: #f5efe0; transition: transform 0.2s; }
-        .card:hover { transform: translateY(-3px); border-color: rgba(243, 185, 91, 0.4); }
-        .card h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.8rem; color: #e9c274; }
-        .balance { font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, #fad974, #ebaa5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .stat-row { display: flex; justify-content: space-between; align-items: center; margin: 0.35rem 0; font-size: 0.8rem; gap: 0.4rem; }
-        .stat-row .stat-label { color: #9b927a; flex: 1; font-size: 0.75rem; min-width: 0; }
-        .stat-row .stat-value { color: #f5d78c; font-weight: 600; text-align: right; font-size: 0.8rem; white-space: nowrap; }
-        .stat-earn { color: #4caf50; font-weight: 600; text-align: right; font-size: 0.75rem; white-space: nowrap; }
-        .btn-vip { background: linear-gradient(135deg, #c084fc, #7c3aed); border: none; color: #fff; font-weight: 700; font-size: 0.9rem; padding: 0.7rem 1.8rem; border-radius: 2rem; cursor: pointer; transition: 0.25s; box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4); width: 100%; margin-top: 0.4rem; animation: glowPulse 2s infinite; }
-        @keyframes glowPulse { 0%, 100% { box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4); } 50% { box-shadow: 0 6px 25px rgba(192, 132, 252, 0.7); } }
-        .btn-vip:hover { background: linear-gradient(135deg, #d8b4fe, #9333ea); }
-        .earn-info-text { color: #b9b09a; font-size: 0.75rem; line-height: 1.5; margin-bottom: 1rem; }
-        .earn-highlight { color: #f5d78c; font-weight: 600; }
-        .btn-calculator { background: linear-gradient(135deg, #4caf50, #2e7d32); border: none; color: #fff; font-weight: 700; font-size: 0.85rem; padding: 0.6rem 1.5rem; border-radius: 2rem; cursor: pointer; transition: 0.25s; box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4); width: 100%; margin-top: 0.4rem; }
-        .btn-calculator:hover { background: linear-gradient(135deg, #66bb6a, #388e3c); box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6); }
-        .calc-row { display: flex; align-items: center; justify-content: space-between; margin: 0.6rem 0; gap: 0.5rem; }
-        .calc-label { color: #b9b09a; font-size: 0.8rem; flex: 1; }
-        .calc-controls { display: flex; align-items: center; gap: 0.5rem; }
-        .calc-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #c9a357; background: rgba(0,0,0,0.3); color: #f5d78c; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .calc-btn:hover { background: #f3b95b30; }
-        .calc-value { color: #f5d78c; font-weight: 700; font-size: 1rem; min-width: 30px; text-align: center; }
-        .calc-result { background: rgba(0,0,0,0.3); border-radius: 1rem; padding: 1rem; margin-top: 1rem; text-align: center; }
-        .calc-total { font-size: 1.8rem; font-weight: 700; color: #4caf50; }
-        .live-feed { width: 100%; max-width: 1200px; background: rgba(10, 12, 15, 0.8); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-radius: 1.8rem; border: 1px solid rgba(230, 180, 70, 0.25); padding: 1rem 1.2rem; display: flex; gap: 1.2rem; z-index: 3; box-shadow: 0 -8px 25px rgba(0,0,0,0.7); margin-top: 8px; }
-        .feed-half { flex: 1; min-width: 0; }
-        .feed-title { font-size: 0.8rem; font-weight: 600; color: #c9ad7a; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.6rem; }
-        .feed-list { display: flex; flex-direction: column; gap: 0.25rem; height: 210px; overflow: hidden; }
-        .feed-item { background: rgba(25, 22, 17, 0.6); border-radius: 0.8rem; padding: 0.4rem 0.8rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; border: 1px solid rgba(212, 165, 60, 0.2); flex-shrink: 0; transition: all 0.3s ease; }
-        .feed-item.new-item-highlight { animation: highlightNewItem 2s ease-out forwards; }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f9d56e, #e6a861);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .user-greeting {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .user-greeting .animated-letter {
+            display: inline-block;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: letterGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes letterGlow {
+            0%, 100% { 
+                filter: brightness(1);
+                transform: translateY(0);
+            }
+            50% { 
+                filter: brightness(1.5);
+                transform: translateY(-2px);
+            }
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #c9a357;
+            color: #e9c274;
+            font-weight: 600;
+            font-size: 0.8rem;
+            padding: 0.45rem 1.2rem;
+            border-radius: 1.8rem;
+            cursor: pointer;
+            transition: 0.25s;
+            text-decoration: none;
+        }
+
+        .btn-outline:hover {
+            background: #f3b95b20;
+            border-color: #f3b95b;
+            color: #ffe6b3;
+            box-shadow: 0 0 12px rgba(243, 185, 91, 0.3);
+        }
+
+        .dashboard {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.2rem;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 1.5rem;
+        }
+
+        .card {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.5rem;
+            padding: 1.4rem;
+            border: 1px solid rgba(255, 215, 150, 0.15);
+            color: #f5efe0;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(243, 185, 91, 0.4);
+        }
+
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: #e9c274;
+        }
+
+        .balance {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.35rem 0;
+            font-size: 0.8rem;
+            gap: 0.4rem;
+        }
+
+        .stat-row .stat-label {
+            color: #9b927a;
+            flex: 1;
+            font-size: 0.75rem;
+            min-width: 0;
+        }
+
+        .stat-row .stat-value {
+            color: #f5d78c;
+            font-weight: 600;
+            text-align: right;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .stat-earn {
+            color: #4caf50;
+            font-weight: 600;
+            text-align: right;
+            font-size: 0.75rem;
+            white-space: nowrap;
+        }
+
+        .btn-vip {
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 0.7rem 1.8rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
+            width: 100%;
+            margin-top: 0.4rem;
+            animation: glowPulse 2s infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 6px 25px rgba(192, 132, 252, 0.7); }
+        }
+
+        .btn-vip:hover {
+            background: linear-gradient(135deg, #d8b4fe, #9333ea);
+        }
+
+        .earn-info-text {
+            color: #b9b09a;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .earn-highlight {
+            color: #f5d78c;
+            font-weight: 600;
+        }
+
+        .btn-calculator {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+
+        .btn-calculator:hover {
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .calc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.6rem 0;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            color: #b9b09a;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        .calc-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .calc-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #c9a357;
+            background: rgba(0,0,0,0.3);
+            color: #f5d78c;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: #f3b95b30;
+        }
+
+        .calc-value {
+            color: #f5d78c;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .calc-result {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .calc-total {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+        }
+
+        .live-feed {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(10, 12, 15, 0.8);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-radius: 1.8rem;
+            border: 1px solid rgba(230, 180, 70, 0.25);
+            padding: 1rem 1.2rem;
+            display: flex;
+            gap: 1.2rem;
+            z-index: 3;
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.7);
+            margin-top: 8px;
+        }
+
+        .feed-half {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .feed-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #c9ad7a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.6rem;
+        }
+
+        .feed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            height: 210px;
+            overflow: hidden;
+        }
+
+        .feed-item {
+            background: rgba(25, 22, 17, 0.6);
+            border-radius: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.78rem;
+            border: 1px solid rgba(212, 165, 60, 0.2);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .feed-item.new-item-highlight {
+            animation: highlightNewItem 2s ease-out forwards;
+        }
+
         @keyframes highlightNewItem {
-            0% { background: rgba(76, 175, 80, 0.4); border-color: rgba(76, 175, 80, 0.8); box-shadow: 0 0 20px rgba(76, 175, 80, 0.6); transform: scale(1.03); }
-            30% { background: rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.7); box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); transform: scale(1.02); }
-            60% { background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.4); box-shadow: 0 0 8px rgba(76, 175, 80, 0.3); transform: scale(1.01); }
-            100% { background: rgba(25, 22, 17, 0.6); border-color: rgba(212, 165, 60, 0.2); box-shadow: none; transform: scale(1); }
+            0% { 
+                background: rgba(76, 175, 80, 0.4);
+                border-color: rgba(76, 175, 80, 0.8);
+                box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
+                transform: scale(1.03);
+            }
+            30% {
+                background: rgba(76, 175, 80, 0.3);
+                border-color: rgba(76, 175, 80, 0.7);
+                box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+                transform: scale(1.02);
+            }
+            60% {
+                background: rgba(76, 175, 80, 0.15);
+                border-color: rgba(76, 175, 80, 0.4);
+                box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+                transform: scale(1.01);
+            }
+            100% {
+                background: rgba(25, 22, 17, 0.6);
+                border-color: rgba(212, 165, 60, 0.2);
+                box-shadow: none;
+                transform: scale(1);
+            }
         }
+
         .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
         .feed-time { color: #8b8a7a; font-size: 0.68rem; margin-left: 0.4rem; }
         .feed-amount { font-weight: 700; font-size: 0.78rem; }
         .deposit .feed-amount { color: #4caf50 !important; }
         .withdraw .feed-amount { color: #ff7043; }
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal { background: rgba(20, 22, 27, 0.95); border: 1px solid rgba(255, 215, 150, 0.3); border-radius: 1.8rem; padding: 1.8rem; width: 90%; max-width: 420px; color: #f5efe0; animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1); }
-        @keyframes modalSlideIn { 0% { opacity: 0; transform: scale(0.85) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
-        .modal h2 { margin-bottom: 1.2rem; color: #e9c274; font-size: 1.3rem; }
-        .modal .input-group { margin-bottom: 1rem; }
-        .modal .input-group label { font-size: 0.7rem; }
-        .modal .input-group input, .modal .input-group select { font-size: 0.85rem; padding: 0.65rem 0.9rem; }
-        .modal-buttons { display: flex; gap: 0.8rem; margin-top: 1.2rem; }
-        .modal-buttons .btn-primary, .modal-buttons .btn-outline { flex: 1; text-align: center; font-size: 0.85rem; }
-        .vip-info-box { background: rgba(0,0,0,0.3); border-radius: 0.8rem; padding: 1rem; margin: 0.8rem 0; text-align: center; border: 1px solid rgba(192, 132, 252, 0.3); }
-        .vip-price { font-size: 1.6rem; font-weight: 700; color: #c084fc; margin: 0.4rem 0; }
-        .vip-id { font-size: 1.2rem; font-weight: 600; color: #f5d78c; letter-spacing: 2px; margin: 0.4rem 0; }
-        .hidden { display: none !important; }
-        .footer { width: 100%; max-width: 1200px; text-align: center; padding: 1.2rem; margin-top: 0.8rem; z-index: 2; position: relative; }
-        .footer-link { color: #9b927a; font-size: 0.75rem; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
-        .footer-link:hover { color: #f3b95b; }
-        .policy-modal { max-width: 650px; max-height: 80vh; overflow-y: auto; text-align: left; line-height: 1.6; font-size: 0.8rem; }
-        .policy-modal h2 { text-align: center; margin-bottom: 1.2rem; font-size: 1.2rem; }
-        .policy-modal h3 { color: #e9c274; margin: 1rem 0 0.4rem; font-size: 0.95rem; }
-        .policy-modal p { color: #b9b09a; font-size: 0.78rem; margin-bottom: 0.6rem; }
-        .optional-label { color: #6b6352; font-size: 0.7rem; font-style: italic; }
-        .support-btn { position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #c084fc, #7c3aed); border: none; color: #fff; font-size: 1.5rem; cursor: pointer; z-index: 200; box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; animation: pulseSupport 2s infinite; }
-        .support-btn:hover { transform: scale(1.1); box-shadow: 0 8px 30px rgba(192, 132, 252, 0.8); }
-        .support-btn.has-response { animation: pulseNotification 1s infinite; background: linear-gradient(135deg, #4caf50, #2e7d32); box-shadow: 0 6px 25px rgba(76, 175, 80, 0.7); }
-        @keyframes pulseSupport { 0%, 100% { box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); } 50% { box-shadow: 0 6px 35px rgba(192, 132, 252, 0.9); } }
-        @keyframes pulseNotification { 0%, 100% { box-shadow: 0 6px 20px rgba(76, 175, 80, 0.7); transform: scale(1); } 50% { box-shadow: 0 6px 35px rgba(76, 175, 80, 1); transform: scale(1.08); } }
-        .support-chat { position: fixed; bottom: 90px; right: 24px; width: 340px; max-width: 90vw; background: rgba(20, 22, 27, 0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(192, 132, 252, 0.4); border-radius: 1.5rem; box-shadow: 0 15px 40px rgba(0,0,0,0.8); z-index: 199; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s ease-out; max-height: 500px; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .support-chat-header { background: linear-gradient(135deg, rgba(192, 132, 252, 0.3), rgba(124, 58, 237, 0.2)); padding: 1rem 1.2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(192, 132, 252, 0.3); }
-        .support-chat-header h3 { font-size: 0.95rem; color: #e9c274; margin: 0; }
-        .support-close-btn { background: transparent; border: none; color: #b9b09a; font-size: 1.3rem; cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s; }
-        .support-close-btn:hover { color: #ff7043; }
-        .support-chat-messages { flex: 1; padding: 1rem; overflow-y: auto; max-height: 250px; display: flex; flex-direction: column; gap: 0.6rem; }
-        .support-message { padding: 0.7rem 1rem; border-radius: 1rem; font-size: 0.8rem; line-height: 1.4; max-width: 85%; }
-        .support-message.operator { background: rgba(192, 132, 252, 0.2); border: 1px solid rgba(192, 132, 252, 0.3); color: #f5efe0; align-self: flex-start; border-bottom-left-radius: 0.3rem; }
-        .support-message.user { background: rgba(243, 185, 91, 0.2); border: 1px solid rgba(243, 185, 91, 0.3); color: #f5efe0; align-self: flex-end; border-bottom-right-radius: 0.3rem; }
-        .support-message.admin-response { background: rgba(76, 175, 80, 0.25); border: 1px solid rgba(76, 175, 80, 0.5); color: #81c784; align-self: flex-start; border-bottom-left-radius: 0.3rem; animation: fadeInUp 0.5s ease-out; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .support-message-time { font-size: 0.65rem; color: #8b8a7a; margin-top: 0.2rem; text-align: right; }
-        .support-chat-input-area { padding: 0.8rem 1rem; border-top: 1px solid rgba(192, 132, 252, 0.2); display: flex; gap: 0.5rem; }
-        .support-chat-input { flex: 1; background: rgba(15, 16, 20, 0.8); border: 1px solid rgba(220, 180, 100, 0.25); border-radius: 1.5rem; padding: 0.6rem 1rem; font-size: 0.8rem; color: #f5e7cc; outline: none; font-family: 'Inter', sans-serif; resize: none; }
-        .support-chat-input:focus { border-color: #c084fc; box-shadow: 0 0 10px rgba(192, 132, 252, 0.3); }
-        .support-send-btn { background: linear-gradient(135deg, #c084fc, #7c3aed); border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .support-send-btn:hover { background: linear-gradient(135deg, #d8b4fe, #9333ea); box-shadow: 0 0 15px rgba(192, 132, 252, 0.5); }
-        @media (max-width: 1024px) { .reg-container { gap: 1rem; } .info-section { flex: 1 1 100%; } }
-        @media (max-width: 900px) { .live-feed { flex-direction: column; } .feed-list { height: 160px; } .header { flex-direction: column; text-align: center; } .header-right { justify-content: center; } .balance { font-size: 1.6rem; } }
-        @media (max-width: 780px) {
-            .reg-container { flex-direction: column; align-items: center; } .form-wrapper { flex: 0 0 auto; width: 100%; max-width: 340px; }
-            .stats-panel { flex: 0 0 auto; width: 100%; max-width: 340px; } .info-section { width: 100%; }
-            .auth-card { margin-left: auto; margin-right: auto; animation: slideFromTopMobile 0.8s ease-out forwards; }
-            @keyframes slideFromTopMobile { 0% { transform: translate(10px, -60px); opacity: 0; } 100% { transform: translate(0,0); opacity: 1; } }
-            .stat-value { font-size: 1.3rem; } .stat-row .stat-label { font-size: 0.7rem; } .stat-row .stat-value { font-size: 0.75rem; } .stat-earn { font-size: 0.7rem; } .dashboard { grid-template-columns: 1fr; }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s;
         }
-        @media (max-width: 480px) { body { padding: 8px; font-size: 13px; } .auth-card { padding: 1.4rem; border-radius: 1.5rem; } .btn-primary, .action-btn { font-size: 0.8rem; padding: 0.6rem 1.4rem; } .logo { font-size: 1.3rem; } .feed-list { height: 140px; } .support-btn { width: 48px; height: 48px; bottom: 16px; right: 16px; font-size: 1.3rem; } .support-chat { width: 300px; bottom: 75px; right: 16px; } }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: rgba(20, 22, 27, 0.95);
+            border: 1px solid rgba(255, 215, 150, 0.3);
+            border-radius: 1.8rem;
+            padding: 1.8rem;
+            width: 90%;
+            max-width: 420px;
+            color: #f5efe0;
+            animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1);
+        }
+
+        @keyframes modalSlideIn {
+            0% { opacity: 0; transform: scale(0.85) translateY(30px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal h2 {
+            margin-bottom: 1.2rem;
+            color: #e9c274;
+            font-size: 1.3rem;
+        }
+
+        .modal .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal .input-group label {
+            font-size: 0.7rem;
+        }
+
+        .modal .input-group input,
+        .modal .input-group select {
+            font-size: 0.85rem;
+            padding: 0.65rem 0.9rem;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+        }
+
+        .modal-buttons .btn-primary,
+        .modal-buttons .btn-outline {
+            flex: 1;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .vip-info-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 0.8rem;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            text-align: center;
+            border: 1px solid rgba(192, 132, 252, 0.3);
+        }
+
+        .vip-price {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #c084fc;
+            margin: 0.4rem 0;
+        }
+
+        .vip-id {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #f5d78c;
+            letter-spacing: 2px;
+            margin: 0.4rem 0;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .footer {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+            padding: 1.2rem;
+            margin-top: 0.8rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .footer-link {
+            color: #9b927a;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+
+        .footer-link:hover {
+            color: #f3b95b;
+        }
+
+        .policy-modal {
+            max-width: 650px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            line-height: 1.6;
+            font-size: 0.8rem;
+        }
+
+        .policy-modal h2 {
+            text-align: center;
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+        }
+
+        .policy-modal h3 {
+            color: #e9c274;
+            margin: 1rem 0 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        .policy-modal p {
+            color: #b9b09a;
+            font-size: 0.78rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .optional-label {
+            color: #6b6352;
+            font-size: 0.7rem;
+            font-style: italic;
+        }
+
+        /* ===== КНОПКА ПОДДЕРЖКИ ===== */
+        .support-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 200;
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulseSupport 2s infinite;
+        }
+
+        .support-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(192, 132, 252, 0.8);
+        }
+
+        .support-btn.has-response {
+            animation: pulseNotification 1s infinite;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.7);
+        }
+
+        @keyframes pulseSupport {
+            0%, 100% { box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
+            50% { box-shadow: 0 6px 35px rgba(192, 132, 252, 0.9); }
+        }
+
+        @keyframes pulseNotification {
+            0%, 100% { box-shadow: 0 6px 20px rgba(76, 175, 80, 0.7); transform: scale(1); }
+            50% { box-shadow: 0 6px 35px rgba(76, 175, 80, 1); transform: scale(1.08); }
+        }
+
+        /* ===== ЧАТ ПОДДЕРЖКИ ===== */
+        .support-chat {
+            position: fixed;
+            bottom: 90px;
+            right: 24px;
+            width: 340px;
+            max-width: 90vw;
+            background: rgba(20, 22, 27, 0.97);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(192, 132, 252, 0.4);
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            z-index: 199;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.3s ease-out;
+            max-height: 500px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .support-chat-header {
+            background: linear-gradient(135deg, rgba(192, 132, 252, 0.3), rgba(124, 58, 237, 0.2));
+            padding: 1rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(192, 132, 252, 0.3);
+        }
+
+        .support-chat-header h3 {
+            font-size: 0.95rem;
+            color: #e9c274;
+            margin: 0;
+        }
+
+        .support-close-btn {
+            background: transparent;
+            border: none;
+            color: #b9b09a;
+            font-size: 1.3rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s;
+        }
+
+        .support-close-btn:hover {
+            color: #ff7043;
+        }
+
+        .support-chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .support-message {
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            max-width: 85%;
+        }
+
+        .support-message.operator {
+            background: rgba(192, 132, 252, 0.2);
+            border: 1px solid rgba(192, 132, 252, 0.3);
+            color: #f5efe0;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.3rem;
+        }
+
+        .support-message.user {
+            background: rgba(243, 185, 91, 0.2);
+            border: 1px solid rgba(243, 185, 91, 0.3);
+            color: #f5efe0;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.3rem;
+        }
+
+        .support-message.admin-response {
+            background: rgba(76, 175, 80, 0.25);
+            border: 1px solid rgba(76, 175, 80, 0.5);
+            color: #81c784;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.3rem;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .support-message-time {
+            font-size: 0.65rem;
+            color: #8b8a7a;
+            margin-top: 0.2rem;
+            text-align: right;
+        }
+
+        .support-chat-input-area {
+            padding: 0.8rem 1rem;
+            border-top: 1px solid rgba(192, 132, 252, 0.2);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .support-chat-input {
+            flex: 1;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1.5rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.8rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            resize: none;
+        }
+
+        .support-chat-input:focus {
+            border-color: #c084fc;
+            box-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+        }
+
+        .support-send-btn {
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            border: none;
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .support-send-btn:hover {
+            background: linear-gradient(135deg, #d8b4fe, #9333ea);
+            box-shadow: 0 0 15px rgba(192, 132, 252, 0.5);
+        }
+
+        @media (max-width: 1024px) {
+            .reg-container { gap: 1rem; }
+            .info-section { flex: 1 1 100%; }
+        }
+
+        @media (max-width: 900px) {
+            .live-feed { flex-direction: column; }
+            .feed-list { height: 160px; }
+            .header { flex-direction: column; text-align: center; }
+            .header-right { justify-content: center; }
+            .balance { font-size: 1.6rem; }
+        }
+
+        @media (max-width: 780px) {
+            .reg-container { flex-direction: column; align-items: center; }
+            .form-wrapper { flex: 0 0 auto; width: 100%; max-width: 340px; }
+            .stats-panel { flex: 0 0 auto; width: 100%; max-width: 340px; }
+            .info-section { width: 100%; }
+            .auth-card { margin-left: auto; margin-right: auto; animation: slideFromTopMobile 0.8s ease-out forwards; }
+            @keyframes slideFromTopMobile {
+                0% { transform: translate(10px, -60px); opacity: 0; }
+                100% { transform: translate(0,0); opacity: 1; }
+            }
+            .stat-value { font-size: 1.3rem; }
+            .stat-row .stat-label { font-size: 0.7rem; }
+            .stat-row .stat-value { font-size: 0.75rem; }
+            .stat-earn { font-size: 0.7rem; }
+            .dashboard { grid-template-columns: 1fr; }
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 8px; font-size: 13px; }
+            .auth-card { padding: 1.4rem; border-radius: 1.5rem; }
+            .btn-primary, .action-btn { font-size: 0.8rem; padding: 0.6rem 1.4rem; }
+            .logo { font-size: 1.3rem; }
+            .feed-list { height: 140px; }
+            .support-btn { width: 48px; height: 48px; bottom: 16px; right: 16px; font-size: 1.3rem; }
+            .support-chat { width: 300px; bottom: 75px; right: 16px; }
+        }
     </style>
 </head>
 <body>
 <div class="toast-container" id="toastContainer"></div>
+
+<!-- ================= КНОПКА ПОДДЕРЖКИ ================= -->
 <button class="support-btn" id="supportBtn" title="Поддержка">💬</button>
+
+<!-- ================= ЧАТ ПОДДЕРЖКИ ================= -->
 <div class="support-chat hidden" id="supportChat">
-    <div class="support-chat-header"><h3>💬 Поддержка Пирамикс</h3><button class="support-close-btn" id="supportCloseBtn">✕</button></div>
+    <div class="support-chat-header">
+        <h3>💬 Поддержка Пирамикс</h3>
+        <button class="support-close-btn" id="supportCloseBtn">✕</button>
+    </div>
     <div class="support-chat-messages" id="supportMessages"></div>
-    <div class="support-chat-input-area"><textarea class="support-chat-input" id="supportInput" placeholder="Введите сообщение..." rows="1"></textarea><button class="support-send-btn" id="supportSendBtn">➤</button></div>
+    <div class="support-chat-input-area">
+        <textarea class="support-chat-input" id="supportInput" placeholder="Введите сообщение..." rows="1"></textarea>
+        <button class="support-send-btn" id="supportSendBtn">➤</button>
+    </div>
 </div>
+
+<!-- ================= ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД ================= -->
 <div id="stageRegister" class="reg-container">
     <div class="form-wrapper">
         <div class="auth-card" id="authCard">
             <h3>✨ Пирамикс</h3>
-            <div class="input-group"><label>Никнейм</label><input type="text" id="nickname" placeholder="Введите ник" autocomplete="off"></div>
-            <div class="input-group" id="password1Group"><label>Пароль</label><input type="password" id="password1" placeholder="••••••••"></div>
-            <div class="input-group visible-password" id="password2Group"><label>Повторите пароль</label><input type="password" id="password2" placeholder="••••••••"></div>
+            <div class="input-group">
+                <label>Никнейм</label>
+                <input type="text" id="nickname" placeholder="Введите ник" autocomplete="off">
+            </div>
+            <div class="input-group" id="password1Group">
+                <label>Пароль</label>
+                <input type="password" id="password1" placeholder="••••••••">
+            </div>
+            <div class="input-group visible-password" id="password2Group">
+                <label>Повторите пароль</label>
+                <input type="password" id="password2" placeholder="••••••••">
+            </div>
             <div class="error-message" id="errorMessage">❌ Данные неверны</div>
             <button class="action-btn" id="actionButton">Зарегистрироваться</button>
-            <div class="switch-text" id="switchTextBlock">Если есть аккаунт, <span id="toggleModeLink">вход</span></div>
+            <div class="switch-text" id="switchTextBlock">
+                Если есть аккаунт, <span id="toggleModeLink">вход</span>
+            </div>
         </div>
     </div>
     <div class="stats-panel">
-        <div class="stat-item"><div class="stat-label">👥 Всего пользователей</div><div class="stat-value" id="regTotalUsers">143.334</div></div>
-        <div class="stat-item"><div class="stat-label">📅 Сегодня зарегистрировано</div><div class="stat-value" id="regTodayUsers">0</div></div>
-        <div class="stat-item"><div class="stat-label">💰 Всего выведено</div><div class="stat-value" id="regTotalWithdrawn">0 $</div></div>
+        <div class="stat-item">
+            <div class="stat-label">👥 Всего пользователей</div>
+            <div class="stat-value" id="regTotalUsers">143.334</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">📅 Сегодня зарегистрировано</div>
+            <div class="stat-value" id="regTodayUsers">0</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-label">💰 Всего выведено</div>
+            <div class="stat-value" id="regTotalWithdrawn">0 $</div>
+        </div>
     </div>
     <div class="info-section">
-        <h2>5 линий рефералов</h2><div class="subtitle">Ваш доход растёт с каждым уровнем</div>
+        <h2>5 линий рефералов</h2>
+        <div class="subtitle">Ваш доход растёт с каждым уровнем</div>
         <div class="chart-container">
             <div class="chart-bars">
-                <div class="bar-wrapper"><span class="bar-percent">1%</span><div class="bar" style="height:28px;"></div><span class="bar-label">1 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">2%</span><div class="bar" style="height:50px;"></div><span class="bar-label">2 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">3%</span><div class="bar" style="height:72px;"></div><span class="bar-label">3 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">4%</span><div class="bar" style="height:94px;"></div><span class="bar-label">4 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">5%</span><div class="bar" style="height:116px;"></div><span class="bar-label">5 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">1%</span><div class="bar" style="height: 28px;"></div><span class="bar-label">1 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">2%</span><div class="bar" style="height: 50px;"></div><span class="bar-label">2 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">3%</span><div class="bar" style="height: 72px;"></div><span class="bar-label">3 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">4%</span><div class="bar" style="height: 94px;"></div><span class="bar-label">4 ур.</span></div>
+                <div class="bar-wrapper"><span class="bar-percent">5%</span><div class="bar" style="height: 116px;"></div><span class="bar-label">5 ур.</span></div>
             </div>
             <div class="legend"><span>Процент от дохода рефералов</span></div>
         </div>
         <div class="graph-note">📊 Чем глубже уровень — тем выше процент. <br> Приглашайте активных партнёров и увеличивайте прибыль.</div>
     </div>
 </div>
-<div class="live-feed" id="regLiveFeed" style="max-width:1200px;">
-    <div class="feed-half deposit-feed"><div class="feed-title">🟢 Последние пополнения</div><div class="feed-list" id="regDepositList"></div></div>
-    <div class="feed-half withdraw-feed"><div class="feed-title">🔴 Последние выводы</div><div class="feed-list" id="regWithdrawList"></div></div>
+
+<!-- Таблицы для страницы регистрации -->
+<div class="live-feed" id="regLiveFeed" style="max-width: 1200px;">
+    <div class="feed-half deposit-feed">
+        <div class="feed-title">🟢 Последние пополнения</div>
+        <div class="feed-list" id="regDepositList"></div>
+    </div>
+    <div class="feed-half withdraw-feed">
+        <div class="feed-title">🔴 Последние выводы</div>
+        <div class="feed-list" id="regWithdrawList"></div>
+    </div>
 </div>
-<div id="stageHome" class="hidden" style="width:100%;display:flex;flex-direction:column;align-items:center;">
+
+<!-- ================= ЭТАП 2: ГЛАВНАЯ СТРАНИЦА ================= -->
+<div id="stageHome" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="header">
         <div class="logo">✨ Пирамикс</div>
-        <div class="header-right"><span class="user-greeting" id="userGreeting"></span><button class="btn-outline" id="profileBtn">👤 Профиль</button><button class="btn-outline" id="logoutBtn">🚪 Выход</button></div>
+        <div class="header-right">
+            <span class="user-greeting" id="userGreeting"></span>
+            <button class="btn-outline" id="profileBtn">👤 Профиль</button>
+            <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
+        </div>
     </header>
+
     <div class="dashboard">
-        <div class="card"><h3>💰 Мой баланс</h3><div class="balance" id="balance">0.00 $</div><div class="stat-row"><span class="stat-label">Заработано всего</span><span class="stat-value" id="totalEarned">0.00 $</span></div><button class="btn-primary" id="withdrawBtn" style="width:100%;">💸 Вывести средства</button></div>
+        <div class="card">
+            <h3>💰 Мой баланс</h3>
+            <div class="balance" id="balance">0.00 $</div>
+            <div class="stat-row">
+                <span class="stat-label">Заработано всего</span>
+                <span class="stat-value" id="totalEarned">0.00 $</span>
+            </div>
+            <button class="btn-primary" id="withdrawBtn" style="width:100%;">💸 Вывести средства</button>
+        </div>
+
         <div class="card">
             <h3>👥 Мои рефералы</h3>
             <div class="stat-row"><span class="stat-label">1 уровень (1%)</span><span class="stat-value" id="lvl1">0</span><span class="stat-earn" id="earn1">0.00 $</span></div>
@@ -289,159 +1293,883 @@
             <div class="stat-row"><span class="stat-label">3 уровень (3%)</span><span class="stat-value" id="lvl3">0</span><span class="stat-earn" id="earn3">0.00 $</span></div>
             <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0</span><span class="stat-earn" id="earn4">0.00 $</span></div>
             <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0</span><span class="stat-earn" id="earn5">0.00 $</span></div>
-            <button class="btn-outline" id="copyRefBtn" style="width:100%;margin-top:0.8rem;border-color:#c084fc;color:#c084fc;">📋 Копировать реферальную ссылку</button>
-            <button class="btn-outline" id="manualBtn" style="width:100%;margin-top:0.5rem;border-color:#4caf50;color:#81c784;">📘 Мануал по привлечению</button>
+            <button class="btn-outline" id="copyRefBtn" style="width:100%; margin-top: 0.8rem; border-color: #c084fc; color: #c084fc;">📋 Копировать реферальную ссылку</button>
+            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Мануал по привлечению</button>
         </div>
-        <div class="card"><h3>📊 Статистика платформы</h3><div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">143.334</span></div><div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">0</span></div><div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">0 $</span></div><button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button></div>
-        <div class="card"><h3>📈 Система заработка</h3><p class="earn-info-text">Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях. Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.</p><div class="stat-row"><span class="stat-label">1 ур. — 1%</span><span class="stat-value">0.10$ с чел.</span></div><div class="stat-row"><span class="stat-label">2 ур. — 2%</span><span class="stat-value">0.20$ с чел.</span></div><div class="stat-row"><span class="stat-label">3 ур. — 3%</span><span class="stat-value">0.30$ с чел.</span></div><div class="stat-row"><span class="stat-label">4 ур. — 4%</span><span class="stat-value">0.40$ с чел.</span></div><div class="stat-row"><span class="stat-label">5 ур. — 5%</span><span class="stat-value">0.50$ с чел.</span></div><button class="btn-calculator" id="calculatorBtn">🧮 Калькулятор дохода</button></div>
+
+        <div class="card">
+            <h3>📊 Статистика платформы</h3>
+            <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">143.334</span></div>
+            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">0</span></div>
+            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">0 $</span></div>
+            <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
+        </div>
+
+        <div class="card">
+            <h3>📈 Система заработка</h3>
+            <p class="earn-info-text">
+                Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях.
+                Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.
+            </p>
+            <div class="stat-row"><span class="stat-label">1 ур. — 1%</span><span class="stat-value">0.10$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">2 ур. — 2%</span><span class="stat-value">0.20$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">3 ур. — 3%</span><span class="stat-value">0.30$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">4 ур. — 4%</span><span class="stat-value">0.40$ с чел.</span></div>
+            <div class="stat-row"><span class="stat-label">5 ур. — 5%</span><span class="stat-value">0.50$ с чел.</span></div>
+            <button class="btn-calculator" id="calculatorBtn">🧮 Калькулятор дохода</button>
+        </div>
     </div>
+
     <div class="live-feed" id="homeLiveFeed">
-        <div class="feed-half deposit-feed"><div class="feed-title">🟢 Последние пополнения</div><div class="feed-list" id="depositList"></div></div>
-        <div class="feed-half withdraw-feed"><div class="feed-title">🔴 Последние выводы</div><div class="feed-list" id="withdrawList"></div></div>
+        <div class="feed-half deposit-feed">
+            <div class="feed-title">🟢 Последние пополнения</div>
+            <div class="feed-list" id="depositList"></div>
+        </div>
+        <div class="feed-half withdraw-feed">
+            <div class="feed-title">🔴 Последние выводы</div>
+            <div class="feed-list" id="withdrawList"></div>
+        </div>
     </div>
-    <div class="footer"><span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span></div>
+
+    <div class="footer">
+        <span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span>
+    </div>
 </div>
+
+<!-- Модальные окна -->
 <div class="modal-overlay hidden" id="withdrawModal">
-    <div class="modal"><h2>💸 Вывод средств</h2><p style="color:#b9b09a;font-size:0.8rem;margin-bottom:1rem;">Минимальная сумма: <strong style="color:#f5d78c;">1$</strong> | Максимальная сумма: <strong style="color:#f5d78c;">25$</strong></p><div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите криптовалюту --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div><div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="От 1$ до 25$" min="1" max="25" step="0.01"></div><div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв..."></div><div class="modal-buttons"><button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button><button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button></div></div>
+    <div class="modal">
+        <h2>💸 Вывод средств</h2>
+        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма: <strong style="color: #f5d78c;">1$</strong> | Максимальная сумма: <strong style="color: #f5d78c;">25$</strong></p>
+        <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите криптовалюту --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
+        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="От 1$ до 25$" min="1" max="25" step="0.01"></div>
+        <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв..."></div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
+            <button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button>
+        </div>
+    </div>
 </div>
+
 <div class="modal-overlay hidden" id="profileModal">
-    <div class="modal"><h2>👤 Профиль пользователя</h2><div class="input-group"><label>Никнейм</label><input type="text" id="profileNickname"></div><div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете"></div><div class="input-group"><label>Повторите новый пароль</label><input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете"></div><div class="modal-buttons"><button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button><button class="btn-outline" id="closeProfileBtn">❌ Отмена</button></div></div>
+    <div class="modal">
+        <h2>👤 Профиль пользователя</h2>
+        <div class="input-group"><label>Никнейм</label><input type="text" id="profileNickname"></div>
+        <div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете"></div>
+        <div class="input-group"><label>Повторите новый пароль</label><input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете"></div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
+            <button class="btn-outline" id="closeProfileBtn">❌ Отмена</button>
+        </div>
+    </div>
 </div>
+
 <div class="modal-overlay hidden" id="vipModal">
-    <div class="modal"><h2>👑 VIP статус</h2><div class="vip-info-box" id="vipInfoBox"><p style="color:#b9b09a;margin-bottom:0.4rem;font-size:0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color:#9b927a;font-size:0.78rem;margin-top:0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p><p style="color:#81c784;font-size:0.78rem;margin-top:0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p></div><div class="modal-buttons"><button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button><button class="btn-outline" id="closeVipBtn">❌ Отмена</button></div></div>
+    <div class="modal">
+        <h2>👑 VIP статус</h2>
+        <div class="vip-info-box" id="vipInfoBox">
+            <p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p>
+            <div class="vip-price">10$</div>
+            <p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>
+            <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button>
+            <button class="btn-outline" id="closeVipBtn">❌ Отмена</button>
+        </div>
+    </div>
 </div>
+
 <div class="modal-overlay hidden" id="policyModal">
-    <div class="modal policy-modal"><h2>📄 Политика конфиденциальности и правила пользования</h2><h3>1. Общие положения</h3><p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p><h3>2. Термины и определения</h3><p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p><h3>3. Регистрация и аккаунт</h3><p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p><h3>4. Реферальная программа</h3><p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>4.2. Реферальная программа имеет 5 уровней глубины.<br>4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p><h3>5. VIP статус</h3><p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p><h3>6. Вывод средств</h3><p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США), максимальная — 25$ (двадцать пять долларов США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p><h3>7. Конфиденциальность</h3><p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p><h3>8. Ответственность</h3><p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>8.2. Пользователь обязуется использовать Платформу в законных целях.<br>8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p><h3>9. Изменения и дополнения</h3><p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>9.2. Изменения вступают в силу с момента публикации на Платформе.<br>9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p><h3>10. Контакты</h3><p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p><p style="text-align:center;color:#c9ad7a;margin-top:1.2rem;"><em>Последнее обновление: 2026 год</em></p><div class="modal-buttons" style="justify-content:center;"><button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button></div></div>
+    <div class="modal policy-modal">
+        <h2>📄 Политика конфиденциальности и правила пользования</h2>
+        <h3>1. Общие положения</h3>
+        <p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
+        <h3>2. Термины и определения</h3>
+        <p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
+        <h3>3. Регистрация и аккаунт</h3>
+        <p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p>
+        <h3>4. Реферальная программа</h3>
+        <p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>4.2. Реферальная программа имеет 5 уровней глубины.<br>4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p>
+        <h3>5. VIP статус</h3>
+        <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
+        <h3>6. Вывод средств</h3>
+        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США), максимальная — 25$ (двадцать пять долларов США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
+        <h3>7. Конфиденциальность</h3>
+        <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
+        <h3>8. Ответственность</h3>
+        <p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>8.2. Пользователь обязуется использовать Платформу в законных целях.<br>8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
+        <h3>9. Изменения и дополнения</h3>
+        <p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>9.2. Изменения вступают в силу с момента публикации на Платформе.<br>9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
+        <h3>10. Контакты</h3>
+        <p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
+        <p style="text-align: center; color: #c9ad7a; margin-top: 1.2rem;"><em>Последнее обновление: 2026 год</em></p>
+        <div class="modal-buttons" style="justify-content: center;">
+            <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
+        </div>
+    </div>
 </div>
+
+<!-- Модальное окно калькулятора -->
 <div class="modal-overlay hidden" id="calculatorModal">
-    <div class="modal" style="max-width:400px;"><h2>🧮 Калькулятор дохода</h2><p style="color:#b9b09a;font-size:0.75rem;margin-bottom:1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p><div class="calc-row"><span class="calc-label">1 уровень (1% = 0.10$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc1',-1)">−</button><span class="calc-value" id="calc1">0</span><button class="calc-btn" onclick="window.calcChange('calc1',1)">+</button></div></div><div class="calc-row"><span class="calc-label">2 уровень (2% = 0.20$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc2',-1)">−</button><span class="calc-value" id="calc2">0</span><button class="calc-btn" onclick="window.calcChange('calc2',1)">+</button></div></div><div class="calc-row"><span class="calc-label">3 уровень (3% = 0.30$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc3',-1)">−</button><span class="calc-value" id="calc3">0</span><button class="calc-btn" onclick="window.calcChange('calc3',1)">+</button></div></div><div class="calc-row"><span class="calc-label">4 уровень (4% = 0.40$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc4',-1)">−</button><span class="calc-value" id="calc4">0</span><button class="calc-btn" onclick="window.calcChange('calc4',1)">+</button></div></div><div class="calc-row"><span class="calc-label">5 уровень (5% = 0.50$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc5',-1)">−</button><span class="calc-value" id="calc5">0</span><button class="calc-btn" onclick="window.calcChange('calc5',1)">+</button></div></div><div class="calc-result"><p style="color:#b9b09a;font-size:0.8rem;">Ваш доход составит:</p><div class="calc-total" id="calcTotal">0.00 $</div></div><div class="modal-buttons"><button class="btn-outline" id="closeCalculatorBtn" style="flex:1;">❌ Закрыть</button></div></div>
+    <div class="modal" style="max-width: 400px;">
+        <h2>🧮 Калькулятор дохода</h2>
+        <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p>
+        
+        <div class="calc-row">
+            <span class="calc-label">1 уровень (1% = 0.10$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button>
+                <span class="calc-value" id="calc1">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">2 уровень (2% = 0.20$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button>
+                <span class="calc-value" id="calc2">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">3 уровень (3% = 0.30$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button>
+                <span class="calc-value" id="calc3">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">4 уровень (4% = 0.40$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button>
+                <span class="calc-value" id="calc4">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">5 уровень (5% = 0.50$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button>
+                <span class="calc-value" id="calc5">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button>
+            </div>
+        </div>
+        
+        <div class="calc-result">
+            <p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p>
+            <div class="calc-total" id="calcTotal">0.00 $</div>
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button>
+        </div>
+    </div>
 </div>
+
 <script>
-(function() {
-    const supabase = window.supabase.createClient('https://kmkgqegtulbmdjlmllka.supabase.co', 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI');
-    const stageRegister = document.getElementById('stageRegister'), stageHome = document.getElementById('stageHome'), regLiveFeed = document.getElementById('regLiveFeed'), homeLiveFeed = document.getElementById('homeLiveFeed'), toastContainer = document.getElementById('toastContainer');
-    let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-    let feedCache = { deposits: [], withdrawals: [] }, lastDepositId = null, lastWithdrawId = null, lastFeedUpdate = 0;
-    const FEED_UPDATE_INTERVAL = 3000;
-    let allNicks = [], namesLoaded = false;
+    (function() {
+        const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
+        const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    async function loadNames() {
-        if (namesLoaded) return;
-        try {
-            const response = await fetch('names.html');
-            const text = await response.text();
-            const match = text.match(/const allNicks = (\[[\s\S]*?\]);/);
-            if (match && match[1]) { allNicks = eval(match[1]); namesLoaded = true; }
-        } catch(e) { console.error('Ошибка загрузки:', e); namesLoaded = true; }
-    }
+        const stageRegister = document.getElementById('stageRegister');
+        const stageHome = document.getElementById('stageHome');
+        const regLiveFeed = document.getElementById('regLiveFeed');
+        const homeLiveFeed = document.getElementById('homeLiveFeed');
+        const toastContainer = document.getElementById('toastContainer');
 
-    function randomNick() {
-        if (!namesLoaded || allNicks.length === 0) return 'User';
-        return allNicks[Math.floor(Math.random() * allNicks.length)];
-    }
+        let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
 
-    function showToast(m, t = 'error') { const d = document.createElement('div'); d.className = `toast toast-${t}`; d.textContent = m; toastContainer.appendChild(d); setTimeout(() => { if (d.parentNode) d.remove(); }, 4000); }
-    function formatNumber(n) { return n >= 1000 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : n.toString(); }
+        // Кэш для хранения последних данных ленты
+        let feedCache = { deposits: [], withdrawals: [] };
+        let lastDepositId = null;
+        let lastWithdrawId = null;
+        let lastFeedUpdate = 0;
+        const FEED_UPDATE_INTERVAL = 3000;
 
-    function playNotificationSound() { try { const a = new (window.AudioContext || window.webkitAudioContext)(); [523.25,659.25,783.99].forEach((f,i) => { const o = a.createOscillator(), g = a.createGain(); o.connect(g); g.connect(a.destination); o.frequency.value = f; o.type = 'sine'; g.gain.setValueAtTime(0.3, a.currentTime + i*0.15); g.gain.exponentialRampToValueAtTime(0.01, a.currentTime + i*0.15 + 0.3); o.start(a.currentTime + i*0.15); o.stop(a.currentTime + i*0.15 + 0.3); }); } catch(e) {} }
+        // ===== ЗАГРУЗКА НИКНЕЙМОВ ИЗ ВНЕШНЕГО ФАЙЛА =====
+        let allNicks = [];
+        let namesLoaded = false;
 
-    let supportCheckInterval;
-    function initSupport() {
-        const sb = document.getElementById('supportBtn'), sc = document.getElementById('supportChat'), scl = document.getElementById('supportCloseBtn'), sm = document.getElementById('supportMessages'), si = document.getElementById('supportInput'), ss = document.getElementById('supportSendBtn');
-        function addMsg(t, tp) { const d = document.createElement('div'); d.className = `support-message ${tp}`; d.innerHTML = `${t}<div class="support-message-time">${new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</div>`; sm.appendChild(d); sm.scrollTop = sm.scrollHeight; }
-        async function sendMsg() { const t = si.value.trim(); if (!t) return; addMsg(t, 'user'); si.value = ''; si.style.height = 'auto'; const n = (userData && userData.nickname) ? userData.nickname : 'User'; await supabase.rpc('send_support_message', { p_message: t, p_nickname: n }); }
-        async function checkResp() { try { const { data, error } = await supabase.rpc('get_support_messages'); if (error || !data || !data.length) return; sm.innerHTML = ''; const cn = (userData && userData.nickname) ? userData.nickname : 'User'; const um = data.filter(m => m.nickname === cn); const dm = um.length > 0 ? um : data.filter(m => m.nickname === 'User'); [...dm].reverse().forEach(m => { addMsg(m.user_message, 'user'); if (m.admin_response) addMsg(m.admin_response, 'admin-response'); }); if (dm.length > 0 && dm[0].admin_response && dm[0].is_read === false) { playNotificationSound(); if (sc.classList.contains('hidden')) { showToast('🔔 Получен ответ от поддержки!', 'info'); sb.classList.add('has-response'); } } } catch(e) {} }
-        sb.onclick = () => { if (sc.classList.contains('hidden')) { sc.classList.remove('hidden'); sb.classList.remove('has-response'); checkResp(); } else sc.classList.add('hidden'); };
-        scl.onclick = () => sc.classList.add('hidden');
-        ss.onclick = sendMsg;
-        si.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } });
-        si.addEventListener('input', function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; });
-        supportCheckInterval = setInterval(checkResp, 5000);
-        checkResp();
-    }
-
-    async function loadPlatformStats() {
-        const { data } = await supabase.rpc('get_platform_stats');
-        if (data) {
-            ['regTotalUsers','totalUsers'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = formatNumber(data.total_users); });
-            ['regTodayUsers','todayUsers'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = data.today_users; });
-            ['regTotalWithdrawn','totalWithdrawn'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $'; });
+        async function loadNames() {
+            if (namesLoaded) return;
+            try {
+                const response = await fetch('names.html');
+                const text = await response.text();
+                const match = text.match(/const allNicks = (\[[\s\S]*?\]);/);
+                if (match && match[1]) {
+                    allNicks = eval(match[1]);
+                    namesLoaded = true;
+                    console.log('✅ Загружено никнеймов из names.html:', allNicks.length);
+                }
+            } catch(e) {
+                console.error('Ошибка загрузки никнеймов:', e);
+                namesLoaded = true;
+            }
         }
-    }
 
-    async function addNewUserToDB() { const n = randomNick(); const { data } = await supabase.rpc('register_user', { p_nickname: n, p_password: 'auto'+Math.floor(Math.random()*9999), p_referral_code: null }); if (data && data.success) loadPlatformStats(); }
-    async function addFeedItemToDB(type, nickname, amount) { const { data } = await supabase.rpc('add_feed_item', { p_type: type, p_nickname: nickname, p_amount: amount }); if (data && data.success) { loadPlatformStats(); lastFeedUpdate = 0; loadFeedFromDB(); } }
+        function randomNick() {
+            if (!namesLoaded || allNicks.length === 0) {
+                return 'User';
+            }
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
 
-    async function loadFeedFromDB() {
-        const now = Date.now(); if (now - lastFeedUpdate < FEED_UPDATE_INTERVAL) return; lastFeedUpdate = now;
-        const [dr, wr] = await Promise.all([supabase.rpc('get_feed_items',{p_type:'deposit',p_limit:10}), supabase.rpc('get_feed_items',{p_type:'withdraw',p_limit:10})]);
-        let hnd = false, hnw = false;
-        if (dr.data && dr.data.length > 0) { const nf = dr.data[0].nickname+'_'+dr.data[0].created_at; if (nf !== lastDepositId) { hnd = true; lastDepositId = nf; } feedCache.deposits = dr.data.map(i => ({ nickname: i.nickname, amount: i.amount, time: new Date(i.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) })); }
-        if (wr.data && wr.data.length > 0) { const nf = wr.data[0].nickname+'_'+wr.data[0].created_at; if (nf !== lastWithdrawId) { hnw = true; lastWithdrawId = nf; } feedCache.withdrawals = wr.data.map(i => ({ nickname: i.nickname, amount: i.amount, time: new Date(i.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) })); }
-        renderAllFeeds(hnd, hnw);
-    }
+        function showToast(message, type = 'error') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
+        }
 
-    function renderFeedList(cid, items, isNew) { const c = document.getElementById(cid); if (!c) return; c.innerHTML = ''; items.forEach((item, i) => { const d = document.createElement('div'); d.className = `feed-item ${cid.includes('Deposit')?'deposit':'withdraw'}`; if (i === 0 && isNew) d.classList.add('new-item-highlight'); d.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`; c.appendChild(d); }); }
-    function renderAllFeeds(hnd, hnw) { renderFeedList('regDepositList', feedCache.deposits, hnd); renderFeedList('depositList', feedCache.deposits, hnd); renderFeedList('regWithdrawList', feedCache.withdrawals, hnw); renderFeedList('withdrawList', feedCache.withdrawals, hnw); }
+        function formatNumber(num) {
+            if (num >= 1000) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            }
+            return num.toString();
+        }
 
-    function scheduleNewUser() { setTimeout(() => { addNewUserToDB(); scheduleNewUser(); }, Math.floor(Math.random()*(140000-45000)+45000)); }
-    function scheduleDeposit() { setTimeout(() => { addFeedItemToDB('deposit', randomNick(), 10); scheduleDeposit(); }, Math.floor(Math.random()*(190000-75000)+75000)); }
-    function scheduleWithdraw() { setTimeout(() => { addFeedItemToDB('withdraw', randomNick(), Math.floor(Math.random()*25)+1); scheduleWithdraw(); }, Math.floor(Math.random()*(240000-95000)+95000)); }
+        // ===== ЗВУКОВОЕ УВЕДОМЛЕНИЕ =====
+        function playNotificationSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [523.25, 659.25, 783.99];
+                notes.forEach((freq, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
+                    osc.start(audioCtx.currentTime + i * 0.15);
+                    osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
+                });
+            } catch(e) {}
+        }
 
-    function showStage(stage) {
-        if (stage === 'home') { stageRegister.style.display = 'none'; regLiveFeed.style.display = 'none'; stageHome.style.display = 'flex'; stageHome.classList.remove('hidden'); homeLiveFeed.style.display = 'flex'; initHomeStage(); }
-        else { stageHome.style.display = 'none'; stageHome.classList.add('hidden'); homeLiveFeed.style.display = 'none'; stageRegister.style.display = 'flex'; regLiveFeed.style.display = 'flex'; initRegStage(); }
-        loadFeedFromDB(); loadPlatformStats();
-    }
+        // ===== ПОДДЕРЖКА ЧЕРЕЗ БД =====
+        let supportCheckInterval = null;
 
-    async function initialize() { await loadNames(); await loadPlatformStats(); await loadFeedFromDB(); initSupport(); scheduleNewUser(); scheduleDeposit(); scheduleWithdraw(); setInterval(loadPlatformStats, 10000); setInterval(() => loadFeedFromDB(), 5000); if (userData && userData.id) showStage('home'); else showStage('register'); }
-    initialize();
+        function initSupport() {
+            const supportBtn = document.getElementById('supportBtn');
+            const supportChat = document.getElementById('supportChat');
+            const supportCloseBtn = document.getElementById('supportCloseBtn');
+            const supportMessages = document.getElementById('supportMessages');
+            const supportInput = document.getElementById('supportInput');
+            const supportSendBtn = document.getElementById('supportSendBtn');
 
-    function initRegStage() {
-        const pg = document.getElementById('password2Group'), ab = document.getElementById('actionButton'), em = document.getElementById('errorMessage'), stb = document.getElementById('switchTextBlock');
-        let ilm = false;
-        function uu() { em.classList.remove('visible'); if (ilm) { pg.classList.remove('visible-password'); pg.classList.add('hidden-password'); ab.textContent = 'Войти'; stb.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>'; } else { pg.classList.remove('hidden-password'); pg.classList.add('visible-password'); ab.textContent = 'Зарегистрироваться'; stb.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>'; } const tl = document.getElementById('toggleModeLink'); if (tl) tl.onclick = () => { ilm = !ilm; uu(); }; }
-        uu(); loadPlatformStats();
-        ab.onclick = async function(e) { e.preventDefault(); const n = document.getElementById('nickname').value.trim(), p = document.getElementById('password1').value; em.classList.remove('visible'); if (!n || !p) return; if (ilm) { const { data, error } = await supabase.rpc('login_user',{p_nickname:n,p_password:p}); if (error || !data || !data.success) { em.textContent = '❌ Данные неверны'; em.classList.add('visible'); return; } localStorage.setItem('pirxmix_user', JSON.stringify({id:data.user_id,nickname:data.nickname,vip_paid:data.vip_paid,referral_code:data.referral_code,balance:data.balance})); userData = JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home'); } else { const p2 = document.getElementById('password2').value; if (p !== p2) { em.textContent = '❌ Пароли не совпадают'; em.classList.add('visible'); return; } const up = new URLSearchParams(window.location.search), rc = up.get('ref') || null; const { data, error } = await supabase.rpc('register_user',{p_nickname:n,p_password:p,p_referral_code:rc}); if (error || !data || !data.success) { em.textContent = '❌ ' + (data?.error || 'Ошибка регистрации'); em.classList.add('visible'); return; } localStorage.setItem('pirxmix_user', JSON.stringify({id:data.user_id,nickname:data.nickname,vip_paid:false,referral_code:data.referral_code,balance:0})); userData = JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home'); } };
-        document.getElementById('authCard').addEventListener('submit', e => e.preventDefault());
-    }
+            function addMessageToChat(text, type) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `support-message ${type}`;
+                const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+                msgDiv.innerHTML = `${text}<div class="support-message-time">${time}</div>`;
+                supportMessages.appendChild(msgDiv);
+                supportMessages.scrollTop = supportMessages.scrollHeight;
+            }
 
-    function initHomeStage() {
-        if (!userData || !userData.id) { showStage('register'); return; }
-        function san(el, n) { el.innerHTML = ''; n.split('').forEach((l,i) => { const s = document.createElement('span'); s.className = 'animated-letter'; s.textContent = l; s.style.animationDelay = (i*0.08)+'s'; el.appendChild(s); }); }
-        san(document.getElementById('userGreeting'), userData.nickname);
-        async function lud() { const { data } = await supabase.rpc('get_user_by_id',{p_user_id:userData.id}); if (data && data.success) { document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2)+' $'; document.getElementById('totalEarned').textContent = (parseFloat(data.balance)*1.2).toFixed(2)+' $'; localStorage.setItem('pirxmix_balance', data.balance); userData.vip_paid = data.vip_paid; userData.referral_code = data.referral_code; userData.balance = data.balance; localStorage.setItem('pirxmix_user', JSON.stringify(userData)); } }
-        async function lr() { const { data } = await supabase.rpc('get_user_referrals',{p_user_id:userData.id}); if (data) { document.getElementById('lvl1').textContent = (data.level_1?.count || 0); document.getElementById('lvl2').textContent = (data.level_2?.count || 0); document.getElementById('lvl3').textContent = (data.level_3?.count || 0); document.getElementById('lvl4').textContent = (data.level_4?.count || 0); document.getElementById('lvl5').textContent = (data.level_5?.count || 0); } }
-        lud(); lr(); loadPlatformStats();
-        const cl = ['calc1','calc2','calc3','calc4','calc5'], pc = [0.10,0.20,0.30,0.40,0.50];
-        window.calcChange = function(id, d) { const el = document.getElementById(id); if (!el) return; let v = parseInt(el.textContent) || 0; v = Math.max(0, v+d); el.textContent = v; let t = 0; cl.forEach((id,i) => { const e = document.getElementById(id); if (e) t += (parseInt(e.textContent)||0) * pc[i]; }); const te = document.getElementById('calcTotal'); if (te) te.textContent = t.toFixed(2)+' $'; };
-        document.getElementById('calculatorBtn').onclick = () => { cl.forEach(id => { const e = document.getElementById(id); if (e) e.textContent = '0'; }); const te = document.getElementById('calcTotal'); if (te) te.textContent = '0.00 $'; document.getElementById('calculatorModal').classList.remove('hidden'); };
-        document.getElementById('closeCalculatorBtn').onclick = () => document.getElementById('calculatorModal').classList.add('hidden');
-        document.getElementById('calculatorModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
+            async function sendMessageToDB() {
+                const text = supportInput.value.trim();
+                if (!text) return;
+                
+                addMessageToChat(text, 'user');
+                supportInput.value = '';
+                supportInput.style.height = 'auto';
 
-        function copyRefLink() { if (!userData || !userData.vip_paid) { showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error'); return; } navigator.clipboard.writeText(`https://vds-game.ink/?ref=${userData.referral_code}`).then(() => showToast('Реферальная ссылка скопирована!', 'success')).catch(() => showToast('Не удалось скопировать ссылку', 'error')); }
-        function openManual() { if (!userData || !userData.vip_paid) { showToast('Мануал доступен пользователям с VIP статусом', 'error'); return; } navigator.clipboard.writeText(`https://vds-game.ink/?ref=${userData.referral_code}`).then(() => showToast('Реферальная ссылка скопирована!', 'success')).catch(() => showToast('Не удалось скопировать ссылку', 'error')); }
-        document.getElementById('copyRefBtn').onclick = copyRefLink;
-        document.getElementById('manualBtn').onclick = openManual;
-        document.getElementById('logoutBtn').onclick = () => { localStorage.removeItem('pirxmix_user'); userData = null; showStage('register'); };
-        document.getElementById('policyLink').onclick = () => document.getElementById('policyModal').classList.remove('hidden');
-        document.getElementById('closePolicyBtn').onclick = () => document.getElementById('policyModal').classList.add('hidden');
-        document.getElementById('policyModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
-        document.getElementById('profileBtn').onclick = () => { document.getElementById('profileNickname').value = userData.nickname; document.getElementById('profilePassword').value = ''; document.getElementById('profilePassword2').value = ''; document.getElementById('profileModal').classList.remove('hidden'); };
-        document.getElementById('closeProfileBtn').onclick = () => document.getElementById('profileModal').classList.add('hidden');
-        document.getElementById('profileModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
-        document.getElementById('saveProfileBtn').onclick = () => { const nn = document.getElementById('profileNickname').value.trim(); if (!nn) return; userData.nickname = nn; localStorage.setItem('pirxmix_user', JSON.stringify(userData)); san(document.getElementById('userGreeting'), nn); document.getElementById('profileModal').classList.add('hidden'); };
-        document.getElementById('withdrawBtn').onclick = () => { document.getElementById('withdrawCrypto').value = ''; document.getElementById('withdrawAmount').value = ''; document.getElementById('withdrawComment').value = ''; document.getElementById('withdrawModal').classList.remove('hidden'); };
-        document.getElementById('closeWithdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.add('hidden');
-        document.getElementById('withdrawModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
-        document.getElementById('confirmWithdrawBtn').onclick = async function() { const cr = document.getElementById('withdrawCrypto').value, am = parseFloat(document.getElementById('withdrawAmount').value); if (!cr || !am || am < 1 || am > 25) return; const { data, error } = await supabase.rpc('withdraw_funds',{p_user_id:userData.id,p_amount:am,p_crypto_type:cr,p_comment:document.getElementById('withdrawComment').value.trim()||null}); if (!error && data && data.success) { await lud(); showToast('Заявка на вывод создана!', 'success'); } document.getElementById('withdrawModal').classList.add('hidden'); };
-        document.getElementById('vipBtn').onclick = async function() { const { data } = await supabase.rpc('get_user_by_id',{p_user_id:userData.id}); const vib = document.getElementById('vipInfoBox'), cvb = document.getElementById('confirmVipBtn'); if (data && data.vip_paid) { vib.innerHTML = '<p style="color:#4caf50;font-weight:600;margin-bottom:0.4rem;font-size:0.8rem;">✅ VIP статус активирован!</p><p style="color:#b9b09a;font-size:0.78rem;">Ваш уникальный ID:</p><div class="vip-id">'+data.referral_code+'</div><p style="color:#b9b09a;font-size:0.78rem;margin-top:0.4rem;">Реферальная ссылка:</p><p style="color:#f5d78c;font-size:0.75rem;word-break:break-all;">https://vds-game.ink/?ref='+data.referral_code+'</p><p style="color:#81c784;font-size:0.78rem;margin-top:0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>'; cvb.style.display = 'none'; } else { vib.innerHTML = '<p style="color:#b9b09a;margin-bottom:0.4rem;font-size:0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color:#9b927a;font-size:0.78rem;margin-top:0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p><p style="color:#81c784;font-size:0.78rem;margin-top:0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>'; cvb.style.display = 'inline-block'; } document.getElementById('vipModal').classList.remove('hidden'); };
-        document.getElementById('closeVipBtn').onclick = () => document.getElementById('vipModal').classList.add('hidden');
-        document.getElementById('vipModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
-        document.getElementById('confirmVipBtn').onclick = async function() { const { data, error } = await supabase.rpc('purchase_vip',{p_user_id:userData.id}); if (!error && data && data.success) { document.getElementById('vipInfoBox').innerHTML = '<p style="color:#4caf50;font-weight:600;margin-bottom:0.4rem;font-size:0.8rem;">✅ VIP статус активирован!</p><p style="color:#b9b09a;font-size:0.78rem;">Ваш уникальный ID:</p><div class="vip-id">'+data.referral_code+'</div><p style="color:#b9b09a;font-size:0.78rem;margin-top:0.4rem;">Реферальная ссылка:</p><p style="color:#f5d78c;font-size:0.75rem;word-break:break-all;">https://vds-game.ink/?ref='+data.referral_code+'</p><p style="color:#81c784;font-size:0.78rem;margin-top:0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>'; document.getElementById('confirmVipBtn').style.display = 'none'; await lud(); showToast('VIP статус успешно активирован!', 'success'); } };
-        setInterval(() => { lud(); lr(); loadPlatformStats(); }, 30000);
-    }
-})();
+                const nickname = (userData && userData.nickname) ? userData.nickname : 'User';
+                const { data, error } = await supabase.rpc('send_support_message', { 
+                    p_message: text,
+                    p_nickname: nickname 
+                });
+                
+                if (error) {
+                    console.error('Ошибка отправки сообщения:', error);
+                }
+            }
+
+            async function checkForAdminResponse() {
+                try {
+                    const { data, error } = await supabase.rpc('get_support_messages');
+                    
+                    if (error) return;
+                    
+                    if (data && data.length > 0) {
+                        supportMessages.innerHTML = '';
+                        
+                        const currentNickname = (userData && userData.nickname) ? userData.nickname : 'User';
+                        const userMessages = data.filter(msg => msg.nickname === currentNickname);
+                        const displayMessages = userMessages.length > 0 ? userMessages : data.filter(msg => msg.nickname === 'User');
+                        
+                        [...displayMessages].reverse().forEach(msg => {
+                            addMessageToChat(msg.user_message, 'user');
+                            if (msg.admin_response) {
+                                addMessageToChat(msg.admin_response, 'admin-response');
+                            }
+                        });
+                        
+                        if (displayMessages.length > 0) {
+                            const lastMsg = displayMessages[0];
+                            if (lastMsg.admin_response && lastMsg.is_read === false) {
+                                playNotificationSound();
+                                if (supportChat.classList.contains('hidden')) {
+                                    showToast('🔔 Получен ответ от поддержки!', 'info');
+                                    supportBtn.classList.add('has-response');
+                                }
+                            }
+                        }
+                        
+                        supportMessages.scrollTop = supportMessages.scrollHeight;
+                    }
+                } catch(e) {
+                    console.error('Ошибка проверки:', e);
+                }
+            }
+
+            supportBtn.onclick = function() {
+                const isHidden = supportChat.classList.contains('hidden');
+                if (isHidden) {
+                    supportChat.classList.remove('hidden');
+                    supportBtn.classList.remove('has-response');
+                    checkForAdminResponse();
+                } else {
+                    supportChat.classList.add('hidden');
+                }
+            };
+
+            supportCloseBtn.onclick = function() {
+                supportChat.classList.add('hidden');
+            };
+
+            supportSendBtn.onclick = sendMessageToDB;
+
+            supportInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessageToDB();
+                }
+            });
+
+            supportInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+
+            supportCheckInterval = setInterval(checkForAdminResponse, 5000);
+            checkForAdminResponse();
+        }
+
+        async function loadPlatformStats() {
+            const { data, error } = await supabase.rpc('get_platform_stats');
+            if (data) {
+                const regTotalUsersEl = document.getElementById('regTotalUsers');
+                const regTodayUsersEl = document.getElementById('regTodayUsers');
+                const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
+                
+                if (regTotalUsersEl) regTotalUsersEl.textContent = formatNumber(data.total_users);
+                if (regTodayUsersEl) regTodayUsersEl.textContent = data.today_users;
+                if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
+
+                const totalUsersEl = document.getElementById('totalUsers');
+                const todayUsersEl = document.getElementById('todayUsers');
+                const totalWithdrawnEl = document.getElementById('totalWithdrawn');
+                
+                if (totalUsersEl) totalUsersEl.textContent = formatNumber(data.total_users);
+                if (todayUsersEl) todayUsersEl.textContent = data.today_users;
+                if (totalWithdrawnEl) totalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
+            }
+        }
+
+        async function addNewUserToDB() {
+            const nickname = randomNick();
+            const password = 'auto' + Math.floor(Math.random() * 9999);
+            
+            const { data, error } = await supabase.rpc('register_user', {
+                p_nickname: nickname,
+                p_password: password,
+                p_referral_code: null
+            });
+            
+            if (data && data.success) {
+                loadPlatformStats();
+            }
+        }
+
+        async function addFeedItemToDB(type, nickname, amount) {
+            const { data, error } = await supabase.rpc('add_feed_item', {
+                p_type: type,
+                p_nickname: nickname,
+                p_amount: amount
+            });
+            
+            if (data && data.success) {
+                loadPlatformStats();
+                lastFeedUpdate = 0;
+                loadFeedFromDB();
+            }
+        }
+
+        async function loadFeedFromDB() {
+            const now = Date.now();
+            if (now - lastFeedUpdate < FEED_UPDATE_INTERVAL) {
+                return;
+            }
+            lastFeedUpdate = now;
+
+            const [depositResult, withdrawResult] = await Promise.all([
+                supabase.rpc('get_feed_items', { p_type: 'deposit', p_limit: 10 }),
+                supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
+            ]);
+
+            let hasNewDeposit = false;
+            let hasNewWithdraw = false;
+
+            if (depositResult.data && depositResult.data.length > 0) {
+                const newFirstId = depositResult.data[0].nickname + '_' + depositResult.data[0].created_at;
+                if (newFirstId !== lastDepositId) {
+                    hasNewDeposit = true;
+                    lastDepositId = newFirstId;
+                }
+                
+                feedCache.deposits = depositResult.data.map(item => ({
+                    nickname: item.nickname,
+                    amount: item.amount,
+                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                }));
+            }
+
+            if (withdrawResult.data && withdrawResult.data.length > 0) {
+                const newFirstId = withdrawResult.data[0].nickname + '_' + withdrawResult.data[0].created_at;
+                if (newFirstId !== lastWithdrawId) {
+                    hasNewWithdraw = true;
+                    lastWithdrawId = newFirstId;
+                }
+                
+                feedCache.withdrawals = withdrawResult.data.map(item => ({
+                    nickname: item.nickname,
+                    amount: item.amount,
+                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+                }));
+            }
+
+            renderAllFeeds(hasNewDeposit, hasNewWithdraw);
+        }
+
+        function renderFeedList(containerId, items, isNew) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            container.innerHTML = '';
+            items.forEach((item, index) => {
+                const div = document.createElement('div');
+                const isDeposit = containerId.includes('Deposit');
+                div.className = `feed-item ${isDeposit ? 'deposit' : 'withdraw'}`;
+                
+                if (index === 0 && isNew) {
+                    div.classList.add('new-item-highlight');
+                }
+                
+                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
+                container.appendChild(div);
+            });
+        }
+        
+        function renderAllFeeds(hasNewDeposit = false, hasNewWithdraw = false) {
+            renderFeedList('regDepositList', feedCache.deposits, hasNewDeposit);
+            renderFeedList('depositList', feedCache.deposits, hasNewDeposit);
+            renderFeedList('regWithdrawList', feedCache.withdrawals, hasNewWithdraw);
+            renderFeedList('withdrawList', feedCache.withdrawals, hasNewWithdraw);
+        }
+
+        function scheduleNewUser() {
+            const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
+            setTimeout(() => {
+                addNewUserToDB();
+                scheduleNewUser();
+            }, delay);
+        }
+
+        function scheduleDeposit() {
+            const delay = Math.floor(Math.random() * (190000 - 75000) + 75000);
+            setTimeout(() => {
+                addFeedItemToDB('deposit', randomNick(), 10);
+                scheduleDeposit();
+            }, delay);
+        }
+        
+        function scheduleWithdraw() {
+            const delay = Math.floor(Math.random() * (240000 - 95000) + 95000);
+            setTimeout(() => {
+                const amount = Math.floor(Math.random() * 25) + 1;
+                addFeedItemToDB('withdraw', randomNick(), amount);
+                scheduleWithdraw();
+            }, delay);
+        }
+
+        function showStage(stage) {
+            if (stage === 'home') {
+                stageRegister.style.display = 'none';
+                regLiveFeed.style.display = 'none';
+                stageHome.style.display = 'flex';
+                stageHome.classList.remove('hidden');
+                homeLiveFeed.style.display = 'flex';
+                initHomeStage();
+            } else {
+                stageHome.style.display = 'none';
+                stageHome.classList.add('hidden');
+                homeLiveFeed.style.display = 'none';
+                stageRegister.style.display = 'flex';
+                regLiveFeed.style.display = 'flex';
+                initRegStage();
+            }
+            loadFeedFromDB();
+            loadPlatformStats();
+        }
+
+        async function initialize() {
+            await loadNames();
+            await loadPlatformStats();
+            await loadFeedFromDB();
+            
+            initSupport();
+            
+            scheduleNewUser();
+            scheduleDeposit();
+            scheduleWithdraw();
+            
+            setInterval(loadPlatformStats, 10000);
+            setInterval(() => loadFeedFromDB(), 5000);
+
+            if (userData && userData.id) {
+                showStage('home');
+            } else {
+                showStage('register');
+            }
+        }
+
+        initialize();
+
+        function initRegStage() {
+            const password2Group = document.getElementById('password2Group');
+            const actionButton = document.getElementById('actionButton');
+            const errorMessage = document.getElementById('errorMessage');
+            const switchTextBlock = document.getElementById('switchTextBlock');
+            let isLoginMode = false;
+
+            function updateUIForMode() {
+                errorMessage.classList.remove('visible');
+                if (isLoginMode) {
+                    password2Group.classList.remove('visible-password');
+                    password2Group.classList.add('hidden-password');
+                    actionButton.textContent = 'Войти';
+                    switchTextBlock.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
+                } else {
+                    password2Group.classList.remove('hidden-password');
+                    password2Group.classList.add('visible-password');
+                    actionButton.textContent = 'Зарегистрироваться';
+                    switchTextBlock.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
+                }
+                const toggleLink = document.getElementById('toggleModeLink');
+                if (toggleLink) {
+                    toggleLink.onclick = () => {
+                        isLoginMode = !isLoginMode;
+                        updateUIForMode();
+                    };
+                }
+            }
+
+            updateUIForMode();
+            loadPlatformStats();
+
+            actionButton.onclick = async function(e) {
+                e.preventDefault();
+                const nickname = document.getElementById('nickname').value.trim();
+                const password = document.getElementById('password1').value;
+                errorMessage.classList.remove('visible');
+                if (!nickname || !password) return;
+
+                if (isLoginMode) {
+                    const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
+                    if (error || !data || !data.success) {
+                        errorMessage.textContent = '❌ Данные неверны';
+                        errorMessage.classList.add('visible');
+                        return;
+                    }
+                    localStorage.setItem('pirxmix_user', JSON.stringify({
+                        id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid,
+                        referral_code: data.referral_code, balance: data.balance
+                    }));
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+                    showStage('home');
+                } else {
+                    const password2 = document.getElementById('password2').value;
+                    if (password !== password2) {
+                        errorMessage.textContent = '❌ Пароли не совпадают';
+                        errorMessage.classList.add('visible');
+                        return;
+                    }
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const refCode = urlParams.get('ref') || null;
+                    const { data, error } = await supabase.rpc('register_user', {
+                        p_nickname: nickname, p_password: password, p_referral_code: refCode
+                    });
+                    if (error || !data || !data.success) {
+                        errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
+                        errorMessage.classList.add('visible');
+                        return;
+                    }
+                    localStorage.setItem('pirxmix_user', JSON.stringify({
+                        id: data.user_id, nickname: data.nickname, vip_paid: false,
+                        referral_code: data.referral_code, balance: 0
+                    }));
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+                    showStage('home');
+                }
+            };
+
+            document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
+        }
+
+        function initHomeStage() {
+            if (!userData || !userData.id) {
+                showStage('register');
+                return;
+            }
+
+            setAnimatedNickname(document.getElementById('userGreeting'), userData.nickname);
+            loadUserData();
+            loadReferrals();
+            loadPlatformStats();
+            initModals();
+            initCalculator();
+
+            setInterval(() => {
+                loadUserData();
+                loadReferrals();
+                loadPlatformStats();
+            }, 30000);
+        }
+
+        function setAnimatedNickname(element, nickname) {
+            element.innerHTML = '';
+            const letters = nickname.split('');
+            letters.forEach((letter, index) => {
+                const span = document.createElement('span');
+                span.className = 'animated-letter';
+                span.textContent = letter;
+                span.style.animationDelay = (index * 0.08) + 's';
+                element.appendChild(span);
+            });
+        }
+
+        async function loadUserData() {
+            const { data, error } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
+            if (data && data.success) {
+                document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
+                document.getElementById('totalEarned').textContent = (parseFloat(data.balance) * 1.2).toFixed(2) + ' $';
+                localStorage.setItem('pirxmix_balance', data.balance);
+                
+                userData.vip_paid = data.vip_paid;
+                userData.referral_code = data.referral_code;
+                userData.balance = data.balance;
+                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
+            }
+        }
+
+        async function loadReferrals() {
+            const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
+            if (data) {
+                document.getElementById('lvl1').textContent = (data.level_1?.count || 0);
+                document.getElementById('lvl2').textContent = (data.level_2?.count || 0);
+                document.getElementById('lvl3').textContent = (data.level_3?.count || 0);
+                document.getElementById('lvl4').textContent = (data.level_4?.count || 0);
+                document.getElementById('lvl5').textContent = (data.level_5?.count || 0);
+            }
+        }
+
+        function initCalculator() {
+            const calcLevels = ['calc1', 'calc2', 'calc3', 'calc4', 'calc5'];
+            const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
+
+            window.calcChange = function(id, delta) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                let val = parseInt(el.textContent) || 0;
+                val = Math.max(0, val + delta);
+                el.textContent = val;
+                updateCalcTotal();
+            };
+
+            function updateCalcTotal() {
+                let total = 0;
+                calcLevels.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el) {
+                        const val = parseInt(el.textContent) || 0;
+                        total += val * percents[i];
+                    }
+                });
+                const totalEl = document.getElementById('calcTotal');
+                if (totalEl) totalEl.textContent = total.toFixed(2) + ' $';
+            }
+
+            function openCalculator() {
+                calcLevels.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = '0';
+                });
+                const totalEl = document.getElementById('calcTotal');
+                if (totalEl) totalEl.textContent = '0.00 $';
+                document.getElementById('calculatorModal').classList.remove('hidden');
+            }
+
+            const calculatorBtn = document.getElementById('calculatorBtn');
+            if (calculatorBtn) calculatorBtn.onclick = openCalculator;
+
+            const closeCalculatorBtn = document.getElementById('closeCalculatorBtn');
+            if (closeCalculatorBtn) {
+                closeCalculatorBtn.onclick = function() {
+                    document.getElementById('calculatorModal').classList.add('hidden');
+                };
+            }
+
+            const calculatorModal = document.getElementById('calculatorModal');
+            if (calculatorModal) {
+                calculatorModal.onclick = function(e) {
+                    if (e.target === calculatorModal) calculatorModal.classList.add('hidden');
+                };
+            }
+        }
+
+        function initModals() {
+            // Общая функция для копирования реф ссылки
+            function copyReferralLink() {
+                if (!userData || !userData.vip_paid) {
+                    showToast('Мануал доступен пользователям с VIP статусом', 'error');
+                    return;
+                }
+                
+                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
+                navigator.clipboard.writeText(refLink).then(() => {
+                    showToast('Реферальная ссылка скопирована!', 'success');
+                }).catch(() => {
+                    showToast('Не удалось скопировать ссылку', 'error');
+                });
+            }
+
+            const copyRefBtn = document.getElementById('copyRefBtn');
+            if (copyRefBtn) {
+                copyRefBtn.onclick = copyReferralLink;
+            }
+
+            const manualBtn = document.getElementById('manualBtn');
+            if (manualBtn) {
+                manualBtn.onclick = copyReferralLink;
+            }
+
+            document.getElementById('logoutBtn').onclick = function() {
+                localStorage.removeItem('pirxmix_user');
+                userData = null;
+                showStage('register');
+            };
+
+            document.getElementById('policyLink').onclick = function() {
+                document.getElementById('policyModal').classList.remove('hidden');
+            };
+            document.getElementById('closePolicyBtn').onclick = function() {
+                document.getElementById('policyModal').classList.add('hidden');
+            };
+            document.getElementById('policyModal').onclick = function(e) {
+                if (e.target === document.getElementById('policyModal')) document.getElementById('policyModal').classList.add('hidden');
+            };
+
+            document.getElementById('profileBtn').onclick = function() {
+                document.getElementById('profileNickname').value = userData.nickname;
+                document.getElementById('profilePassword').value = '';
+                document.getElementById('profilePassword2').value = '';
+                document.getElementById('profileModal').classList.remove('hidden');
+            };
+            document.getElementById('closeProfileBtn').onclick = function() {
+                document.getElementById('profileModal').classList.add('hidden');
+            };
+            document.getElementById('profileModal').onclick = function(e) {
+                if (e.target === document.getElementById('profileModal')) document.getElementById('profileModal').classList.add('hidden');
+            };
+            document.getElementById('saveProfileBtn').onclick = function() {
+                const newNickname = document.getElementById('profileNickname').value.trim();
+                if (!newNickname) return;
+                userData.nickname = newNickname;
+                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
+                setAnimatedNickname(document.getElementById('userGreeting'), newNickname);
+                document.getElementById('profileModal').classList.add('hidden');
+            };
+
+            document.getElementById('withdrawBtn').onclick = function() {
+                document.getElementById('withdrawCrypto').value = '';
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('withdrawComment').value = '';
+                document.getElementById('withdrawModal').classList.remove('hidden');
+            };
+            document.getElementById('closeWithdrawBtn').onclick = function() {
+                document.getElementById('withdrawModal').classList.add('hidden');
+            };
+            document.getElementById('withdrawModal').onclick = function(e) {
+                if (e.target === document.getElementById('withdrawModal')) document.getElementById('withdrawModal').classList.add('hidden');
+            };
+            document.getElementById('confirmWithdrawBtn').onclick = async function() {
+                const crypto = document.getElementById('withdrawCrypto').value;
+                const amount = parseFloat(document.getElementById('withdrawAmount').value);
+                if (!crypto || !amount || amount < 1 || amount > 25) return;
+                
+                const { data, error } = await supabase.rpc('withdraw_funds', {
+                    p_user_id: userData.id,
+                    p_amount: amount,
+                    p_crypto_type: crypto,
+                    p_comment: document.getElementById('withdrawComment').value.trim() || null
+                });
+                
+                if (!error && data && data.success) {
+                    await loadUserData();
+                    showToast('Заявка на вывод создана!', 'success');
+                }
+                document.getElementById('withdrawModal').classList.add('hidden');
+            };
+
+            document.getElementById('vipBtn').onclick = async function() {
+                const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
+                const vipInfoBox = document.getElementById('vipInfoBox');
+                const confirmVipBtn = document.getElementById('confirmVipBtn');
+                
+                if (data && data.vip_paid) {
+                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
+                    confirmVipBtn.style.display = 'none';
+                } else {
+                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
+                    confirmVipBtn.style.display = 'inline-block';
+                }
+                document.getElementById('vipModal').classList.remove('hidden');
+            };
+            document.getElementById('closeVipBtn').onclick = function() {
+                document.getElementById('vipModal').classList.add('hidden');
+            };
+            document.getElementById('vipModal').onclick = function(e) {
+                if (e.target === document.getElementById('vipModal')) document.getElementById('vipModal').classList.add('hidden');
+            };
+            document.getElementById('confirmVipBtn').onclick = async function() {
+                const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
+                if (!error && data && data.success) {
+                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
+                    document.getElementById('confirmVipBtn').style.display = 'none';
+                    await loadUserData();
+                    showToast('VIP статус успешно активирован!', 'success');
+                }
+            };
+        }
+
+    })();
 </script>
 </body>
 </html>
