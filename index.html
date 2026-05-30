@@ -1506,21 +1506,13 @@
                 }
             } catch(e) {
                 console.error('Ошибка загрузки никнеймов:', e);
-                allNicks = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-                    'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-                    'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
-                    'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
-                    'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
-                    'Player001', 'Gamer999', 'Hunter777', 'Killer666', 'Master555'];
                 namesLoaded = true;
             }
         }
 
         function randomNick() {
             if (!namesLoaded || allNicks.length === 0) {
-                const fallback = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-                    'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear'];
-                return fallback[Math.floor(Math.random() * fallback.length)];
+                return 'User';
             }
             return allNicks[Math.floor(Math.random() * allNicks.length)];
         }
@@ -2056,7 +2048,7 @@
             // Общая функция для копирования реф ссылки
             function copyReferralLink() {
                 if (!userData || !userData.vip_paid) {
-                    showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error');
+                    showToast('Мануал доступен пользователям с VIP статусом', 'error');
                     return;
                 }
                 
