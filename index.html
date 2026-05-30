@@ -937,7 +937,6 @@
             font-style: italic;
         }
 
-        /* ===== КНОПКА ПОДДЕРЖКИ ===== */
         .support-btn {
             position: fixed;
             bottom: 24px;
@@ -980,7 +979,6 @@
             50% { box-shadow: 0 6px 35px rgba(76, 175, 80, 1); transform: scale(1.08); }
         }
 
-        /* ===== ЧАТ ПОДДЕРЖКИ ===== */
         .support-chat {
             position: fixed;
             bottom: 90px;
@@ -1181,10 +1179,8 @@
 <body>
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- ================= КНОПКА ПОДДЕРЖКИ ================= -->
 <button class="support-btn" id="supportBtn" title="Поддержка">💬</button>
 
-<!-- ================= ЧАТ ПОДДЕРЖКИ ================= -->
 <div class="support-chat hidden" id="supportChat">
     <div class="support-chat-header">
         <h3>💬 Поддержка Пирамикс</h3>
@@ -1197,7 +1193,6 @@
     </div>
 </div>
 
-<!-- ================= ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД ================= -->
 <div id="stageRegister" class="reg-container">
     <div class="form-wrapper">
         <div class="auth-card" id="authCard">
@@ -1252,7 +1247,6 @@
     </div>
 </div>
 
-<!-- Таблицы для страницы регистрации -->
 <div class="live-feed" id="regLiveFeed" style="max-width: 1200px;">
     <div class="feed-half deposit-feed">
         <div class="feed-title">🟢 Последние пополнения</div>
@@ -1264,7 +1258,6 @@
     </div>
 </div>
 
-<!-- ================= ЭТАП 2: ГЛАВНАЯ СТРАНИЦА ================= -->
 <div id="stageHome" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="header">
         <div class="logo">✨ Пирамикс</div>
@@ -1336,7 +1329,6 @@
     </div>
 </div>
 
-<!-- Модальные окна -->
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
@@ -1410,7 +1402,6 @@
     </div>
 </div>
 
-<!-- Модальное окно калькулятора -->
 <div class="modal-overlay hidden" id="calculatorModal">
     <div class="modal" style="max-width: 400px;">
         <h2>🧮 Калькулятор дохода</h2>
@@ -1470,9 +1461,6 @@
 
 <script>
     (function() {
-        // ============================================
-        // НОВЫЕ ДАННЫЕ ПОДКЛЮЧЕНИЯ К SUPABASE
-        // ============================================
         const supabaseUrl = 'https://zvneiyhsoivaozzhzeoy.supabase.co';
         const supabaseKey = 'sb_publishable_CFPn1BIheE6L8wS89l0LtA_G9GofNzt';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -1485,7 +1473,6 @@
 
         let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
 
-        // Кэш для хранения последних данных ленты
         let feedCache = { deposits: [], withdrawals: [] };
         let lastDepositId = null;
         let lastWithdrawId = null;
@@ -1535,7 +1522,6 @@
             return num.toString();
         }
 
-        // ===== ЗВУКОВОЕ УВЕДОМЛЕНИЕ =====
         function playNotificationSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1555,7 +1541,6 @@
             } catch(e) {}
         }
 
-        // ===== ПОДДЕРЖКА ЧЕРЕЗ БД =====
         let supportCheckInterval = null;
 
         function initSupport() {
@@ -2048,7 +2033,6 @@
         }
 
         function initModals() {
-            // Общая функция для копирования реф ссылки
             function copyReferralLink() {
                 if (!userData || !userData.vip_paid) {
                     showToast('Мануал доступен пользователям с VIP статусом', 'error');
@@ -2064,14 +2048,10 @@
             }
 
             const copyRefBtn = document.getElementById('copyRefBtn');
-            if (copyRefBtn) {
-                copyRefBtn.onclick = copyReferralLink;
-            }
+            if (copyRefBtn) copyRefBtn.onclick = copyReferralLink;
 
             const manualBtn = document.getElementById('manualBtn');
-            if (manualBtn) {
-                manualBtn.onclick = copyReferralLink;
-            }
+            if (manualBtn) manualBtn.onclick = copyReferralLink;
 
             document.getElementById('logoutBtn').onclick = function() {
                 localStorage.removeItem('pirxmix_user');
