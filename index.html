@@ -206,11 +206,6 @@
             box-shadow: 0 8px 20px rgba(243, 185, 91, 0.6);
         }
 
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
         .switch-text {
             font-size: 0.8rem;
             color: #b9b09a;
@@ -401,6 +396,19 @@
             font-weight: 600;
             font-size: 0.9rem;
             color: #f5d78c;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .vip-badge {
+            background: linear-gradient(135deg, #c084fc, #7c3aed);
+            color: #fff;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.6rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
         .btn-outline {
@@ -483,8 +491,15 @@
         .stat-row {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             margin: 0.35rem 0;
             font-size: 0.8rem;
+        }
+
+        .stat-earn {
+            color: #4caf50;
+            font-weight: 600;
+            font-size: 0.75rem;
         }
 
         .btn-primary {
@@ -503,6 +518,38 @@
 
         .btn-primary:hover {
             background: linear-gradient(135deg, #f3b95b, #da9729);
+        }
+
+        .btn-calculator {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 0.6rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: 0.25s;
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+            width: 100%;
+            margin-top: 0.4rem;
+        }
+
+        .btn-calculator:hover {
+            background: linear-gradient(135deg, #66bb6a, #388e3c);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+
+        .earn-info-text {
+            color: #b9b09a;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .earn-highlight {
+            color: #f5d78c;
+            font-weight: 600;
         }
 
         .live-feed {
@@ -662,6 +709,25 @@
             margin: 0.4rem 0;
         }
 
+        .nickname-edit-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nickname-edit-row input {
+            flex: 1;
+        }
+
+        .edit-icon {
+            cursor: pointer;
+            color: #f3b95b;
+            font-size: 1.1rem;
+            transition: color 0.2s;
+        }
+
+        .edit-icon:hover { color: #ffd966; }
+
         .hidden { display: none !important; }
 
         .footer {
@@ -694,6 +760,66 @@
         .policy-modal h2 { text-align: center; margin-bottom: 1.2rem; font-size: 1.2rem; }
         .policy-modal h3 { color: #e9c274; margin: 1rem 0 0.4rem; font-size: 0.95rem; }
         .policy-modal p { color: #b9b09a; font-size: 0.78rem; margin-bottom: 0.6rem; }
+
+        /* Калькулятор */
+        .calc-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0.6rem 0;
+            gap: 0.5rem;
+        }
+
+        .calc-label {
+            color: #b9b09a;
+            font-size: 0.8rem;
+            flex: 1;
+        }
+
+        .calc-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .calc-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #c9a357;
+            background: rgba(0,0,0,0.3);
+            color: #f5d78c;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .calc-btn:hover { background: #f3b95b30; }
+
+        .calc-value {
+            color: #f5d78c;
+            font-weight: 700;
+            font-size: 1rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .calc-result {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .calc-total {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4caf50;
+        }
 
         .support-btn {
             position: fixed;
@@ -956,12 +1082,13 @@
 
         <div class="card">
             <h3>👥 Мои рефералы</h3>
-            <div class="stat-row"><span>1 уровень (1%)</span><span id="lvl1">0</span></div>
-            <div class="stat-row"><span>2 уровень (2%)</span><span id="lvl2">0</span></div>
-            <div class="stat-row"><span>3 уровень (3%)</span><span id="lvl3">0</span></div>
-            <div class="stat-row"><span>4 уровень (4%)</span><span id="lvl4">0</span></div>
-            <div class="stat-row"><span>5 уровень (5%)</span><span id="lvl5">0</span></div>
+            <div class="stat-row"><span>1 уровень (1%)</span><span id="lvl1">0</span><span class="stat-earn" id="earn1">0.00 $</span></div>
+            <div class="stat-row"><span>2 уровень (2%)</span><span id="lvl2">0</span><span class="stat-earn" id="earn2">0.00 $</span></div>
+            <div class="stat-row"><span>3 уровень (3%)</span><span id="lvl3">0</span><span class="stat-earn" id="earn3">0.00 $</span></div>
+            <div class="stat-row"><span>4 уровень (4%)</span><span id="lvl4">0</span><span class="stat-earn" id="earn4">0.00 $</span></div>
+            <div class="stat-row"><span>5 уровень (5%)</span><span id="lvl5">0</span><span class="stat-earn" id="earn5">0.00 $</span></div>
             <button class="btn-outline" id="copyRefBtn" style="width:100%; margin-top: 0.8rem; border-color: #c084fc; color: #c084fc;">📋 Копировать реф. ссылку</button>
+            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Мануал</button>
         </div>
 
         <div class="card">
@@ -970,6 +1097,20 @@
             <div class="stat-row"><span>Сегодня</span><span id="todayUsers">0</span></div>
             <div class="stat-row"><span>Выведено</span><span id="totalWithdrawn">0 $</span></div>
             <button class="btn-vip" id="vipBtn">👑 Получить VIP</button>
+        </div>
+
+        <div class="card">
+            <h3>📈 Система заработка</h3>
+            <p class="earn-info-text">
+                Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях.
+                Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.
+            </p>
+            <div class="stat-row"><span>1 ур. — 1%</span><span>0.10$ с чел.</span></div>
+            <div class="stat-row"><span>2 ур. — 2%</span><span>0.20$ с чел.</span></div>
+            <div class="stat-row"><span>3 ур. — 3%</span><span>0.30$ с чел.</span></div>
+            <div class="stat-row"><span>4 ур. — 4%</span><span>0.40$ с чел.</span></div>
+            <div class="stat-row"><span>5 ур. — 5%</span><span>0.50$ с чел.</span></div>
+            <button class="btn-calculator" id="calculatorBtn">🧮 Калькулятор дохода</button>
         </div>
     </div>
 
@@ -989,6 +1130,7 @@
     </div>
 </div>
 
+<!-- МОДАЛЬНЫЕ ОКНА -->
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
@@ -1005,9 +1147,23 @@
 <div class="modal-overlay hidden" id="profileModal">
     <div class="modal">
         <h2>👤 Профиль</h2>
-        <div class="input-group"><label>Никнейм</label><input type="text" id="profileNickname"></div>
+        <div class="input-group">
+            <label>Никнейм</label>
+            <div class="nickname-edit-row">
+                <input type="text" id="profileNickname" placeholder="Ваш никнейм">
+                <span class="edit-icon" id="editNicknameIcon" title="Редактировать никнейм">✏️</span>
+            </div>
+        </div>
+        <div class="input-group">
+            <label>Новый пароль</label>
+            <input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете">
+        </div>
+        <div class="input-group">
+            <label>Повторите новый пароль</label>
+            <input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете">
+        </div>
         <div class="modal-buttons">
-            <button class="btn-primary" id="saveProfileBtn">Сохранить</button>
+            <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
             <button class="btn-outline" id="closeProfileBtn">Отмена</button>
         </div>
     </div>
@@ -1019,6 +1175,7 @@
         <div class="vip-info-box" id="vipInfoBox">
             <p>Цена: <span class="vip-price">10$</span></p>
         </div>
+        <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem; text-align: center;" id="vipBenefitsText"></p>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmVipBtn">Купить за 10$</button>
             <button class="btn-outline" id="closeVipBtn">Отмена</button>
@@ -1037,6 +1194,64 @@
         <p>Минимальная сумма вывода: 1$, максимальная: 25$.</p>
         <div class="modal-buttons">
             <button class="btn-outline" id="closePolicyBtn">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- КАЛЬКУЛЯТОР -->
+<div class="modal-overlay hidden" id="calculatorModal">
+    <div class="modal" style="max-width: 400px;">
+        <h2>🧮 Калькулятор дохода</h2>
+        <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p>
+        
+        <div class="calc-row">
+            <span class="calc-label">1 уровень (1% = 0.10$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button>
+                <span class="calc-value" id="calc1">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">2 уровень (2% = 0.20$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button>
+                <span class="calc-value" id="calc2">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">3 уровень (3% = 0.30$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button>
+                <span class="calc-value" id="calc3">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">4 уровень (4% = 0.40$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button>
+                <span class="calc-value" id="calc4">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button>
+            </div>
+        </div>
+        <div class="calc-row">
+            <span class="calc-label">5 уровень (5% = 0.50$)</span>
+            <div class="calc-controls">
+                <button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button>
+                <span class="calc-value" id="calc5">0</span>
+                <button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button>
+            </div>
+        </div>
+        
+        <div class="calc-result">
+            <p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p>
+            <div class="calc-total" id="calcTotal">0.00 $</div>
+        </div>
+        
+        <div class="modal-buttons">
+            <button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button>
         </div>
     </div>
 </div>
@@ -1060,7 +1275,6 @@
         let lastFeedUpdate = 0;
         let captchaAnswer = 0;
 
-        // ===== ЗАГРУЗКА НИКНЕЙМОВ ИЗ name.html =====
         let allNicks = [];
         let namesLoaded = false;
 
@@ -1086,7 +1300,6 @@
             return allNicks[Math.floor(Math.random() * allNicks.length)];
         }
 
-        // ===== ГЕНЕРАЦИЯ КАПЧИ =====
         function generateCaptcha() {
             const a = Math.floor(Math.random() * 10) + 1;
             const b = Math.floor(Math.random() * 10) + 1;
@@ -1181,27 +1394,20 @@
             }
         }
 
-        // ===== ДОБАВЛЕНИЕ ПОЛЬЗОВАТЕЛЯ (+1 каждые 75-150 сек) =====
         async function addNewUserToDB() {
             const nickname = randomNick();
             const password = 'auto' + Math.floor(Math.random() * 9999);
             await supabase.rpc('register_user', {
-                p_nickname: nickname,
-                p_password: password,
-                p_referral_code: null
+                p_nickname: nickname, p_password: password, p_referral_code: null
             });
             loadPlatformStats();
         }
 
         function scheduleNewUser() {
             const delay = Math.floor(Math.random() * (150000 - 75000) + 75000);
-            setTimeout(() => {
-                addNewUserToDB();
-                scheduleNewUser();
-            }, delay);
+            setTimeout(() => { addNewUserToDB(); scheduleNewUser(); }, delay);
         }
 
-        // ===== ДОБАВЛЕНИЕ ЗАПИСЕЙ В ЛЕНТУ =====
         async function addFeedItemToDB(type, nickname, amount) {
             await supabase.rpc('add_feed_item', { p_type: type, p_nickname: nickname, p_amount: amount });
             loadPlatformStats();
@@ -1211,10 +1417,7 @@
 
         function scheduleDeposit() {
             const delay = Math.floor(Math.random() * (190000 - 75000) + 75000);
-            setTimeout(() => {
-                addFeedItemToDB('deposit', randomNick(), 10);
-                scheduleDeposit();
-            }, delay);
+            setTimeout(() => { addFeedItemToDB('deposit', randomNick(), 10); scheduleDeposit(); }, delay);
         }
 
         function scheduleWithdraw() {
@@ -1226,7 +1429,6 @@
             }, delay);
         }
 
-        // ===== ЗАГРУЗКА ЛЕНТЫ =====
         async function loadFeedFromDB() {
             const now = Date.now();
             if (now - lastFeedUpdate < 3000) return;
@@ -1284,7 +1486,6 @@
             renderFeedList('withdrawList', feedCache.withdrawals, hasNewWithdraw);
         }
 
-        // ===== ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ =====
         function showStage(stage) {
             if (stage === 'home') {
                 stageRegister.style.display = 'none';
@@ -1305,7 +1506,6 @@
             loadPlatformStats();
         }
 
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
         async function initialize() {
             await loadNames();
             await loadPlatformStats();
@@ -1362,7 +1562,6 @@
                 const nickname = document.getElementById('nickname').value.trim();
                 const password = document.getElementById('password1').value;
                 errorMessage.classList.remove('visible');
-
                 if (!nickname || !password) return;
 
                 if (!isLoginMode) {
@@ -1420,14 +1619,22 @@
         // ===== ЭКРАН КАБИНЕТА =====
         function initHomeStage() {
             if (!userData || !userData.id) { showStage('register'); return; }
-
-            document.getElementById('userGreeting').textContent = '👋 ' + userData.nickname;
+            updateGreeting();
             loadUserData();
             loadReferrals();
             loadPlatformStats();
             initModals();
-
+            initCalculator();
             setInterval(() => { loadUserData(); loadReferrals(); loadPlatformStats(); }, 30000);
+        }
+
+        function updateGreeting() {
+            const greetingEl = document.getElementById('userGreeting');
+            let html = '👋 ' + userData.nickname;
+            if (userData.vip_paid) {
+                html += ' <span class="vip-badge">VIP</span>';
+            }
+            greetingEl.innerHTML = html;
         }
 
         async function loadUserData() {
@@ -1436,19 +1643,58 @@
                 document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
                 userData.vip_paid = data.vip_paid;
                 userData.balance = data.balance;
+                userData.referral_code = data.referral_code;
                 localStorage.setItem('pirxmix_user', JSON.stringify(userData));
+                updateGreeting();
             }
         }
 
         async function loadReferrals() {
             const { data } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
             if (data) {
-                document.getElementById('lvl1').textContent = (data.level_1?.count || 0);
-                document.getElementById('lvl2').textContent = (data.level_2?.count || 0);
-                document.getElementById('lvl3').textContent = (data.level_3?.count || 0);
-                document.getElementById('lvl4').textContent = (data.level_4?.count || 0);
-                document.getElementById('lvl5').textContent = (data.level_5?.count || 0);
+                const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
+                for (let i = 1; i <= 5; i++) {
+                    const count = data['level_' + i]?.count || 0;
+                    document.getElementById('lvl' + i).textContent = count;
+                    document.getElementById('earn' + i).textContent = (count * percents[i-1]).toFixed(2) + ' $';
+                }
             }
+        }
+
+        function initCalculator() {
+            const calcLevels = ['calc1', 'calc2', 'calc3', 'calc4', 'calc5'];
+            const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
+
+            window.calcChange = function(id, delta) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                let val = parseInt(el.textContent) || 0;
+                val = Math.max(0, val + delta);
+                el.textContent = val;
+                updateCalcTotal();
+            };
+
+            function updateCalcTotal() {
+                let total = 0;
+                calcLevels.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el) total += (parseInt(el.textContent) || 0) * percents[i];
+                });
+                document.getElementById('calcTotal').textContent = total.toFixed(2) + ' $';
+            }
+
+            document.getElementById('calculatorBtn').onclick = function() {
+                calcLevels.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0'; });
+                document.getElementById('calcTotal').textContent = '0.00 $';
+                document.getElementById('calculatorModal').classList.remove('hidden');
+            };
+
+            document.getElementById('closeCalculatorBtn').onclick = function() {
+                document.getElementById('calculatorModal').classList.add('hidden');
+            };
+            document.getElementById('calculatorModal').onclick = function(e) {
+                if (e.target === this) this.classList.add('hidden');
+            };
         }
 
         function initModals() {
@@ -1458,33 +1704,65 @@
                 showStage('register');
             };
 
-            document.getElementById('copyRefBtn').onclick = function() {
+            // Копировать реф. ссылку и Мануал
+            function handleRefAction() {
                 if (!userData || !userData.vip_paid) {
-                    showToast('VIP статус требуется для реферальной ссылки', 'error');
+                    showToast('Доступ получают владельцы статуса VIP', 'error');
                     return;
                 }
                 const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
-                navigator.clipboard.writeText(refLink).then(() => showToast('Ссылка скопирована!', 'success'));
+                navigator.clipboard.writeText(refLink).then(() => showToast('Реферальная ссылка скопирована!', 'success'));
+            }
+
+            document.getElementById('copyRefBtn').onclick = handleRefAction;
+            document.getElementById('manualBtn').onclick = function() {
+                if (!userData || !userData.vip_paid) {
+                    showToast('Доступ получают владельцы статуса VIP', 'error');
+                    return;
+                }
+                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
+                navigator.clipboard.writeText(refLink).then(() => showToast('Мануал скопирован! Используйте реферальную ссылку для привлечения пользователей.', 'success'));
             };
 
+            // Политика
             document.getElementById('policyLink').onclick = () => document.getElementById('policyModal').classList.remove('hidden');
             document.getElementById('closePolicyBtn').onclick = () => document.getElementById('policyModal').classList.add('hidden');
             document.getElementById('policyModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
 
+            // Профиль
             document.getElementById('profileBtn').onclick = function() {
                 document.getElementById('profileNickname').value = userData.nickname;
+                document.getElementById('profilePassword').value = '';
+                document.getElementById('profilePassword2').value = '';
                 document.getElementById('profileModal').classList.remove('hidden');
             };
             document.getElementById('closeProfileBtn').onclick = () => document.getElementById('profileModal').classList.add('hidden');
-            document.getElementById('saveProfileBtn').onclick = function() {
+            document.getElementById('editNicknameIcon').onclick = function() {
+                document.getElementById('profileNickname').focus();
+                document.getElementById('profileNickname').select();
+            };
+            document.getElementById('saveProfileBtn').onclick = async function() {
                 const newNickname = document.getElementById('profileNickname').value.trim();
+                const newPassword = document.getElementById('profilePassword').value;
+                const newPassword2 = document.getElementById('profilePassword2').value;
+
                 if (!newNickname) return;
+
+                if (newPassword || newPassword2) {
+                    if (newPassword !== newPassword2) {
+                        showToast('Пароли не совпадают', 'error');
+                        return;
+                    }
+                }
+
                 userData.nickname = newNickname;
                 localStorage.setItem('pirxmix_user', JSON.stringify(userData));
-                document.getElementById('userGreeting').textContent = '👋 ' + newNickname;
+                updateGreeting();
                 document.getElementById('profileModal').classList.add('hidden');
+                showToast('Профиль обновлён!', 'success');
             };
 
+            // Вывод
             document.getElementById('withdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.remove('hidden');
             document.getElementById('closeWithdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.add('hidden');
             document.getElementById('confirmWithdrawBtn').onclick = async function() {
@@ -1499,16 +1777,21 @@
                 document.getElementById('withdrawModal').classList.add('hidden');
             };
 
+            // VIP
             document.getElementById('vipBtn').onclick = async function() {
                 const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
                 const vipInfoBox = document.getElementById('vipInfoBox');
                 const confirmVipBtn = document.getElementById('confirmVipBtn');
+                const vipBenefitsText = document.getElementById('vipBenefitsText');
+
                 if (data && data.vip_paid) {
                     vipInfoBox.innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
                     confirmVipBtn.style.display = 'none';
+                    vipBenefitsText.textContent = '';
                 } else {
                     vipInfoBox.innerHTML = '<p>Цена:</p><div class="vip-price">10$</div>';
                     confirmVipBtn.style.display = 'inline-block';
+                    vipBenefitsText.textContent = 'При покупке статуса вы получаете доступ к реферальной ссылке и мануалу по привлечению пользователей бесплатно.';
                 }
                 document.getElementById('vipModal').classList.remove('hidden');
             };
@@ -1518,8 +1801,11 @@
                 if (data && data.success) {
                     document.getElementById('vipInfoBox').innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
                     document.getElementById('confirmVipBtn').style.display = 'none';
+                    document.getElementById('vipBenefitsText').textContent = '';
                     await loadUserData();
                     showToast('VIP активирован!', 'success');
+                } else if (data && data.error) {
+                    showToast(data.error, 'error');
                 }
             };
         }
