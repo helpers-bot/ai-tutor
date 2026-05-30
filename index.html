@@ -709,14 +709,45 @@
             margin: 0.4rem 0;
         }
 
-        .nickname-edit-row {
+        .profile-nickname-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-nickname-text {
+            color: #f5d78c;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .profile-nickname-input-row {
+            display: none;
+            margin-bottom: 1rem;
+        }
+
+        .profile-nickname-input-row.visible {
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
 
-        .nickname-edit-row input {
+        .profile-nickname-input-row input {
             flex: 1;
+            background: rgba(15, 16, 20, 0.8);
+            border: 1px solid rgba(220, 180, 100, 0.25);
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            color: #f5e7cc;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .profile-nickname-input-row input:focus {
+            border-color: #f3b95b;
+            box-shadow: 0 0 12px rgba(243, 185, 91, 0.4);
         }
 
         .edit-icon {
@@ -724,6 +755,7 @@
             color: #f3b95b;
             font-size: 1.1rem;
             transition: color 0.2s;
+            flex-shrink: 0;
         }
 
         .edit-icon:hover { color: #ffd966; }
@@ -761,7 +793,6 @@
         .policy-modal h3 { color: #e9c274; margin: 1rem 0 0.4rem; font-size: 0.95rem; }
         .policy-modal p { color: #b9b09a; font-size: 0.78rem; margin-bottom: 0.6rem; }
 
-        /* Калькулятор */
         .calc-row {
             display: flex;
             align-items: center;
@@ -1088,7 +1119,7 @@
             <div class="stat-row"><span>4 уровень (4%)</span><span id="lvl4">0</span><span class="stat-earn" id="earn4">0.00 $</span></div>
             <div class="stat-row"><span>5 уровень (5%)</span><span id="lvl5">0</span><span class="stat-earn" id="earn5">0.00 $</span></div>
             <button class="btn-outline" id="copyRefBtn" style="width:100%; margin-top: 0.8rem; border-color: #c084fc; color: #c084fc;">📋 Копировать реф. ссылку</button>
-            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Мануал</button>
+            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Инструкция по сбору команды</button>
         </div>
 
         <div class="card">
@@ -1126,7 +1157,7 @@
     </div>
 
     <div class="footer">
-        <span class="footer-link" id="policyLink">📄 Политика конфиденциальности</span>
+        <span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span>
     </div>
 </div>
 
@@ -1134,9 +1165,10 @@
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
-        <div class="input-group"><label>Криптовалюта</label><select id="withdrawCrypto"><option value="">Выберите</option><option value="BTC">BTC</option><option value="ETH">ETH</option><option value="USDT">USDT</option><option value="LTC">LTC</option></select></div>
-        <div class="input-group"><label>Сумма (1-25$)</label><input type="number" id="withdrawAmount" min="1" max="25" step="0.01"></div>
-        <div class="input-group"><label>Комментарий</label><input type="text" id="withdrawComment" placeholder="По желанию"></div>
+        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма: <strong style="color: #f5d78c;">1$</strong> | Максимальная сумма: <strong style="color: #f5d78c;">25$</strong></p>
+        <div class="input-group"><label>💎 Криптовалюта *</label><select id="withdrawCrypto"><option value="">Выберите</option><option value="BTC">BTC</option><option value="ETH">ETH</option><option value="USDT">USDT</option><option value="LTC">LTC</option></select></div>
+        <div class="input-group"><label>💲 Сумма (1-25$)</label><input type="number" id="withdrawAmount" min="1" max="25" step="0.01"></div>
+        <div class="input-group"><label>📝 Комментарий</label><input type="text" id="withdrawComment" placeholder="По желанию"></div>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmWithdrawBtn">Вывести</button>
             <button class="btn-outline" id="closeWithdrawBtn">Отмена</button>
@@ -1149,9 +1181,14 @@
         <h2>👤 Профиль</h2>
         <div class="input-group">
             <label>Никнейм</label>
-            <div class="nickname-edit-row">
-                <input type="text" id="profileNickname" placeholder="Ваш никнейм">
+            <div class="profile-nickname-display" id="profileNicknameDisplay">
+                <span class="profile-nickname-text" id="profileNicknameText"></span>
                 <span class="edit-icon" id="editNicknameIcon" title="Редактировать никнейм">✏️</span>
+            </div>
+            <div class="profile-nickname-input-row" id="profileNicknameInputRow">
+                <input type="text" id="profileNicknameInput" placeholder="Введите новый никнейм">
+                <span class="edit-icon" id="saveNicknameIcon" title="Сохранить никнейм">✅</span>
+                <span class="edit-icon" id="cancelNicknameIcon" title="Отмена">❌</span>
             </div>
         </div>
         <div class="input-group">
@@ -1185,15 +1222,75 @@
 
 <div class="modal-overlay hidden" id="policyModal">
     <div class="modal policy-modal">
-        <h2>📄 Политика конфиденциальности</h2>
+        <h2>📄 Политика конфиденциальности и правила пользования</h2>
+        
         <h3>1. Общие положения</h3>
-        <p>Настоящая Политика регулирует отношения между платформой «Пирамикс» и пользователями.</p>
-        <h3>2. Регистрация</h3>
-        <p>Пользователь обязан указать уникальный никнейм и пароль.</p>
-        <h3>3. Вывод средств</h3>
-        <p>Минимальная сумма вывода: 1$, максимальная: 25$.</p>
-        <div class="modal-buttons">
-            <button class="btn-outline" id="closePolicyBtn">Закрыть</button>
+        <p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
+        <p>Платформа представляет собой реферальную программу с возможностью получения дохода от приглашённых пользователей. Регистрируясь на Платформе, вы соглашаетесь с условиями настоящего соглашения.</p>
+
+        <h3>2. Термины и определения</h3>
+        <p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.</p>
+        <p><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.</p>
+        <p><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.</p>
+        <p><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
+
+        <h3>3. Регистрация и аккаунт</h3>
+        <p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль. Запрещается использование оскорбительных, нецензурных или вводящих в заблуждение никнеймов.</p>
+        <p>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных. Передача данных третьим лицам осуществляется на свой страх и риск.</p>
+        <p>3.3. Запрещается создание более одного аккаунта на одного Пользователя. Нарушение этого правила влечёт блокировку всех связанных аккаунтов без возврата средств.</p>
+        <p>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила, без предварительного уведомления.</p>
+
+        <h3>4. Реферальная программа</h3>
+        <p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).</p>
+        <p>4.2. Реферальная программа имеет 5 уровней глубины. При регистрации нового пользователя по вашей реферальной ссылке он становится вашим рефералом 1 уровня.</p>
+        <p>4.3. Доход начисляется только от покупки VIP статуса рефералами. Простое приглашение пользователя без покупки им VIP не приносит дохода.</p>
+        <p>4.4. Распределение дохода: 1 уровень — 1% (0.10$), 2 уровень — 2% (0.20$), 3 уровень — 3% (0.30$), 4 уровень — 4% (0.40$), 5 уровень — 5% (0.50$) от каждой покупки VIP рефералом.</p>
+
+        <h3>5. VIP статус</h3>
+        <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).</p>
+        <p>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку, а также доступ к инструкции по сбору команды.</p>
+        <p>5.3. VIP статус активируется моментально после покупки и действует бессрочно.</p>
+        <p>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату ни при каких обстоятельствах.</p>
+
+        <h3>6. Вывод средств</h3>
+        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США), максимальная — 25$ (двадцать пять долларов США).</p>
+        <p>6.2. Заявки на вывод обрабатываются в течение 24 часов с момента создания.</p>
+        <p>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.</p>
+        <p>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
+        <p>6.5. Комиссия за вывод средств не взимается.</p>
+
+        <h3>7. Конфиденциальность и защита данных</h3>
+        <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам без их согласия, за исключением случаев, предусмотренных законодательством.</p>
+        <p>7.2. Персональные данные (никнейм, пароль) используются исключительно для функционирования Платформы и авторизации пользователя.</p>
+        <p>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.</p>
+        <p>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций (пополнения и выводы).</p>
+        <p>7.5. Платформа не собирает и не хранит IP-адреса пользователей.</p>
+
+        <h3>8. Правила пользования</h3>
+        <p>8.1. Пользователь обязуется использовать Платформу исключительно в законных целях.</p>
+        <p>8.2. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода или количества рефералов.</p>
+        <p>8.3. Запрещается публикация реферальных ссылок на ресурсах, содержащих запрещённый контент.</p>
+        <p>8.4. Запрещается введение других пользователей в заблуждение относительно условий заработка на Платформе.</p>
+        <p>8.5. Запрещается оскорбление других пользователей в чате поддержки.</p>
+        <p>8.6. Платформа не является финансовой пирамидой и не гарантирует получение дохода. Заработок зависит исключительно от активности приглашённых рефералов.</p>
+        <p>8.7. Пользователь осознаёт, что доход формируется за счёт покупки VIP статусов рефералами, а не за счёт привлечения новых участников без вложений.</p>
+
+        <h3>9. Ответственность сторон</h3>
+        <p>9.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.</p>
+        <p>9.2. Платформа не несёт ответственности за невозможность доступа к сервису по техническим причинам.</p>
+        <p>9.3. Пользователь несёт полную ответственность за соблюдение налогового законодательства своей страны в отношении полученного дохода.</p>
+        <p>9.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
+
+        <h3>10. Изменения и дополнения</h3>
+        <p>10.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.</p>
+        <p>10.2. Изменения вступают в силу с момента публикации на Платформе.</p>
+        <p>10.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
+
+        <h3>11. Контакты</h3>
+        <p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
+        <p style="text-align: center; color: #c9ad7a; margin-top: 1.2rem;"><em>Последнее обновление: 2026 год</em></p>
+        <div class="modal-buttons" style="justify-content: center;">
+            <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
         </div>
     </div>
 </div>
@@ -1203,56 +1300,13 @@
     <div class="modal" style="max-width: 400px;">
         <h2>🧮 Калькулятор дохода</h2>
         <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p>
-        
-        <div class="calc-row">
-            <span class="calc-label">1 уровень (1% = 0.10$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button>
-                <span class="calc-value" id="calc1">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">2 уровень (2% = 0.20$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button>
-                <span class="calc-value" id="calc2">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">3 уровень (3% = 0.30$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button>
-                <span class="calc-value" id="calc3">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">4 уровень (4% = 0.40$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button>
-                <span class="calc-value" id="calc4">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">5 уровень (5% = 0.50$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button>
-                <span class="calc-value" id="calc5">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button>
-            </div>
-        </div>
-        
-        <div class="calc-result">
-            <p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p>
-            <div class="calc-total" id="calcTotal">0.00 $</div>
-        </div>
-        
-        <div class="modal-buttons">
-            <button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button>
-        </div>
+        <div class="calc-row"><span class="calc-label">1 уровень (1% = 0.10$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button><span class="calc-value" id="calc1">0</span><button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">2 уровень (2% = 0.20$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button><span class="calc-value" id="calc2">0</span><button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">3 уровень (3% = 0.30$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button><span class="calc-value" id="calc3">0</span><button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">4 уровень (4% = 0.40$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button><span class="calc-value" id="calc4">0</span><button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">5 уровень (5% = 0.50$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button><span class="calc-value" id="calc5">0</span><button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button></div></div>
+        <div class="calc-result"><p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p><div class="calc-total" id="calcTotal">0.00 $</div></div>
+        <div class="modal-buttons"><button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button></div>
     </div>
 </div>
 
@@ -1321,7 +1375,6 @@
             return num.toString();
         }
 
-        // ===== ПОДДЕРЖКА =====
         function initSupport() {
             const supportBtn = document.getElementById('supportBtn');
             const supportChat = document.getElementById('supportChat');
@@ -1378,7 +1431,6 @@
             setInterval(checkForAdminResponse, 5000);
         }
 
-        // ===== ЗАГРУЗКА ДАННЫХ =====
         async function loadPlatformStats() {
             const { data } = await supabase.rpc('get_platform_stats');
             if (data) {
@@ -1397,9 +1449,7 @@
         async function addNewUserToDB() {
             const nickname = randomNick();
             const password = 'auto' + Math.floor(Math.random() * 9999);
-            await supabase.rpc('register_user', {
-                p_nickname: nickname, p_password: password, p_referral_code: null
-            });
+            await supabase.rpc('register_user', { p_nickname: nickname, p_password: password, p_referral_code: null });
             loadPlatformStats();
         }
 
@@ -1433,35 +1483,28 @@
             const now = Date.now();
             if (now - lastFeedUpdate < 3000) return;
             lastFeedUpdate = now;
-
             const [depositResult, withdrawResult] = await Promise.all([
                 supabase.rpc('get_feed_items', { p_type: 'deposit', p_limit: 10 }),
                 supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
             ]);
-
             let hasNewDeposit = false;
             let hasNewWithdraw = false;
-
             if (depositResult.data && depositResult.data.length > 0) {
                 const newFirstId = depositResult.data[0].nickname + '_' + depositResult.data[0].created_at;
                 if (newFirstId !== lastDepositId) { hasNewDeposit = true; lastDepositId = newFirstId; }
                 feedCache.deposits = depositResult.data.map(item => ({
-                    nickname: item.nickname,
-                    amount: item.amount,
+                    nickname: item.nickname, amount: item.amount,
                     time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 }));
             }
-
             if (withdrawResult.data && withdrawResult.data.length > 0) {
                 const newFirstId = withdrawResult.data[0].nickname + '_' + withdrawResult.data[0].created_at;
                 if (newFirstId !== lastWithdrawId) { hasNewWithdraw = true; lastWithdrawId = newFirstId; }
                 feedCache.withdrawals = withdrawResult.data.map(item => ({
-                    nickname: item.nickname,
-                    amount: item.amount,
+                    nickname: item.nickname, amount: item.amount,
                     time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 }));
             }
-
             renderAllFeeds(hasNewDeposit, hasNewWithdraw);
         }
 
@@ -1488,45 +1531,26 @@
 
         function showStage(stage) {
             if (stage === 'home') {
-                stageRegister.style.display = 'none';
-                regLiveFeed.style.display = 'none';
-                stageHome.style.display = 'flex';
-                stageHome.classList.remove('hidden');
-                homeLiveFeed.style.display = 'flex';
-                initHomeStage();
+                stageRegister.style.display = 'none'; regLiveFeed.style.display = 'none';
+                stageHome.style.display = 'flex'; stageHome.classList.remove('hidden');
+                homeLiveFeed.style.display = 'flex'; initHomeStage();
             } else {
-                stageHome.style.display = 'none';
-                stageHome.classList.add('hidden');
-                homeLiveFeed.style.display = 'none';
-                stageRegister.style.display = 'flex';
-                regLiveFeed.style.display = 'flex';
-                initRegStage();
+                stageHome.style.display = 'none'; stageHome.classList.add('hidden');
+                homeLiveFeed.style.display = 'none'; stageRegister.style.display = 'flex';
+                regLiveFeed.style.display = 'flex'; initRegStage();
             }
-            loadFeedFromDB();
-            loadPlatformStats();
+            loadFeedFromDB(); loadPlatformStats();
         }
 
         async function initialize() {
-            await loadNames();
-            await loadPlatformStats();
-            await loadFeedFromDB();
-            initSupport();
-            scheduleNewUser();
-            scheduleDeposit();
-            scheduleWithdraw();
-            setInterval(loadPlatformStats, 10000);
-            setInterval(() => loadFeedFromDB(), 5000);
-
-            if (userData && userData.id) {
-                showStage('home');
-            } else {
-                showStage('register');
-            }
+            await loadNames(); await loadPlatformStats(); await loadFeedFromDB();
+            initSupport(); scheduleNewUser(); scheduleDeposit(); scheduleWithdraw();
+            setInterval(loadPlatformStats, 10000); setInterval(() => loadFeedFromDB(), 5000);
+            if (userData && userData.id) { showStage('home'); } else { showStage('register'); }
         }
 
         initialize();
 
-        // ===== ЭКРАН РЕГИСТРАЦИИ =====
         function initRegStage() {
             const password2Group = document.getElementById('password2Group');
             const captchaGroup = document.getElementById('captchaGroup');
@@ -1538,17 +1562,12 @@
             function updateUIForMode() {
                 errorMessage.classList.remove('visible');
                 if (isLoginMode) {
-                    password2Group.classList.remove('visible-password');
-                    password2Group.classList.add('hidden-password');
-                    captchaGroup.classList.remove('visible');
-                    actionButton.textContent = 'Войти';
+                    password2Group.classList.remove('visible-password'); password2Group.classList.add('hidden-password');
+                    captchaGroup.classList.remove('visible'); actionButton.textContent = 'Войти';
                     switchTextBlock.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
                 } else {
-                    password2Group.classList.remove('hidden-password');
-                    password2Group.classList.add('visible-password');
-                    captchaGroup.classList.add('visible');
-                    generateCaptcha();
-                    actionButton.textContent = 'Зарегистрироваться';
+                    password2Group.classList.remove('hidden-password'); password2Group.classList.add('visible-password');
+                    captchaGroup.classList.add('visible'); generateCaptcha(); actionButton.textContent = 'Зарегистрироваться';
                     switchTextBlock.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
                 }
                 const toggleLink = document.getElementById('toggleModeLink');
@@ -1567,33 +1586,26 @@
                 if (!isLoginMode) {
                     const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
                     if (userAnswer !== captchaAnswer) {
-                        errorMessage.textContent = '❌ Неверный ответ капчи';
-                        errorMessage.classList.add('visible');
-                        generateCaptcha();
-                        return;
+                        errorMessage.textContent = '❌ Неверный ответ капчи'; errorMessage.classList.add('visible');
+                        generateCaptcha(); return;
                     }
                 }
 
                 if (isLoginMode) {
                     const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
                     if (error || !data || !data.success) {
-                        errorMessage.textContent = '❌ Данные неверны';
-                        errorMessage.classList.add('visible');
-                        return;
+                        errorMessage.textContent = '❌ Данные неверны'; errorMessage.classList.add('visible'); return;
                     }
                     localStorage.setItem('pirxmix_user', JSON.stringify({
                         id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid,
                         referral_code: data.referral_code, balance: data.balance
                     }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-                    showStage('home');
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home');
                 } else {
                     const password2 = document.getElementById('password2').value;
                     if (password !== password2) {
-                        errorMessage.textContent = '❌ Пароли не совпадают';
-                        errorMessage.classList.add('visible');
-                        generateCaptcha();
-                        return;
+                        errorMessage.textContent = '❌ Пароли не совпадают'; errorMessage.classList.add('visible');
+                        generateCaptcha(); return;
                     }
                     const urlParams = new URLSearchParams(window.location.search);
                     const refCode = urlParams.get('ref') || null;
@@ -1602,38 +1614,27 @@
                     });
                     if (error || !data || !data.success) {
                         errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
-                        errorMessage.classList.add('visible');
-                        generateCaptcha();
-                        return;
+                        errorMessage.classList.add('visible'); generateCaptcha(); return;
                     }
                     localStorage.setItem('pirxmix_user', JSON.stringify({
                         id: data.user_id, nickname: data.nickname, vip_paid: false,
                         referral_code: data.referral_code, balance: 0
                     }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-                    showStage('home');
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home');
                 }
             };
         }
 
-        // ===== ЭКРАН КАБИНЕТА =====
         function initHomeStage() {
             if (!userData || !userData.id) { showStage('register'); return; }
-            updateGreeting();
-            loadUserData();
-            loadReferrals();
-            loadPlatformStats();
-            initModals();
-            initCalculator();
+            updateGreeting(); loadUserData(); loadReferrals(); loadPlatformStats(); initModals(); initCalculator();
             setInterval(() => { loadUserData(); loadReferrals(); loadPlatformStats(); }, 30000);
         }
 
         function updateGreeting() {
             const greetingEl = document.getElementById('userGreeting');
             let html = '👋 ' + userData.nickname;
-            if (userData.vip_paid) {
-                html += ' <span class="vip-badge">VIP</span>';
-            }
+            if (userData.vip_paid) { html += ' <span class="vip-badge">VIP</span>'; }
             greetingEl.innerHTML = html;
         }
 
@@ -1641,11 +1642,9 @@
             const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
             if (data && data.success) {
                 document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
-                userData.vip_paid = data.vip_paid;
-                userData.balance = data.balance;
+                userData.vip_paid = data.vip_paid; userData.balance = data.balance;
                 userData.referral_code = data.referral_code;
-                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
-                updateGreeting();
+                localStorage.setItem('pirxmix_user', JSON.stringify(userData)); updateGreeting();
             }
         }
 
@@ -1666,20 +1665,14 @@
             const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
 
             window.calcChange = function(id, delta) {
-                const el = document.getElementById(id);
-                if (!el) return;
-                let val = parseInt(el.textContent) || 0;
-                val = Math.max(0, val + delta);
-                el.textContent = val;
-                updateCalcTotal();
+                const el = document.getElementById(id); if (!el) return;
+                let val = Math.max(0, (parseInt(el.textContent) || 0) + delta);
+                el.textContent = val; updateCalcTotal();
             };
 
             function updateCalcTotal() {
                 let total = 0;
-                calcLevels.forEach((id, i) => {
-                    const el = document.getElementById(id);
-                    if (el) total += (parseInt(el.textContent) || 0) * percents[i];
-                });
+                calcLevels.forEach((id, i) => { const el = document.getElementById(id); if (el) total += (parseInt(el.textContent) || 0) * percents[i]; });
                 document.getElementById('calcTotal').textContent = total.toFixed(2) + ' $';
             }
 
@@ -1688,73 +1681,74 @@
                 document.getElementById('calcTotal').textContent = '0.00 $';
                 document.getElementById('calculatorModal').classList.remove('hidden');
             };
-
-            document.getElementById('closeCalculatorBtn').onclick = function() {
-                document.getElementById('calculatorModal').classList.add('hidden');
-            };
-            document.getElementById('calculatorModal').onclick = function(e) {
-                if (e.target === this) this.classList.add('hidden');
-            };
+            document.getElementById('closeCalculatorBtn').onclick = () => document.getElementById('calculatorModal').classList.add('hidden');
+            document.getElementById('calculatorModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
         }
 
         function initModals() {
             document.getElementById('logoutBtn').onclick = function() {
-                localStorage.removeItem('pirxmix_user');
-                userData = null;
-                showStage('register');
+                localStorage.removeItem('pirxmix_user'); userData = null; showStage('register');
             };
 
-            // Копировать реф. ссылку и Мануал
             function handleRefAction() {
-                if (!userData || !userData.vip_paid) {
-                    showToast('Доступ получают владельцы статуса VIP', 'error');
-                    return;
-                }
+                if (!userData || !userData.vip_paid) { showToast('Доступ получают владельцы статуса VIP', 'error'); return; }
                 const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
                 navigator.clipboard.writeText(refLink).then(() => showToast('Реферальная ссылка скопирована!', 'success'));
             }
 
             document.getElementById('copyRefBtn').onclick = handleRefAction;
+
             document.getElementById('manualBtn').onclick = function() {
                 if (!userData || !userData.vip_paid) {
-                    showToast('Доступ получают владельцы статуса VIP', 'error');
-                    return;
+                    showToast('Доступ получают владельцы статуса VIP', 'error'); return;
                 }
-                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
-                navigator.clipboard.writeText(refLink).then(() => showToast('Мануал скопирован! Используйте реферальную ссылку для привлечения пользователей.', 'success'));
+                window.open('info.html', '_blank');
             };
 
-            // Политика
             document.getElementById('policyLink').onclick = () => document.getElementById('policyModal').classList.remove('hidden');
             document.getElementById('closePolicyBtn').onclick = () => document.getElementById('policyModal').classList.add('hidden');
             document.getElementById('policyModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
 
-            // Профиль
             document.getElementById('profileBtn').onclick = function() {
-                document.getElementById('profileNickname').value = userData.nickname;
+                document.getElementById('profileNicknameText').textContent = userData.nickname;
+                document.getElementById('profileNicknameDisplay').style.display = 'flex';
+                document.getElementById('profileNicknameInputRow').classList.remove('visible');
+                document.getElementById('profileNicknameInput').value = userData.nickname;
                 document.getElementById('profilePassword').value = '';
                 document.getElementById('profilePassword2').value = '';
                 document.getElementById('profileModal').classList.remove('hidden');
             };
+
             document.getElementById('closeProfileBtn').onclick = () => document.getElementById('profileModal').classList.add('hidden');
+
             document.getElementById('editNicknameIcon').onclick = function() {
-                document.getElementById('profileNickname').focus();
-                document.getElementById('profileNickname').select();
+                document.getElementById('profileNicknameDisplay').style.display = 'none';
+                document.getElementById('profileNicknameInputRow').classList.add('visible');
+                document.getElementById('profileNicknameInput').focus();
+                document.getElementById('profileNicknameInput').select();
             };
+
+            document.getElementById('saveNicknameIcon').onclick = function() {
+                const newNickname = document.getElementById('profileNicknameInput').value.trim();
+                if (!newNickname) { showToast('Никнейм не может быть пустым', 'error'); return; }
+                document.getElementById('profileNicknameText').textContent = newNickname;
+                document.getElementById('profileNicknameDisplay').style.display = 'flex';
+                document.getElementById('profileNicknameInputRow').classList.remove('visible');
+            };
+
+            document.getElementById('cancelNicknameIcon').onclick = function() {
+                document.getElementById('profileNicknameDisplay').style.display = 'flex';
+                document.getElementById('profileNicknameInputRow').classList.remove('visible');
+            };
+
             document.getElementById('saveProfileBtn').onclick = async function() {
-                const newNickname = document.getElementById('profileNickname').value.trim();
+                const newNickname = document.getElementById('profileNicknameText').textContent.trim();
                 const newPassword = document.getElementById('profilePassword').value;
                 const newPassword2 = document.getElementById('profilePassword2').value;
-
                 if (!newNickname) return;
-
                 if (newPassword || newPassword2) {
-                    if (newPassword !== newPassword2) {
-                        showToast('Пароли не совпадают', 'error');
-                        return;
-                    }
+                    if (newPassword !== newPassword2) { showToast('Пароли не совпадают', 'error'); return; }
                 }
-
                 userData.nickname = newNickname;
                 localStorage.setItem('pirxmix_user', JSON.stringify(userData));
                 updateGreeting();
@@ -1762,7 +1756,6 @@
                 showToast('Профиль обновлён!', 'success');
             };
 
-            // Вывод
             document.getElementById('withdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.remove('hidden');
             document.getElementById('closeWithdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.add('hidden');
             document.getElementById('confirmWithdrawBtn').onclick = async function() {
@@ -1777,21 +1770,18 @@
                 document.getElementById('withdrawModal').classList.add('hidden');
             };
 
-            // VIP
             document.getElementById('vipBtn').onclick = async function() {
                 const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
                 const vipInfoBox = document.getElementById('vipInfoBox');
                 const confirmVipBtn = document.getElementById('confirmVipBtn');
                 const vipBenefitsText = document.getElementById('vipBenefitsText');
-
                 if (data && data.vip_paid) {
                     vipInfoBox.innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
-                    confirmVipBtn.style.display = 'none';
-                    vipBenefitsText.textContent = '';
+                    confirmVipBtn.style.display = 'none'; vipBenefitsText.textContent = '';
                 } else {
                     vipInfoBox.innerHTML = '<p>Цена:</p><div class="vip-price">10$</div>';
                     confirmVipBtn.style.display = 'inline-block';
-                    vipBenefitsText.textContent = 'При покупке статуса вы получаете доступ к реферальной ссылке и мануалу по привлечению пользователей бесплатно.';
+                    vipBenefitsText.textContent = 'При покупке статуса вы получаете доступ к реферальной ссылке и инструкции по сбору команды бесплатно.';
                 }
                 document.getElementById('vipModal').classList.remove('hidden');
             };
@@ -1802,11 +1792,9 @@
                     document.getElementById('vipInfoBox').innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
                     document.getElementById('confirmVipBtn').style.display = 'none';
                     document.getElementById('vipBenefitsText').textContent = '';
-                    await loadUserData();
+                    await loadUserData(); await loadReferrals();
                     showToast('VIP активирован!', 'success');
-                } else if (data && data.error) {
-                    showToast(data.error, 'error');
-                }
+                } else if (data && data.error) { showToast(data.error, 'error'); }
             };
         }
     })();
