@@ -1340,9 +1340,9 @@
 <div class="modal-overlay hidden" id="withdrawModal">
     <div class="modal">
         <h2>💸 Вывод средств</h2>
-        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма вывода: <strong style="color: #f5d78c;">1$</strong></p>
+        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма: <strong style="color: #f5d78c;">1$</strong> | Максимальная сумма: <strong style="color: #f5d78c;">25$</strong></p>
         <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите криптовалюту --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
-        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="Минимум 1$" min="1" step="0.01"></div>
+        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="От 1$ до 25$" min="1" max="25" step="0.01"></div>
         <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв..."></div>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
@@ -1394,7 +1394,7 @@
         <h3>5. VIP статус</h3>
         <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
         <h3>6. Вывод средств</h3>
-        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
+        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США), максимальная — 25$ (двадцать пять долларов США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
         <h3>7. Конфиденциальность</h3>
         <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
         <h3>8. Ответственность</h3>
@@ -1803,7 +1803,7 @@
         function scheduleWithdraw() {
             const delay = Math.floor(Math.random() * (240000 - 95000) + 95000);
             setTimeout(() => {
-                const amount = Math.floor(Math.random() * 130) + 1;
+                const amount = Math.floor(Math.random() * 25) + 1;
                 addFeedItemToDB('withdraw', randomNick(), amount);
                 scheduleWithdraw();
             }, delay);
@@ -2122,7 +2122,7 @@
             document.getElementById('confirmWithdrawBtn').onclick = async function() {
                 const crypto = document.getElementById('withdrawCrypto').value;
                 const amount = parseFloat(document.getElementById('withdrawAmount').value);
-                if (!crypto || !amount || amount < 1) return;
+                if (!crypto || !amount || amount < 1 || amount > 25) return;
                 
                 const { data, error } = await supabase.rpc('withdraw_funds', {
                     p_user_id: userData.id,
