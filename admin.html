@@ -206,7 +206,8 @@
             font-weight: 600;
         }
 
-        .message-list {
+        /* ===== ДИАЛОГИ ===== */
+        .dialog-list {
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
@@ -214,76 +215,93 @@
             overflow-y: auto;
         }
 
-        .message-item {
+        .dialog-item {
             background: rgba(0,0,0,0.3);
             border-radius: 1rem;
             padding: 1rem;
             border: 1px solid rgba(212, 165, 60, 0.2);
             cursor: pointer;
             transition: all 0.2s;
-            position: relative;
         }
 
-        .message-item:hover {
+        .dialog-item:hover {
             border-color: rgba(192, 132, 252, 0.5);
             background: rgba(192, 132, 252, 0.1);
         }
 
-        .message-item.unread {
-            border-color: rgba(192, 132, 252, 0.5);
+        .dialog-item.has-unread {
+            border-color: rgba(192, 132, 252, 0.6);
             background: rgba(192, 132, 252, 0.1);
+            animation: pulseUnread 2s infinite;
         }
 
-        .message-text {
-            font-size: 0.85rem;
+        @keyframes pulseUnread {
+            0%, 100% { border-color: rgba(192, 132, 252, 0.4); }
+            50% { border-color: rgba(192, 132, 252, 0.8); }
+        }
+
+        .dialog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 0.5rem;
-            color: #f5efe0;
         }
 
-        .message-meta {
-            font-size: 0.7rem;
+        .dialog-nickname {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #f5d78c;
+        }
+
+        .dialog-nickname.user-guest {
+            color: #b9b09a;
+            font-style: italic;
+        }
+
+        .dialog-badge {
+            background: #ff7043;
+            color: #fff;
+            border-radius: 1rem;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+        }
+
+        .dialog-last-message {
+            font-size: 0.8rem;
+            color: #b9b09a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 0.3rem;
+        }
+
+        .dialog-meta {
+            font-size: 0.65rem;
             color: #8b8a7a;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 0.5rem;
         }
 
-        .message-response {
-            background: rgba(76, 175, 80, 0.1);
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            border-radius: 0.8rem;
-            padding: 0.7rem;
-            margin-top: 0.5rem;
-            font-size: 0.8rem;
-            color: #4caf50;
-        }
-
-        .response-area {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .response-area input {
-            flex: 1;
-            background: rgba(15, 16, 20, 0.8);
-            border: 1px solid rgba(220, 180, 100, 0.25);
+        .dialog-delete-btn {
+            background: transparent;
+            border: 1px solid #ff7043;
+            color: #ff7043;
+            padding: 0.2rem 0.6rem;
             border-radius: 1rem;
-            padding: 0.5rem 0.8rem;
-            font-size: 0.8rem;
-            color: #f5e7cc;
-            outline: none;
-            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .response-area input:focus {
-            border-color: #c084fc;
+        .dialog-delete-btn:hover {
+            background: #ff7043;
+            color: #fff;
         }
 
-        /* ===== ПЕРЕТАСКИВАЕМОЕ ОКНО СООБЩЕНИЯ ===== */
-        .message-modal-overlay {
+        /* ===== МОДАЛЬНОЕ ОКНО ДИАЛОГА ===== */
+        .dialog-modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5);
@@ -293,23 +311,24 @@
             justify-content: center;
         }
 
-        .message-modal {
+        .dialog-modal {
             position: absolute;
             background: rgba(20, 22, 27, 0.97);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(192, 132, 252, 0.5);
             border-radius: 1.5rem;
             box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            min-width: 380px;
+            min-width: 400px;
             max-width: 700px;
-            width: 500px;
+            width: 550px;
+            max-height: 80vh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             user-select: none;
         }
 
-        .message-modal-header {
+        .dialog-modal-header {
             background: linear-gradient(135deg, rgba(192, 132, 252, 0.3), rgba(124, 58, 237, 0.2));
             padding: 0.8rem 1.2rem;
             display: flex;
@@ -319,14 +338,14 @@
             border-bottom: 1px solid rgba(192, 132, 252, 0.3);
         }
 
-        .message-modal-header h3 {
+        .dialog-modal-header h3 {
             font-size: 0.9rem;
             color: #e9c274;
             margin: 0;
             pointer-events: none;
         }
 
-        .message-modal-close {
+        .dialog-modal-close {
             background: transparent;
             border: none;
             color: #b9b09a;
@@ -337,71 +356,73 @@
             transition: color 0.2s;
         }
 
-        .message-modal-close:hover {
+        .dialog-modal-close:hover {
             color: #ff7043;
         }
 
-        .message-modal-body {
-            padding: 1.2rem;
-            overflow-y: auto;
-            max-height: 400px;
+        .dialog-modal-messages {
             flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
         }
 
-        .message-modal-body .user-msg {
+        .dialog-msg {
+            padding: 0.7rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            max-width: 85%;
+        }
+
+        .dialog-msg.user {
             background: rgba(243, 185, 91, 0.2);
             border: 1px solid rgba(243, 185, 91, 0.3);
-            border-radius: 1rem;
-            padding: 0.8rem;
-            margin-bottom: 0.8rem;
-            font-size: 0.85rem;
             color: #f5efe0;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.3rem;
         }
 
-        .message-modal-body .admin-msg {
-            background: rgba(76, 175, 80, 0.15);
+        .dialog-msg.admin {
+            background: rgba(76, 175, 80, 0.2);
             border: 1px solid rgba(76, 175, 80, 0.4);
-            border-radius: 1rem;
-            padding: 0.8rem;
-            margin-bottom: 0.8rem;
-            font-size: 0.85rem;
             color: #81c784;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.3rem;
         }
 
-        .message-modal-body .msg-time {
-            font-size: 0.65rem;
+        .dialog-msg-time {
+            font-size: 0.6rem;
             color: #8b8a7a;
-            margin-top: 0.3rem;
+            margin-top: 0.2rem;
             text-align: right;
         }
 
-        .message-modal-footer {
+        .dialog-modal-footer {
             padding: 0.8rem 1.2rem;
             border-top: 1px solid rgba(192, 132, 252, 0.2);
             display: flex;
             gap: 0.5rem;
-            justify-content: flex-end;
-            flex-wrap: wrap;
         }
 
-        .message-modal-footer .response-input {
+        .dialog-modal-footer input {
             flex: 1;
-            min-width: 200px;
             background: rgba(15, 16, 20, 0.8);
             border: 1px solid rgba(220, 180, 100, 0.25);
-            border-radius: 1rem;
-            padding: 0.5rem 0.8rem;
+            border-radius: 1.5rem;
+            padding: 0.6rem 1rem;
             font-size: 0.8rem;
             color: #f5e7cc;
             outline: none;
             font-family: 'Inter', sans-serif;
         }
 
-        .message-modal-footer .response-input:focus {
+        .dialog-modal-footer input:focus {
             border-color: #c084fc;
         }
 
-        /* Ресайз-хендл */
         .resize-handle {
             position: absolute;
             bottom: 0;
@@ -452,7 +473,7 @@
             .input-row { flex-direction: column; }
             .btn { width: 100%; }
             .header { flex-direction: column; text-align: center; }
-            .message-modal {
+            .dialog-modal {
                 width: 95vw !important;
                 min-width: auto !important;
                 max-width: 95vw !important;
@@ -482,7 +503,7 @@
                 <div class="stat-value" id="statTotalWithdrawn">0 $</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">💬 Новых сообщений</div>
+                <div class="stat-label">💬 Диалогов</div>
                 <div class="stat-value" id="statUnread">0</div>
             </div>
         </div>
@@ -514,11 +535,11 @@
             </div>
         </div>
 
-        <!-- Сообщения поддержки -->
+        <!-- Диалоги -->
         <div class="panel">
-            <h2>💬 Сообщения поддержки <span class="badge" id="unreadBadge" style="display:none;">0</span></h2>
-            <div class="message-list" id="messageList">
-                <p style="color: #b9b09a; text-align: center;">Загрузка сообщений...</p>
+            <h2>💬 Диалоги с пользователями <span class="badge" id="unreadBadge" style="display:none;">0</span></h2>
+            <div class="dialog-list" id="dialogList">
+                <p style="color: #b9b09a; text-align: center;">Загрузка диалогов...</p>
             </div>
         </div>
     </div>
@@ -531,7 +552,7 @@
 
             let currentUser = null;
             let currentUserId = null;
-            let currentMessageModal = null;
+            let currentDialogModal = null;
 
             // ===== ПРОВЕРКА ДОСТУПА =====
             function checkAuth() {
@@ -541,9 +562,9 @@
                 } else {
                     document.querySelector('.container').classList.remove('hidden');
                     loadStats();
-                    loadMessages();
+                    loadDialogs();
                     setInterval(loadStats, 30000);
-                    setInterval(loadMessages, 15000);
+                    setInterval(loadDialogs, 10000);
                 }
             }
 
@@ -558,8 +579,7 @@
                 `;
                 overlay.innerHTML = `
                     <div style="background: rgba(20,22,27,0.95); border: 1px solid rgba(255,215,150,0.3);
-                        border-radius: 1.8rem; padding: 2rem; width: 90%; max-width: 380px; color: #f5efe0;
-                        animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1);">
+                        border-radius: 1.8rem; padding: 2rem; width: 90%; max-width: 380px; color: #f5efe0;">
                         <h2 style="color: #e9c274; margin-bottom: 1.5rem; text-align: center;">👑 Админ-панель</h2>
                         <div style="margin-bottom: 1rem;">
                             <label style="display: block; font-size: 0.75rem; color: #b9b09a; margin-bottom: 0.25rem;">Пароль</label>
@@ -586,7 +606,7 @@
                     if (overlay) overlay.remove();
                     document.querySelector('.container').classList.remove('hidden');
                     loadStats();
-                    loadMessages();
+                    loadDialogs();
                 } else {
                     document.getElementById('loginError').style.display = 'block';
                 }
@@ -610,89 +630,121 @@
                 return num.toString();
             }
 
-            // ===== ПЕРЕТАСКИВАЕМОЕ ОКНО СООБЩЕНИЯ =====
-            function openMessageModal(msg) {
-                // Закрываем предыдущее окно
-                if (currentMessageModal) {
-                    currentMessageModal.remove();
-                    currentMessageModal = null;
+            // ===== ГРУППИРОВКА СООБЩЕНИЙ ПО ПОЛЬЗОВАТЕЛЯМ =====
+            function groupMessagesByUser(messages) {
+                const dialogs = {};
+                
+                messages.forEach(msg => {
+                    const nickname = msg.nickname || 'User';
+                    if (!dialogs[nickname]) {
+                        dialogs[nickname] = {
+                            nickname: nickname,
+                            messages: [],
+                            hasUnread: false,
+                            lastMessage: null,
+                            lastTime: null
+                        };
+                    }
+                    
+                    dialogs[nickname].messages.push(msg);
+                    
+                    if (!msg.is_read) {
+                        dialogs[nickname].hasUnread = true;
+                    }
+                    
+                    if (!dialogs[nickname].lastTime || new Date(msg.created_at) > new Date(dialogs[nickname].lastTime)) {
+                        dialogs[nickname].lastMessage = msg.user_message;
+                        dialogs[nickname].lastTime = msg.created_at;
+                    }
+                });
+                
+                return Object.values(dialogs).sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
+            }
+
+            // ===== ОТКРЫТИЕ ДИАЛОГА =====
+            function openDialog(dialog) {
+                if (currentDialogModal) {
+                    currentDialogModal.remove();
+                    currentDialogModal = null;
                 }
 
                 const overlay = document.createElement('div');
-                overlay.className = 'message-modal-overlay';
+                overlay.className = 'dialog-modal-overlay';
                 
                 const modal = document.createElement('div');
-                modal.className = 'message-modal';
-                modal.style.top = '50px';
-                modal.style.left = '50px';
+                modal.className = 'dialog-modal';
+                modal.style.top = '40px';
+                modal.style.left = '60px';
                 
-                modal.innerHTML = `
-                    <div class="message-modal-header" id="modalHeader">
-                        <h3>💬 Сообщение #${msg.id}</h3>
-                        <button class="message-modal-close" id="modalClose">✕</button>
+                const isGuest = dialog.nickname === 'User';
+                const nicknameClass = isGuest ? 'user-guest' : '';
+                
+                let messagesHTML = dialog.messages.map(msg => `
+                    <div class="dialog-msg user">
+                        ${msg.user_message}
+                        <div class="dialog-msg-time">📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</div>
                     </div>
-                    <div class="message-modal-body">
-                        <div class="user-msg">
-                            ${msg.user_message}
-                            <div class="msg-time">📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</div>
+                    ${msg.admin_response ? `
+                        <div class="dialog-msg admin">
+                            ${msg.admin_response}
+                            <div class="dialog-msg-time">✅ Отвечено</div>
                         </div>
-                        ${msg.admin_response ? `
-                            <div class="admin-msg">
-                                ${msg.admin_response}
-                                <div class="msg-time">✅ Отвечено</div>
-                            </div>
-                        ` : ''}
+                    ` : ''}
+                `).join('');
+
+                modal.innerHTML = `
+                    <div class="dialog-modal-header" id="modalHeader">
+                        <h3>💬 ${dialog.nickname} <span style="color: ${isGuest ? '#b9b09a' : '#f5d78c'}; font-style: ${isGuest ? 'italic' : 'normal'};">${isGuest ? '(гость)' : ''}</span></h3>
+                        <button class="dialog-modal-close" id="modalClose">✕</button>
                     </div>
-                    <div class="message-modal-footer">
-                        ${!msg.admin_response ? `
-                            <input type="text" class="response-input" id="modalResponseInput" placeholder="Введите ответ...">
-                            <button class="btn btn-success btn-sm" id="modalSendBtn">📤 Ответить</button>
-                        ` : ''}
-                        <button class="btn btn-danger btn-sm" id="modalDeleteBtn">🗑 Удалить</button>
+                    <div class="dialog-modal-messages" id="modalMessages">
+                        ${messagesHTML}
+                    </div>
+                    <div class="dialog-modal-footer">
+                        <input type="text" id="modalResponseInput" placeholder="Введите ответ...">
+                        <button class="btn btn-success btn-sm" id="modalSendBtn">📤</button>
+                        <button class="btn btn-danger btn-sm" id="modalDeleteDialogBtn">🗑 Удалить диалог</button>
                     </div>
                     <div class="resize-handle" id="resizeHandle"></div>
                 `;
                 
                 overlay.appendChild(modal);
                 document.body.appendChild(overlay);
-                currentMessageModal = overlay;
+                currentDialogModal = overlay;
 
-                // Закрытие по клику на оверлей
+                // Прокрутка вниз
+                setTimeout(() => {
+                    const msgContainer = modal.querySelector('#modalMessages');
+                    if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
+                }, 100);
+
+                // Закрытие
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
                         overlay.remove();
-                        currentMessageModal = null;
+                        currentDialogModal = null;
                     }
                 });
-
-                // Закрытие по кнопке
                 modal.querySelector('#modalClose').addEventListener('click', function() {
                     overlay.remove();
-                    currentMessageModal = null;
+                    currentDialogModal = null;
                 });
 
                 // Перетаскивание
                 const header = modal.querySelector('#modalHeader');
-                let isDragging = false;
-                let startX, startY, startLeft, startTop;
-
+                let isDragging = false, startX, startY, startLeft, startTop;
                 header.addEventListener('mousedown', function(e) {
                     isDragging = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    startLeft = parseInt(modal.style.left) || 50;
-                    startTop = parseInt(modal.style.top) || 50;
+                    startX = e.clientX; startY = e.clientY;
+                    startLeft = parseInt(modal.style.left) || 60;
+                    startTop = parseInt(modal.style.top) || 40;
                     document.body.style.userSelect = 'none';
                 });
-
                 document.addEventListener('mousemove', function(e) {
-                    if (!isDragging || !currentMessageModal) return;
-                    const dx = e.clientX - startX;
-                    const dy = e.clientY - startY;
-                    modal.style.left = Math.max(0, startLeft + dx) + 'px';
-                    modal.style.top = Math.max(0, startTop + dy) + 'px';
+                    if (!isDragging || !currentDialogModal) return;
+                    modal.style.left = Math.max(0, startLeft + (e.clientX - startX)) + 'px';
+                    modal.style.top = Math.max(0, startTop + (e.clientY - startY)) + 'px';
                 });
-
                 document.addEventListener('mouseup', function() {
                     isDragging = false;
                     document.body.style.userSelect = '';
@@ -700,74 +752,66 @@
 
                 // Изменение размера
                 const resizeHandle = modal.querySelector('#resizeHandle');
-                let isResizing = false;
-                let startWidth, startHeight, resizeStartX, resizeStartY;
-
+                let isResizing = false, startW, startH, rsX, rsY;
                 resizeHandle.addEventListener('mousedown', function(e) {
                     isResizing = true;
-                    resizeStartX = e.clientX;
-                    resizeStartY = e.clientY;
-                    startWidth = modal.offsetWidth;
-                    startHeight = modal.offsetHeight;
+                    rsX = e.clientX; rsY = e.clientY;
+                    startW = modal.offsetWidth; startH = modal.offsetHeight;
                     e.stopPropagation();
                     document.body.style.userSelect = 'none';
                 });
-
                 document.addEventListener('mousemove', function(e) {
-                    if (!isResizing || !currentMessageModal) return;
-                    const newWidth = Math.max(380, startWidth + (e.clientX - resizeStartX));
-                    const newHeight = Math.max(200, startHeight + (e.clientY - resizeStartY));
-                    modal.style.width = newWidth + 'px';
-                    modal.style.minHeight = newHeight + 'px';
+                    if (!isResizing || !currentDialogModal) return;
+                    modal.style.width = Math.max(400, startW + (e.clientX - rsX)) + 'px';
+                    modal.style.height = Math.max(300, startH + (e.clientY - rsY)) + 'px';
                 });
-
                 document.addEventListener('mouseup', function() {
                     isResizing = false;
                     document.body.style.userSelect = '';
                 });
 
                 // Отправка ответа
-                const sendBtn = modal.querySelector('#modalSendBtn');
-                if (sendBtn) {
-                    sendBtn.addEventListener('click', async function() {
-                        const input = modal.querySelector('#modalResponseInput');
-                        const response = input.value.trim();
-                        if (!response) return;
-                        
-                        const { data, error } = await supabase.rpc('admin_respond_support', {
-                            p_message_id: msg.id,
-                            p_response: response
-                        });
-                        
-                        if (data && data.success) {
-                            showToast('Ответ отправлен');
-                            overlay.remove();
-                            currentMessageModal = null;
-                            loadMessages();
-                            loadStats();
-                        } else {
-                            showToast(data?.error || 'Ошибка', 'error');
-                        }
-                    });
-                }
-
-                // Удаление сообщения
-                modal.querySelector('#modalDeleteBtn').addEventListener('click', async function() {
-                    if (!confirm('Удалить это сообщение?')) return;
+                modal.querySelector('#modalSendBtn').addEventListener('click', async function() {
+                    const input = modal.querySelector('#modalResponseInput');
+                    const response = input.value.trim();
+                    if (!response) return;
                     
-                    const { data, error } = await supabase.rpc('admin_delete_support_message', {
-                        p_message_id: msg.id
+                    // Отвечаем на последнее сообщение без ответа
+                    const unansweredMsg = dialog.messages.find(m => !m.admin_response);
+                    if (!unansweredMsg) {
+                        showToast('Все сообщения уже имеют ответ', 'error');
+                        return;
+                    }
+                    
+                    const { data, error } = await supabase.rpc('admin_respond_support', {
+                        p_message_id: unansweredMsg.id,
+                        p_response: response
                     });
                     
                     if (data && data.success) {
-                        showToast('Сообщение удалено');
+                        showToast('Ответ отправлен');
                         overlay.remove();
-                        currentMessageModal = null;
-                        loadMessages();
+                        currentDialogModal = null;
+                        loadDialogs();
                         loadStats();
                     } else {
                         showToast(data?.error || 'Ошибка', 'error');
                     }
+                });
+
+                // Удаление всего диалога
+                modal.querySelector('#modalDeleteDialogBtn').addEventListener('click', async function() {
+                    if (!confirm(`Удалить весь диалог с пользователем "${dialog.nickname}"?`)) return;
+                    
+                    for (const msg of dialog.messages) {
+                        await supabase.rpc('admin_delete_support_message', { p_message_id: msg.id });
+                    }
+                    
+                    showToast('Диалог удалён');
+                    overlay.remove();
+                    currentDialogModal = null;
+                    loadDialogs();
+                    loadStats();
                 });
             }
 
@@ -822,15 +866,13 @@
                 if (!amount || amount <= 0) return;
                 
                 const { data, error } = await supabase.rpc('admin_add_balance', {
-                    p_user_id: currentUserId,
-                    p_amount: amount
+                    p_user_id: currentUserId, p_amount: amount
                 });
                 
                 if (data && data.success) {
                     showToast(data.message);
                     document.getElementById('balanceAmount').value = '';
-                    searchUser();
-                    loadStats();
+                    searchUser(); loadStats();
                 } else {
                     showToast(data?.error || 'Ошибка', 'error');
                 }
@@ -843,48 +885,56 @@
                 if (!amount || amount <= 0) return;
                 
                 const { data, error } = await supabase.rpc('admin_remove_balance', {
-                    p_user_id: currentUserId,
-                    p_amount: amount
+                    p_user_id: currentUserId, p_amount: amount
                 });
                 
                 if (data && data.success) {
                     showToast(data.message);
                     document.getElementById('balanceAmount').value = '';
-                    searchUser();
-                    loadStats();
+                    searchUser(); loadStats();
                 } else {
                     showToast(data?.error || 'Ошибка', 'error');
                 }
             };
 
-            // ===== ЗАГРУЗКА СООБЩЕНИЙ =====
-            async function loadMessages() {
+            // ===== ЗАГРУЗКА ДИАЛОГОВ =====
+            async function loadDialogs() {
                 const { data, error } = await supabase.rpc('get_support_messages');
-                const container = document.getElementById('messageList');
+                const container = document.getElementById('dialogList');
                 
                 if (!data || data.length === 0) {
-                    container.innerHTML = '<p style="color: #b9b09a; text-align: center;">Нет сообщений</p>';
+                    container.innerHTML = '<p style="color: #b9b09a; text-align: center;">Нет диалогов</p>';
                     return;
                 }
                 
-                container.innerHTML = data.map(msg => `
-                    <div class="message-item ${msg.is_read ? '' : 'unread'}" onclick="openMessageModalById(${msg.id})">
-                        <div class="message-text">${msg.user_message}</div>
-                        <div class="message-meta">
-                            <span>📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</span>
-                            <span>${msg.is_read ? '✅ Прочитано' : '🆕 Новое'} ${msg.admin_response ? '| ✉️ Отвечено' : ''}</span>
+                const dialogs = groupMessagesByUser(data);
+                
+                container.innerHTML = dialogs.map(dialog => `
+                    <div class="dialog-item ${dialog.hasUnread ? 'has-unread' : ''}" onclick="openDialogByNickname('${dialog.nickname.replace(/'/g, "\\'")}')">
+                        <div class="dialog-header">
+                            <span class="dialog-nickname ${dialog.nickname === 'User' ? 'user-guest' : ''}">
+                                ${dialog.nickname}
+                                ${dialog.nickname === 'User' ? ' (гость)' : ''}
+                            </span>
+                            ${dialog.hasUnread ? '<span class="dialog-badge">Новое</span>' : ''}
+                        </div>
+                        <div class="dialog-last-message">${dialog.lastMessage}</div>
+                        <div class="dialog-meta">
+                            <span>📅 ${new Date(dialog.lastTime).toLocaleString('ru-RU')}</span>
+                            <span>📨 ${dialog.messages.length} сообщ.</span>
                         </div>
                     </div>
                 `).join('');
             }
 
-            // ===== ОТКРЫТИЕ ОКНА СООБЩЕНИЯ =====
-            window.openMessageModalById = async function(messageId) {
+            // ===== ОТКРЫТИЕ ДИАЛОГА ПО НИКНЕЙМУ =====
+            window.openDialogByNickname = async function(nickname) {
                 const { data, error } = await supabase.rpc('get_support_messages');
                 if (data) {
-                    const msg = data.find(m => m.id === messageId);
-                    if (msg) {
-                        openMessageModal(msg);
+                    const dialogs = groupMessagesByUser(data);
+                    const dialog = dialogs.find(d => d.nickname === nickname);
+                    if (dialog) {
+                        openDialog(dialog);
                     }
                 }
             };
