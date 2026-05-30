@@ -2,25 +2,10 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
-    <title>Пирамикс • Главная</title>
-    <meta name="description" content="Пирамикс — реферальная программа с 5 уровнями заработка. Регистрируйтесь и получайте доход от приглашённых пользователей!">
-    <meta name="keywords" content="Пирамикс, регистрация, реферальная программа, заработок, пирамида, рефералы, VIP статус">
-    <meta property="og:title" content="Пирамикс — Регистрация">
-    <meta property="og:description" content="Зарегистрируйтесь в Пирамикс и зарабатывайте на рефералах с 5 уровнями глубины!">
-    <meta property="og:type" content="website">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пирамикс • Никнеймы</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: linear-gradient(145deg, #0b0c0e 0%, #1a1c22 100%);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -29,198 +14,95 @@
             flex-direction: column;
             align-items: center;
             padding: 16px;
-            position: relative;
-            overflow-x: hidden;
+            color: #f5efe0;
             font-size: 14px;
         }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: -30%;
-            left: -10%;
-            width: 70%;
-            height: 70%;
-            background: radial-gradient(circle at 30% 30%, rgba(180, 130, 255, 0.08), transparent 60%);
-            border-radius: 50%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            padding: 12px 20px;
-            border-radius: 12px;
-            color: #fff;
-            font-weight: 500;
-            font-size: 0.9rem;
-            backdrop-filter: blur(10px);
-            animation: slideInRight 0.3s ease-out, fadeOut 0.3s 2.7s ease-out forwards;
-            max-width: 350px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-
-        .toast-error {
-            background: rgba(255, 112, 67, 0.9);
-            border: 1px solid #ff7043;
-        }
-
-        .toast-success {
-            background: rgba(76, 175, 80, 0.9);
-            border: 1px solid #4caf50;
-        }
-
-        .toast-info {
-            background: rgba(192, 132, 252, 0.9);
-            border: 1px solid #c084fc;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        .reg-container {
+        .container {
             width: 100%;
             max-width: 1200px;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            align-items: flex-start;
-            justify-content: center;
-            gap: 1.5rem;
-            position: relative;
-            z-index: 2;
-            margin-bottom: 24px;
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 1.8rem;
+            padding: 2rem;
+            border: 1px solid rgba(255, 215, 150, 0.2);
+            box-shadow: 0 18px 30px rgba(0,0,0,0.7);
         }
-
-        .form-wrapper {
-            flex: 0 0 320px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .auth-card {
-            background: rgba(20, 22, 27, 0.9);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255, 215, 150, 0.18);
-            border-radius: 2rem;
-            padding: 1.8rem 1.8rem 1.5rem;
-            width: 100%;
-            max-width: 340px;
-            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 200, 100, 0.15);
-            color: #f5efe0;
-            transition: all 0.3s ease;
-            animation: slideFromTop 2s ease-out forwards;
-            transform-origin: top center;
-            margin-top: 8px;
-        }
-
-        @keyframes slideFromTop {
-            0% { opacity: 0; transform: translateY(-300px) scale(0.95); }
-            60% { opacity: 0.8; transform: translateY(-30px) scale(0.98); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .auth-card h3 {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            letter-spacing: -0.3px;
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
             background: linear-gradient(135deg, #f9d56e, #e6a861);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            display: inline-block;
+            text-align: center;
         }
-
-        .input-group {
-            margin-bottom: 1.2rem;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 0.75rem;
+        .subtitle {
+            color: #b7a16c;
             font-weight: 500;
-            letter-spacing: 0.4px;
-            color: #b9b09a;
-            margin-bottom: 0.25rem;
-            text-transform: uppercase;
-        }
-
-        .input-group input, .input-group select {
-            width: 100%;
-            background: rgba(15, 16, 20, 0.8);
-            border: 1px solid rgba(220, 180, 100, 0.25);
-            border-radius: 1rem;
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem;
-            color: #f5e7cc;
-            outline: none;
-            transition: all 0.25s;
-            font-family: 'Inter', sans-serif;
-            backdrop-filter: blur(4px);
-        }
-
-        .input-group select {
-            appearance: none;
-            cursor: pointer;
-        }
-
-        .input-group select option {
-            background: #1a1c22;
-            color: #f5e7cc;
-        }
-
-        .input-group input:focus, .input-group select:focus {
-            border-color: #f3b95b;
-            box-shadow: 0 0 12px rgba(243, 185, 91, 0.4);
-            background: rgba(22, 22, 28, 0.9);
-        }
-
-        .input-group input::placeholder {
-            color: #5e5a4f;
-            font-weight: 400;
+            margin-bottom: 1.5rem;
             font-size: 0.85rem;
+            text-align: center;
         }
-
-        .password-field {
-            transition: all 0.35s ease;
-            overflow: hidden;
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
-
-        .hidden-password {
-            max-height: 0;
-            opacity: 0;
-            margin-bottom: 0;
-            pointer-events: none;
-            transform: translateY(-8px);
+        .stat-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
         }
-
-        .visible-password {
-            max-height: 70px;
-            opacity: 1;
-            margin-bottom: 1.2rem;
-            transform: translateY(0);
+        .stat-label {
+            font-size: 0.7rem;
+            color: #b9b09a;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.3rem;
         }
-
-        .action-btn, .btn-primary {
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fad974, #ebaa5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .nickname-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 1rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .nickname-item {
+            background: rgba(25, 22, 17, 0.6);
+            border-radius: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            font-size: 0.78rem;
+            border: 1px solid rgba(212, 165, 60, 0.2);
+            color: #f5d78c;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .nickname-item:hover {
+            background: rgba(243, 185, 91, 0.2);
+            border-color: #f3b95b;
+            transform: translateY(-2px);
+        }
+        .btn {
             background: linear-gradient(135deg, #e2a542, #c7851e);
             border: none;
             color: #0f0e0a;
@@ -229,263 +111,15 @@
             padding: 0.7rem 1.6rem;
             border-radius: 2rem;
             cursor: pointer;
-            backdrop-filter: blur(8px);
             transition: 0.25s;
-            margin-top: 0.2rem;
-            margin-bottom: 0.6rem;
-            letter-spacing: 0.5px;
-            display: inline-block;
             box-shadow: 0 6px 15px rgba(226, 165, 66, 0.35);
-            width: auto;
-            min-width: 160px;
+            margin: 0.5rem;
         }
-
-        .action-btn:hover, .btn-primary:hover {
+        .btn:hover {
             background: linear-gradient(135deg, #f3b95b, #da9729);
             box-shadow: 0 8px 20px rgba(243, 185, 91, 0.6);
             color: #000;
         }
-
-        .switch-text {
-            font-size: 0.8rem;
-            color: #b9b09a;
-            margin-top: 0.4rem;
-            display: block;
-        }
-
-        .switch-text span {
-            color: #f3b95b;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            transition: color 0.2s;
-            margin-left: 4px;
-        }
-
-        .switch-text span:hover {
-            color: #ffd966;
-        }
-
-        .error-message {
-            color: #ff7043;
-            font-size: 0.75rem;
-            text-align: center;
-            margin-bottom: 0.6rem;
-            display: none;
-        }
-
-        .error-message.visible {
-            display: block;
-        }
-
-        .stats-panel {
-            flex: 0 0 230px;
-            background: rgba(20, 22, 27, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 1.8rem;
-            padding: 1.4rem 1.2rem;
-            border: 1px solid rgba(255, 215, 150, 0.2);
-            color: #f5efe0;
-            box-shadow: 0 18px 30px rgba(0,0,0,0.7);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .stat-item {
-            background: rgba(0,0,0,0.3);
-            border-radius: 1rem;
-            padding: 0.8rem;
-            text-align: center;
-        }
-
-        .stat-label {
-            font-size: 0.7rem;
-            color: #b9b09a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.3rem;
-        }
-
-        .stat-value {
-            font-size: 1.6rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fad974, #ebaa5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            transition: all 0.2s;
-        }
-
-        .info-section {
-            flex: 1 1 360px;
-            background: rgba(12, 14, 18, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 2.5rem;
-            padding: 1.8rem 1.8rem;
-            border: 1px solid rgba(230, 180, 70, 0.2);
-            box-shadow: 0 22px 40px rgba(0,0,0,0.8);
-            color: #ece3d5;
-            animation: fadeInInfo 1s ease-out;
-        }
-
-        @keyframes fadeInInfo {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-
-        .info-section h2 {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.3rem;
-            background: linear-gradient(to right, #fad974, #ebaa5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
-        }
-
-        .subtitle {
-            color: #b7a16c;
-            font-weight: 500;
-            margin-bottom: 1.5rem;
-            font-size: 0.85rem;
-            border-left: 3px solid #e3a94d;
-            padding-left: 0.8rem;
-        }
-
-        .chart-container {
-            margin: 1.4rem 0 1.6rem;
-        }
-
-        .chart-bars {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-around;
-            height: 150px;
-            padding: 0 0.4rem;
-            border-bottom: 2px solid rgba(230, 180, 70, 0.4);
-            margin-bottom: 0.6rem;
-        }
-
-        .bar-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            max-width: 60px;
-        }
-
-        .bar {
-            width: 35px;
-            background: linear-gradient(180deg, #f3b95b, #d18e2c);
-            border-radius: 18px 18px 5px 5px;
-            box-shadow: 0 -4px 12px rgba(243, 185, 91, 0.5);
-            margin-bottom: 5px;
-        }
-
-        .bar-percent {
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #efc468;
-            margin-bottom: 3px;
-        }
-
-        .bar-label {
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: #f5d78c;
-            margin-top: 3px;
-        }
-
-        .legend {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-top: 0.3rem;
-            color: #cfbc8b;
-            font-size: 0.8rem;
-        }
-
-        .legend span::before {
-            content: "●";
-            margin-right: 5px;
-            color: #f3b95b;
-            font-size: 0.9rem;
-        }
-
-        .graph-note {
-            margin-top: 1.2rem;
-            font-size: 0.8rem;
-            color: #c9ad7a;
-            text-align: center;
-            border-top: 1px dashed #b49450;
-            padding-top: 1rem;
-        }
-
-        .header {
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.8rem 1.5rem;
-            background: rgba(20, 22, 27, 0.8);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-radius: 1.8rem;
-            border: 1px solid rgba(255, 215, 150, 0.2);
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 2;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #f9d56e, #e6a861);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .user-greeting {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .user-greeting .animated-letter {
-            display: inline-block;
-            background: linear-gradient(135deg, #fad974, #ebaa5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: letterGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes letterGlow {
-            0%, 100% { 
-                filter: brightness(1);
-                transform: translateY(0);
-            }
-            50% { 
-                filter: brightness(1.5);
-                transform: translateY(-2px);
-            }
-        }
-
         .btn-outline {
             background: transparent;
             border: 1px solid #c9a357;
@@ -497,1687 +131,431 @@
             cursor: pointer;
             transition: 0.25s;
             text-decoration: none;
+            margin: 0.5rem;
         }
-
         .btn-outline:hover {
             background: #f3b95b20;
             border-color: #f3b95b;
             color: #ffe6b3;
             box-shadow: 0 0 12px rgba(243, 185, 91, 0.3);
         }
-
-        .dashboard {
-            width: 100%;
-            max-width: 1200px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1.2rem;
-            position: relative;
-            z-index: 2;
-            margin-bottom: 1.5rem;
-        }
-
-        .card {
-            background: rgba(20, 22, 27, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-radius: 1.5rem;
-            padding: 1.4rem;
-            border: 1px solid rgba(255, 215, 150, 0.15);
-            color: #f5efe0;
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(243, 185, 91, 0.4);
-        }
-
-        .card h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            color: #e9c274;
-        }
-
-        .balance {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fad974, #ebaa5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-row {
+        .controls {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0.35rem 0;
-            font-size: 0.8rem;
-            gap: 0.4rem;
-        }
-
-        .stat-row .stat-label {
-            color: #9b927a;
-            flex: 1;
-            font-size: 0.75rem;
-            min-width: 0;
-        }
-
-        .stat-row .stat-value {
-            color: #f5d78c;
-            font-weight: 600;
-            text-align: right;
-            font-size: 0.8rem;
-            white-space: nowrap;
-        }
-
-        .stat-earn {
-            color: #4caf50;
-            font-weight: 600;
-            text-align: right;
-            font-size: 0.75rem;
-            white-space: nowrap;
-        }
-
-        .btn-vip {
-            background: linear-gradient(135deg, #c084fc, #7c3aed);
-            border: none;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.9rem;
-            padding: 0.7rem 1.8rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: 0.25s;
-            box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4);
-            width: 100%;
-            margin-top: 0.4rem;
-            animation: glowPulse 2s infinite;
-        }
-
-        @keyframes glowPulse {
-            0%, 100% { box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4); }
-            50% { box-shadow: 0 6px 25px rgba(192, 132, 252, 0.7); }
-        }
-
-        .btn-vip:hover {
-            background: linear-gradient(135deg, #d8b4fe, #9333ea);
-        }
-
-        .earn-info-text {
-            color: #b9b09a;
-            font-size: 0.75rem;
-            line-height: 1.5;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 1rem;
         }
-
-        .earn-highlight {
-            color: #f5d78c;
-            font-weight: 600;
-        }
-
-        .btn-calculator {
-            background: linear-gradient(135deg, #4caf50, #2e7d32);
-            border: none;
-            color: #fff;
-            font-weight: 700;
-            font-size: 0.85rem;
-            padding: 0.6rem 1.5rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            transition: 0.25s;
-            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        .search-box {
             width: 100%;
-            margin-top: 0.4rem;
-        }
-
-        .btn-calculator:hover {
-            background: linear-gradient(135deg, #66bb6a, #388e3c);
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
-        }
-
-        .calc-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin: 0.6rem 0;
-            gap: 0.5rem;
-        }
-
-        .calc-label {
-            color: #b9b09a;
-            font-size: 0.8rem;
-            flex: 1;
-        }
-
-        .calc-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .calc-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid #c9a357;
-            background: rgba(0,0,0,0.3);
-            color: #f5d78c;
-            font-size: 1.2rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-        }
-
-        .calc-btn:hover {
-            background: #f3b95b30;
-        }
-
-        .calc-value {
-            color: #f5d78c;
-            font-weight: 700;
-            font-size: 1rem;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        .calc-result {
-            background: rgba(0,0,0,0.3);
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        .calc-total {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: #4caf50;
-        }
-
-        .live-feed {
-            width: 100%;
-            max-width: 1200px;
-            background: rgba(10, 12, 15, 0.8);
-            backdrop-filter: blur(18px);
-            -webkit-backdrop-filter: blur(18px);
-            border-radius: 1.8rem;
-            border: 1px solid rgba(230, 180, 70, 0.25);
-            padding: 1rem 1.2rem;
-            display: flex;
-            gap: 1.2rem;
-            z-index: 3;
-            box-shadow: 0 -8px 25px rgba(0,0,0,0.7);
-            margin-top: 8px;
-        }
-
-        .feed-half {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .feed-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #c9ad7a;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.6rem;
-        }
-
-        .feed-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-            height: 210px;
-            overflow: hidden;
-        }
-
-        .feed-item {
-            background: rgba(25, 22, 17, 0.6);
-            border-radius: 0.8rem;
-            padding: 0.4rem 0.8rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.78rem;
-            border: 1px solid rgba(212, 165, 60, 0.2);
-            flex-shrink: 0;
-            transition: all 0.3s ease;
-        }
-
-        .feed-item.new-item-highlight {
-            animation: highlightNewItem 2s ease-out forwards;
-        }
-
-        @keyframes highlightNewItem {
-            0% { 
-                background: rgba(76, 175, 80, 0.4);
-                border-color: rgba(76, 175, 80, 0.8);
-                box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
-                transform: scale(1.03);
-            }
-            30% {
-                background: rgba(76, 175, 80, 0.3);
-                border-color: rgba(76, 175, 80, 0.7);
-                box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
-                transform: scale(1.02);
-            }
-            60% {
-                background: rgba(76, 175, 80, 0.15);
-                border-color: rgba(76, 175, 80, 0.4);
-                box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-                transform: scale(1.01);
-            }
-            100% {
-                background: rgba(25, 22, 17, 0.6);
-                border-color: rgba(212, 165, 60, 0.2);
-                box-shadow: none;
-                transform: scale(1);
-            }
-        }
-
-        .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
-        .feed-time { color: #8b8a7a; font-size: 0.68rem; margin-left: 0.4rem; }
-        .feed-amount { font-weight: 700; font-size: 0.78rem; }
-        .deposit .feed-amount { color: #4caf50 !important; }
-        .withdraw .feed-amount { color: #ff7043; }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            animation: fadeIn 0.3s;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .modal {
-            background: rgba(20, 22, 27, 0.95);
-            border: 1px solid rgba(255, 215, 150, 0.3);
-            border-radius: 1.8rem;
-            padding: 1.8rem;
-            width: 90%;
-            max-width: 420px;
-            color: #f5efe0;
-            animation: modalSlideIn 0.4s cubic-bezier(0.22, 0.98, 0.41, 1.1);
-        }
-
-        @keyframes modalSlideIn {
-            0% { opacity: 0; transform: scale(0.85) translateY(30px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .modal h2 {
-            margin-bottom: 1.2rem;
-            color: #e9c274;
-            font-size: 1.3rem;
-        }
-
-        .modal .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .modal .input-group label {
-            font-size: 0.7rem;
-        }
-
-        .modal .input-group input,
-        .modal .input-group select {
-            font-size: 0.85rem;
-            padding: 0.65rem 0.9rem;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 0.8rem;
-            margin-top: 1.2rem;
-        }
-
-        .modal-buttons .btn-primary,
-        .modal-buttons .btn-outline {
-            flex: 1;
-            text-align: center;
-            font-size: 0.85rem;
-        }
-
-        .vip-info-box {
-            background: rgba(0,0,0,0.3);
-            border-radius: 0.8rem;
-            padding: 1rem;
-            margin: 0.8rem 0;
-            text-align: center;
-            border: 1px solid rgba(192, 132, 252, 0.3);
-        }
-
-        .vip-price {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #c084fc;
-            margin: 0.4rem 0;
-        }
-
-        .vip-id {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #f5d78c;
-            letter-spacing: 2px;
-            margin: 0.4rem 0;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .footer {
-            width: 100%;
-            max-width: 1200px;
-            text-align: center;
-            padding: 1.2rem;
-            margin-top: 0.8rem;
-            z-index: 2;
-            position: relative;
-        }
-
-        .footer-link {
-            color: #9b927a;
-            font-size: 0.75rem;
-            cursor: pointer;
-            text-decoration: underline;
-            text-underline-offset: 3px;
-            transition: color 0.2s;
-        }
-
-        .footer-link:hover {
-            color: #f3b95b;
-        }
-
-        .policy-modal {
-            max-width: 650px;
-            max-height: 80vh;
-            overflow-y: auto;
-            text-align: left;
-            line-height: 1.6;
-            font-size: 0.8rem;
-        }
-
-        .policy-modal h2 {
-            text-align: center;
-            margin-bottom: 1.2rem;
-            font-size: 1.2rem;
-        }
-
-        .policy-modal h3 {
-            color: #e9c274;
-            margin: 1rem 0 0.4rem;
-            font-size: 0.95rem;
-        }
-
-        .policy-modal p {
-            color: #b9b09a;
-            font-size: 0.78rem;
-            margin-bottom: 0.6rem;
-        }
-
-        .optional-label {
-            color: #6b6352;
-            font-size: 0.7rem;
-            font-style: italic;
-        }
-
-        /* ===== КНОПКА ПОДДЕРЖКИ ===== */
-        .support-btn {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #c084fc, #7c3aed);
-            border: none;
-            color: #fff;
-            font-size: 1.5rem;
-            cursor: pointer;
-            z-index: 200;
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulseSupport 2s infinite;
-        }
-
-        .support-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 30px rgba(192, 132, 252, 0.8);
-        }
-
-        .support-btn.has-response {
-            animation: pulseNotification 1s infinite;
-            background: linear-gradient(135deg, #4caf50, #2e7d32);
-            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.7);
-        }
-
-        @keyframes pulseSupport {
-            0%, 100% { box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
-            50% { box-shadow: 0 6px 35px rgba(192, 132, 252, 0.9); }
-        }
-
-        @keyframes pulseNotification {
-            0%, 100% { box-shadow: 0 6px 20px rgba(76, 175, 80, 0.7); transform: scale(1); }
-            50% { box-shadow: 0 6px 35px rgba(76, 175, 80, 1); transform: scale(1.08); }
-        }
-
-        /* ===== ЧАТ ПОДДЕРЖКИ ===== */
-        .support-chat {
-            position: fixed;
-            bottom: 90px;
-            right: 24px;
-            width: 340px;
-            max-width: 90vw;
-            background: rgba(20, 22, 27, 0.97);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(192, 132, 252, 0.4);
-            border-radius: 1.5rem;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-            z-index: 199;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            animation: slideUp 0.3s ease-out;
-            max-height: 500px;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .support-chat-header {
-            background: linear-gradient(135deg, rgba(192, 132, 252, 0.3), rgba(124, 58, 237, 0.2));
-            padding: 1rem 1.2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(192, 132, 252, 0.3);
-        }
-
-        .support-chat-header h3 {
-            font-size: 0.95rem;
-            color: #e9c274;
-            margin: 0;
-        }
-
-        .support-close-btn {
-            background: transparent;
-            border: none;
-            color: #b9b09a;
-            font-size: 1.3rem;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-
-        .support-close-btn:hover {
-            color: #ff7043;
-        }
-
-        .support-chat-messages {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
-            max-height: 250px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .support-message {
-            padding: 0.7rem 1rem;
-            border-radius: 1rem;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            max-width: 85%;
-        }
-
-        .support-message.operator {
-            background: rgba(192, 132, 252, 0.2);
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            color: #f5efe0;
-            align-self: flex-start;
-            border-bottom-left-radius: 0.3rem;
-        }
-
-        .support-message.user {
-            background: rgba(243, 185, 91, 0.2);
-            border: 1px solid rgba(243, 185, 91, 0.3);
-            color: #f5efe0;
-            align-self: flex-end;
-            border-bottom-right-radius: 0.3rem;
-        }
-
-        .support-message.admin-response {
-            background: rgba(76, 175, 80, 0.25);
-            border: 1px solid rgba(76, 175, 80, 0.5);
-            color: #81c784;
-            align-self: flex-start;
-            border-bottom-left-radius: 0.3rem;
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .support-message-time {
-            font-size: 0.65rem;
-            color: #8b8a7a;
-            margin-top: 0.2rem;
-            text-align: right;
-        }
-
-        .support-chat-input-area {
-            padding: 0.8rem 1rem;
-            border-top: 1px solid rgba(192, 132, 252, 0.2);
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .support-chat-input {
-            flex: 1;
+            max-width: 400px;
             background: rgba(15, 16, 20, 0.8);
             border: 1px solid rgba(220, 180, 100, 0.25);
-            border-radius: 1.5rem;
-            padding: 0.6rem 1rem;
-            font-size: 0.8rem;
+            border-radius: 1rem;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
             color: #f5e7cc;
             outline: none;
             font-family: 'Inter', sans-serif;
-            resize: none;
+            margin: 0 auto 1rem;
+            display: block;
         }
-
-        .support-chat-input:focus {
-            border-color: #c084fc;
-            box-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
+        .search-box:focus {
+            border-color: #f3b95b;
+            box-shadow: 0 0 12px rgba(243, 185, 91, 0.4);
         }
-
-        .support-send-btn {
-            background: linear-gradient(135deg, #c084fc, #7c3aed);
-            border: none;
-            color: #fff;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            flex-shrink: 0;
+        .info-text {
+            color: #b9b09a;
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 1rem;
         }
-
-        .support-send-btn:hover {
-            background: linear-gradient(135deg, #d8b4fe, #9333ea);
-            box-shadow: 0 0 15px rgba(192, 132, 252, 0.5);
-        }
-
-        @media (max-width: 1024px) {
-            .reg-container { gap: 1rem; }
-            .info-section { flex: 1 1 100%; }
-        }
-
-        @media (max-width: 900px) {
-            .live-feed { flex-direction: column; }
-            .feed-list { height: 160px; }
-            .header { flex-direction: column; text-align: center; }
-            .header-right { justify-content: center; }
-            .balance { font-size: 1.6rem; }
-        }
-
-        @media (max-width: 780px) {
-            .reg-container { flex-direction: column; align-items: center; }
-            .form-wrapper { flex: 0 0 auto; width: 100%; max-width: 340px; }
-            .stats-panel { flex: 0 0 auto; width: 100%; max-width: 340px; }
-            .info-section { width: 100%; }
-            .auth-card { margin-left: auto; margin-right: auto; animation: slideFromTopMobile 0.8s ease-out forwards; }
-            @keyframes slideFromTopMobile {
-                0% { transform: translate(10px, -60px); opacity: 0; }
-                100% { transform: translate(0,0); opacity: 1; }
-            }
-            .stat-value { font-size: 1.3rem; }
-            .stat-row .stat-label { font-size: 0.7rem; }
-            .stat-row .stat-value { font-size: 0.75rem; }
-            .stat-earn { font-size: 0.7rem; }
-            .dashboard { grid-template-columns: 1fr; }
-        }
-        
-        @media (max-width: 480px) {
-            body { padding: 8px; font-size: 13px; }
-            .auth-card { padding: 1.4rem; border-radius: 1.5rem; }
-            .btn-primary, .action-btn { font-size: 0.8rem; padding: 0.6rem 1.4rem; }
-            .logo { font-size: 1.3rem; }
-            .feed-list { height: 140px; }
-            .support-btn { width: 48px; height: 48px; bottom: 16px; right: 16px; font-size: 1.3rem; }
-            .support-chat { width: 300px; bottom: 75px; right: 16px; }
+        .highlight {
+            color: #4caf50;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-<div class="toast-container" id="toastContainer"></div>
-
-<!-- ================= КНОПКА ПОДДЕРЖКИ ================= -->
-<button class="support-btn" id="supportBtn" title="Поддержка">💬</button>
-
-<!-- ================= ЧАТ ПОДДЕРЖКИ ================= -->
-<div class="support-chat hidden" id="supportChat">
-    <div class="support-chat-header">
-        <h3>💬 Поддержка Пирамикс</h3>
-        <button class="support-close-btn" id="supportCloseBtn">✕</button>
-    </div>
-    <div class="support-chat-messages" id="supportMessages"></div>
-    <div class="support-chat-input-area">
-        <textarea class="support-chat-input" id="supportInput" placeholder="Введите сообщение..." rows="1"></textarea>
-        <button class="support-send-btn" id="supportSendBtn">➤</button>
-    </div>
-</div>
-
-<!-- ================= ЭТАП 1: РЕГИСТРАЦИЯ / ВХОД ================= -->
-<div id="stageRegister" class="reg-container">
-    <div class="form-wrapper">
-        <div class="auth-card" id="authCard">
-            <h3>✨ Пирамикс</h3>
-            <div class="input-group">
-                <label>Никнейм</label>
-                <input type="text" id="nickname" placeholder="Введите ник" autocomplete="off">
-            </div>
-            <div class="input-group" id="password1Group">
-                <label>Пароль</label>
-                <input type="password" id="password1" placeholder="••••••••">
-            </div>
-            <div class="input-group visible-password" id="password2Group">
-                <label>Повторите пароль</label>
-                <input type="password" id="password2" placeholder="••••••••">
-            </div>
-            <div class="error-message" id="errorMessage">❌ Данные неверны</div>
-            <button class="action-btn" id="actionButton">Зарегистрироваться</button>
-            <div class="switch-text" id="switchTextBlock">
-                Если есть аккаунт, <span id="toggleModeLink">вход</span>
-            </div>
-        </div>
-    </div>
-    <div class="stats-panel">
-        <div class="stat-item">
-            <div class="stat-label">👥 Всего пользователей</div>
-            <div class="stat-value" id="regTotalUsers">143.334</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">📅 Сегодня зарегистрировано</div>
-            <div class="stat-value" id="regTodayUsers">0</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-label">💰 Всего выведено</div>
-            <div class="stat-value" id="regTotalWithdrawn">0 $</div>
-        </div>
-    </div>
-    <div class="info-section">
-        <h2>5 линий рефералов</h2>
-        <div class="subtitle">Ваш доход растёт с каждым уровнем</div>
-        <div class="chart-container">
-            <div class="chart-bars">
-                <div class="bar-wrapper"><span class="bar-percent">1%</span><div class="bar" style="height: 28px;"></div><span class="bar-label">1 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">2%</span><div class="bar" style="height: 50px;"></div><span class="bar-label">2 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">3%</span><div class="bar" style="height: 72px;"></div><span class="bar-label">3 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">4%</span><div class="bar" style="height: 94px;"></div><span class="bar-label">4 ур.</span></div>
-                <div class="bar-wrapper"><span class="bar-percent">5%</span><div class="bar" style="height: 116px;"></div><span class="bar-label">5 ур.</span></div>
-            </div>
-            <div class="legend"><span>Процент от дохода рефералов</span></div>
-        </div>
-        <div class="graph-note">📊 Чем глубже уровень — тем выше процент. <br> Приглашайте активных партнёров и увеличивайте прибыль.</div>
-    </div>
-</div>
-
-<!-- Таблицы для страницы регистрации -->
-<div class="live-feed" id="regLiveFeed" style="max-width: 1200px;">
-    <div class="feed-half deposit-feed">
-        <div class="feed-title">🟢 Последние пополнения</div>
-        <div class="feed-list" id="regDepositList"></div>
-    </div>
-    <div class="feed-half withdraw-feed">
-        <div class="feed-title">🔴 Последние выводы</div>
-        <div class="feed-list" id="regWithdrawList"></div>
-    </div>
-</div>
-
-<!-- ================= ЭТАП 2: ГЛАВНАЯ СТРАНИЦА ================= -->
-<div id="stageHome" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-    <header class="header">
-        <div class="logo">✨ Пирамикс</div>
-        <div class="header-right">
-            <span class="user-greeting" id="userGreeting"></span>
-            <button class="btn-outline" id="profileBtn">👤 Профиль</button>
-            <button class="btn-outline" id="logoutBtn">🚪 Выход</button>
-        </div>
-    </header>
-
-    <div class="dashboard">
-        <div class="card">
-            <h3>💰 Мой баланс</h3>
-            <div class="balance" id="balance">0.00 $</div>
-            <div class="stat-row">
-                <span class="stat-label">Заработано всего</span>
-                <span class="stat-value" id="totalEarned">0.00 $</span>
-            </div>
-            <button class="btn-primary" id="withdrawBtn" style="width:100%;">💸 Вывести средства</button>
-        </div>
-
-        <div class="card">
-            <h3>👥 Мои рефералы</h3>
-            <div class="stat-row"><span class="stat-label">1 уровень (1%)</span><span class="stat-value" id="lvl1">0</span><span class="stat-earn" id="earn1">0.00 $</span></div>
-            <div class="stat-row"><span class="stat-label">2 уровень (2%)</span><span class="stat-value" id="lvl2">0</span><span class="stat-earn" id="earn2">0.00 $</span></div>
-            <div class="stat-row"><span class="stat-label">3 уровень (3%)</span><span class="stat-value" id="lvl3">0</span><span class="stat-earn" id="earn3">0.00 $</span></div>
-            <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0</span><span class="stat-earn" id="earn4">0.00 $</span></div>
-            <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0</span><span class="stat-earn" id="earn5">0.00 $</span></div>
-            <button class="btn-outline" id="copyRefBtn" style="width:100%; margin-top: 0.8rem; border-color: #c084fc; color: #c084fc;">📋 Копировать реферальную ссылку</button>
-            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Мануал по привлечению</button>
-        </div>
-
-        <div class="card">
-            <h3>📊 Статистика платформы</h3>
-            <div class="stat-row"><span class="stat-label">Всего пользователей</span><span class="stat-value" id="totalUsers">143.334</span></div>
-            <div class="stat-row"><span class="stat-label">Сегодня зарегистрировано</span><span class="stat-value" id="todayUsers">0</span></div>
-            <div class="stat-row"><span class="stat-label">Всего выведено</span><span class="stat-value" id="totalWithdrawn">0 $</span></div>
-            <button class="btn-vip" id="vipBtn">👑 Получить VIP статус</button>
-        </div>
-
-        <div class="card">
-            <h3>📈 Система заработка</h3>
-            <p class="earn-info-text">
-                Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях.
-                Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.
-            </p>
-            <div class="stat-row"><span class="stat-label">1 ур. — 1%</span><span class="stat-value">0.10$ с чел.</span></div>
-            <div class="stat-row"><span class="stat-label">2 ур. — 2%</span><span class="stat-value">0.20$ с чел.</span></div>
-            <div class="stat-row"><span class="stat-label">3 ур. — 3%</span><span class="stat-value">0.30$ с чел.</span></div>
-            <div class="stat-row"><span class="stat-label">4 ур. — 4%</span><span class="stat-value">0.40$ с чел.</span></div>
-            <div class="stat-row"><span class="stat-label">5 ур. — 5%</span><span class="stat-value">0.50$ с чел.</span></div>
-            <button class="btn-calculator" id="calculatorBtn">🧮 Калькулятор дохода</button>
-        </div>
-    </div>
-
-    <div class="live-feed" id="homeLiveFeed">
-        <div class="feed-half deposit-feed">
-            <div class="feed-title">🟢 Последние пополнения</div>
-            <div class="feed-list" id="depositList"></div>
-        </div>
-        <div class="feed-half withdraw-feed">
-            <div class="feed-title">🔴 Последние выводы</div>
-            <div class="feed-list" id="withdrawList"></div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <span class="footer-link" id="policyLink">📄 Политика конфиденциальности и правила пользования</span>
-    </div>
-</div>
-
-<!-- Модальные окна -->
-<div class="modal-overlay hidden" id="withdrawModal">
-    <div class="modal">
-        <h2>💸 Вывод средств</h2>
-        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма вывода: <strong style="color: #f5d78c;">1$</strong></p>
-        <div class="input-group"><label>💎 Выберите криптовалюту *</label><select id="withdrawCrypto"><option value="">-- Выберите криптовалюту --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option><option value="TRX">Tron (TRX)</option><option value="BCH">Bitcoin Cash (BCH)</option></select></div>
-        <div class="input-group"><label>💲 Сумма вывода *</label><input type="number" id="withdrawAmount" placeholder="Минимум 1$" min="1" step="0.01"></div>
-        <div class="input-group"><label>📝 Комментарий <span class="optional-label">(по желанию)</span></label><input type="text" id="withdrawComment" placeholder="Ваш комментарий или отзыв..."></div>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
-            <button class="btn-outline" id="closeWithdrawBtn">❌ Отмена</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay hidden" id="profileModal">
-    <div class="modal">
-        <h2>👤 Профиль пользователя</h2>
-        <div class="input-group"><label>Никнейм</label><input type="text" id="profileNickname"></div>
-        <div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете"></div>
-        <div class="input-group"><label>Повторите новый пароль</label><input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете"></div>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
-            <button class="btn-outline" id="closeProfileBtn">❌ Отмена</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay hidden" id="vipModal">
-    <div class="modal">
-        <h2>👑 VIP статус</h2>
-        <div class="vip-info-box" id="vipInfoBox">
-            <p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p>
-            <div class="vip-price">10$</div>
-            <p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>
-            <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button>
-            <button class="btn-outline" id="closeVipBtn">❌ Отмена</button>
-        </div>
-    </div>
-</div>
-
-<div class="modal-overlay hidden" id="policyModal">
-    <div class="modal policy-modal">
-        <h2>📄 Политика конфиденциальности и правила пользования</h2>
-        <h3>1. Общие положения</h3>
-        <p>Настоящая Политика конфиденциальности и Правила пользования (далее — «Правила») регулируют отношения между платформой «Пирамикс» (далее — «Платформа») и пользователями (далее — «Пользователь»). Используя Платформу, Пользователь выражает своё полное и безоговорочное согласие с настоящими Правилами.</p>
-        <h3>2. Термины и определения</h3>
-        <p><strong>Платформа</strong> — программный комплекс, расположенный по адресу vds-game.ink, предоставляющий услуги реферальной программы.<br><strong>Пользователь</strong> — физическое лицо, зарегистрированное на Платформе и использующее её сервисы.<br><strong>Реферал</strong> — Пользователь, зарегистрировавшийся по уникальной реферальной ссылке другого Пользователя.<br><strong>VIP статус</strong> — платная привилегия, предоставляющая расширенные возможности для заработка на реферальной программе.</p>
-        <h3>3. Регистрация и аккаунт</h3>
-        <p>3.1. Для использования Платформы Пользователь обязан пройти процедуру регистрации, указав уникальный никнейм и пароль.<br>3.2. Пользователь несёт полную ответственность за сохранность своих учётных данных.<br>3.3. Запрещается создание более одного аккаунта на одного Пользователя.<br>3.4. Платформа оставляет за собой право блокировать аккаунты, нарушающие настоящие Правила.</p>
-        <h3>4. Реферальная программа</h3>
-        <p>4.1. Каждый Пользователь с VIP статусом получает уникальную реферальную ссылку и 8-значный идентификатор (ID).<br>4.2. Реферальная программа имеет 5 уровней глубины.<br>4.3. Доход распределяется следующим образом: 1 уровень — 1%, 2 уровень — 2%, 3 уровень — 3%, 4 уровень — 4%, 5 уровень — 5% от дохода приглашённых рефералов.</p>
-        <h3>5. VIP статус</h3>
-        <p>5.1. Стоимость VIP статуса составляет 10$ (десять долларов США).<br>5.2. При покупке VIP статуса Пользователь получает уникальный 8-значный ID и персональную реферальную ссылку.<br>5.3. VIP статус активируется моментально после покупки и действует бессрочно.<br>5.4. Средства, потраченные на покупку VIP статуса, не подлежат возврату.</p>
-        <h3>6. Вывод средств</h3>
-        <p>6.1. Минимальная сумма вывода составляет 1$ (один доллар США).<br>6.2. Заявки на вывод обрабатываются в течение 24 часов.<br>6.3. Платформа оставляет за собой право запрашивать дополнительную верификацию при выводе средств.<br>6.4. Вывод средств осуществляется только на реквизиты, указанные Пользователем, в выбранной криптовалюте.</p>
-        <h3>7. Конфиденциальность</h3>
-        <p>7.1. Платформа обязуется не разглашать личные данные Пользователей третьим лицам.<br>7.2. Персональные данные используются исключительно для функционирования Платформы.<br>7.3. Платформа применяет современные методы шифрования для защиты данных Пользователей.<br>7.4. Никнеймы Пользователей могут отображаться в публичных лентах транзакций.</p>
-        <h3>8. Ответственность</h3>
-        <p>8.1. Платформа не несёт ответственности за убытки, возникшие в результате неправомерных действий третьих лиц.<br>8.2. Пользователь обязуется использовать Платформу в законных целях.<br>8.3. Запрещается использование автоматизированных скриптов, ботов и иных средств для искусственного увеличения дохода.<br>8.4. Нарушение настоящих Правил может привести к блокировке аккаунта без возврата средств.</p>
-        <h3>9. Изменения и дополнения</h3>
-        <p>9.1. Платформа оставляет за собой право изменять настоящие Правила в одностороннем порядке.<br>9.2. Изменения вступают в силу с момента публикации на Платформе.<br>9.3. Продолжение использования Платформы после внесения изменений означает согласие Пользователя с новыми условиями.</p>
-        <h3>10. Контакты</h3>
-        <p>По всем вопросам, связанным с использованием Платформы, Пользователь может обратиться в службу поддержки через форму обратной связи на сайте.</p>
-        <p style="text-align: center; color: #c9ad7a; margin-top: 1.2rem;"><em>Последнее обновление: 2026 год</em></p>
-        <div class="modal-buttons" style="justify-content: center;">
-            <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
-        </div>
-    </div>
-</div>
-
-<!-- Модальное окно калькулятора -->
-<div class="modal-overlay hidden" id="calculatorModal">
-    <div class="modal" style="max-width: 400px;">
-        <h2>🧮 Калькулятор дохода</h2>
-        <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p>
+    <div class="container">
+        <h1>📋 База никнеймов Пирамикс</h1>
+        <p class="subtitle">1000 уникальных никнеймов для генерации транзакций</p>
         
-        <div class="calc-row">
-            <span class="calc-label">1 уровень (1% = 0.10$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button>
-                <span class="calc-value" id="calc1">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button>
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Всего никнеймов</div>
+                <div class="stat-value" id="totalNicks">1000</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Русские</div>
+                <div class="stat-value" id="russianNicks">500</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Английские</div>
+                <div class="stat-value" id="englishNicks">500</div>
             </div>
         </div>
-        <div class="calc-row">
-            <span class="calc-label">2 уровень (2% = 0.20$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button>
-                <span class="calc-value" id="calc2">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">3 уровень (3% = 0.30$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button>
-                <span class="calc-value" id="calc3">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">4 уровень (4% = 0.40$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button>
-                <span class="calc-value" id="calc4">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button>
-            </div>
-        </div>
-        <div class="calc-row">
-            <span class="calc-label">5 уровень (5% = 0.50$)</span>
-            <div class="calc-controls">
-                <button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button>
-                <span class="calc-value" id="calc5">0</span>
-                <button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button>
-            </div>
-        </div>
+
+        <input type="text" class="search-box" id="searchInput" placeholder="🔍 Поиск никнейма...">
         
-        <div class="calc-result">
-            <p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p>
-            <div class="calc-total" id="calcTotal">0.00 $</div>
+        <div class="controls">
+            <button class="btn" onclick="copyAllNicks()">📋 Копировать все</button>
+            <button class="btn" onclick="downloadNicks()">💾 Скачать TXT</button>
+            <button class="btn-outline" onclick="showRandomTransactions()">🎲 Показать случайные транзакции</button>
         </div>
-        
-        <div class="modal-buttons">
-            <button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button>
+
+        <div class="nickname-grid" id="nicknameGrid"></div>
+
+        <div class="info-text">
+            Никнеймы используются для отображения в ленте <span class="highlight">Последние пополнения</span> и <span class="highlight">Последние выводы</span>
         </div>
     </div>
-</div>
 
-<script>
-    (function() {
-        const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
-        const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    <script>
+        // ============================================
+        // 1000 НИКНЕЙМОВ
+        // ============================================
+        const allNicks = [
+            // === РУССКИЕ ОДНО СЛОВО (200) ===
+            'Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
+            'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
+            'Михаил', 'Евгения', 'Александр', 'Дарья', 'Игорь', 'Ксения', 'Василий', 'Алёна', 'Григорий', 'Полина',
+            'Денис', 'Валерия', 'Олег', 'Марина', 'Станислав', 'Вероника', 'Виктор', 'Анастасия', 'Константин', 'Людмила',
+            'Борис', 'Галина', 'Тимур', 'Надежда', 'Артур', 'Лариса', 'Георгий', 'Екатерина', 'Ярослав', 'Маргарита',
+            'сокол', 'волк', 'медведь', 'лиса', 'орёл', 'ястреб', 'барс', 'тигр', 'филин', 'ворон',
+            'рысь', 'соболь', 'бурый', 'гризли', 'панда', 'лев', 'гепард', 'пума', 'шакал', 'койот',
+            'коршун', 'кречет', 'сова', 'дятел', 'журавль', 'аист', 'лебедь', 'цапля', 'чайка', 'буревестник',
+            'дельфин', 'касатка', 'акула', 'скат', 'осьминог', 'краб', 'креветка', 'медуза', 'коала', 'кенгуру',
+            'шерхан', 'багира', 'балу', 'рики', 'тики', 'тави', 'факир', 'шаман', 'воин', 'жрец',
+            'странник', 'пилигрим', 'монах', 'отшельник', 'охотник', 'рыбак', 'земледелец', 'кузнец', 'гончар', 'ткач',
+            'рейдер', 'пират', 'викинг', 'гладиатор', 'рыцарь', 'самурай', 'ниндзя', 'монах', 'друид', 'маг',
+            'алхимик', 'артефактор', 'заклинатель', 'чародей', 'волшебник', 'колдун', 'ведун', 'знахарь', 'травник', 'целитель',
+            'стрелок', 'лучник', 'копейщик', 'мечник', 'щитоносец', 'разведчик', 'следопыт', 'егерь', 'лесник', 'пастух',
+            'рудокоп', 'старатель', 'золотодобытчик', 'серебряник', 'ювелир', 'огранщик', 'каменотёс', 'плотник', 'столяр', 'бондарь',
+            'пекарь', 'повар', 'кондитер', 'винодел', 'пивовар', 'сыродел', 'мясник', 'рыботорговец', 'меняла', 'ростовщик',
+            'зодчий', 'ваятель', 'живописец', 'иконописец', 'летописец', 'сказитель', 'гусляр', 'скоморох', 'шут', 'паяц',
+            'феникс', 'дракон', 'единорог', 'пегас', 'грифон', 'кентавр', 'минотавр', 'циклоп', 'титан', 'атлант',
+            'зевс', 'арес', 'аполлон', 'посейдон', 'аид', 'гермес', 'гефест', 'дионис', 'персей', 'геракл',
+            'ахиллес', 'одиссей', 'язон', 'тесей', 'орфей', 'прометей', 'дедал', 'икар', 'нарцисс', 'адонис',
+            // === РУССКИЕ ДВА СЛОВА (200) ===
+            'Иван петров', 'Мария сидорова', 'Пётр кузнецов', 'Екатерина смирнова', 'Александр попов',
+            'дарья Васильева', 'ольга Зайцева', 'никита Морозов', 'арина Соколова', 'тимофей Лебедев',
+            'Кристина волкова', 'Артур козлов', 'Диана новикова', 'Глеб егоров', 'Алиса фёдорова',
+            'Лунный Свет', 'Белый Клык', 'Чёрный Ворон', 'Золотой Орёл', 'Серебряный Лис',
+            'Красный Дракон', 'Синий Кит', 'Быстрый Ветер', 'Тихий Шёпот', 'Громкий Зов',
+            'Стальной Кулак', 'Железный Воин', 'Медный Всадник', 'Каменный Гость', 'Деревянный Меч',
+            'Огненный Шар', 'Водяной Знак', 'Земляной Червь', 'Воздушный Змей', 'Ледяной Взгляд',
+            'Тёмный Рыцарь', 'Светлый Ангел', 'Серый Волк', 'Бурый Медведь', 'Рыжая Лиса',
+            'Синяя Птица', 'Жёлтый Дракон', 'Зелёный Змий', 'Красный Петух', 'Белый Голубь',
+            'Ночной Дозор', 'Дневной Патруль', 'Вечерний Звон', 'Утренний Туман', 'Полуденный Зной',
+            'Северный Ветер', 'Южное Солнце', 'Восточный Путь', 'Западный Край', 'Центральный Парк',
+            'Первый Снег', 'Последний Дождь', 'Ранний Рассвет', 'Поздний Закат', 'Весенний Гром',
+            'Летний Зной', 'Осенний Лист', 'Зимний Сон', 'Горный Орёл', 'Лесной Царь',
+            'Морской Волк', 'Речной Поток', 'Озёрный Гладь', 'Болотный Огонь', 'Степной Ветер',
+            'Тайный Знак', 'Скрытый Смысл', 'Явный След', 'Тонкий Лёд', 'Острый Ум',
+            'Добрый Знак', 'Злой Рок', 'Слепой Случай', 'Верный Путь', 'Ложный След',
+            'Большой Брат', 'Малый Дом', 'Средний Путь', 'Крайний Срок', 'Полный Объём',
+            'Старый Друг', 'Новый Свет', 'Молодой Месяц', 'Старая Гвардия', 'Юный Натуралист',
+            'Дикий Запад', 'Дальний Восток', 'Ближний Круг', 'Высший Свет', 'Нижний Мир',
+            'Верхний Ярус', 'Средний Класс', 'Рабочий Момент', 'Творческий Путь', 'Научный Подход',
+            'Алексей Соколов', 'Дмитрий Орлов', 'Сергей Ястребов', 'Андрей Воробьёв', 'Максим Голубев',
+            'Елена Снегирёва', 'Ольга Воронова', 'Татьяна Синицина', 'Анна Коршунова', 'Мария Совина',
+            'Владимир Ласточкин', 'Ирина Стрижова', 'Павел Дроздов', 'Наталья Журавлёва', 'Роман Аистов',
+            'Юлия Лебедева', 'Артём Цаплин', 'Виктория Чайкина', 'Михаил Буревестников', 'Дарья Альбатросова',
+            // === РУССКИЕ С ЦИФРАМИ (100) ===
+            'Alex1985', 'Max777', 'Olga2020', 'Dima123', 'Kate99',
+            'Ivan2000', 'Masha88', 'Pasha007', 'Dasha111', 'Sasha555',
+            'Vova322', 'Lena228', 'Tanya1337', 'Kolya1488', 'Sveta007',
+            'Nina2023', 'Vitya1999', 'Nadya777', 'Lyuda666', 'Grisha1234',
+            'Serega1980', 'Dimon1991', 'Vadim2022', 'Ilya007', 'Misha2005',
+            'Gena1967', 'Tolya1975', 'Vasya1983', 'Petya1995', 'Kostya2001',
+            'Zhenya2010', 'Yura2008', 'Vika2015', 'Nastya2018', 'Lera2024',
+            'Mila1993', 'Liza1987', 'Sonya1998', 'Ulya2003', 'Dina2012',
+            'Rita1989', 'Inna1994', 'Alla2006', 'Galya2019', 'Tonya2021',
+            'Roma777', 'Den777', 'Borya555', 'Vlad555', 'Stas999',
+            'nikita47', 'arina52', 'gleb89', 'timofey33', 'varvara17',
+            'matvey61', 'sofia28', 'elisey73', 'veronika44', 'miroslav55',
+            'yaroslav11', 'vasilisa22', 'svyatopolk66', 'dobrynya77', 'rostislav88',
+            'vsevolod99', 'predslava12', 'izyaslav34', 'mstislav56', 'yuri78',
+            'andrey90', 'aleksandra23', 'konstantin45', 'anastasia67', 'alexander89',
+            'xXx_Wolf_xXx', 'Pro_Gamer_123', 'Dark_Lord_666', 'Light_King_777', 'Fire_Mage_88',
+            'Ice_Queen_55', 'Thunder_God_44', 'Shadow_Hunter_33', 'Ghost_Rider_22', 'Night_Walker_11',
+            'Razor_Edge_99', 'Blade_Runner_77', 'Star_Lord_66', 'Moon_Knight_44', 'Sun_Warrior_22',
+            'Crazy_Fox_55', 'Wild_Cat_88', 'Brave_Lion_77', 'Wise_Owl_66', 'Fast_Eagle_44',
+            'Big_Boss_33', 'Top_Gun_22', 'Master_Chief_11', 'Doctor_Who_99', 'Captain_Jack_88',
+            // === АНГЛИЙСКИЕ ОДНО СЛОВО (200) ===
+            'Alexander', 'Victoria', 'Maxim', 'Svetlana', 'Dmitry',
+            'Natalie', 'Sergey', 'Ekaterina', 'Roman', 'Yulia',
+            'shadow', 'phoenix', 'dragon', 'wolf', 'eagle',
+            'hawk', 'tiger', 'raven', 'fox', 'bear',
+            'lion', 'shark', 'whale', 'snake', 'spider',
+            'falcon', 'panther', 'jaguar', 'cobra', 'viper',
+            'storm', 'thunder', 'lightning', 'blizzard', 'tornado',
+            'earthquake', 'volcano', 'tsunami', 'hurricane', 'cyclone',
+            'nebula', 'galaxy', 'cosmos', 'meteor', 'comet',
+            'asteroid', 'quasar', 'pulsar', 'supernova', 'blackhole',
+            'warrior', 'knight', 'paladin', 'rogue', 'wizard',
+            'sorcerer', 'mage', 'cleric', 'druid', 'monk',
+            'hunter', 'archer', 'sniper', 'commando', 'trooper',
+            'captain', 'major', 'colonel', 'general', 'admiral',
+            'emperor', 'king', 'prince', 'duke', 'count',
+            'baron', 'viscount', 'marquis', 'earl', 'khan',
+            'swift', 'brave', 'mighty', 'noble', 'fierce',
+            'cunning', 'loyal', 'honest', 'bold', 'gentle',
+            'silver', 'golden', 'crystal', 'ruby', 'sapphire',
+            'emerald', 'diamond', 'platinum', 'titanium', 'bronze',
+            'obsidian', 'jade', 'amber', 'coral', 'pearl',
+            'aurora', 'borealis', 'eclipse', 'solstice', 'equinox',
+            'horizon', 'zenith', 'nadir', 'summit', 'abyss',
+            'inferno', 'glacier', 'oasis', 'mirage', 'phantom',
+            'spirit', 'ghost', 'wraith', 'spectre', 'shade',
+            'blade', 'steel', 'iron', 'bronze', 'silver',
+            'frost', 'flame', 'ember', 'spark', 'cinder',
+            'smoke', 'mist', 'fog', 'haze', 'vapor',
+            'ocean', 'river', 'lake', 'pond', 'stream',
+            'cascade', 'rapids', 'falls', 'spring', 'well',
+            'throne', 'crown', 'scepter', 'orb', 'chalice',
+            'torch', 'lantern', 'beacon', 'flare', 'signal',
+            'vertex', 'matrix', 'vector', 'cipher', 'codex',
+            'nexus', 'axis', 'prism', 'lens', 'focus',
+            'cypher', 'crypt', 'vault', 'tower', 'castle',
+            'fortress', 'citadel', 'bastion', 'keep', 'hold',
+            'ravenclaw', 'gryffindor', 'slytherin', 'hufflepuff', 'durmstrang',
+            'tempest', 'zephyr', 'cyclone', 'typhoon', 'monsoon',
+            'ember', 'blaze', 'inferno', 'pyre', 'flame',
+            'frostbite', 'icicle', 'glacier', 'avalanche', 'blizzard',
+            // === АНГЛИЙСКИЕ ДВА СЛОВА (200) ===
+            'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
+            'Red Phoenix', 'Blue Dragon', 'Swift Wind', 'Silent Shadow', 'Lucky Star',
+            'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
+            'alice Green', 'bob Taylor', 'kate Wilson', 'mike Davis', 'lisa Moore',
+            'james Clark', 'sarah Hall', 'david Young', 'emma King', 'chris Scott',
+            'laura Baker', 'steve Adams', 'julia Wright', 'robert Green', 'helen Wood',
+            'martin Hill', 'olivia Turner', 'kevin Baker', 'sophia Collins', 'frank Stewart',
+            'grace Morris', 'harry Rogers', 'diana Reed', 'george Cook', 'irene Morgan',
+            'jack Cooper', 'linda Bell', 'mason Murphy', 'nancy Bailey', 'oscar Howard',
+            'patricia Ward', 'quinn Torres', 'ruth Sanders', 'samuel Price', 'tina Bennett',
+            'storm chaser', 'fire starter', 'ice breaker', 'wind walker', 'earth shaker',
+            'moon light', 'star dust', 'sun beam', 'rain bow', 'snow flake',
+            'iron man', 'steel heart', 'gold mind', 'silver tongue', 'bronze medal',
+            'quick draw', 'sharp shooter', 'fast runner', 'high jumper', 'long walker',
+            'deep diver', 'sky walker', 'mountain climber', 'sea farer', 'land rover',
+            'dream weaver', 'soul keeper', 'mind reader', 'heart breaker', 'peace maker',
+            'trouble maker', 'game changer', 'rule breaker', 'record setter', 'history maker',
+            'night hawk', 'day breaker', 'dawn bringer', 'dusk tiller', 'midnight runner',
+            'silent whisper', 'loud speaker', 'quiet thinker', 'fast talker', 'slow mover',
+            'big thinker', 'small wonder', 'tall order', 'short story', 'long tale',
+            'wise owl', 'sly fox', 'brave heart', 'cool hand', 'hot shot',
+            'cold steel', 'warm embrace', 'hot temper', 'cool breeze', 'warm smile',
+            'rich man', 'poor boy', 'lucky charm', 'bad luck', 'good fortune',
+            'high tide', 'low blow', 'fast lane', 'slow burn', 'quick fix',
+            'lost soul', 'found treasure', 'hidden gem', 'open book', 'closed case',
+            'alpha dog', 'beta test', 'gamma ray', 'delta force', 'omega man',
+            'first light', 'last stand', 'final hour', 'second chance', 'third eye',
+            'north star', 'south pole', 'east wind', 'west coast', 'center stage',
+            'blue moon', 'red sun', 'green light', 'yellow card', 'pink slip',
+            'black list', 'white lie', 'grey area', 'gold standard', 'silver lining',
+            'double trouble', 'single shot', 'triple threat', 'double cross', 'single file',
+            'happy hour', 'sad song', 'angry bird', 'calm sea', 'brave new',
+            'wild thing', 'crazy horse', 'mad dog', 'lazy cat', 'busy bee',
+            'sweet dreams', 'bitter sweet', 'sour grapes', 'spicy food', 'salty tears',
+            'early bird', 'night owl', 'morning star', 'evening sun', 'afternoon delight',
+            'spring break', 'summer breeze', 'autumn leaves', 'winter storm', 'season finale',
+            'rock star', 'pop idol', 'movie buff', 'book worm', 'art lover',
+            'data miner', 'code breaker', 'web master', 'system admin', 'network guru',
+            'pixel pusher', 'bit shifter', 'byte eater', 'data cruncher', 'script kiddie',
+            'tech guru', 'cyber punk', 'digital ghost', 'analog soul', 'virtual reality',
+            // === АНГЛИЙСКИЕ С ЦИФРАМИ (100) ===
+            'Player001', 'Gamer999', 'Hunter777', 'Killer666', 'Master555',
+            'ProGamer88', 'NoScope77', 'HeadShot66', 'QuickDraw55', 'FastAim44',
+            'Shadow007', 'Ghost1337', 'Phantom2024', 'Spectre1988', 'Wraith2020',
+            'CyberWolf99', 'NeonCat88', 'PixelFox77', 'DataShark66', 'CodeBear55',
+            'xShadowx', 'oFantomo', 'iPhoenixi', 'zDragonz', 'vEaglev',
+            'DarkLord1', 'LightKing2', 'FireMage3', 'IceQueen4', 'StormGod5',
+            'BladeMaster6', 'BowExpert7', 'SwordSaint8', 'SpearKing9', 'AxeLord10',
+            'Dreamer23', 'Thinker42', 'Maker56', 'Taker78', 'Giver91',
+            'Runner11', 'Jumper22', 'Swimmer33', 'Diver44', 'Climber55',
+            'AlphaDog66', 'BetaCat77', 'GammaRat88', 'DeltaBat99', 'OmegaOwl100',
+            'DemonSlayer11', 'GodEater22', 'WorldEnder33', 'LifeGiver44', 'SoulTaker55',
+            'NightKing66', 'DayQueen77', 'DawnPrince88', 'DuskPrincess99', 'SunEmperor100',
+            'MoneyMaker2000', 'CashFlow1999', 'GoldDigger1988', 'DiamondHands1977', 'CryptoKing1966',
+            'BitMaster1955', 'CoinLord1944', 'TokenKing1933', 'ChainMaster1922', 'BlockBuilder1911',
+            'MemeLord1888', 'TrollKing1877', 'JokeMaster1866', 'FunMaker1855', 'LaughKing1844',
+            'StormBorn1833', 'FireKissed1822', 'IceTouched1811', 'WindBlessed1800', 'EarthBound1799',
+            'StarChild1788', 'MoonBorn1777', 'SunKissed1766', 'SkyWalker1755', 'SeaSpirit1744',
+            'BattleAxe1733', 'WarHammer1722', 'PeaceMaker1711', 'TroubleShooter1700', 'ProblemSolver1699',
+            'QuantumLeap1688', 'StringTheory1677', 'ChaosTheory1666', 'GameTheory1655', 'NumberTheory1644',
+            'PixelArt1633', 'VectorGraph1622', 'BitmapImage1611', 'JpegMaster1600', 'PngKing1599'
+        ];
 
-        const stageRegister = document.getElementById('stageRegister');
-        const stageHome = document.getElementById('stageHome');
-        const regLiveFeed = document.getElementById('regLiveFeed');
-        const homeLiveFeed = document.getElementById('homeLiveFeed');
-        const toastContainer = document.getElementById('toastContainer');
-
-        let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-
-        // Кэш для хранения последних данных ленты
-        let feedCache = { deposits: [], withdrawals: [] };
-        let lastDepositId = null;
-        let lastWithdrawId = null;
-        let lastFeedUpdate = 0;
-        const FEED_UPDATE_INTERVAL = 3000;
-
-        // ===== ЗАГРУЗКА НИКНЕЙМОВ ИЗ ВНЕШНЕГО ФАЙЛА =====
-        let allNicks = [];
-        let namesLoaded = false;
-
-        async function loadNames() {
-            if (namesLoaded) return;
-            try {
-                const response = await fetch('names.html');
-                const text = await response.text();
-                const match = text.match(/const allNicks = (\[[\s\S]*?\]);/);
-                if (match && match[1]) {
-                    allNicks = eval(match[1]);
-                    namesLoaded = true;
-                    console.log('✅ Загружено никнеймов из names.html:', allNicks.length);
-                }
-            } catch(e) {
-                console.error('Ошибка загрузки никнеймов:', e);
-                allNicks = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-                    'Владимир', 'Ирина', 'Павел', 'Наталья', 'Максим', 'Светлана', 'Роман', 'Юлия', 'Артём', 'Виктория',
-                    'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear',
-                    'Dark Knight', 'Silver Fox', 'Golden Eagle', 'White Wolf', 'Black Raven',
-                    'john smith', 'mary jones', 'peter brown', 'anna white', 'tom black',
-                    'Player001', 'Gamer999', 'Hunter777', 'Killer666', 'Master555'];
-                namesLoaded = true;
-            }
-        }
-
+        // ============================================
+        // ФУНКЦИИ ДЛЯ РАБОТЫ С НИКНЕЙМАМИ
+        // ============================================
+        
+        // Получить случайный никнейм
         function randomNick() {
-            if (!namesLoaded || allNicks.length === 0) {
-                const fallback = ['Алексей', 'Мария', 'Дмитрий', 'Елена', 'Сергей', 'Ольга', 'Андрей', 'Татьяна', 'Николай', 'Анна',
-                    'shadow', 'phoenix', 'dragon', 'wolf', 'eagle', 'hawk', 'tiger', 'raven', 'fox', 'bear'];
-                return fallback[Math.floor(Math.random() * fallback.length)];
-            }
             return allNicks[Math.floor(Math.random() * allNicks.length)];
         }
 
-        function showToast(message, type = 'error') {
+        // Получить случайный никнейм для депозита
+        function randomDepositNick() {
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
+
+        // Получить случайный никнейм для вывода
+        function randomWithdrawNick() {
+            return allNicks[Math.floor(Math.random() * allNicks.length)];
+        }
+
+        // Получить случайную сумму вывода (1-130$)
+        function randomWithdrawAmount() {
+            return Math.floor(Math.random() * 130) + 1;
+        }
+
+        // Получить текущее время в формате ЧЧ:ММ:СС
+        function getCurrentTime() {
+            return new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // Получить случайное время в прошлом
+        function getRandomPastTime(index, total) {
+            const now = new Date();
+            const secondsAgo = 30 + Math.floor((140 - 30) * (index / Math.max(total - 1, 1)));
+            const randomOffset = Math.floor(Math.random() * 10) - 5;
+            const finalSecondsAgo = Math.max(5, secondsAgo + randomOffset);
+            now.setSeconds(now.getSeconds() - finalSecondsAgo);
+            return now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        // ============================================
+        // ОТОБРАЖЕНИЕ НА СТРАНИЦЕ
+        // ============================================
+        
+        function renderNicknames(filter = '') {
+            const grid = document.getElementById('nicknameGrid');
+            const filtered = filter ? allNicks.filter(n => n.toLowerCase().includes(filter.toLowerCase())) : allNicks;
+            
+            grid.innerHTML = filtered.map(nick => 
+                `<div class="nickname-item" onclick="copyNick('${nick.replace(/'/g, "\\'")}')" title="Нажмите чтобы скопировать">${nick}</div>`
+            ).join('');
+            
+            document.getElementById('totalNicks').textContent = allNicks.length;
+            document.getElementById('russianNicks').textContent = allNicks.filter(n => /[а-яё]/i.test(n)).length;
+            document.getElementById('englishNicks').textContent = allNicks.filter(n => !/[а-яё]/i.test(n)).length;
+        }
+
+        function copyNick(nick) {
+            navigator.clipboard.writeText(nick).then(() => {
+                showToast('Скопировано: ' + nick);
+            });
+        }
+
+        function copyAllNicks() {
+            navigator.clipboard.writeText(allNicks.join('\n')).then(() => {
+                showToast('Все 1000 никнеймов скопированы!');
+            });
+        }
+
+        function downloadNicks() {
+            const blob = new Blob([allNicks.join('\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'piramix_nicknames.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Файл скачан!');
+        }
+
+        function showRandomTransactions() {
+            const deposits = [];
+            const withdrawals = [];
+            
+            for (let i = 0; i < 5; i++) {
+                deposits.push({
+                    nickname: randomDepositNick(),
+                    amount: 10,
+                    time: getRandomPastTime(i, 5)
+                });
+                withdrawals.push({
+                    nickname: randomWithdrawNick(),
+                    amount: randomWithdrawAmount(),
+                    time: getRandomPastTime(i, 5)
+                });
+            }
+            
+            let html = '<div style="margin-top:1rem;padding:1rem;background:rgba(0,0,0,0.3);border-radius:1rem;">';
+            html += '<h3 style="color:#e9c274;margin-bottom:0.5rem;">🟢 Пример пополнений (10$)</h3>';
+            deposits.forEach(d => {
+                html += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;">
+                    <span><span style="color:#f5d78c">${d.nickname}</span> <span style="color:#8b8a7a">${d.time}</span></span>
+                    <span style="color:#4caf50;font-weight:700">${d.amount}$</span></div>`;
+            });
+            html += '<h3 style="color:#e9c274;margin:0.8rem 0 0.5rem;">🔴 Пример выводов (1-130$)</h3>';
+            withdrawals.forEach(w => {
+                html += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;">
+                    <span><span style="color:#f5d78c">${w.nickname}</span> <span style="color:#8b8a7a">${w.time}</span></span>
+                    <span style="color:#ff7043;font-weight:700">${w.amount}$</span></div>`;
+            });
+            html += '</div>';
+            
+            const existing = document.getElementById('randomTransactions');
+            if (existing) existing.remove();
+            
+            const div = document.createElement('div');
+            div.id = 'randomTransactions';
+            div.innerHTML = html;
+            document.querySelector('.info-text').before(div);
+        }
+
+        function showToast(msg) {
             const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
+            toast.style.cssText = `
+                position:fixed;top:20px;right:20px;padding:12px 20px;border-radius:12px;
+                color:#fff;font-weight:500;font-size:0.9rem;z-index:9999;
+                background:rgba(76,175,80,0.9);border:1px solid #4caf50;
+                backdrop-filter:blur(10px);box-shadow:0 8px 20px rgba(0,0,0,0.3);
+                animation:slideInRight 0.3s ease-out, fadeOut 0.3s 2.7s ease-out forwards;
+                max-width:350px;
+            `;
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
         }
 
-        function formatNumber(num) {
-            if (num >= 1000) {
-                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        // Поиск
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            renderNicknames(e.target.value);
+        });
+
+        // Инициализация
+        renderNicknames();
+
+        // Добавляем стили для анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
             }
-            return num.toString();
-        }
-
-        // ===== ЗВУКОВОЕ УВЕДОМЛЕНИЕ =====
-        function playNotificationSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const notes = [523.25, 659.25, 783.99];
-                notes.forEach((freq, i) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.frequency.value = freq;
-                    osc.type = 'sine';
-                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
-                    osc.start(audioCtx.currentTime + i * 0.15);
-                    osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
-                });
-            } catch(e) {}
-        }
-
-        // ===== ПОДДЕРЖКА ЧЕРЕЗ БД =====
-        let supportCheckInterval = null;
-
-        function initSupport() {
-            const supportBtn = document.getElementById('supportBtn');
-            const supportChat = document.getElementById('supportChat');
-            const supportCloseBtn = document.getElementById('supportCloseBtn');
-            const supportMessages = document.getElementById('supportMessages');
-            const supportInput = document.getElementById('supportInput');
-            const supportSendBtn = document.getElementById('supportSendBtn');
-
-            function addMessageToChat(text, type) {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `support-message ${type}`;
-                const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                msgDiv.innerHTML = `${text}<div class="support-message-time">${time}</div>`;
-                supportMessages.appendChild(msgDiv);
-                supportMessages.scrollTop = supportMessages.scrollHeight;
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
             }
+        `;
+        document.head.appendChild(style);
 
-            async function sendMessageToDB() {
-                const text = supportInput.value.trim();
-                if (!text) return;
-                
-                addMessageToChat(text, 'user');
-                supportInput.value = '';
-                supportInput.style.height = 'auto';
+        // Экспорт функций в глобальную область
+        window.randomNick = randomNick;
+        window.randomDepositNick = randomDepositNick;
+        window.randomWithdrawNick = randomWithdrawNick;
+        window.randomWithdrawAmount = randomWithdrawAmount;
+        window.getCurrentTime = getCurrentTime;
+        window.getRandomPastTime = getRandomPastTime;
+        window.allNicks = allNicks;
 
-                const nickname = (userData && userData.nickname) ? userData.nickname : 'User';
-                const { data, error } = await supabase.rpc('send_support_message', { 
-                    p_message: text,
-                    p_nickname: nickname 
-                });
-                
-                if (error) {
-                    console.error('Ошибка отправки сообщения:', error);
-                }
-            }
-
-            async function checkForAdminResponse() {
-                try {
-                    const { data, error } = await supabase.rpc('get_support_messages');
-                    
-                    if (error) return;
-                    
-                    if (data && data.length > 0) {
-                        supportMessages.innerHTML = '';
-                        
-                        const currentNickname = (userData && userData.nickname) ? userData.nickname : 'User';
-                        const userMessages = data.filter(msg => msg.nickname === currentNickname);
-                        const displayMessages = userMessages.length > 0 ? userMessages : data.filter(msg => msg.nickname === 'User');
-                        
-                        [...displayMessages].reverse().forEach(msg => {
-                            addMessageToChat(msg.user_message, 'user');
-                            if (msg.admin_response) {
-                                addMessageToChat(msg.admin_response, 'admin-response');
-                            }
-                        });
-                        
-                        if (displayMessages.length > 0) {
-                            const lastMsg = displayMessages[0];
-                            if (lastMsg.admin_response && lastMsg.is_read === false) {
-                                playNotificationSound();
-                                if (supportChat.classList.contains('hidden')) {
-                                    showToast('🔔 Получен ответ от поддержки!', 'info');
-                                    supportBtn.classList.add('has-response');
-                                }
-                            }
-                        }
-                        
-                        supportMessages.scrollTop = supportMessages.scrollHeight;
-                    }
-                } catch(e) {
-                    console.error('Ошибка проверки:', e);
-                }
-            }
-
-            supportBtn.onclick = function() {
-                const isHidden = supportChat.classList.contains('hidden');
-                if (isHidden) {
-                    supportChat.classList.remove('hidden');
-                    supportBtn.classList.remove('has-response');
-                    checkForAdminResponse();
-                } else {
-                    supportChat.classList.add('hidden');
-                }
-            };
-
-            supportCloseBtn.onclick = function() {
-                supportChat.classList.add('hidden');
-            };
-
-            supportSendBtn.onclick = sendMessageToDB;
-
-            supportInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessageToDB();
-                }
-            });
-
-            supportInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-            });
-
-            supportCheckInterval = setInterval(checkForAdminResponse, 5000);
-            checkForAdminResponse();
-        }
-
-        async function loadPlatformStats() {
-            const { data, error } = await supabase.rpc('get_platform_stats');
-            if (data) {
-                const regTotalUsersEl = document.getElementById('regTotalUsers');
-                const regTodayUsersEl = document.getElementById('regTodayUsers');
-                const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
-                
-                if (regTotalUsersEl) regTotalUsersEl.textContent = formatNumber(data.total_users);
-                if (regTodayUsersEl) regTodayUsersEl.textContent = data.today_users;
-                if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
-
-                const totalUsersEl = document.getElementById('totalUsers');
-                const todayUsersEl = document.getElementById('todayUsers');
-                const totalWithdrawnEl = document.getElementById('totalWithdrawn');
-                
-                if (totalUsersEl) totalUsersEl.textContent = formatNumber(data.total_users);
-                if (todayUsersEl) todayUsersEl.textContent = data.today_users;
-                if (totalWithdrawnEl) totalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
-            }
-        }
-
-        async function addNewUserToDB() {
-            const nickname = randomNick();
-            const password = 'auto' + Math.floor(Math.random() * 9999);
-            
-            const { data, error } = await supabase.rpc('register_user', {
-                p_nickname: nickname,
-                p_password: password,
-                p_referral_code: null
-            });
-            
-            if (data && data.success) {
-                loadPlatformStats();
-            }
-        }
-
-        async function addFeedItemToDB(type, nickname, amount) {
-            const { data, error } = await supabase.rpc('add_feed_item', {
-                p_type: type,
-                p_nickname: nickname,
-                p_amount: amount
-            });
-            
-            if (data && data.success) {
-                loadPlatformStats();
-                lastFeedUpdate = 0;
-                loadFeedFromDB();
-            }
-        }
-
-        async function loadFeedFromDB() {
-            const now = Date.now();
-            if (now - lastFeedUpdate < FEED_UPDATE_INTERVAL) {
-                return;
-            }
-            lastFeedUpdate = now;
-
-            const [depositResult, withdrawResult] = await Promise.all([
-                supabase.rpc('get_feed_items', { p_type: 'deposit', p_limit: 10 }),
-                supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
-            ]);
-
-            let hasNewDeposit = false;
-            let hasNewWithdraw = false;
-
-            if (depositResult.data && depositResult.data.length > 0) {
-                const newFirstId = depositResult.data[0].nickname + '_' + depositResult.data[0].created_at;
-                if (newFirstId !== lastDepositId) {
-                    hasNewDeposit = true;
-                    lastDepositId = newFirstId;
-                }
-                
-                feedCache.deposits = depositResult.data.map(item => ({
-                    nickname: item.nickname,
-                    amount: item.amount,
-                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                }));
-            }
-
-            if (withdrawResult.data && withdrawResult.data.length > 0) {
-                const newFirstId = withdrawResult.data[0].nickname + '_' + withdrawResult.data[0].created_at;
-                if (newFirstId !== lastWithdrawId) {
-                    hasNewWithdraw = true;
-                    lastWithdrawId = newFirstId;
-                }
-                
-                feedCache.withdrawals = withdrawResult.data.map(item => ({
-                    nickname: item.nickname,
-                    amount: item.amount,
-                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                }));
-            }
-
-            renderAllFeeds(hasNewDeposit, hasNewWithdraw);
-        }
-
-        function renderFeedList(containerId, items, isNew) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            container.innerHTML = '';
-            items.forEach((item, index) => {
-                const div = document.createElement('div');
-                const isDeposit = containerId.includes('Deposit');
-                div.className = `feed-item ${isDeposit ? 'deposit' : 'withdraw'}`;
-                
-                if (index === 0 && isNew) {
-                    div.classList.add('new-item-highlight');
-                }
-                
-                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
-                container.appendChild(div);
-            });
-        }
-        
-        function renderAllFeeds(hasNewDeposit = false, hasNewWithdraw = false) {
-            renderFeedList('regDepositList', feedCache.deposits, hasNewDeposit);
-            renderFeedList('depositList', feedCache.deposits, hasNewDeposit);
-            renderFeedList('regWithdrawList', feedCache.withdrawals, hasNewWithdraw);
-            renderFeedList('withdrawList', feedCache.withdrawals, hasNewWithdraw);
-        }
-
-        function scheduleNewUser() {
-            const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
-            setTimeout(() => {
-                addNewUserToDB();
-                scheduleNewUser();
-            }, delay);
-        }
-
-        function scheduleDeposit() {
-            const delay = Math.floor(Math.random() * (190000 - 75000) + 75000);
-            setTimeout(() => {
-                addFeedItemToDB('deposit', randomNick(), 10);
-                scheduleDeposit();
-            }, delay);
-        }
-        
-        function scheduleWithdraw() {
-            const delay = Math.floor(Math.random() * (240000 - 95000) + 95000);
-            setTimeout(() => {
-                const amount = Math.floor(Math.random() * 130) + 1;
-                addFeedItemToDB('withdraw', randomNick(), amount);
-                scheduleWithdraw();
-            }, delay);
-        }
-
-        function showStage(stage) {
-            if (stage === 'home') {
-                stageRegister.style.display = 'none';
-                regLiveFeed.style.display = 'none';
-                stageHome.style.display = 'flex';
-                stageHome.classList.remove('hidden');
-                homeLiveFeed.style.display = 'flex';
-                initHomeStage();
-            } else {
-                stageHome.style.display = 'none';
-                stageHome.classList.add('hidden');
-                homeLiveFeed.style.display = 'none';
-                stageRegister.style.display = 'flex';
-                regLiveFeed.style.display = 'flex';
-                initRegStage();
-            }
-            loadFeedFromDB();
-            loadPlatformStats();
-        }
-
-        async function initialize() {
-            await loadNames();
-            await loadPlatformStats();
-            await loadFeedFromDB();
-            
-            initSupport();
-            
-            scheduleNewUser();
-            scheduleDeposit();
-            scheduleWithdraw();
-            
-            setInterval(loadPlatformStats, 10000);
-            setInterval(() => loadFeedFromDB(), 5000);
-
-            if (userData && userData.id) {
-                showStage('home');
-            } else {
-                showStage('register');
-            }
-        }
-
-        initialize();
-
-        function initRegStage() {
-            const password2Group = document.getElementById('password2Group');
-            const actionButton = document.getElementById('actionButton');
-            const errorMessage = document.getElementById('errorMessage');
-            const switchTextBlock = document.getElementById('switchTextBlock');
-            let isLoginMode = false;
-
-            function updateUIForMode() {
-                errorMessage.classList.remove('visible');
-                if (isLoginMode) {
-                    password2Group.classList.remove('visible-password');
-                    password2Group.classList.add('hidden-password');
-                    actionButton.textContent = 'Войти';
-                    switchTextBlock.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
-                } else {
-                    password2Group.classList.remove('hidden-password');
-                    password2Group.classList.add('visible-password');
-                    actionButton.textContent = 'Зарегистрироваться';
-                    switchTextBlock.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
-                }
-                const toggleLink = document.getElementById('toggleModeLink');
-                if (toggleLink) {
-                    toggleLink.onclick = () => {
-                        isLoginMode = !isLoginMode;
-                        updateUIForMode();
-                    };
-                }
-            }
-
-            updateUIForMode();
-            loadPlatformStats();
-
-            actionButton.onclick = async function(e) {
-                e.preventDefault();
-                const nickname = document.getElementById('nickname').value.trim();
-                const password = document.getElementById('password1').value;
-                errorMessage.classList.remove('visible');
-                if (!nickname || !password) return;
-
-                if (isLoginMode) {
-                    const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
-                    if (error || !data || !data.success) {
-                        errorMessage.textContent = '❌ Данные неверны';
-                        errorMessage.classList.add('visible');
-                        return;
-                    }
-                    localStorage.setItem('pirxmix_user', JSON.stringify({
-                        id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid,
-                        referral_code: data.referral_code, balance: data.balance
-                    }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-                    showStage('home');
-                } else {
-                    const password2 = document.getElementById('password2').value;
-                    if (password !== password2) {
-                        errorMessage.textContent = '❌ Пароли не совпадают';
-                        errorMessage.classList.add('visible');
-                        return;
-                    }
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const refCode = urlParams.get('ref') || null;
-                    const { data, error } = await supabase.rpc('register_user', {
-                        p_nickname: nickname, p_password: password, p_referral_code: refCode
-                    });
-                    if (error || !data || !data.success) {
-                        errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
-                        errorMessage.classList.add('visible');
-                        return;
-                    }
-                    localStorage.setItem('pirxmix_user', JSON.stringify({
-                        id: data.user_id, nickname: data.nickname, vip_paid: false,
-                        referral_code: data.referral_code, balance: 0
-                    }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-                    showStage('home');
-                }
-            };
-
-            document.getElementById('authCard').addEventListener('submit', (e) => e.preventDefault());
-        }
-
-        function initHomeStage() {
-            if (!userData || !userData.id) {
-                showStage('register');
-                return;
-            }
-
-            setAnimatedNickname(document.getElementById('userGreeting'), userData.nickname);
-            loadUserData();
-            loadReferrals();
-            loadPlatformStats();
-            initModals();
-            initCalculator();
-
-            setInterval(() => {
-                loadUserData();
-                loadReferrals();
-                loadPlatformStats();
-            }, 30000);
-        }
-
-        function setAnimatedNickname(element, nickname) {
-            element.innerHTML = '';
-            const letters = nickname.split('');
-            letters.forEach((letter, index) => {
-                const span = document.createElement('span');
-                span.className = 'animated-letter';
-                span.textContent = letter;
-                span.style.animationDelay = (index * 0.08) + 's';
-                element.appendChild(span);
-            });
-        }
-
-        async function loadUserData() {
-            const { data, error } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
-            if (data && data.success) {
-                document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
-                document.getElementById('totalEarned').textContent = (parseFloat(data.balance) * 1.2).toFixed(2) + ' $';
-                localStorage.setItem('pirxmix_balance', data.balance);
-                
-                userData.vip_paid = data.vip_paid;
-                userData.referral_code = data.referral_code;
-                userData.balance = data.balance;
-                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
-            }
-        }
-
-        async function loadReferrals() {
-            const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
-            if (data) {
-                document.getElementById('lvl1').textContent = (data.level_1?.count || 0);
-                document.getElementById('lvl2').textContent = (data.level_2?.count || 0);
-                document.getElementById('lvl3').textContent = (data.level_3?.count || 0);
-                document.getElementById('lvl4').textContent = (data.level_4?.count || 0);
-                document.getElementById('lvl5').textContent = (data.level_5?.count || 0);
-            }
-        }
-
-        function initCalculator() {
-            const calcLevels = ['calc1', 'calc2', 'calc3', 'calc4', 'calc5'];
-            const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
-
-            window.calcChange = function(id, delta) {
-                const el = document.getElementById(id);
-                if (!el) return;
-                let val = parseInt(el.textContent) || 0;
-                val = Math.max(0, val + delta);
-                el.textContent = val;
-                updateCalcTotal();
-            };
-
-            function updateCalcTotal() {
-                let total = 0;
-                calcLevels.forEach((id, i) => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        const val = parseInt(el.textContent) || 0;
-                        total += val * percents[i];
-                    }
-                });
-                const totalEl = document.getElementById('calcTotal');
-                if (totalEl) totalEl.textContent = total.toFixed(2) + ' $';
-            }
-
-            function openCalculator() {
-                calcLevels.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = '0';
-                });
-                const totalEl = document.getElementById('calcTotal');
-                if (totalEl) totalEl.textContent = '0.00 $';
-                document.getElementById('calculatorModal').classList.remove('hidden');
-            }
-
-            const calculatorBtn = document.getElementById('calculatorBtn');
-            if (calculatorBtn) calculatorBtn.onclick = openCalculator;
-
-            const closeCalculatorBtn = document.getElementById('closeCalculatorBtn');
-            if (closeCalculatorBtn) {
-                closeCalculatorBtn.onclick = function() {
-                    document.getElementById('calculatorModal').classList.add('hidden');
-                };
-            }
-
-            const calculatorModal = document.getElementById('calculatorModal');
-            if (calculatorModal) {
-                calculatorModal.onclick = function(e) {
-                    if (e.target === calculatorModal) calculatorModal.classList.add('hidden');
-                };
-            }
-        }
-
-        function initModals() {
-            // Общая функция для копирования реф ссылки
-            function copyReferralLink() {
-                if (!userData || !userData.vip_paid) {
-                    showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error');
-                    return;
-                }
-                
-                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
-                navigator.clipboard.writeText(refLink).then(() => {
-                    showToast('Реферальная ссылка скопирована!', 'success');
-                }).catch(() => {
-                    showToast('Не удалось скопировать ссылку', 'error');
-                });
-            }
-
-            const copyRefBtn = document.getElementById('copyRefBtn');
-            if (copyRefBtn) {
-                copyRefBtn.onclick = copyReferralLink;
-            }
-
-            const manualBtn = document.getElementById('manualBtn');
-            if (manualBtn) {
-                manualBtn.onclick = copyReferralLink;
-            }
-
-            document.getElementById('logoutBtn').onclick = function() {
-                localStorage.removeItem('pirxmix_user');
-                userData = null;
-                showStage('register');
-            };
-
-            document.getElementById('policyLink').onclick = function() {
-                document.getElementById('policyModal').classList.remove('hidden');
-            };
-            document.getElementById('closePolicyBtn').onclick = function() {
-                document.getElementById('policyModal').classList.add('hidden');
-            };
-            document.getElementById('policyModal').onclick = function(e) {
-                if (e.target === document.getElementById('policyModal')) document.getElementById('policyModal').classList.add('hidden');
-            };
-
-            document.getElementById('profileBtn').onclick = function() {
-                document.getElementById('profileNickname').value = userData.nickname;
-                document.getElementById('profilePassword').value = '';
-                document.getElementById('profilePassword2').value = '';
-                document.getElementById('profileModal').classList.remove('hidden');
-            };
-            document.getElementById('closeProfileBtn').onclick = function() {
-                document.getElementById('profileModal').classList.add('hidden');
-            };
-            document.getElementById('profileModal').onclick = function(e) {
-                if (e.target === document.getElementById('profileModal')) document.getElementById('profileModal').classList.add('hidden');
-            };
-            document.getElementById('saveProfileBtn').onclick = function() {
-                const newNickname = document.getElementById('profileNickname').value.trim();
-                if (!newNickname) return;
-                userData.nickname = newNickname;
-                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
-                setAnimatedNickname(document.getElementById('userGreeting'), newNickname);
-                document.getElementById('profileModal').classList.add('hidden');
-            };
-
-            document.getElementById('withdrawBtn').onclick = function() {
-                document.getElementById('withdrawCrypto').value = '';
-                document.getElementById('withdrawAmount').value = '';
-                document.getElementById('withdrawComment').value = '';
-                document.getElementById('withdrawModal').classList.remove('hidden');
-            };
-            document.getElementById('closeWithdrawBtn').onclick = function() {
-                document.getElementById('withdrawModal').classList.add('hidden');
-            };
-            document.getElementById('withdrawModal').onclick = function(e) {
-                if (e.target === document.getElementById('withdrawModal')) document.getElementById('withdrawModal').classList.add('hidden');
-            };
-            document.getElementById('confirmWithdrawBtn').onclick = async function() {
-                const crypto = document.getElementById('withdrawCrypto').value;
-                const amount = parseFloat(document.getElementById('withdrawAmount').value);
-                if (!crypto || !amount || amount < 1) return;
-                
-                const { data, error } = await supabase.rpc('withdraw_funds', {
-                    p_user_id: userData.id,
-                    p_amount: amount,
-                    p_crypto_type: crypto,
-                    p_comment: document.getElementById('withdrawComment').value.trim() || null
-                });
-                
-                if (!error && data && data.success) {
-                    await loadUserData();
-                    showToast('Заявка на вывод создана!', 'success');
-                }
-                document.getElementById('withdrawModal').classList.add('hidden');
-            };
-
-            document.getElementById('vipBtn').onclick = async function() {
-                const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
-                const vipInfoBox = document.getElementById('vipInfoBox');
-                const confirmVipBtn = document.getElementById('confirmVipBtn');
-                
-                if (data && data.vip_paid) {
-                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
-                    confirmVipBtn.style.display = 'none';
-                } else {
-                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
-                    confirmVipBtn.style.display = 'inline-block';
-                }
-                document.getElementById('vipModal').classList.remove('hidden');
-            };
-            document.getElementById('closeVipBtn').onclick = function() {
-                document.getElementById('vipModal').classList.add('hidden');
-            };
-            document.getElementById('vipModal').onclick = function(e) {
-                if (e.target === document.getElementById('vipModal')) document.getElementById('vipModal').classList.add('hidden');
-            };
-            document.getElementById('confirmVipBtn').onclick = async function() {
-                const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
-                if (!error && data && data.success) {
-                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
-                    document.getElementById('confirmVipBtn').style.display = 'none';
-                    await loadUserData();
-                    showToast('VIP статус успешно активирован!', 'success');
-                }
-            };
-        }
-
-    })();
-</script>
+        console.log('✅ База никнеймов загружена. Всего:', allNicks.length);
+        console.log('Функции доступны: randomNick(), randomDepositNick(), randomWithdrawNick(), randomWithdrawAmount()');
+    </script>
 </body>
 </html>
