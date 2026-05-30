@@ -1294,6 +1294,7 @@
             <div class="stat-row"><span class="stat-label">4 уровень (4%)</span><span class="stat-value" id="lvl4">0</span><span class="stat-earn" id="earn4">0.00 $</span></div>
             <div class="stat-row"><span class="stat-label">5 уровень (5%)</span><span class="stat-value" id="lvl5">0</span><span class="stat-earn" id="earn5">0.00 $</span></div>
             <button class="btn-outline" id="copyRefBtn" style="width:100%; margin-top: 0.8rem; border-color: #c084fc; color: #c084fc;">📋 Копировать реферальную ссылку</button>
+            <button class="btn-outline" id="manualBtn" style="width:100%; margin-top: 0.5rem; border-color: #4caf50; color: #81c784;">📘 Мануал по привлечению</button>
         </div>
 
         <div class="card">
@@ -1370,6 +1371,7 @@
             <p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p>
             <div class="vip-price">10$</div>
             <p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>
+            <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>
         </div>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmVipBtn">💳 Купить за 10$</button>
@@ -2051,21 +2053,29 @@
         }
 
         function initModals() {
+            // Общая функция для копирования реф ссылки
+            function copyReferralLink() {
+                if (!userData || !userData.vip_paid) {
+                    showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error');
+                    return;
+                }
+                
+                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
+                navigator.clipboard.writeText(refLink).then(() => {
+                    showToast('Реферальная ссылка скопирована!', 'success');
+                }).catch(() => {
+                    showToast('Не удалось скопировать ссылку', 'error');
+                });
+            }
+
             const copyRefBtn = document.getElementById('copyRefBtn');
             if (copyRefBtn) {
-                copyRefBtn.onclick = function() {
-                    if (!userData || !userData.vip_paid) {
-                        showToast('Реферальная ссылка доступна пользователям с VIP статусом', 'error');
-                        return;
-                    }
-                    
-                    const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
-                    navigator.clipboard.writeText(refLink).then(() => {
-                        showToast('Реферальная ссылка скопирована!', 'success');
-                    }).catch(() => {
-                        showToast('Не удалось скопировать ссылку', 'error');
-                    });
-                };
+                copyRefBtn.onclick = copyReferralLink;
+            }
+
+            const manualBtn = document.getElementById('manualBtn');
+            if (manualBtn) {
+                manualBtn.onclick = copyReferralLink;
             }
 
             document.getElementById('logoutBtn').onclick = function() {
@@ -2142,10 +2152,10 @@
                 const confirmVipBtn = document.getElementById('confirmVipBtn');
                 
                 if (data && data.vip_paid) {
-                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p>';
+                    vipInfoBox.innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
                     confirmVipBtn.style.display = 'none';
                 } else {
-                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>';
+                    vipInfoBox.innerHTML = '<p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p><div class="vip-price">10$</div><p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
                     confirmVipBtn.style.display = 'inline-block';
                 }
                 document.getElementById('vipModal').classList.remove('hidden');
@@ -2159,7 +2169,7 @@
             document.getElementById('confirmVipBtn').onclick = async function() {
                 const { data, error } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
                 if (!error && data && data.success) {
-                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p>';
+                    document.getElementById('vipInfoBox').innerHTML = '<p style="color: #4caf50; font-weight: 600; margin-bottom: 0.4rem; font-size: 0.8rem;">✅ VIP статус активирован!</p><p style="color: #b9b09a; font-size: 0.78rem;">Ваш уникальный ID:</p><div class="vip-id">' + data.referral_code + '</div><p style="color: #b9b09a; font-size: 0.78rem; margin-top: 0.4rem;">Реферальная ссылка:</p><p style="color: #f5d78c; font-size: 0.75rem; word-break: break-all;">https://vds-game.ink/?ref=' + data.referral_code + '</p><p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem;">📘 При покупке VIP вы получаете полную инструкцию как без вложений пригласить много пользователей в свою команду.</p>';
                     document.getElementById('confirmVipBtn').style.display = 'none';
                     await loadUserData();
                     showToast('VIP статус успешно активирован!', 'success');
