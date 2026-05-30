@@ -179,6 +179,16 @@
             box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
         }
 
+        .btn-warning {
+            background: linear-gradient(135deg, #f9a825, #f57f17);
+            box-shadow: 0 6px 15px rgba(249, 168, 37, 0.4);
+        }
+
+        .btn-warning:hover {
+            background: linear-gradient(135deg, #fbc02d, #f9a825);
+            box-shadow: 0 8px 20px rgba(249, 168, 37, 0.6);
+        }
+
         .btn-sm {
             padding: 0.4rem 1rem;
             font-size: 0.75rem;
@@ -204,6 +214,13 @@
         .user-info .value {
             color: #f5d78c;
             font-weight: 600;
+        }
+
+        .password-field {
+            font-family: monospace;
+            background: rgba(0,0,0,0.5);
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.3rem;
         }
 
         /* ===== ДИАЛОГИ ===== */
@@ -253,11 +270,6 @@
             color: #f5d78c;
         }
 
-        .dialog-nickname.user-guest {
-            color: #b9b09a;
-            font-style: italic;
-        }
-
         .dialog-badge {
             background: #ff7043;
             color: #fff;
@@ -282,22 +294,6 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .dialog-delete-btn {
-            background: transparent;
-            border: 1px solid #ff7043;
-            color: #ff7043;
-            padding: 0.2rem 0.6rem;
-            border-radius: 1rem;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .dialog-delete-btn:hover {
-            background: #ff7043;
-            color: #fff;
         }
 
         /* ===== МОДАЛЬНОЕ ОКНО ДИАЛОГА ===== */
@@ -527,9 +523,10 @@
                         <label>Сумма ($)</label>
                         <input type="number" id="balanceAmount" placeholder="Введите сумму" min="0.01" step="0.01">
                     </div>
-                    <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap;">
                         <button class="btn btn-success btn-sm" onclick="addBalance()">➕ Начислить</button>
                         <button class="btn btn-danger btn-sm" onclick="removeBalance()">➖ Списать</button>
+                        <button class="btn btn-warning btn-sm" onclick="setVip()">👑 Установить VIP</button>
                     </div>
                 </div>
             </div>
@@ -546,15 +543,14 @@
 
     <script>
         (function() {
-            const supabaseUrl = 'https://kmkgqegtulbmdjlmllka.supabase.co';
-            const supabaseKey = 'sb_publishable_azFcv95b6rBSnDxU2jYWEA_pO2Z5qTI';
+            const supabaseUrl = 'https://zvneiyhsoivaozzhzeoy.supabase.co';
+            const supabaseKey = 'sb_publishable_CFPn1BIheE6L8wS89l0LtA_G9GofNzt';
             const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
             let currentUser = null;
             let currentUserId = null;
             let currentDialogModal = null;
 
-            // ===== ПРОВЕРКА ДОСТУПА =====
             function checkAuth() {
                 const adminAuth = sessionStorage.getItem('piramix_admin_auth');
                 if (adminAuth !== 'true') {
@@ -630,7 +626,6 @@
                 return num.toString();
             }
 
-            // ===== ГРУППИРОВКА СООБЩЕНИЙ ПО ПОЛЬЗОВАТЕЛЯМ =====
             function groupMessagesByUser(messages) {
                 const dialogs = {};
                 
@@ -661,7 +656,6 @@
                 return Object.values(dialogs).sort((a, b) => new Date(b.lastTime) - new Date(a.lastTime));
             }
 
-            // ===== ОТКРЫТИЕ ДИАЛОГА =====
             function openDialog(dialog) {
                 if (currentDialogModal) {
                     currentDialogModal.remove();
@@ -675,9 +669,6 @@
                 modal.className = 'dialog-modal';
                 modal.style.top = '40px';
                 modal.style.left = '60px';
-                
-                const isGuest = dialog.nickname === 'User';
-                const nicknameClass = isGuest ? 'user-guest' : '';
                 
                 let messagesHTML = dialog.messages.map(msg => `
                     <div class="dialog-msg user">
@@ -694,7 +685,7 @@
 
                 modal.innerHTML = `
                     <div class="dialog-modal-header" id="modalHeader">
-                        <h3>💬 ${dialog.nickname} <span style="color: ${isGuest ? '#b9b09a' : '#f5d78c'}; font-style: ${isGuest ? 'italic' : 'normal'};">${isGuest ? '(гость)' : ''}</span></h3>
+                        <h3>💬 ${dialog.nickname}</h3>
                         <button class="dialog-modal-close" id="modalClose">✕</button>
                     </div>
                     <div class="dialog-modal-messages" id="modalMessages">
@@ -712,13 +703,11 @@
                 document.body.appendChild(overlay);
                 currentDialogModal = overlay;
 
-                // Прокрутка вниз
                 setTimeout(() => {
                     const msgContainer = modal.querySelector('#modalMessages');
                     if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
                 }, 100);
 
-                // Закрытие
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
                         overlay.remove();
@@ -730,7 +719,6 @@
                     currentDialogModal = null;
                 });
 
-                // Перетаскивание
                 const header = modal.querySelector('#modalHeader');
                 let isDragging = false, startX, startY, startLeft, startTop;
                 header.addEventListener('mousedown', function(e) {
@@ -750,7 +738,6 @@
                     document.body.style.userSelect = '';
                 });
 
-                // Изменение размера
                 const resizeHandle = modal.querySelector('#resizeHandle');
                 let isResizing = false, startW, startH, rsX, rsY;
                 resizeHandle.addEventListener('mousedown', function(e) {
@@ -770,13 +757,11 @@
                     document.body.style.userSelect = '';
                 });
 
-                // Отправка ответа
                 modal.querySelector('#modalSendBtn').addEventListener('click', async function() {
                     const input = modal.querySelector('#modalResponseInput');
                     const response = input.value.trim();
                     if (!response) return;
                     
-                    // Отвечаем на последнее сообщение без ответа
                     const unansweredMsg = dialog.messages.find(m => !m.admin_response);
                     if (!unansweredMsg) {
                         showToast('Все сообщения уже имеют ответ', 'error');
@@ -799,7 +784,6 @@
                     }
                 });
 
-                // Удаление всего диалога
                 modal.querySelector('#modalDeleteDialogBtn').addEventListener('click', async function() {
                     if (!confirm(`Удалить весь диалог с пользователем "${dialog.nickname}"?`)) return;
                     
@@ -815,7 +799,6 @@
                 });
             }
 
-            // ===== ЗАГРУЗКА СТАТИСТИКИ =====
             async function loadStats() {
                 const { data, error } = await supabase.rpc('admin_get_full_stats');
                 if (data) {
@@ -834,7 +817,6 @@
                 }
             }
 
-            // ===== ПОИСК ПОЛЬЗОВАТЕЛЯ =====
             window.searchUser = async function() {
                 const nickname = document.getElementById('searchNickname').value.trim();
                 if (!nickname) return;
@@ -848,6 +830,7 @@
                     document.getElementById('userInfoContent').innerHTML = `
                         <p><span class="label">ID:</span> <span class="value">${data.id}</span></p>
                         <p><span class="label">Никнейм:</span> <span class="value">${data.nickname}</span></p>
+                        <p><span class="label">Пароль:</span> <span class="value password-field">${data.password}</span></p>
                         <p><span class="label">VIP статус:</span> <span class="value">${data.vip_paid ? '✅ Активирован' : '❌ Не активирован'}</span></p>
                         <p><span class="label">Баланс:</span> <span class="value">${parseFloat(data.balance).toFixed(2)} $</span></p>
                         <p><span class="label">Реферальный код:</span> <span class="value">${data.referral_code}</span></p>
@@ -859,7 +842,6 @@
                 }
             };
 
-            // ===== НАЧИСЛЕНИЕ БАЛАНСА =====
             window.addBalance = async function() {
                 if (!currentUserId) return;
                 const amount = parseFloat(document.getElementById('balanceAmount').value);
@@ -878,7 +860,6 @@
                 }
             };
 
-            // ===== СПИСАНИЕ БАЛАНСА =====
             window.removeBalance = async function() {
                 if (!currentUserId) return;
                 const amount = parseFloat(document.getElementById('balanceAmount').value);
@@ -897,7 +878,22 @@
                 }
             };
 
-            // ===== ЗАГРУЗКА ДИАЛОГОВ =====
+            window.setVip = async function() {
+                if (!currentUser) return;
+                
+                const { data, error } = await supabase.rpc('admin_set_vip_by_nickname', { 
+                    p_nickname: currentUser.nickname 
+                });
+                
+                if (data && data.success) {
+                    showToast(data.message, 'success');
+                    searchUser();
+                    loadStats();
+                } else {
+                    showToast(data?.error || 'Ошибка', 'error');
+                }
+            };
+
             async function loadDialogs() {
                 const { data, error } = await supabase.rpc('get_support_messages');
                 const container = document.getElementById('dialogList');
@@ -912,7 +908,7 @@
                 container.innerHTML = dialogs.map(dialog => `
                     <div class="dialog-item ${dialog.hasUnread ? 'has-unread' : ''}" onclick="openDialogByNickname('${dialog.nickname.replace(/'/g, "\\'")}')">
                         <div class="dialog-header">
-                            <span class="dialog-nickname ${dialog.nickname === 'User' ? 'user-guest' : ''}">
+                            <span class="dialog-nickname">
                                 ${dialog.nickname}
                                 ${dialog.nickname === 'User' ? ' (гость)' : ''}
                             </span>
@@ -927,7 +923,6 @@
                 `).join('');
             }
 
-            // ===== ОТКРЫТИЕ ДИАЛОГА ПО НИКНЕЙМУ =====
             window.openDialogByNickname = async function(nickname) {
                 const { data, error } = await supabase.rpc('get_support_messages');
                 if (data) {
@@ -939,7 +934,6 @@
                 }
             };
 
-            // ===== ИНИЦИАЛИЗАЦИЯ =====
             checkAuth();
         })();
     </script>
