@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Админ-панель</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: #0d0d1a;
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6b9d;
+            margin-bottom: 8px;
+            font-size: 1.8em;
+        }
+        .sub {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 28px;
+            font-size: 0.85em;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .panel h3 {
+            color: #ffd700;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        label {
+            display: block;
+            margin-top: 12px;
+            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85em;
+        }
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Georgia', serif;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s;
+        }
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #ff6b9d;
+            box-shadow: 0 0 12px rgba(255, 107, 157, 0.2);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .step-block {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 12px 0;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .step-block h4 {
+            color: #ff6b9d;
+            margin-bottom: 8px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Georgia', serif;
+            font-size: 1em;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin: 4px;
+        }
+        .btn-pink {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: #fff;
+        }
+        .btn-gold {
+            background: #ffd700;
+            color: #1a1a2e;
+            font-weight: bold;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+        }
+        .btn-danger {
+            background: #ff4757;
+            color: #fff;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.8em;
+            margin: 8px 0;
+        }
+        .status-active {
+            background: #4effb4;
+            color: #1a1a2e;
+        }
+        .status-inactive {
+            background: #555;
+            color: #aaa;
+        }
+
+        .preview-box {
+            background: #1a1a2e;
+            border-radius: 14px;
+            padding: 16px;
+            margin-top: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.85em;
+            white-space: pre-wrap;
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: bold;
+            z-index: 300;
+            animation: slideUp 0.4s ease, slideDown 0.4s ease 2.5s forwards;
+            font-family: 'Georgia', serif;
+            font-size: 0.9em;
+        }
+        .toast-success {
+            background: #4effb4;
+            color: #1a1a2e;
+        }
+        .toast-error {
+            background: #ff4757;
+            color: #fff;
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-50%) translateY(100px);
+                opacity: 0;
+            }
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            margin: 2px;
+            background: rgba(255, 107, 157, 0.2);
+            color: #ff6b9d;
+            cursor: pointer;
+        }
+        .tag.selected {
+            background: #ff6b9d;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Админ-панель</h1>
+        <p class="sub">Создай квест → протестируй → отправь любимой</p>
+
+        <!-- Статус -->
+        <div class="panel">
+            <h3>📡 Статус</h3>
+            <span id="questStatus" class="status status-inactive">Нет активного квеста</span>
+            <span id="notifStatus" style="margin-left:10px;color:rgba(255,255,255,0.5);font-size:0.8em;"></span>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="loadCurrentQuest()">🔄 Обновить статус</button>
+                <button class="btn btn-danger" onclick="resetQuest()" id="resetBtn" disabled>🗑 Сбросить квест</button>
+            </div>
+        </div>
+
+        <!-- Создание квеста -->
+        <div class="panel">
+            <h3>📝 Создать новый квест</h3>
+
+            <label>Название квеста</label>
+            <input type="text" id="questTitle" placeholder="Например: Ключ к сердцу">
+
+            <!-- Шаг 1 -->
+            <div class="step-block">
+                <h4>Шаг 1</h4>
+                <label>Тип загадки</label>
+                <select id="step1type" onchange="updateStepForm(1)">
+                    <option value="text">Текстовая загадка</option>
+                    <option value="colors">Цветовая головоломка</option>
+                    <option value="number">Числовая загадка</option>
+                </select>
+                <label>Заголовок шага</label>
+                <input type="text" id="step1title" placeholder="Например: Шифр любви">
+                <label>Вопрос</label>
+                <textarea id="step1question" placeholder="Например: Разгадай, что я хочу тебе сказать..."></textarea>
+                <div id="step1extra"></div>
+                <label>Правильный ответ</label>
+                <input type="text" id="step1answer" placeholder="Для цветов: ❤️,💜,💙,💚 (через запятую)">
+            </div>
+
+            <!-- Шаг 2 -->
+            <div class="step-block">
+                <h4>Шаг 2</h4>
+                <label>Тип загадки</label>
+                <select id="step2type" onchange="updateStepForm(2)">
+                    <option value="text">Текстовая загадка</option>
+                    <option value="colors">Цветовая головоломка</option>
+                    <option value="number">Числовая загадка</option>
+                </select>
+                <label>Заголовок шага</label>
+                <input type="text" id="step2title" placeholder="Например: Палитра чувств">
+                <label>Вопрос</label>
+                <textarea id="step2question" placeholder="Например: Расположи сердечки в правильном порядке"></textarea>
+                <div id="step2extra"></div>
+                <label>Правильный ответ</label>
+                <input type="text" id="step2answer" placeholder="Для цветов: ❤️,💜,💙,💚 (через запятую)">
+            </div>
+
+            <!-- Шаг 3 -->
+            <div class="step-block">
+                <h4>Шаг 3</h4>
+                <label>Тип загадки</label>
+                <select id="step3type" onchange="updateStepForm(3)">
+                    <option value="text">Текстовая загадка</option>
+                    <option value="colors">Цветовая головоломка</option>
+                    <option value="number">Числовая загадка</option>
+                </select>
+                <label>Заголовок шага</label>
+                <input type="text" id="step3title" placeholder="Например: Математика любви">
+                <label>Вопрос</label>
+                <textarea id="step3question" placeholder="Например: Сколько дней мы вместе?"></textarea>
+                <div id="step3extra"></div>
+                <label>Правильный ответ</label>
+                <input type="text" id="step3answer" placeholder="Для цветов: ❤️,💜,💙,💚 (через запятую)">
+            </div>
+
+            <!-- Приз -->
+            <div class="step-block" style="border-color: rgba(255,215,0,0.3);">
+                <h4 style="color:#ffd700;">🎁 Приз</h4>
+                <label>Сообщение</label>
+                <textarea id="prizeMessage" placeholder="Например: Ты разгадала все тайны моего сердца! Твой приз ждёт тебя..."></textarea>
+                <label>Ссылка (необязательно)</label>
+                <input type="text" id="prizeLink" placeholder="https://... или оставь пустым">
+                <label>Текст кнопки-ссылки</label>
+                <input type="text" id="prizeLinkText" placeholder="🎁 Забрать приз">
+            </div>
+        </div>
+
+        <!-- Действия -->
+        <div class="panel">
+            <h3>🚀 Действия</h3>
+            <div class="btn-row">
+                <button class="btn btn-outline" onclick="previewQuest()">👁 Предпросмотр JSON</button>
+                <button class="btn btn-pink" onclick="testQuest()">🧪 Тестировать квест</button>
+                <button class="btn btn-gold" onclick="sendQuest()" id="sendBtn">📤 Отправить супруге</button>
+            </div>
+            <div class="preview-box" id="previewOutput" style="display:none;"></div>
+        </div>
+
+        <!-- Тестовое модальное окно -->
+        <div class="modal-overlay" id="testModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:200;">
+            <div style="background:#1e1e38; border-radius:24px; padding:28px 20px; width:90%; max-width:420px; max-height:85vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.15); color:#fff; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);" id="testContent">
+                <p style="text-align:center;">Загрузка теста...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ УТИЛИТЫ ============
+        function showToast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        function updateStepForm(num) {
+            const type = document.getElementById(`step${num}type`).value;
+            const extra = document.getElementById(`step${num}extra`);
+            if (type === 'colors') {
+                extra.innerHTML = `
+                    <label>Варианты цветов (через запятую)</label>
+                    <input type="text" id="step${num}options" value="❤️,💜,💙,💚,🧡,💛" placeholder="❤️,💜,💙,💚,🧡,💛">
+                `;
+            } else {
+                extra.innerHTML = '';
+            }
+        }
+
+        // Инициализация форм
+        updateStepForm(1);
+        updateStepForm(2);
+        updateStepForm(3);
+
+        // ============ СБОРКА КВЕСТА ============
+        function buildQuest() {
+            const steps = [];
+            for (let i = 1; i <= 3; i++) {
+                const type = document.getElementById(`step${i}type`).value;
+                const title = document.getElementById(`step${i}title`).value.trim();
+                const question = document.getElementById(`step${i}question`).value.trim();
+                let answer = document.getElementById(`step${i}answer`).value.trim();
+                const step = { type, title: title || `Шаг ${i}`, question: question || 'Реши загадку...' };
+
+                if (type === 'colors') {
+                    step.answer = answer.split(',').map(s => s.trim()).filter(s => s);
+                    const optsEl = document.getElementById(`step${i}options`);
+                    step.options = optsEl ? optsEl.value.split(',').map(s => s.trim()).filter(s => s) : ['❤️',
+                        '💜', '💙', '💚', '🧡', '💛'
+                    ];
+                } else if (type === 'number') {
+                    step.answer = parseInt(answer) || answer;
+                } else {
+                    step.answer = answer;
+                }
+                steps.push(step);
+            }
+
+            const prize = {
+                message: document.getElementById('prizeMessage').value.trim() || 'Ты справилась! Твой приз ждёт тебя!',
+                link: document.getElementById('prizeLink').value.trim() || null,
+                linkText: document.getElementById('prizeLinkText').value.trim() || '🎁 Забрать приз',
+            };
+
+            return {
+                title: document.getElementById('questTitle').value.trim() || 'Квест-сюрприз',
+                steps,
+                prize,
+                createdAt: new Date().toISOString(),
+            };
+        }
+
+        function previewQuest() {
+            const quest = buildQuest();
+            const out = document.getElementById('previewOutput');
+            out.style.display = 'block';
+            out.textContent = JSON.stringify(quest, null, 2);
+        }
+
+        // ============ ТЕСТИРОВАНИЕ ============
+        let testState = {};
+
+        function testQuest() {
+            const quest = buildQuest();
+            // Проверка на заполненность
+            for (let i = 0; i < quest.steps.length; i++) {
+                if (!quest.steps[i].answer || (Array.isArray(quest.steps[i].answer) && quest.steps[i].answer.length ===
+                        0)) {
+                    showToast(`Заполни ответ для шага ${i+1}!`, 'error');
+                    return;
+                }
+            }
+
+            testState = { ...quest, currentStep: 0, colorSlots: [null, null, null, null], selectedColor: null };
+            renderTestStep();
+            document.getElementById('testModal').style.display = 'block';
+        }
+
+        function closeTest() {
+            document.getElementById('testModal').style.display = 'none';
+        }
+
+        document.getElementById('testModal').addEventListener('click', function(e) {
+            if (e.target === this) closeTest();
+        });
+
+        function renderTestStep() {
+            const box = document.getElementById('testContent');
+            const step = testState.steps[testState.currentStep];
+
+            let html = `
+                <button style="position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.5em;cursor:pointer;" onclick="closeTest()">✕</button>
+                <div style="text-align:center;margin-bottom:16px;">
+                    <span style="color:rgba(255,255,255,0.4);font-size:0.85em;">🧪 ТЕСТ: Шаг ${testState.currentStep+1} из ${testState.steps.length}</span>
+                </div>
+                <h2 style="text-align:center;color:#ff6b9d;margin-bottom:4px;">${step.title}</h2>
+                <p style="text-align:center;color:rgba(255,255,255,0.7);margin-bottom:16px;">${step.question}</p>
+            `;
+
+            if (step.type === 'text') {
+                html += `
+                    <input id="tAnswer" placeholder="Твой ответ..." style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;text-align:center;font-size:1.1em;outline:none;">
+                    <div id="tError" style="color:#ff4757;font-size:0.8em;margin-top:8px;text-align:center;min-height:20px;"></div>
+                    <p style="color:rgba(255,255,255,0.3);font-size:0.7em;text-align:center;margin-top:4px;">✅ Правильный ответ: <strong>${step.answer}</strong></p>
+                    <button id="tSubmit" style="width:100%;margin-top:12px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;letter-spacing:1px;">💫 Проверить</button>
+                `;
+            } else if (step.type === 'colors') {
+                const pal = step.options;
+                html += '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">';
+                pal.forEach(c => {
+                    const placed = testState.colorSlots.includes(c);
+                    html +=
+                        `<div class="thpick" data-color="${c}" style="width:50px;height:50px;border-radius:50%;font-size:2em;display:flex;align-items:center;justify-content:center;cursor:${placed?'default':'pointer'};opacity:${placed?'0.4':'1'};background:rgba(255,255,255,0.05);transition:all 0.3s;">${c}</div>`;
+                });
+                html += '</div><div style="display:flex;justify-content:center;gap:10px;margin:16px 0;">';
+                for (let i = 0; i < step.answer.length; i++) {
+                    html +=
+                        `<div class="tslot" data-slot="${i}" style="width:50px;height:50px;border-radius:50%;border:2px dashed rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:2em;cursor:pointer;">${testState.colorSlots[i]||'◌'}</div>`;
+                }
+                html += '</div>';
+                html +=
+                    '<p style="color:rgba(255,255,255,0.3);font-size:0.7em;text-align:center;">✅ Правильный порядок: <strong>' +
+                    step.answer.join(', ') + '</strong></p>';
+                html +=
+                    '<button id="tClear" style="width:100%;margin-top:8px;padding:10px;border-radius:50px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;cursor:pointer;font-family:Georgia;">🔄 Заново</button>';
+                html +=
+                    '<button id="tColorSubmit" style="width:100%;margin-top:8px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;letter-spacing:1px;">💫 Проверить</button>';
+                html +=
+                    '<div id="tError" style="color:#ff4757;font-size:0.8em;margin-top:8px;text-align:center;min-height:20px;"></div>';
+            } else if (step.type === 'number') {
+                html += `
+                    <input type="number" id="tAnswer" placeholder="Введи число..." style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;text-align:center;font-size:1.1em;outline:none;">
+                    <div id="tError" style="color:#ff4757;font-size:0.8em;margin-top:8px;text-align:center;min-height:20px;"></div>
+                    <p style="color:rgba(255,255,255,0.3);font-size:0.7em;text-align:center;margin-top:4px;">✅ Правильный ответ: <strong>${step.answer}</strong></p>
+                    <button id="tSubmit" style="width:100%;margin-top:12px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;letter-spacing:1px;">💫 Проверить</button>
+                `;
+            }
+
+            box.innerHTML = html;
+            bindTestEvents(step);
+        }
+
+        function bindTestEvents(step) {
+            const submit = document.getElementById('tSubmit');
+            const input = document.getElementById('tAnswer');
+            const err = document.getElementById('tError');
+
+            if (submit && input) {
+                input.addEventListener('keydown', e => { if (e.key === 'Enter') submit.click(); });
+                submit.addEventListener('click', () => {
+                    const ans = input.value.trim().toLowerCase();
+                    const correct = String(step.answer).toLowerCase();
+                    if (ans === correct) {
+                        err.textContent = '';
+                        input.style.borderColor = '#4effb4';
+                        submit.disabled = true;
+                        submit.textContent = '✅ Верно!';
+                        advanceTest();
+                    } else {
+                        err.textContent = 'Неверно! Правильный ответ: ' + step.answer;
+                        input.style.borderColor = '#ff4757';
+                    }
+                });
+                setTimeout(() => input?.focus(), 300);
+            }
+
+            document.querySelectorAll('.thpick').forEach(el => {
+                el.addEventListener('click', function() {
+                    if (this.style.opacity === '0.4') return;
+                    document.querySelectorAll('.thpick').forEach(e => e.style.background =
+                        'rgba(255,255,255,0.05)');
+                    this.style.background = 'rgba(255,107,157,0.4)';
+                    testState.selectedColor = this.dataset.color;
+                });
+            });
+            document.querySelectorAll('.tslot').forEach(el => {
+                el.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.slot);
+                    if (testState.colorSlots[idx] !== null || !testState.selectedColor) return;
+                    testState.colorSlots[idx] = testState.selectedColor;
+                    testState.selectedColor = null;
+                    document.querySelectorAll('.thpick').forEach(e => e.style.background =
+                        'rgba(255,255,255,0.05)');
+                    renderTestStep();
+                });
+                let lt;
+                el.addEventListener('touchstart', () => {
+                    lt = setTimeout(() => {
+                        testState.colorSlots[parseInt(el.dataset.slot)] = null;
+                        renderTestStep();
+                    }, 600);
+                });
+                el.addEventListener('touchend', () => clearTimeout(lt));
+                el.addEventListener('touchmove', () => clearTimeout(lt));
+            });
+
+            const clr = document.getElementById('tClear');
+            if (clr) clr.addEventListener('click', () => {
+                testState.colorSlots = [null, null, null, null];
+                testState.selectedColor = null;
+                renderTestStep();
+            });
+
+            const csub = document.getElementById('tColorSubmit');
+            if (csub) csub.addEventListener('click', () => {
+                const correct = step.answer;
+                const filled = testState.colorSlots.every(c => c !== null);
+                if (!filled) {
+                    document.getElementById('tError').textContent = 'Заполни все кружочки!';
+                    return;
+                }
+                if (testState.colorSlots.every((c, i) => c === correct[i])) {
+                    document.getElementById('tError').textContent = '';
+                    csub.disabled = true;
+                    csub.textContent = '✅ Идеально!';
+                    advanceTest();
+                } else {
+                    document.getElementById('tError').textContent =
+                        'Неверный порядок! Правильно: ' + correct.join(', ');
+                }
+            });
+        }
+
+        function advanceTest() {
+            setTimeout(() => {
+                if (testState.currentStep < testState.steps.length - 1) {
+                    testState.currentStep++;
+                    testState.selectedColor = null;
+                    renderTestStep();
+                } else {
+                    const box = document.getElementById('testContent');
+                    box.innerHTML = `
+                        <button style="position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.5em;cursor:pointer;" onclick="closeTest()">✕</button>
+                        <div style="text-align:center;">
+                            <div style="font-size:5em;">🎁</div>
+                            <h2 style="color:#ffd700;margin:12px 0;">Тест пройден!</h2>
+                            <p style="color:#fff;">${testState.prize.message}</p>
+                            ${testState.prize.link?`<a href="${testState.prize.link}" target="_blank" style="display:inline-block;margin-top:12px;padding:14px 28px;background:#ffd700;color:#1a1a2e;border-radius:50px;text-decoration:none;font-weight:bold;">${testState.prize.linkText}</a>`:''}
+                            <br><br>
+                            <button onclick="closeTest()" style="padding:12px 24px;border-radius:50px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;cursor:pointer;font-family:Georgia;">Закрыть</button>
+                        </div>
+                    `;
+                }
+            }, 700);
+        }
+
+        // ============ ОТПРАВКА КВЕСТА ============
+        function sendQuest() {
+            const quest = buildQuest();
+            // Проверка
+            for (let i = 0; i < quest.steps.length; i++) {
+                if (!quest.steps[i].answer || (Array.isArray(quest.steps[i].answer) && quest.steps[i].answer.length ===
+                        0)) {
+                    showToast(`Заполни ответ для шага ${i+1}!`, 'error');
+                    return;
+                }
+            }
+            if (!quest.prize.message) {
+                showToast('Напиши сообщение для приза!', 'error');
+                return;
+            }
+
+            // Сохраняем в localStorage
+            localStorage.setItem('activeQuest', JSON.stringify(quest));
+            localStorage.removeItem('questCompleted');
+
+            // Отправляем push-уведомление
+            sendPushNotification(quest.title);
+
+            showToast('✅ Квест отправлен! Супруга получит уведомление.');
+            updateStatus();
+        }
+
+        async function sendPushNotification(title) {
+            const subData = localStorage.getItem('pushSub');
+            if (!subData) {
+                console.log('Нет подписки для push');
+                document.getElementById('notifStatus').textContent =
+                    '(уведомление не отправлено — супруга не подписана)';
+                document.getElementById('notifStatus').style.color = '#ff9f43';
+                return;
+            }
+
+            try {
+                const subscription = JSON.parse(subData);
+                // Отправляем через сервис (в реальности нужен сервер, здесь — эмуляция)
+                // Пока просто покажем уведомление через SW если он активен
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({
+                        type: 'SHOW_NOTIFICATION',
+                        title: '💝 Новый сюрприз!',
+                        body: title || 'Тебя ждёт кое-что особенное...',
+                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💝</text></svg>',
+                    });
+                }
+                document.getElementById('notifStatus').textContent = '(уведомление отправлено)';
+                document.getElementById('notifStatus').style.color = '#4effb4';
+            } catch (e) {
+                console.error('Ошибка отправки:', e);
+                document.getElementById('notifStatus').textContent = '(ошибка отправки)';
+                document.getElementById('notifStatus').style.color = '#ff4757';
+            }
+        }
+
+        function resetQuest() {
+            localStorage.removeItem('activeQuest');
+            localStorage.removeItem('questCompleted');
+            showToast('🗑 Квест сброшен');
+            updateStatus();
+        }
+
+        function loadCurrentQuest() {
+            updateStatus();
+            const data = localStorage.getItem('activeQuest');
+            const preview = document.getElementById('previewOutput');
+            if (data) {
+                preview.style.display = 'block';
+                preview.textContent = 'Активный квест:\n' + JSON.stringify(JSON.parse(data), null, 2);
+            } else {
+                preview.style.display = 'block';
+                preview.textContent = 'Нет активного квеста';
+            }
+        }
+
+        function updateStatus() {
+            const data = localStorage.getItem('activeQuest');
+            const done = localStorage.getItem('questCompleted');
+            const status = document.getElementById('questStatus');
+            const resetBtn = document.getElementById('resetBtn');
+
+            if (data && !done) {
+                status.textContent = '🟢 Активный квест';
+                status.className = 'status status-active';
+                resetBtn.disabled = false;
+            } else if (done) {
+                status.textContent = '✅ Квест пройден';
+                status.className = 'status status-active';
+                resetBtn.disabled = false;
+            } else {
+                status.textContent = '⚫ Нет активного квеста';
+                status.className = 'status status-inactive';
+                resetBtn.disabled = true;
+            }
+        }
+
+        // ============ ЗАПУСК ============
+        updateStatus();
+    </script>
+</body>
+</html>
