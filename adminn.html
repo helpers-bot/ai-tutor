@@ -64,7 +64,7 @@
             padding:8px 12px;
             display:flex;justify-content:space-between;align-items:center;
             z-index:10;background:rgba(0,0,0,0.5);
-            height:40px;
+            height:40px;pointer-events:none;
         }
         .timer{color:#ffd700;font-size:1.3em;font-weight:bold;}
         .timer.urgent{color:#ff4757;animation:pulse 0.5s ease-in-out infinite;}
@@ -72,11 +72,10 @@
         .game-close{
             background:none;border:none;color:#fff;
             font-size:1.3em;cursor:pointer;z-index:20;
-            padding:4px 8px;
+            padding:4px 8px;pointer-events:auto;
         }
         .game-title{color:#fff;font-size:0.85em;}
 
-        /* Инструкция */
         .instruction-overlay{
             position:absolute;top:0;left:0;width:100%;height:100%;
             background:rgba(0,0,0,0.85);z-index:50;
@@ -97,7 +96,6 @@
             border-radius:50%;margin:0 3px;vertical-align:middle;
         }
 
-        /* Трава */
         .grass{
             position:absolute;bottom:0;left:0;right:0;height:25%;
             background:linear-gradient(to top,#1a5c1a,#228B22);
@@ -112,7 +110,6 @@
         }
         @keyframes sway{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
 
-        /* Цветы */
         .flower{
             position:absolute;
             width:75px;height:75px;
@@ -142,7 +139,6 @@
         .flower.filled{animation:flowerHappy 0.8s ease-out;}
         @keyframes flowerHappy{0%{transform:scale(1.3);}100%{transform:scale(1);}}
 
-        /* Бабочки */
         .butterfly{
             position:absolute;
             width:50px;height:50px;
@@ -175,7 +171,6 @@
         }
         @keyframes butterflyLand{0%{transform:scale(1.2);}60%{transform:scale(0.9);}100%{transform:scale(1);}}
 
-        /* Пыльца */
         .pollen{
             position:absolute;width:6px;height:6px;
             border-radius:50%;pointer-events:none;
@@ -187,7 +182,6 @@
             100%{transform:translate(var(--px),var(--py)) scale(0);opacity:0;}
         }
 
-        /* Штыри */
         .peg{
             position:absolute;bottom:20px;
             width:22px;height:100px;
@@ -223,7 +217,6 @@
             transition:all 0.5s ease;opacity:0.85;
         }
 
-        /* Приз */
         .prize-overlay{
             position:fixed;top:0;left:0;width:100%;height:100%;
             z-index:2000;pointer-events:none;
@@ -294,10 +287,10 @@
 
     <div class="game-overlay" id="gameOverlay" style="display:none;">
         <div class="game-container" id="gameContainer">
-            <div class="game-header" style="pointer-events:none;">
+            <div class="game-header">
                 <span class="game-title" id="gameTitle">Шаг 1</span>
                 <span class="timer" id="gameTimer">60</span>
-                <button class="game-close" onclick="stopGame()" style="pointer-events:auto;">✕</button>
+                <button class="game-close" onclick="stopGame()">✕</button>
             </div>
         </div>
     </div>
@@ -329,9 +322,9 @@
                 pegsCount: 4,
             }],
             prize: {
-                message: 'Ты справилась! Твой приз ждёт тебя...',
-                link: 'https://t.me/your_username',
-                linkText: '🎁 Забрать приз',
+                message: 'Люблю тебя, Леночка моя,\nТы — свет в окошке, радость бытия.\nС тобою каждый день — как волшебство,\nТы — моё счастье, сердце и тепло. 💕',
+                link: '',
+                linkText: '',
             },
         };
 
@@ -581,7 +574,7 @@
                 cloud.appendChild(b2);
             }
 
-            // Цветы (всегда все цвета)
+            // Цветы
             const flowerAreaTop = containerRect.height * 0.45;
             const flowerAreaBottom = containerRect.height * 0.78;
             const flowerAreaH = flowerAreaBottom - flowerAreaTop;
@@ -618,7 +611,7 @@
                 });
             }
 
-            // Бабочки (все одинаковые 🦋, цвет задаём через CSS)
+            // Бабочки
             for (let i = 0; i < step.butterflyCount; i++) {
                 let bx, by;
                 const flowerPos = gameState.stepData.flowerPositions[i];
@@ -630,7 +623,6 @@
                 const butterfly = document.createElement('div');
                 butterfly.className = 'butterfly';
                 butterfly.textContent = '🦋';
-                // Бабочка окрашивается в цвет своего цветка
                 butterfly.style.color = colors[i];
                 butterfly.style.left = bx + 'px';
                 butterfly.style.top = by + 'px';
@@ -652,7 +644,6 @@
                 });
             }
 
-            // Move/up на контейнере
             container.addEventListener('pointermove', (e) => {
                 if (!dragTarget || !dragTarget.classList.contains('butterfly') || !gameActive) return;
                 const cRect = container.getBoundingClientRect();
@@ -706,7 +697,6 @@
                 }
             });
 
-            // Показываем инструкцию
             showInstruction(container, step, () => {});
         }
 
@@ -752,13 +742,11 @@
             gameState.stepData.circlesPlaced = 0;
             gameState.stepData.totalCircles = step.circleCount;
 
-            // Стол
             const table = document.createElement('div');
             table.style.cssText =
                 'position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(139,90,43,0.4),transparent);z-index:0;border-radius:0 0 20px 20px;pointer-events:none;';
             container.appendChild(table);
 
-            // Штыри
             for (let i = 0; i < step.pegsCount; i++) {
                 const peg = document.createElement('div');
                 peg.className = 'peg';
@@ -770,7 +758,6 @@
                 container.appendChild(peg);
             }
 
-            // Летающие круги
             for (let i = 0; i < step.circleCount; i++) {
                 const color = colors[i % step.pegsCount];
                 const circle = document.createElement('div');
@@ -845,7 +832,6 @@
                 }
             });
 
-            // Инструкция
             showInstruction(container, step, () => {});
         }
 
@@ -893,7 +879,7 @@
                 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;';
             prizeBox.innerHTML = `
                 <div style="font-size:4em;">🎁</div>
-                <p style="color:#ffd700;font-size:1.2em;margin:10px 0;text-shadow:0 2px 4px rgba(0,0,0,0.5);">${QUEST_CONFIG.prize.message}</p>
+                <p style="color:#ffd700;font-size:1.2em;margin:10px 0;text-shadow:0 2px 4px rgba(0,0,0,0.5);white-space:pre-line;">${QUEST_CONFIG.prize.message}</p>
                 ${QUEST_CONFIG.prize.link ? `<a href="${QUEST_CONFIG.prize.link}" target="_blank" style="display:inline-block;padding:12px 28px;background:#ffd700;color:#1a1a2e;border-radius:50px;text-decoration:none;font-weight:bold;">${QUEST_CONFIG.prize.linkText}</a>` : ''}
             `;
             container.appendChild(prizeBox);
