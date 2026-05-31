@@ -1,16 +1,7 @@
 <?php
-// api/create-payment.php
 require_once 'config.php';
-
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: Content-Type');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    die(json_encode(['error' => 'Method not allowed']));
-}
 
 $input = json_decode(file_get_contents('php://input'), true);
 $userId = $input['user_id'] ?? null;
@@ -20,7 +11,6 @@ if (!$userId) {
     die(json_encode(['error' => 'user_id required']));
 }
 
-// Создаём платёж в NOWPayments
 $ch = curl_init('https://api.nowpayments.io/v1/payment');
 curl_setopt_array($ch, [
     CURLOPT_POST => true,
@@ -35,19 +25,16 @@ curl_setopt_array($ch, [
         'pay_currency' => $cryptoType,
         'ipn_callback_url' => 'https://vds-game.ink/api/ipn.php',
         'order_id' => 'vip_' . $userId . '_' . time(),
-        'order_description' => 'VIP статус Пирамикс',
-        'success_url' => 'https://vds-game.ink/?payment=success',
-        'cancel_url' => 'https://vds-game.ink/?payment=cancel'
+        'order_description' => 'VIP Пирамикс'
     ])
 ]);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
 
 if ($httpCode >= 400) {
     http_response_code(500);
-    die(json_encode(['error' => 'Payment creation failed', 'details' => $response]));
+    die($response);
 }
 
 echo $response;
