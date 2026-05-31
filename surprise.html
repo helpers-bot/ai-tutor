@@ -49,13 +49,15 @@
 </head>
 <body>
     <div class="stars" id="stars"></div>
-    <div class="container">
+    <div class="container" id="mainContainer">
         <div class="heart-icon">💝</div>
         <h1>Сюрприз для тебя</h1>
         <p class="subtitle" id="statusText">Новых заданий пока нет...</p>
         <button class="main-btn locked" id="mainBtn" disabled>🔒 Жди сюрприз...</button>
     </div>
+
     <script>
+        // Звёзды
         (function(){
             const box=document.getElementById('stars');
             for(let i=0;i<80;i++){
@@ -97,8 +99,287 @@
             }
         }
 
+        // По нажатию — загружаем админку в этот же документ
         document.getElementById('mainBtn').addEventListener('click',()=>{
-            window.location.href='adminn.html?mode=play';
+            // Скрываем главный контейнер
+            document.getElementById('mainContainer').style.display='none';
+            // Подгружаем скрипт и стили админки динамически
+            if(!document.getElementById('adminScript')){
+                // Копируем стили админки
+                const adminStyles=document.createElement('style');
+                adminStyles.textContent=`
+                    *{margin:0;padding:0;box-sizing:border-box;}
+                    body{font-family:'Georgia',serif;background:#0d0d1a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-y:auto;}
+                    .game-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.97);z-index:1000;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+                    .game-container{width:95%;max-width:500px;height:80vh;border-radius:20px;position:relative;overflow:hidden;border:2px solid rgba(255,255,255,0.3);}
+                    .butterfly-bg{background:linear-gradient(to bottom,#87CEEB 0%,#98FB98 40%,#228B22 100%);}
+                    .pegs-bg{background:linear-gradient(to bottom,#2c1810 0%,#5c3a28 60%,#3d2010 100%);}
+                    .game-header{position:absolute;top:0;left:0;right:0;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;z-index:10;background:rgba(0,0,0,0.5);height:40px;pointer-events:none;}
+                    .timer{color:#ffd700;font-size:1.3em;font-weight:bold;}
+                    .timer.urgent{color:#ff4757;animation:pulse 0.5s ease-in-out infinite;}
+                    @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+                    .game-title{color:#fff;font-size:0.85em;}
+                    .instruction-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:50;display:flex;align-items:center;justify-content:center;border-radius:20px;}
+                    .instruction-box{background:#1e1e38;border-radius:20px;padding:28px 22px;text-align:center;width:85%;max-width:380px;border:2px solid rgba(255,255,255,0.15);}
+                    .instruction-box h3{color:#ff6b9d;margin-bottom:12px;font-size:1.2em;}
+                    .instruction-box p{color:rgba(255,255,255,0.8);font-size:0.9em;line-height:1.6;margin-bottom:8px;}
+                    .instruction-box .demo-icon{font-size:3em;margin:8px 0;}
+                    .instruction-box .color-dot{display:inline-block;width:18px;height:18px;border-radius:50%;margin:0 3px;vertical-align:middle;}
+                    .grass{position:absolute;bottom:0;left:0;right:0;height:25%;background:linear-gradient(to top,#1a5c1a,#228B22);z-index:0;border-radius:0 0 20px 20px;}
+                    .grass-blade{position:absolute;bottom:0;width:4px;background:#2d8a2d;border-radius:50% 50% 0 0;animation:sway 2s ease-in-out infinite;transform-origin:bottom center;}
+                    @keyframes sway{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+                    .flower{position:absolute;width:75px;height:75px;z-index:2;display:flex;align-items:center;justify-content:center;animation:flowerBreathe 2s ease-in-out infinite;}
+                    @keyframes flowerBreathe{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+                    .flower-center{width:28px;height:28px;border-radius:50%;background:#ffd700;position:absolute;z-index:1;box-shadow:0 0 10px rgba(255,215,0,0.5);}
+                    .petal{position:absolute;width:22px;height:22px;border-radius:50% 50% 50% 0;transform-origin:bottom right;}
+                    .petal:nth-child(1){transform:rotate(0deg) translate(12px,-12px);}
+                    .petal:nth-child(2){transform:rotate(72deg) translate(12px,-12px);}
+                    .petal:nth-child(3){transform:rotate(144deg) translate(12px,-12px);}
+                    .petal:nth-child(4){transform:rotate(216deg) translate(12px,-12px);}
+                    .petal:nth-child(5){transform:rotate(288deg) translate(12px,-12px);}
+                    .flower.filled{animation:flowerHappy 0.8s ease-out;}
+                    @keyframes flowerHappy{0%{transform:scale(1.3);}100%{transform:scale(1);}}
+                    .butterfly{position:absolute;width:50px;height:50px;cursor:grab;z-index:5;touch-action:none;user-select:none;font-size:2.8em;text-align:center;line-height:50px;animation:butterflyFly 3s ease-in-out infinite;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3));}
+                    @keyframes butterflyFly{0%,100%{transform:translate(0,0) rotate(-3deg);}25%{transform:translate(20px,-15px) rotate(5deg);}50%{transform:translate(-10px,-25px) rotate(-2deg);}75%{transform:translate(-20px,-8px) rotate(4deg);}}
+                    .butterfly:active{cursor:grabbing;z-index:15;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.5)) brightness(1.2);}
+                    .butterfly.placed{animation:butterflyLand 0.8s ease-out forwards;pointer-events:none;}
+                    @keyframes butterflyLand{0%{transform:scale(1.2);}60%{transform:scale(0.9);}100%{transform:scale(1);}}
+                    .pollen{position:absolute;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:20;animation:pollenFloat 0.8s ease-out forwards;}
+                    @keyframes pollenFloat{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--px),var(--py)) scale(0);opacity:0;}}
+                    .peg{position:absolute;bottom:20px;width:22px;height:100px;border-radius:11px 11px 0 0;z-index:2;box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.2);}
+                    .peg::after{content:'';position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:34px;height:34px;border-radius:50%;background:inherit;box-shadow:0 2px 8px rgba(0,0,0,0.3),inset 0 2px 4px rgba(255,255,255,0.3);}
+                    .floating-circle{position:absolute;width:44px;height:44px;border-radius:50%;cursor:grab;z-index:5;animation:floatAround 3s ease-in-out infinite;touch-action:none;box-shadow:0 4px 16px rgba(0,0,0,0.4),inset 0 -2px 6px rgba(0,0,0,0.3),inset 0 2px 6px rgba(255,255,255,0.3);}
+                    .floating-circle:active{cursor:grabbing;z-index:15;}
+                    @keyframes floatAround{0%,100%{transform:translate(0,0);}25%{transform:translate(15px,-10px);}50%{transform:translate(-10px,-20px);}75%{transform:translate(-15px,5px);}}
+                    .floating-circle.placed{animation:none;pointer-events:none;transition:all 0.5s ease;opacity:0.85;}
+                    .prize-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:2000;pointer-events:none;}
+                    .heart-particle{position:absolute;font-size:2em;animation:heartFall var(--hd) linear forwards;animation-delay:var(--hdel);opacity:0;}
+                    @keyframes heartFall{0%{transform:translateY(-100px) scale(1) rotate(0deg);opacity:1;}70%{transform:translateY(var(--burstY)) scale(1.8) rotate(180deg);opacity:1;}80%{transform:translateY(var(--burstY)) scale(2.5) rotate(200deg);opacity:1;}100%{transform:translateY(110vh) scale(0.5) rotate(360deg);opacity:0;}}
+                    .cloud{position:absolute;background:white;border-radius:50%;opacity:0.7;z-index:1;}
+                    .btn-pink{padding:12px 20px;border-radius:50px;border:none;cursor:pointer;font-family:'Georgia',serif;font-size:0.9em;letter-spacing:1px;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;margin-top:16px;width:100%;}
+                `;
+                document.head.appendChild(adminStyles);
+
+                // Создаём игровой оверлей
+                const overlay=document.createElement('div');
+                overlay.className='game-overlay';
+                overlay.id='gameOverlayPlay';
+                overlay.innerHTML=`
+                    <div class="game-container" id="gameContainerPlay">
+                        <div class="game-header">
+                            <span class="game-title" id="gameTitlePlay">Загрузка...</span>
+                            <span class="timer" id="gameTimerPlay">--</span>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(overlay);
+
+                const prizeOverlay=document.createElement('div');
+                prizeOverlay.className='prize-overlay';
+                prizeOverlay.id='prizeOverlayPlay';
+                document.body.appendChild(prizeOverlay);
+
+                // Загружаем скрипт игры
+                const script=document.createElement('script');
+                script.id='adminScript';
+                script.textContent=`
+                    const QUEST_CONFIG_PLAY=${JSON.stringify(JSON.parse(localStorage.getItem('activeQuest')||'{}'))};
+                    let audioCtxPlay=null;
+                    let gameStatePlay={};
+                    let gameTimerIntervalPlay=null;
+                    let dragTargetPlay=null;
+                    let dragOffsetXPlay=0;
+                    let dragOffsetYPlay=0;
+                    let gameActivePlay=false;
+
+                    function createMelodyPlay(){
+                        if(!audioCtxPlay) audioCtxPlay=new(window.AudioContext||window.webkitAudioContext)();
+                        const notes=[523,659,784,1047,784,659,523,659,784,659,523];
+                        notes.forEach((freq,i)=>{
+                            const osc=audioCtxPlay.createOscillator();
+                            const gain=audioCtxPlay.createGain();
+                            osc.type='sine';osc.frequency.value=freq;
+                            gain.gain.setValueAtTime(0.3,audioCtxPlay.currentTime+i*0.25);
+                            gain.gain.exponentialRampToValueAtTime(0.01,audioCtxPlay.currentTime+i*0.25+0.25);
+                            osc.connect(gain);gain.connect(audioCtxPlay.destination);
+                            osc.start(audioCtxPlay.currentTime+i*0.25);
+                            osc.stop(audioCtxPlay.currentTime+i*0.25+0.25);
+                        });
+                    }
+                    function createLandSoundPlay(){
+                        if(!audioCtxPlay) audioCtxPlay=new(window.AudioContext||window.webkitAudioContext)();
+                        const osc=audioCtxPlay.createOscillator();
+                        const gain=audioCtxPlay.createGain();
+                        osc.type='sine';osc.frequency.setValueAtTime(600,audioCtxPlay.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(1200,audioCtxPlay.currentTime+0.1);
+                        osc.frequency.exponentialRampToValueAtTime(800,audioCtxPlay.currentTime+0.2);
+                        gain.gain.setValueAtTime(0.2,audioCtxPlay.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01,audioCtxPlay.currentTime+0.25);
+                        osc.connect(gain);gain.connect(audioCtxPlay.destination);
+                        osc.start(audioCtxPlay.currentTime);osc.stop(audioCtxPlay.currentTime+0.25);
+                    }
+                    function createPopSoundPlay(){
+                        if(!audioCtxPlay) audioCtxPlay=new(window.AudioContext||window.webkitAudioContext)();
+                        const osc=audioCtxPlay.createOscillator();
+                        const gain=audioCtxPlay.createGain();
+                        osc.type='triangle';osc.frequency.setValueAtTime(600,audioCtxPlay.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(200,audioCtxPlay.currentTime+0.1);
+                        gain.gain.setValueAtTime(0.25,audioCtxPlay.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01,audioCtxPlay.currentTime+0.15);
+                        osc.connect(gain);gain.connect(audioCtxPlay.destination);
+                        osc.start(audioCtxPlay.currentTime);osc.stop(audioCtxPlay.currentTime+0.15);
+                    }
+
+                    function stopGamePlay(){
+                        clearInterval(gameTimerIntervalPlay);
+                        gameActivePlay=false;
+                        const ov=document.getElementById('gameOverlayPlay');
+                        if(ov) ov.remove();
+                        const po=document.getElementById('prizeOverlayPlay');
+                        if(po) po.remove();
+                        const as=document.getElementById('adminScript');
+                        if(as) as.remove();
+                        const st=document.querySelector('style');
+                        // не удаляем стили чтобы не сломать
+                        document.getElementById('mainContainer').style.display='block';
+                        localStorage.setItem('questCompleted','true');
+                        checkQuest();
+                    }
+
+                    function loadStepPlay(stepIndex){
+                        clearInterval(gameTimerIntervalPlay);
+                        gameActivePlay=false;
+                        const container=document.getElementById('gameContainerPlay');
+                        container.querySelectorAll('.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,.instruction-overlay').forEach(el=>el.remove());
+                        container.className='game-container';
+                        const step=QUEST_CONFIG_PLAY.steps[stepIndex];
+                        document.getElementById('gameTitlePlay').textContent=step.title;
+                        document.getElementById('gameTimerPlay').textContent=step.timeLimit||'∞';
+                        document.getElementById('gameTimerPlay').classList.remove('urgent');
+                        gameStatePlay.currentStep=stepIndex;
+                        gameStatePlay.stepData={};
+                        if(step.type==='text'){renderTextStepPlay(container,step);gameActivePlay=true;}
+                        else if(step.type==='butterflies'){container.classList.add('butterfly-bg');renderButterflyStepPlay(container,step);}
+                        else if(step.type==='pegs'){container.classList.add('pegs-bg');renderPegStepPlay(container,step);}
+                    }
+
+                    function showInstructionPlay(container,step){
+                        const overlay=document.createElement('div');
+                        overlay.className='instruction-overlay';
+                        let demoHtml='';
+                        if(step.type==='butterflies'){
+                            demoHtml='<div class="demo-icon">🦋 ➡️ 🌸</div><p>Перетаскивай <strong>бабочек</strong> на <strong>цветки</strong></p><p>Бабочка должна сесть на цветок <strong>такого же цвета</strong>!</p>';
+                        }else if(step.type==='pegs'){
+                            demoHtml='<div class="demo-icon">🔴 ➡️ 📍</div><p>Перетаскивай <strong>круги</strong> на <strong>штыри</strong></p><p>Круг должен попасть на штырь <strong>такого же цвета</strong>!</p><p style="font-size:0.8em;">На каждый штырь надо надеть по 4 круга</p>';
+                        }
+                        overlay.innerHTML='<div class="instruction-box"><h3>📋 '+step.title+'</h3>'+demoHtml+'<p style="color:#ffd700;font-size:0.85em;margin-top:6px;">⏱ Время: '+step.timeLimit+' секунд</p><button class="btn-pink" id="startGameBtnPlay">▶ Начать!</button></div>';
+                        container.appendChild(overlay);
+                        document.getElementById('startGameBtnPlay').addEventListener('click',()=>{
+                            overlay.remove();gameActivePlay=true;
+                            startTimerPlay(step.timeLimit,()=>{gameActivePlay=false;setTimeout(()=>loadStepPlay(stepIndex),1500);});
+                        });
+                    }
+
+                    function startTimerPlay(seconds,onEnd){
+                        let remaining=seconds;
+                        const timerEl=document.getElementById('gameTimerPlay');
+                        timerEl.textContent=remaining;
+                        gameTimerIntervalPlay=setInterval(()=>{
+                            remaining--;timerEl.textContent=remaining;
+                            if(remaining<=10) timerEl.classList.add('urgent');
+                            if(remaining<=0){clearInterval(gameTimerIntervalPlay);if(onEnd) onEnd();}
+                        },1000);
+                    }
+
+                    function renderTextStepPlay(container,step){
+                        container.style.background='linear-gradient(135deg,#1a1a2e,#16213e)';
+                        const box=document.createElement('div');
+                        box.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:85%;z-index:10;';
+                        box.innerHTML='<p style="color:#fff;font-size:1.1em;margin-bottom:8px;">'+step.question+'</p><input type="text" id="textAnswerPlay" placeholder="Твой ответ..." style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;text-align:center;font-size:1.1em;outline:none;"><div id="textErrorPlay" style="color:#ff4757;font-size:0.8em;margin-top:8px;min-height:20px;"></div><button id="textSubmitPlay" style="width:100%;margin-top:12px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;">💫 Проверить</button>';
+                        container.appendChild(box);
+                        document.getElementById('textSubmitPlay').addEventListener('click',()=>{
+                            const ans=document.getElementById('textAnswerPlay').value.trim().toLowerCase();
+                            if(ans===step.answer.toLowerCase()){advanceStepPlay();}
+                            else{document.getElementById('textErrorPlay').textContent='Не совсем так... 💕';}
+                        });
+                        document.getElementById('textAnswerPlay').addEventListener('keydown',(e)=>{if(e.key==='Enter') document.getElementById('textSubmitPlay').click();});
+                        setTimeout(()=>document.getElementById('textAnswerPlay')?.focus(),300);
+                    }
+
+                    function renderButterflyStepPlay(container,step){
+                        const colors=step.colors;
+                        const containerRect=container.getBoundingClientRect();
+                        const margin=40;const areaW=containerRect.width-margin*2;
+                        gameStatePlay.stepData.butterfliesPlaced=0;
+                        gameStatePlay.stepData.totalButterflies=step.butterflyCount;
+                        gameStatePlay.stepData.flowerPositions=[];
+                        const grass=document.createElement('div');grass.className='grass';container.appendChild(grass);
+                        for(let i=0;i<30;i++){const blade=document.createElement('div');blade.className='grass-blade';blade.style.left=Math.random()*100+'%';blade.style.height=(15+Math.random()*25)+'px';blade.style.animationDelay=Math.random()*2+'s';blade.style.animationDuration=(1.5+Math.random()*2)+'s';grass.appendChild(blade);}
+                        const flowerAreaTop=containerRect.height*0.45;const flowerAreaBottom=containerRect.height*0.78;const flowerAreaH=flowerAreaBottom-flowerAreaTop;
+                        for(let i=0;i<step.butterflyCount;i++){
+                            const fx=margin+(areaW/step.butterflyCount)*i+(areaW/step.butterflyCount)/2-37;
+                            const fy=flowerAreaTop+Math.random()*flowerAreaH;
+                            const flower=document.createElement('div');flower.className='flower';flower.style.left=fx+'px';flower.style.top=fy+'px';flower.style.animationDelay=(Math.random()*1)+'s';flower.dataset.color=colors[i];flower.dataset.index=i;
+                            for(let p=0;p<5;p++){const petal=document.createElement('div');petal.className='petal';petal.style.backgroundColor=colors[i];flower.appendChild(petal);}
+                            const center=document.createElement('div');center.className='flower-center';flower.appendChild(center);
+                            container.appendChild(flower);
+                            gameStatePlay.stepData.flowerPositions.push({x:fx+37,y:fy+37,color:colors[i],index:i,el:flower});
+                        }
+                        for(let i=0;i<step.butterflyCount;i++){
+                            let bx,by;const flowerPos=gameStatePlay.stepData.flowerPositions[i];
+                            do{bx=margin+Math.random()*areaW;by=60+Math.random()*(containerRect.height-120);}while(Math.hypot(bx-flowerPos.x,by-flowerPos.y)<90);
+                            const butterfly=document.createElement('div');butterfly.className='butterfly';butterfly.textContent='🦋';butterfly.style.color=colors[i];butterfly.style.left=bx+'px';butterfly.style.top=by+'px';butterfly.style.animationDelay=(Math.random()*2)+'s';butterfly.style.animationDuration=(2.5+Math.random()*2)+'s';butterfly.dataset.color=colors[i];butterfly.dataset.index=i;
+                            container.appendChild(butterfly);
+                            butterfly.addEventListener('pointerdown',(e)=>{if(!gameActivePlay||butterfly.classList.contains('placed')) return;dragTargetPlay=butterfly;const rect=butterfly.getBoundingClientRect();dragOffsetXPlay=e.clientX-rect.left;dragOffsetYPlay=e.clientY-rect.top;butterfly.style.animation='none';butterfly.style.zIndex='15';e.preventDefault();});
+                        }
+                        container.addEventListener('pointermove',(e)=>{if(!dragTargetPlay||!dragTargetPlay.classList.contains('butterfly')||!gameActivePlay) return;const cRect=container.getBoundingClientRect();let nx=e.clientX-cRect.left-dragOffsetXPlay;let ny=e.clientY-cRect.top-dragOffsetYPlay;nx=Math.max(0,Math.min(nx,cRect.width-50));ny=Math.max(40,Math.min(ny,cRect.height-50));dragTargetPlay.style.left=nx+'px';dragTargetPlay.style.top=ny+'px';});
+                        container.addEventListener('pointerup',(e)=>{if(!dragTargetPlay||!dragTargetPlay.classList.contains('butterfly')||!gameActivePlay) return;const butterflyEl=dragTargetPlay;const butterflyColor=butterflyEl.dataset.color;dragTargetPlay=null;const bRect=butterflyEl.getBoundingClientRect();const cRect=container.getBoundingClientRect();const bCX=bRect.left+bRect.width/2-cRect.left;const bCY=bRect.top+bRect.height/2-cRect.top;let landed=false;gameStatePlay.stepData.flowerPositions.forEach(flower=>{if(flower.color===butterflyColor&&!flower.el.classList.contains('filled')){const dist=Math.hypot(bCX-flower.x,bCY-flower.y);if(dist<48){landed=true;flower.el.classList.add('filled');butterflyEl.classList.add('placed');butterflyEl.style.left=(flower.x-25)+'px';butterflyEl.style.top=(flower.y-30)+'px';gameStatePlay.stepData.butterfliesPlaced++;createLandSoundPlay();if(gameStatePlay.stepData.butterfliesPlaced>=gameStatePlay.stepData.totalButterflies){clearInterval(gameTimerIntervalPlay);gameActivePlay=false;setTimeout(()=>advanceStepPlay(),600);}}}});if(!landed){butterflyEl.style.animation='butterflyFly 3s ease-in-out infinite';butterflyEl.style.animationDelay='0s';butterflyEl.style.zIndex='5';}});
+                        showInstructionPlay(container,step);
+                    }
+
+                    function renderPegStepPlay(container,step){
+                        const colors=step.colors;const containerRect=container.getBoundingClientRect();const pegSpacing=containerRect.width/(step.pegsCount+1);
+                        gameStatePlay.stepData.circlesPlaced=0;gameStatePlay.stepData.totalCircles=step.circleCount;
+                        const table=document.createElement('div');table.style.cssText='position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(139,90,43,0.4),transparent);z-index:0;border-radius:0 0 20px 20px;pointer-events:none;';container.appendChild(table);
+                        for(let i=0;i<step.pegsCount;i++){const peg=document.createElement('div');peg.className='peg';peg.style.backgroundColor=colors[i];peg.style.left=(pegSpacing*(i+1)-11)+'px';peg.dataset.color=colors[i];peg.dataset.count=0;peg.dataset.need=step.circleCount/step.pegsCount;container.appendChild(peg);}
+                        for(let i=0;i<step.circleCount;i++){const color=colors[i%step.pegsCount];const circle=document.createElement('div');circle.className='floating-circle';circle.style.backgroundColor=color;circle.style.left=(20+Math.random()*(containerRect.width-70))+'px';circle.style.top=(20+Math.random()*(containerRect.height*0.45))+'px';circle.style.animationDelay=(Math.random()*3)+'s';circle.style.animationDuration=(2+Math.random()*3)+'s';circle.dataset.color=color;container.appendChild(circle);circle.addEventListener('pointerdown',(e)=>{if(!gameActivePlay||circle.classList.contains('placed')) return;dragTargetPlay=circle;const rect=circle.getBoundingClientRect();dragOffsetXPlay=e.clientX-rect.left;dragOffsetYPlay=e.clientY-rect.top;circle.style.animation='none';circle.style.zIndex='15';e.preventDefault();});}
+                        container.addEventListener('pointermove',(e)=>{if(!dragTargetPlay||!dragTargetPlay.classList.contains('floating-circle')||!gameActivePlay) return;const cRect=container.getBoundingClientRect();let nx=e.clientX-cRect.left-dragOffsetXPlay;let ny=e.clientY-cRect.top-dragOffsetYPlay;dragTargetPlay.style.left=nx+'px';dragTargetPlay.style.top=ny+'px';});
+                        container.addEventListener('pointerup',(e)=>{if(!dragTargetPlay||!dragTargetPlay.classList.contains('floating-circle')||!gameActivePlay) return;const circleEl=dragTargetPlay;const circleColor=circleEl.dataset.color;dragTargetPlay=null;circleEl.style.zIndex='5';const cRect=circleEl.getBoundingClientRect();const contRect=container.getBoundingClientRect();const cCX=cRect.left+cRect.width/2-contRect.left;const cCY=cRect.top+cRect.height/2-contRect.top;let placed=false;container.querySelectorAll('.peg').forEach(peg=>{if(peg.dataset.color===circleColor&&parseInt(peg.dataset.count)<parseInt(peg.dataset.need)){const pRect=peg.getBoundingClientRect();const pCX=pRect.left+pRect.width/2-contRect.left;const pCY=pRect.top-contRect.top;const dist=Math.hypot(cCX-pCX,cCY-pCY);if(dist<80){placed=true;peg.dataset.count=parseInt(peg.dataset.count)+1;circleEl.classList.add('placed');circleEl.style.left=(pCX-22)+'px';circleEl.style.top=(pCY-30-parseInt(peg.dataset.count)*24)+'px';createPopSoundPlay();gameStatePlay.stepData.circlesPlaced++;if(gameStatePlay.stepData.circlesPlaced>=gameStatePlay.stepData.totalCircles){clearInterval(gameTimerIntervalPlay);gameActivePlay=false;setTimeout(()=>advanceStepPlay(),800);}}}});if(!placed){circleEl.style.animation='floatAround 3s ease-in-out infinite';circleEl.style.animationDelay='0s';}});
+                        showInstructionPlay(container,step);
+                    }
+
+                    function advanceStepPlay(){
+                        clearInterval(gameTimerIntervalPlay);gameActivePlay=false;
+                        if(gameStatePlay.currentStep<QUEST_CONFIG_PLAY.steps.length-1){
+                            const container=document.getElementById('gameContainerPlay');
+                            container.querySelectorAll('.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,.instruction-overlay').forEach(el=>el.remove());
+                            loadStepPlay(gameStatePlay.currentStep+1);
+                        }else{showPrizePlay();}
+                    }
+
+                    function showPrizePlay(){
+                        clearInterval(gameTimerIntervalPlay);gameActivePlay=false;
+                        const container=document.getElementById('gameContainerPlay');
+                        container.querySelectorAll('.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,.instruction-overlay').forEach(el=>el.remove());
+                        container.className='game-container';container.style.background='linear-gradient(135deg,#1a1a2e,#16213e)';
+                        document.getElementById('gameTitlePlay').textContent='🎁 Приз!';
+                        document.getElementById('gameTimerPlay').textContent='🎉';
+                        createMelodyPlay();
+                        const overlay=document.getElementById('prizeOverlayPlay');
+                        overlay.innerHTML='';
+                        const hearts=['❤️','💕','💖','💗','💝','💘','💓','💞'];
+                        const centerY=window.innerHeight*0.45;
+                        for(let i=0;i<80;i++){const heart=document.createElement('div');heart.className='heart-particle';heart.textContent=hearts[Math.floor(Math.random()*hearts.length)];heart.style.left=Math.random()*100+'%';heart.style.setProperty('--hd',(2+Math.random()*3)+'s');heart.style.setProperty('--hdel',Math.random()*1.5+'s');heart.style.setProperty('--burstY',centerY+'px');heart.style.fontSize=(1.5+Math.random()*3)+'em';overlay.appendChild(heart);setTimeout(()=>heart.remove(),5000);}
+                        const prizeBox=document.createElement('div');prizeBox.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;';
+                        prizeBox.innerHTML='<div style="font-size:4em;">🎁</div><p style="color:#ffd700;font-size:1.2em;margin:10px 0;text-shadow:0 2px 4px rgba(0,0,0,0.5);white-space:pre-line;">'+QUEST_CONFIG_PLAY.prize.message+'</p><button class="btn-pink" onclick="stopGamePlay()" style="width:auto;padding:12px 28px;">💝 Закрыть</button>';
+                        container.appendChild(prizeBox);
+                    }
+
+                    gameStatePlay={currentStep:0,stepData:{}};
+                    loadStepPlay(0);
+                `;
+                document.body.appendChild(script);
+            }
         });
 
         setInterval(checkQuest,3000);
