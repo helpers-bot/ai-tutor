@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🔧 Админ-панель</title>
     <style>
         * {
@@ -10,142 +10,83 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Georgia', serif;
             background: #0d0d1a;
             color: #fff;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+        .admin-container {
+            width: 100%;
+            max-width: 600px;
             padding: 20px;
         }
-
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
-
         h1 {
             text-align: center;
             color: #ff6b9d;
             margin-bottom: 8px;
-            font-size: 1.8em;
         }
-        .sub {
+        .subtitle {
             text-align: center;
             color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             font-size: 0.85em;
         }
 
         .panel {
             background: rgba(255, 255, 255, 0.03);
             border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .panel h3 {
             color: #ffd700;
             margin-bottom: 12px;
-            font-size: 1.1em;
-        }
-
-        label {
-            display: block;
-            margin-top: 12px;
-            margin-bottom: 4px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.85em;
-        }
-        input,
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.05);
-            color: #fff;
-            font-family: 'Georgia', serif;
             font-size: 1em;
-            outline: none;
-            transition: all 0.3s;
-        }
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: #ff6b9d;
-            box-shadow: 0 0 12px rgba(255, 107, 157, 0.2);
-        }
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .step-block {
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 14px;
-            padding: 16px;
-            margin: 12px 0;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-        }
-        .step-block h4 {
-            color: #ff6b9d;
-            margin-bottom: 8px;
         }
 
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
+            padding: 12px 20px;
             border-radius: 50px;
             border: none;
             cursor: pointer;
             font-family: 'Georgia', serif;
-            font-size: 1em;
+            font-size: 0.9em;
             letter-spacing: 1px;
             transition: all 0.3s;
             margin: 4px;
-        }
-        .btn-pink {
-            background: linear-gradient(135deg, #ff6b9d, #c44569);
-            color: #fff;
+            width: 100%;
         }
         .btn-gold {
             background: #ffd700;
             color: #1a1a2e;
             font-weight: bold;
         }
+        .btn-pink {
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: #fff;
+        }
         .btn-outline {
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.3);
             color: #fff;
         }
-        .btn-danger {
-            background: #ff4757;
-            color: #fff;
-        }
         .btn:active {
             transform: scale(0.95);
-        }
-        .btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 16px;
         }
 
         .status {
             display: inline-block;
-            padding: 6px 14px;
+            padding: 8px 16px;
             border-radius: 50px;
             font-size: 0.8em;
-            margin: 8px 0;
+            text-align: center;
+            width: 100%;
         }
         .status-active {
             background: #4effb4;
@@ -156,17 +97,229 @@
             color: #aaa;
         }
 
-        .preview-box {
+        /* Игровой экран */
+        .game-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .game-container {
+            width: 95%;
+            max-width: 500px;
+            height: 80vh;
             background: #1a1a2e;
-            border-radius: 14px;
-            padding: 16px;
-            margin-top: 12px;
-            max-height: 400px;
-            overflow-y: auto;
-            font-size: 0.85em;
-            white-space: pre-wrap;
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        .game-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 10px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.6);
+        }
+        .timer {
+            color: #ffd700;
+            font-size: 1.4em;
+            font-weight: bold;
+        }
+        .timer.urgent {
+            color: #ff4757;
+            animation: pulse 0.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+        .game-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 20;
+        }
+        .game-title {
+            color: #fff;
+            font-size: 0.9em;
+        }
+
+        /* Змея */
+        .snake {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: grab;
+            z-index: 5;
+            transition: none;
+            touch-action: none;
+            font-size: 2.5em;
+            text-align: center;
+            line-height: 50px;
+            animation: wiggle 0.8s ease-in-out infinite;
+            user-select: none;
+        }
+        .snake:active {
+            cursor: grabbing;
+            z-index: 15;
+        }
+        @keyframes wiggle {
+            0%,
+            100% {
+                transform: rotate(-5deg) scale(1);
+            }
+            25% {
+                transform: rotate(5deg) scale(1.1);
+            }
+            50% {
+                transform: rotate(-3deg) scale(1);
+            }
+            75% {
+                transform: rotate(3deg) scale(1.05);
+            }
+        }
+        .snake.caught {
+            animation: suckIn 0.6s ease-in forwards;
+            pointer-events: none;
+        }
+        @keyframes suckIn {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Круг */
+        .circle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            z-index: 2;
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        /* Штыри (шаг 3) */
+        .peg {
+            position: absolute;
+            bottom: 30px;
+            width: 20px;
+            height: 100px;
+            border-radius: 10px 10px 0 0;
+            z-index: 2;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        .peg::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: inherit;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .floating-circle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 5;
+            animation: floatAround 3s ease-in-out infinite;
+            touch-action: none;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+        .floating-circle:active {
+            cursor: grabbing;
+            z-index: 15;
+        }
+        @keyframes floatAround {
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(15px, -10px);
+            }
+            50% {
+                transform: translate(-10px, -20px);
+            }
+            75% {
+                transform: translate(-15px, 5px);
+            }
+        }
+        .floating-circle.placed {
+            animation: none;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            opacity: 0.8;
+        }
+
+        /* Победа / приз */
+        .prize-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2000;
+            pointer-events: none;
+        }
+        .heart-particle {
+            position: absolute;
+            font-size: 2em;
+            animation: heartFall var(--hd) linear forwards;
+            animation-delay: var(--hdel);
+            opacity: 0;
+        }
+        @keyframes heartFall {
+            0% {
+                transform: translateY(-100px) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            70% {
+                transform: translateY(var(--burstY)) scale(1.5) rotate(180deg);
+                opacity: 1;
+            }
+            80% {
+                transform: translateY(var(--burstY)) scale(2) rotate(200deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) scale(0.5) rotate(360deg);
+                opacity: 0;
+            }
         }
 
         .toast {
@@ -177,10 +330,11 @@
             padding: 12px 24px;
             border-radius: 50px;
             font-weight: bold;
-            z-index: 300;
-            animation: slideUp 0.4s ease, slideDown 0.4s ease 2.5s forwards;
+            z-index: 3000;
+            animation: slideUp 0.4s ease, slideDown 0.4s ease 2s forwards;
             font-family: 'Georgia', serif;
             font-size: 0.9em;
+            text-align: center;
         }
         .toast-success {
             background: #4effb4;
@@ -211,491 +365,602 @@
             }
         }
 
-        .tag {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75em;
-            margin: 2px;
-            background: rgba(255, 107, 157, 0.2);
-            color: #ff6b9d;
-            cursor: pointer;
-        }
-        .tag.selected {
-            background: #ff6b9d;
+        /* Аудио-контрол */
+        .audio-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
             color: #fff;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔧 Админ-панель</h1>
-        <p class="sub">Создай квест → протестируй → отправь любимой</p>
 
-        <!-- Статус -->
+    <div class="admin-container" id="adminPanel">
+        <h1>🔧 Админ-панель</h1>
+        <p class="subtitle">Тестируй квест → отправляй супруге</p>
+
         <div class="panel">
             <h3>📡 Статус</h3>
-            <span id="questStatus" class="status status-inactive">Нет активного квеста</span>
-            <span id="notifStatus" style="margin-left:10px;color:rgba(255,255,255,0.5);font-size:0.8em;"></span>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="loadCurrentQuest()">🔄 Обновить статус</button>
-                <button class="btn btn-danger" onclick="resetQuest()" id="resetBtn" disabled>🗑 Сбросить квест</button>
-            </div>
+            <div class="status status-inactive" id="questStatus">Нет активного квеста</div>
+            <br><br>
+            <button class="btn btn-outline" onclick="checkStatus()">🔄 Обновить статус</button>
+            <button class="btn btn-outline" onclick="resetQuest()">🗑 Сбросить квест</button>
         </div>
 
-        <!-- Создание квеста -->
         <div class="panel">
-            <h3>📝 Создать новый квест</h3>
-
-            <label>Название квеста</label>
-            <input type="text" id="questTitle" placeholder="Например: Ключ к сердцу">
-
-            <!-- Шаг 1 -->
-            <div class="step-block">
-                <h4>Шаг 1</h4>
-                <label>Тип загадки</label>
-                <select id="step1type" onchange="updateStepForm(1)">
-                    <option value="text">Текстовая загадка</option>
-                    <option value="colors">Цветовая головоломка</option>
-                    <option value="number">Числовая загадка</option>
-                </select>
-                <label>Заголовок шага</label>
-                <input type="text" id="step1title" placeholder="Например: Шифр любви">
-                <label>Вопрос</label>
-                <textarea id="step1question" placeholder="Например: Разгадай, что я хочу тебе сказать..."></textarea>
-                <div id="step1extra"></div>
-                <label>Правильный ответ</label>
-                <input type="text" id="step1answer" placeholder="Для цветов: ❤️,💜,💙,💚 (через запятую)">
-            </div>
-
-            <!-- Шаг 2 -->
-            <div class="step-block">
-                <h4>Шаг 2</h4>
-                <label>Тип загадки</label>
-                <select id="step2type" onchange="updateStepForm(2)">
-                    <option value="text">Текстовая загадка</option>
-                    <option value="colors">Цветовая головоломка</option>
-                    <option value="number">Числовая загадка</option>
-                </select>
-                <label>Заголовок шага</label>
-                <input type="text" id="step2title" placeholder="Например: Палитра чувств">
-                <label>Вопрос</label>
-                <textarea id="step2question" placeholder="Например: Расположи сердечки в правильном порядке"></textarea>
-                <div id="step2extra"></div>
-                <label>Правильный ответ</label>
-                <input type="text" id="step2answer" placeholder="Для цветов: ❤️,💜,💙,💚 (через запятую)">
-            </div>
-
-            <!-- Шаг 3 -->
-            <div class="step-block">
-                <h4>Шаг 3</h4>
-                <label>Тип загадки</label>
-                <select id="step3type" onchange="updateStepForm(3)">
-                    <option value="text">Текстовая загадка</option>
-                    <option value="colors">Цветовая головоломка</option>
-                    <option value="number">Числовая загадка</option>
-                </select>
-                <label>Заголовок шага</label>
-                <input type="text" id="step3title" placeholder="Например: Математика любви">
-                <label>Вопрос</label>
-                <textarea id="step3question" placeholder="Например: Сколько дней мы вместе?"></textarea>
-                <div id="step3extra"></div>
-                <label>Правильный ответ</label>
-                <input type="text" id="step3answer" placeholder="Для цветов: ❤️,💜,💙,💚 (через запятую)">
-            </div>
-
-            <!-- Приз -->
-            <div class="step-block" style="border-color: rgba(255,215,0,0.3);">
-                <h4 style="color:#ffd700;">🎁 Приз</h4>
-                <label>Сообщение</label>
-                <textarea id="prizeMessage" placeholder="Например: Ты разгадала все тайны моего сердца! Твой приз ждёт тебя..."></textarea>
-                <label>Ссылка (необязательно)</label>
-                <input type="text" id="prizeLink" placeholder="https://... или оставь пустым">
-                <label>Текст кнопки-ссылки</label>
-                <input type="text" id="prizeLinkText" placeholder="🎁 Забрать приз">
-            </div>
+            <h3>🧪 Тестировать квест</h3>
+            <button class="btn btn-pink" onclick="testQuest()">▶ Запустить тест</button>
         </div>
 
-        <!-- Действия -->
         <div class="panel">
-            <h3>🚀 Действия</h3>
-            <div class="btn-row">
-                <button class="btn btn-outline" onclick="previewQuest()">👁 Предпросмотр JSON</button>
-                <button class="btn btn-pink" onclick="testQuest()">🧪 Тестировать квест</button>
-                <button class="btn btn-gold" onclick="sendQuest()" id="sendBtn">📤 Отправить супруге</button>
-            </div>
-            <div class="preview-box" id="previewOutput" style="display:none;"></div>
+            <h3>📤 Отправить супруге</h3>
+            <button class="btn btn-gold" onclick="sendQuest()">💝 Отправить + уведомление</button>
         </div>
+    </div>
 
-        <!-- Тестовое модальное окно -->
-        <div class="modal-overlay" id="testModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:200;">
-            <div style="background:#1e1e38; border-radius:24px; padding:28px 20px; width:90%; max-width:420px; max-height:85vh; overflow-y:auto; border:1px solid rgba(255,255,255,0.15); color:#fff; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);" id="testContent">
-                <p style="text-align:center;">Загрузка теста...</p>
+    <!-- Игровой оверлей -->
+    <div class="game-overlay" id="gameOverlay" style="display:none;">
+        <div class="game-container" id="gameContainer">
+            <div class="game-header">
+                <span class="game-title" id="gameTitle">Шаг 1</span>
+                <span class="timer" id="gameTimer">60</span>
+                <button class="game-close" onclick="stopGame()">✕</button>
             </div>
         </div>
     </div>
 
+    <!-- Призовой оверлей -->
+    <div class="prize-overlay" id="prizeOverlay"></div>
+
+    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()" style="display:none;">🔇</button>
+
     <script>
-        // ============ УТИЛИТЫ ============
-        function showToast(msg, type = 'success') {
-            const t = document.createElement('div');
-            t.className = `toast toast-${type}`;
-            t.textContent = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+        // ============ КОНФИГУРАЦИЯ КВЕСТА ============
+        const QUEST_CONFIG = {
+            title: 'Квест-сюрприз',
+            steps: [{
+                type: 'text',
+                title: '🎈 Полёт в прошлое 🎈',
+                question: 'Какого числа мы отмечаем совместные отношения? (ответ из двух цифр)',
+                answer: '11',
+                timeLimit: 0, // без таймера
+            }, {
+                type: 'snakes',
+                title: '🐍 Цветные змеи',
+                question: 'Перетащи змей в круги их цвета!',
+                answer: null, // проверяется автоматически
+                timeLimit: 60,
+                colors: ['#ff4757', '#ff6b9d', '#ffd700', '#4effb4', '#54a0ff', '#a29bfe', '#ff9f43'],
+                snakeCount: 7,
+            }, {
+                type: 'pegs',
+                title: '📌 Штыри и круги',
+                question: 'Затяни круги на штыри нужного цвета!',
+                answer: null,
+                timeLimit: 30,
+                colors: ['#ff4757', '#ffd700', '#54a0ff', '#4effb4'],
+                circleCount: 16,
+                pegsCount: 4,
+            }],
+            prize: {
+                message: 'Ты справилась! Твой приз ждёт тебя...',
+                link: 'https://t.me/your_username',
+                linkText: '🎁 Забрать приз',
+            },
+        };
+
+        // ============ АУДИО ============
+        let audioCtx = null;
+
+        function createMelody() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            const notes = [523, 659, 784, 1047, 784, 659, 523, 659, 784, 659, 523];
+            const duration = 0.25;
+            notes.forEach((freq, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * duration);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * duration + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(audioCtx.currentTime + i * duration);
+                osc.stop(audioCtx.currentTime + i * duration + duration);
+            });
         }
 
-        function updateStepForm(num) {
-            const type = document.getElementById(`step${num}type`).value;
-            const extra = document.getElementById(`step${num}extra`);
-            if (type === 'colors') {
-                extra.innerHTML = `
-                    <label>Варианты цветов (через запятую)</label>
-                    <input type="text" id="step${num}options" value="❤️,💜,💙,💚,🧡,💛" placeholder="❤️,💜,💙,💚,🧡,💛">
-                `;
-            } else {
-                extra.innerHTML = '';
+        function toggleAudio() {
+            const btn = document.getElementById('audioToggle');
+            if (audioCtx && audioCtx.state === 'running') {
+                audioCtx.suspend();
+                btn.textContent = '🔇';
+            } else if (audioCtx) {
+                audioCtx.resume();
+                btn.textContent = '🔊';
             }
-        }
-
-        // Инициализация форм
-        updateStepForm(1);
-        updateStepForm(2);
-        updateStepForm(3);
-
-        // ============ СБОРКА КВЕСТА ============
-        function buildQuest() {
-            const steps = [];
-            for (let i = 1; i <= 3; i++) {
-                const type = document.getElementById(`step${i}type`).value;
-                const title = document.getElementById(`step${i}title`).value.trim();
-                const question = document.getElementById(`step${i}question`).value.trim();
-                let answer = document.getElementById(`step${i}answer`).value.trim();
-                const step = { type, title: title || `Шаг ${i}`, question: question || 'Реши загадку...' };
-
-                if (type === 'colors') {
-                    step.answer = answer.split(',').map(s => s.trim()).filter(s => s);
-                    const optsEl = document.getElementById(`step${i}options`);
-                    step.options = optsEl ? optsEl.value.split(',').map(s => s.trim()).filter(s => s) : ['❤️',
-                        '💜', '💙', '💚', '🧡', '💛'
-                    ];
-                } else if (type === 'number') {
-                    step.answer = parseInt(answer) || answer;
-                } else {
-                    step.answer = answer;
-                }
-                steps.push(step);
-            }
-
-            const prize = {
-                message: document.getElementById('prizeMessage').value.trim() || 'Ты справилась! Твой приз ждёт тебя!',
-                link: document.getElementById('prizeLink').value.trim() || null,
-                linkText: document.getElementById('prizeLinkText').value.trim() || '🎁 Забрать приз',
-            };
-
-            return {
-                title: document.getElementById('questTitle').value.trim() || 'Квест-сюрприз',
-                steps,
-                prize,
-                createdAt: new Date().toISOString(),
-            };
-        }
-
-        function previewQuest() {
-            const quest = buildQuest();
-            const out = document.getElementById('previewOutput');
-            out.style.display = 'block';
-            out.textContent = JSON.stringify(quest, null, 2);
         }
 
         // ============ ТЕСТИРОВАНИЕ ============
-        let testState = {};
+        let gameState = {};
+        let gameTimerInterval = null;
+        let dragTarget = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
 
         function testQuest() {
-            const quest = buildQuest();
-            // Проверка на заполненность
-            for (let i = 0; i < quest.steps.length; i++) {
-                if (!quest.steps[i].answer || (Array.isArray(quest.steps[i].answer) && quest.steps[i].answer.length ===
-                        0)) {
-                    showToast(`Заполни ответ для шага ${i+1}!`, 'error');
-                    return;
-                }
-            }
+            // Сбрасываем состояние
+            gameState = {
+                currentStep: 0,
+                stepData: {},
+            };
 
-            testState = { ...quest, currentStep: 0, colorSlots: [null, null, null, null], selectedColor: null };
-            renderTestStep();
-            document.getElementById('testModal').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('gameOverlay').style.display = 'flex';
+            document.getElementById('audioToggle').style.display = 'flex';
+            document.getElementById('prizeOverlay').innerHTML = '';
+
+            loadStep(0);
         }
 
-        function closeTest() {
-            document.getElementById('testModal').style.display = 'none';
+        function stopGame() {
+            clearInterval(gameTimerInterval);
+            document.getElementById('gameOverlay').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('audioToggle').style.display = 'none';
+            document.getElementById('prizeOverlay').innerHTML = '';
+            if (audioCtx) audioCtx.suspend();
         }
 
-        document.getElementById('testModal').addEventListener('click', function(e) {
-            if (e.target === this) closeTest();
-        });
+        function loadStep(stepIndex) {
+            clearInterval(gameTimerInterval);
+            const container = document.getElementById('gameContainer');
+            // Убираем старые элементы
+            container.querySelectorAll('.snake,.circle,.peg,.floating-circle').forEach(el => el.remove());
 
-        function renderTestStep() {
-            const box = document.getElementById('testContent');
-            const step = testState.steps[testState.currentStep];
+            const step = QUEST_CONFIG.steps[stepIndex];
+            document.getElementById('gameTitle').textContent = step.title;
+            document.getElementById('gameTimer').textContent = step.timeLimit || '∞';
+            document.getElementById('gameTimer').classList.remove('urgent');
 
-            let html = `
-                <button style="position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.5em;cursor:pointer;" onclick="closeTest()">✕</button>
-                <div style="text-align:center;margin-bottom:16px;">
-                    <span style="color:rgba(255,255,255,0.4);font-size:0.85em;">🧪 ТЕСТ: Шаг ${testState.currentStep+1} из ${testState.steps.length}</span>
-                </div>
-                <h2 style="text-align:center;color:#ff6b9d;margin-bottom:4px;">${step.title}</h2>
-                <p style="text-align:center;color:rgba(255,255,255,0.7);margin-bottom:16px;">${step.question}</p>
-            `;
+            gameState.currentStep = stepIndex;
+            gameState.stepData = {};
 
             if (step.type === 'text') {
-                html += `
-                    <input id="tAnswer" placeholder="Твой ответ..." style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;text-align:center;font-size:1.1em;outline:none;">
-                    <div id="tError" style="color:#ff4757;font-size:0.8em;margin-top:8px;text-align:center;min-height:20px;"></div>
-                    <p style="color:rgba(255,255,255,0.3);font-size:0.7em;text-align:center;margin-top:4px;">✅ Правильный ответ: <strong>${step.answer}</strong></p>
-                    <button id="tSubmit" style="width:100%;margin-top:12px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;letter-spacing:1px;">💫 Проверить</button>
-                `;
-            } else if (step.type === 'colors') {
-                const pal = step.options;
-                html += '<div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">';
-                pal.forEach(c => {
-                    const placed = testState.colorSlots.includes(c);
-                    html +=
-                        `<div class="thpick" data-color="${c}" style="width:50px;height:50px;border-radius:50%;font-size:2em;display:flex;align-items:center;justify-content:center;cursor:${placed?'default':'pointer'};opacity:${placed?'0.4':'1'};background:rgba(255,255,255,0.05);transition:all 0.3s;">${c}</div>`;
+                renderTextStep(container, step);
+            } else if (step.type === 'snakes') {
+                renderSnakeStep(container, step);
+                startTimer(step.timeLimit, () => {
+                    showToast('Время вышло! Попробуй ещё раз.', 'error');
+                    setTimeout(() => loadStep(stepIndex), 1500);
                 });
-                html += '</div><div style="display:flex;justify-content:center;gap:10px;margin:16px 0;">';
-                for (let i = 0; i < step.answer.length; i++) {
-                    html +=
-                        `<div class="tslot" data-slot="${i}" style="width:50px;height:50px;border-radius:50%;border:2px dashed rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:2em;cursor:pointer;">${testState.colorSlots[i]||'◌'}</div>`;
-                }
-                html += '</div>';
-                html +=
-                    '<p style="color:rgba(255,255,255,0.3);font-size:0.7em;text-align:center;">✅ Правильный порядок: <strong>' +
-                    step.answer.join(', ') + '</strong></p>';
-                html +=
-                    '<button id="tClear" style="width:100%;margin-top:8px;padding:10px;border-radius:50px;border:1px solid rgba(255,255,255,0.2);background:transparent;color:#fff;cursor:pointer;font-family:Georgia;">🔄 Заново</button>';
-                html +=
-                    '<button id="tColorSubmit" style="width:100%;margin-top:8px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;letter-spacing:1px;">💫 Проверить</button>';
-                html +=
-                    '<div id="tError" style="color:#ff4757;font-size:0.8em;margin-top:8px;text-align:center;min-height:20px;"></div>';
-            } else if (step.type === 'number') {
-                html += `
-                    <input type="number" id="tAnswer" placeholder="Введи число..." style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.07);color:#fff;text-align:center;font-size:1.1em;outline:none;">
-                    <div id="tError" style="color:#ff4757;font-size:0.8em;margin-top:8px;text-align:center;min-height:20px;"></div>
-                    <p style="color:rgba(255,255,255,0.3);font-size:0.7em;text-align:center;margin-top:4px;">✅ Правильный ответ: <strong>${step.answer}</strong></p>
-                    <button id="tSubmit" style="width:100%;margin-top:12px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;letter-spacing:1px;">💫 Проверить</button>
-                `;
+            } else if (step.type === 'pegs') {
+                renderPegStep(container, step);
+                startTimer(step.timeLimit, () => {
+                    showToast('Время вышло! Попробуй ещё раз.', 'error');
+                    setTimeout(() => loadStep(stepIndex), 1500);
+                });
             }
-
-            box.innerHTML = html;
-            bindTestEvents(step);
         }
 
-        function bindTestEvents(step) {
-            const submit = document.getElementById('tSubmit');
-            const input = document.getElementById('tAnswer');
-            const err = document.getElementById('tError');
+        function startTimer(seconds, onEnd) {
+            let remaining = seconds;
+            const timerEl = document.getElementById('gameTimer');
+            timerEl.textContent = remaining;
 
-            if (submit && input) {
-                input.addEventListener('keydown', e => { if (e.key === 'Enter') submit.click(); });
-                submit.addEventListener('click', () => {
-                    const ans = input.value.trim().toLowerCase();
-                    const correct = String(step.answer).toLowerCase();
-                    if (ans === correct) {
-                        err.textContent = '';
-                        input.style.borderColor = '#4effb4';
-                        submit.disabled = true;
-                        submit.textContent = '✅ Верно!';
-                        advanceTest();
-                    } else {
-                        err.textContent = 'Неверно! Правильный ответ: ' + step.answer;
-                        input.style.borderColor = '#ff4757';
+            gameTimerInterval = setInterval(() => {
+                remaining--;
+                timerEl.textContent = remaining;
+                if (remaining <= 10) timerEl.classList.add('urgent');
+                if (remaining <= 0) {
+                    clearInterval(gameTimerInterval);
+                    if (onEnd) onEnd();
+                }
+            }, 1000);
+        }
+
+        // ============ ШАГ 1: ТЕКСТ ============
+        function renderTextStep(container, step) {
+            const box = document.createElement('div');
+            box.style.cssText =
+                'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:85%;';
+            box.innerHTML = `
+                <p style="color:#fff;font-size:1.1em;margin-bottom:8px;">${step.question}</p>
+                <input type="text" id="textAnswer" placeholder="Твой ответ..." 
+                       style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;text-align:center;font-size:1.1em;outline:none;">
+                <div id="textError" style="color:#ff4757;font-size:0.8em;margin-top:8px;min-height:20px;"></div>
+                <button id="textSubmit" style="width:100%;margin-top:12px;padding:14px;border-radius:50px;border:none;background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;font-size:1em;cursor:pointer;font-family:Georgia;">💫 Проверить</button>
+            `;
+            container.appendChild(box);
+
+            document.getElementById('textSubmit').addEventListener('click', () => {
+                const ans = document.getElementById('textAnswer').value.trim().toLowerCase();
+                if (ans === step.answer.toLowerCase()) {
+                    document.getElementById('textError').textContent = '';
+                    advanceStep();
+                } else {
+                    document.getElementById('textError').textContent = 'Не совсем так... 💕';
+                }
+            });
+
+            document.getElementById('textAnswer').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') document.getElementById('textSubmit').click();
+            });
+        }
+
+        // ============ ШАГ 2: ЗМЕИ ============
+        function renderSnakeStep(container, step) {
+            const colors = step.colors;
+            const containerRect = container.getBoundingClientRect();
+            const margin = 60;
+            const areaW = containerRect.width - margin * 2;
+            const areaH = containerRect.height - 120 - margin * 2;
+
+            gameState.stepData.snakesPlaced = 0;
+            gameState.stepData.totalSnakes = step.snakeCount;
+
+            // Создаём круги
+            const circlePositions = [];
+            for (let i = 0; i < step.snakeCount; i++) {
+                const circle = document.createElement('div');
+                circle.className = 'circle';
+                circle.style.backgroundColor = colors[i] + '33';
+                circle.style.borderColor = colors[i];
+                circle.style.color = colors[i];
+                circle.textContent = '○';
+                const cx = margin + Math.random() * areaW;
+                const cy = 120 + Math.random() * areaH;
+                circle.style.left = cx + 'px';
+                circle.style.top = cy + 'px';
+                circle.dataset.color = colors[i];
+                circle.dataset.index = i;
+                container.appendChild(circle);
+                circlePositions.push({ x: cx + 30, y: cy + 30, color: colors[i] });
+            }
+
+            // Создаём змей
+            const snakePositions = [];
+            for (let i = 0; i < step.snakeCount; i++) {
+                const snake = document.createElement('div');
+                snake.className = 'snake';
+                snake.textContent = '🐍';
+                snake.style.color = colors[i];
+                snake.dataset.color = colors[i];
+                snake.dataset.index = i;
+                // Размещаем не слишком близко к кругу своего цвета
+                let sx, sy;
+                do {
+                    sx = margin + Math.random() * areaW;
+                    sy = 120 + Math.random() * areaH;
+                } while (Math.hypot(sx - circlePositions[i].x, sy - circlePositions[i].y) < 100);
+                snake.style.left = sx + 'px';
+                snake.style.top = sy + 'px';
+                snake.style.animationDelay = (Math.random() * 0.5) + 's';
+                container.appendChild(snake);
+                snakePositions.push({ el: snake, color: colors[i], index: i });
+
+                // Drag events
+                snake.addEventListener('pointerdown', (e) => {
+                    if (snake.classList.contains('caught')) return;
+                    dragTarget = snake;
+                    const rect = snake.getBoundingClientRect();
+                    dragOffsetX = e.clientX - rect.left;
+                    dragOffsetY = e.clientY - rect.top;
+                    snake.style.zIndex = '15';
+                    snake.style.animation = 'none';
+                    e.preventDefault();
+                });
+            }
+
+            // Move event
+            container.addEventListener('pointermove', (e) => {
+                if (!dragTarget) return;
+                const containerRect = container.getBoundingClientRect();
+                let newX = e.clientX - containerRect.left - dragOffsetX;
+                let newY = e.clientY - containerRect.top - dragOffsetY;
+                newX = Math.max(0, Math.min(newX, containerRect.width - 50));
+                newY = Math.max(100, Math.min(newY, containerRect.height - 50));
+                dragTarget.style.left = newX + 'px';
+                dragTarget.style.top = newY + 'px';
+            });
+
+            // Drop event
+            container.addEventListener('pointerup', (e) => {
+                if (!dragTarget) return;
+                const snakeColor = dragTarget.dataset.color;
+                const snakeEl = dragTarget;
+                dragTarget = null;
+                snakeEl.style.zIndex = '5';
+                snakeEl.style.animation = 'wiggle 0.8s ease-in-out infinite';
+                snakeEl.style.animationDelay = (Math.random() * 0.5) + 's';
+
+                // Проверяем, попала ли змея в круг своего цвета
+                const snakeRect = snakeEl.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                const snakeCX = snakeRect.left + snakeRect.width / 2 - containerRect.left;
+                const snakeCY = snakeRect.top + snakeRect.height / 2 - containerRect.top;
+
+                let caught = false;
+                container.querySelectorAll('.circle').forEach(circle => {
+                    if (circle.dataset.color === snakeColor && !circle.dataset.caught) {
+                        const cRect = circle.getBoundingClientRect();
+                        const cCX = cRect.left + cRect.width / 2 - containerRect.left;
+                        const cCY = cRect.top + cRect.height / 2 - containerRect.top;
+                        const dist = Math.hypot(snakeCX - cCX, snakeCY - cCY);
+                        if (dist < 45) {
+                            // Поймана!
+                            caught = true;
+                            circle.dataset.caught = 'true';
+                            snakeEl.classList.add('caught');
+                            snakeEl.style.left = (cCX - 25) + 'px';
+                            snakeEl.style.top = (cCY - 25) + 'px';
+                            gameState.stepData.snakesPlaced++;
+                            setTimeout(() => {
+                                snakeEl.remove();
+                                circle.style.opacity = '0';
+                            }, 600);
+                            // Проверка победы
+                            if (gameState.stepData.snakesPlaced >= gameState.stepData
+                                .totalSnakes) {
+                                clearInterval(gameTimerInterval);
+                                setTimeout(() => advanceStep(), 800);
+                            }
+                        }
                     }
                 });
-                setTimeout(() => input?.focus(), 300);
-            }
-
-            document.querySelectorAll('.thpick').forEach(el => {
-                el.addEventListener('click', function() {
-                    if (this.style.opacity === '0.4') return;
-                    document.querySelectorAll('.thpick').forEach(e => e.style.background =
-                        'rgba(255,255,255,0.05)');
-                    this.style.background = 'rgba(255,107,157,0.4)';
-                    testState.selectedColor = this.dataset.color;
-                });
-            });
-            document.querySelectorAll('.tslot').forEach(el => {
-                el.addEventListener('click', function() {
-                    const idx = parseInt(this.dataset.slot);
-                    if (testState.colorSlots[idx] !== null || !testState.selectedColor) return;
-                    testState.colorSlots[idx] = testState.selectedColor;
-                    testState.selectedColor = null;
-                    document.querySelectorAll('.thpick').forEach(e => e.style.background =
-                        'rgba(255,255,255,0.05)');
-                    renderTestStep();
-                });
-                let lt;
-                el.addEventListener('touchstart', () => {
-                    lt = setTimeout(() => {
-                        testState.colorSlots[parseInt(el.dataset.slot)] = null;
-                        renderTestStep();
-                    }, 600);
-                });
-                el.addEventListener('touchend', () => clearTimeout(lt));
-                el.addEventListener('touchmove', () => clearTimeout(lt));
-            });
-
-            const clr = document.getElementById('tClear');
-            if (clr) clr.addEventListener('click', () => {
-                testState.colorSlots = [null, null, null, null];
-                testState.selectedColor = null;
-                renderTestStep();
-            });
-
-            const csub = document.getElementById('tColorSubmit');
-            if (csub) csub.addEventListener('click', () => {
-                const correct = step.answer;
-                const filled = testState.colorSlots.every(c => c !== null);
-                if (!filled) {
-                    document.getElementById('tError').textContent = 'Заполни все кружочки!';
-                    return;
-                }
-                if (testState.colorSlots.every((c, i) => c === correct[i])) {
-                    document.getElementById('tError').textContent = '';
-                    csub.disabled = true;
-                    csub.textContent = '✅ Идеально!';
-                    advanceTest();
-                } else {
-                    document.getElementById('tError').textContent =
-                        'Неверный порядок! Правильно: ' + correct.join(', ');
+                if (!caught) {
+                    // Возвращаем на место если не попала
+                    snakeEl.style.transition = 'all 0.3s ease';
                 }
             });
         }
 
-        function advanceTest() {
+        // ============ ШАГ 3: ШТЫРИ ============
+        function renderPegStep(container, step) {
+            const colors = step.colors;
+            const containerRect = container.getBoundingClientRect();
+            const pegSpacing = containerRect.width / (step.pegsCount + 1);
+
+            gameState.stepData.circlesPlaced = 0;
+            gameState.stepData.totalCircles = step.circleCount;
+
+            // Создаём штыри
+            for (let i = 0; i < step.pegsCount; i++) {
+                const peg = document.createElement('div');
+                peg.className = 'peg';
+                peg.style.backgroundColor = colors[i];
+                peg.style.left = (pegSpacing * (i + 1) - 10) + 'px';
+                peg.dataset.color = colors[i];
+                peg.dataset.count = 0;
+                peg.dataset.need = step.circleCount / step.pegsCount;
+                container.appendChild(peg);
+            }
+
+            // Создаём летающие круги
+            for (let i = 0; i < step.circleCount; i++) {
+                const color = colors[i % step.pegsCount];
+                const circle = document.createElement('div');
+                circle.className = 'floating-circle';
+                circle.style.backgroundColor = color;
+                circle.style.left = (30 + Math.random() * (containerRect.width - 80)) + 'px';
+                circle.style.top = (30 + Math.random() * 120) + 'px';
+                circle.style.animationDelay = (Math.random() * 3) + 's';
+                circle.style.animationDuration = (2 + Math.random() * 3) + 's';
+                circle.dataset.color = color;
+                container.appendChild(circle);
+
+                // Drag
+                circle.addEventListener('pointerdown', (e) => {
+                    if (circle.classList.contains('placed')) return;
+                    dragTarget = circle;
+                    const rect = circle.getBoundingClientRect();
+                    dragOffsetX = e.clientX - rect.left;
+                    dragOffsetY = e.clientY - rect.top;
+                    circle.style.animation = 'none';
+                    circle.style.zIndex = '15';
+                    e.preventDefault();
+                });
+            }
+
+            container.addEventListener('pointermove', (e) => {
+                if (!dragTarget || !dragTarget.classList.contains('floating-circle')) return;
+                const containerRect = container.getBoundingClientRect();
+                let newX = e.clientX - containerRect.left - dragOffsetX;
+                let newY = e.clientY - containerRect.top - dragOffsetY;
+                dragTarget.style.left = newX + 'px';
+                dragTarget.style.top = newY + 'px';
+            });
+
+            container.addEventListener('pointerup', (e) => {
+                if (!dragTarget || !dragTarget.classList.contains('floating-circle')) return;
+                const circleEl = dragTarget;
+                const circleColor = circleEl.dataset.color;
+                dragTarget = null;
+                circleEl.style.zIndex = '5';
+
+                const cRect = circleEl.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                const cCX = cRect.left + cRect.width / 2 - containerRect.left;
+                const cCY = cRect.top + cRect.height / 2 - containerRect.top;
+
+                let placed = false;
+                container.querySelectorAll('.peg').forEach(peg => {
+                    if (peg.dataset.color === circleColor && parseInt(peg.dataset.count) < parseInt(peg
+                            .dataset.need)) {
+                        const pRect = peg.getBoundingClientRect();
+                        const pCX = pRect.left + pRect.width / 2 - containerRect.left;
+                        const pCY = pRect.top - containerRect.top;
+                        const dist = Math.hypot(cCX - pCX, cCY - pCY);
+                        if (dist < 70) {
+                            placed = true;
+                            peg.dataset.count = parseInt(peg.dataset.count) + 1;
+                            circleEl.classList.add('placed');
+                            circleEl.style.left = (pCX - 20) + 'px';
+                            circleEl.style.top = (pCY - 30 - parseInt(peg.dataset.count) * 22) +
+                                'px';
+                            gameState.stepData.circlesPlaced++;
+                            if (gameState.stepData.circlesPlaced >= gameState.stepData
+                                .totalCircles) {
+                                clearInterval(gameTimerInterval);
+                                setTimeout(() => advanceStep(), 800);
+                            }
+                        }
+                    }
+                });
+                if (!placed) {
+                    circleEl.style.animation = 'floatAround 3s ease-in-out infinite';
+                    circleEl.style.animationDelay = '0s';
+                }
+            });
+        }
+
+        // ============ ПЕРЕХОД МЕЖДУ ШАГАМИ ============
+        function advanceStep() {
+            clearInterval(gameTimerInterval);
+            if (gameState.currentStep < QUEST_CONFIG.steps.length - 1) {
+                const container = document.getElementById('gameContainer');
+                container.querySelectorAll('.snake,.circle,.peg,.floating-circle,div[style]').forEach(el => {
+                    if (el.closest && !el.closest('.game-header')) el.remove();
+                });
+                container.querySelectorAll('div').forEach(el => {
+                    if (!el.closest('.game-header') && el !== container && el.parentElement === container &&
+                        !el.classList.contains('snake') && !el.classList.contains('circle') && !el.classList
+                        .contains('peg') && !el.classList.contains('floating-circle')) {
+                        el.remove();
+                    }
+                });
+                loadStep(gameState.currentStep + 1);
+            } else {
+                showPrize();
+            }
+        }
+
+        // ============ ПРИЗ ============
+        function showPrize() {
+            clearInterval(gameTimerInterval);
+            const container = document.getElementById('gameContainer');
+            container.querySelectorAll('.snake,.circle,.peg,.floating-circle').forEach(el => el.remove());
+            document.getElementById('gameTitle').textContent = '🎁 Приз!';
+            document.getElementById('gameTimer').textContent = '🎉';
+
+            // Музыка
+            createMelody();
+            document.getElementById('audioToggle').textContent = '🔊';
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+
+            // Сердечки
+            launchHearts();
+
+            // Сообщение в контейнере
+            const prizeBox = document.createElement('div');
+            prizeBox.style.cssText =
+                'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;';
+            prizeBox.innerHTML = `
+                <div style="font-size:4em;">🎁</div>
+                <p style="color:#ffd700;font-size:1.2em;margin:10px 0;">${QUEST_CONFIG.prize.message}</p>
+                ${QUEST_CONFIG.prize.link ? `<a href="${QUEST_CONFIG.prize.link}" target="_blank" style="display:inline-block;padding:12px 28px;background:#ffd700;color:#1a1a2e;border-radius:50px;text-decoration:none;font-weight:bold;">${QUEST_CONFIG.prize.linkText}</a>` : ''}
+            `;
+            container.appendChild(prizeBox);
+
+            // Автозакрытие теста через 8 секунд
             setTimeout(() => {
-                if (testState.currentStep < testState.steps.length - 1) {
-                    testState.currentStep++;
-                    testState.selectedColor = null;
-                    renderTestStep();
-                } else {
-                    const box = document.getElementById('testContent');
-                    box.innerHTML = `
-                        <button style="position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.5);font-size:1.5em;cursor:pointer;" onclick="closeTest()">✕</button>
-                        <div style="text-align:center;">
-                            <div style="font-size:5em;">🎁</div>
-                            <h2 style="color:#ffd700;margin:12px 0;">Тест пройден!</h2>
-                            <p style="color:#fff;">${testState.prize.message}</p>
-                            ${testState.prize.link?`<a href="${testState.prize.link}" target="_blank" style="display:inline-block;margin-top:12px;padding:14px 28px;background:#ffd700;color:#1a1a2e;border-radius:50px;text-decoration:none;font-weight:bold;">${testState.prize.linkText}</a>`:''}
-                            <br><br>
-                            <button onclick="closeTest()" style="padding:12px 24px;border-radius:50px;border:1px solid rgba(255,255,255,0.3);background:transparent;color:#fff;cursor:pointer;font-family:Georgia;">Закрыть</button>
-                        </div>
-                    `;
-                }
-            }, 700);
+                if (confirm('Тест пройден! Закрыть?')) stopGame();
+            }, 8000);
         }
 
-        // ============ ОТПРАВКА КВЕСТА ============
-        function sendQuest() {
-            const quest = buildQuest();
-            // Проверка
-            for (let i = 0; i < quest.steps.length; i++) {
-                if (!quest.steps[i].answer || (Array.isArray(quest.steps[i].answer) && quest.steps[i].answer.length ===
-                        0)) {
-                    showToast(`Заполни ответ для шага ${i+1}!`, 'error');
-                    return;
-                }
-            }
-            if (!quest.prize.message) {
-                showToast('Напиши сообщение для приза!', 'error');
-                return;
-            }
+        function launchHearts() {
+            const overlay = document.getElementById('prizeOverlay');
+            overlay.innerHTML = '';
+            const hearts = ['❤️', '💕', '💖', '💗', '💝', '💘', '💓', '💞', '🩷', '♥️'];
+            const centerY = window.innerHeight * 0.45;
 
-            // Сохраняем в localStorage
-            localStorage.setItem('activeQuest', JSON.stringify(quest));
+            for (let i = 0; i < 80; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.setProperty('--hd', (2 + Math.random() * 3) + 's');
+                heart.style.setProperty('--hdel', Math.random() * 1.5 + 's');
+                heart.style.setProperty('--burstY', centerY + 'px');
+                heart.style.fontSize = (1.5 + Math.random() * 3) + 'em';
+                overlay.appendChild(heart);
+                setTimeout(() => heart.remove(), 5000);
+            }
+        }
+
+        // ============ ОТПРАВКА ============
+        function sendQuest() {
+            // Сохраняем квест в localStorage (общий для всего домена)
+            localStorage.setItem('activeQuest', JSON.stringify(QUEST_CONFIG));
             localStorage.removeItem('questCompleted');
 
-            // Отправляем push-уведомление
-            sendPushNotification(quest.title);
+            // Отправляем push-уведомление через Service Worker
+            sendPushNotification();
 
-            showToast('✅ Квест отправлен! Супруга получит уведомление.');
-            updateStatus();
+            showToast('✅ Квест отправлен! Супруга получит уведомление.', 'success');
+            checkStatus();
         }
 
-        async function sendPushNotification(title) {
-            const subData = localStorage.getItem('pushSub');
-            if (!subData) {
-                console.log('Нет подписки для push');
-                document.getElementById('notifStatus').textContent =
-                    '(уведомление не отправлено — супруга не подписана)';
-                document.getElementById('notifStatus').style.color = '#ff9f43';
+        async function sendPushNotification() {
+            if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
+                showToast('⚠ Service Worker не активен. Уведомление не отправлено.', 'error');
                 return;
             }
-
-            try {
-                const subscription = JSON.parse(subData);
-                // Отправляем через сервис (в реальности нужен сервер, здесь — эмуляция)
-                // Пока просто покажем уведомление через SW если он активен
-                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({
-                        type: 'SHOW_NOTIFICATION',
-                        title: '💝 Новый сюрприз!',
-                        body: title || 'Тебя ждёт кое-что особенное...',
-                        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💝</text></svg>',
-                    });
-                }
-                document.getElementById('notifStatus').textContent = '(уведомление отправлено)';
-                document.getElementById('notifStatus').style.color = '#4effb4';
-            } catch (e) {
-                console.error('Ошибка отправки:', e);
-                document.getElementById('notifStatus').textContent = '(ошибка отправки)';
-                document.getElementById('notifStatus').style.color = '#ff4757';
-            }
+            navigator.serviceWorker.controller.postMessage({
+                type: 'SHOW_NOTIFICATION',
+                title: '💝 Новый сюрприз!',
+                body: QUEST_CONFIG.title || 'Тебя ждёт кое-что особенное...',
+                icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💝</text></svg>',
+            });
         }
 
         function resetQuest() {
             localStorage.removeItem('activeQuest');
             localStorage.removeItem('questCompleted');
-            showToast('🗑 Квест сброшен');
-            updateStatus();
+            showToast('🗑 Квест сброшен', 'success');
+            checkStatus();
         }
 
-        function loadCurrentQuest() {
-            updateStatus();
-            const data = localStorage.getItem('activeQuest');
-            const preview = document.getElementById('previewOutput');
-            if (data) {
-                preview.style.display = 'block';
-                preview.textContent = 'Активный квест:\n' + JSON.stringify(JSON.parse(data), null, 2);
-            } else {
-                preview.style.display = 'block';
-                preview.textContent = 'Нет активного квеста';
-            }
-        }
-
-        function updateStatus() {
+        function checkStatus() {
             const data = localStorage.getItem('activeQuest');
             const done = localStorage.getItem('questCompleted');
             const status = document.getElementById('questStatus');
-            const resetBtn = document.getElementById('resetBtn');
-
             if (data && !done) {
                 status.textContent = '🟢 Активный квест';
                 status.className = 'status status-active';
-                resetBtn.disabled = false;
             } else if (done) {
                 status.textContent = '✅ Квест пройден';
                 status.className = 'status status-active';
-                resetBtn.disabled = false;
             } else {
                 status.textContent = '⚫ Нет активного квеста';
                 status.className = 'status status-inactive';
-                resetBtn.disabled = true;
             }
         }
 
+        function showToast(msg, type) {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+            const t = document.createElement('div');
+            t.className = `toast toast-${type}`;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2500);
+        }
+
         // ============ ЗАПУСК ============
-        updateStatus();
+        checkStatus();
     </script>
 </body>
 </html>
