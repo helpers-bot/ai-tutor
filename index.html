@@ -760,6 +760,28 @@
 
         .edit-icon:hover { color: #ffd966; }
 
+        .payment-info {
+            background: rgba(0,0,0,0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .payment-address {
+            background: rgba(0,0,0,0.5);
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            word-break: break-all;
+            font-size: 0.75rem;
+            color: #f5d78c;
+            margin: 0.5rem 0;
+        }
+        .payment-status {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
         .hidden { display: none !important; }
 
         .footer {
@@ -1168,6 +1190,7 @@
         <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма: <strong style="color: #f5d78c;">1$</strong> | Максимальная сумма: <strong style="color: #f5d78c;">25$</strong></p>
         <div class="input-group"><label>💎 Криптовалюта *</label><select id="withdrawCrypto"><option value="">Выберите</option><option value="BTC">BTC</option><option value="ETH">ETH</option><option value="USDT">USDT</option><option value="LTC">LTC</option></select></div>
         <div class="input-group"><label>💲 Сумма (1-25$)</label><input type="number" id="withdrawAmount" min="1" max="25" step="0.01"></div>
+        <div class="input-group"><label>📝 Адрес кошелька</label><input type="text" id="withdrawAddress" placeholder="Введите адрес кошелька"></div>
         <div class="input-group"><label>📝 Комментарий</label><input type="text" id="withdrawComment" placeholder="По желанию"></div>
         <div class="modal-buttons">
             <button class="btn-primary" id="confirmWithdrawBtn">Вывести</button>
@@ -1214,8 +1237,33 @@
         </div>
         <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem; text-align: center;" id="vipBenefitsText"></p>
         <div class="modal-buttons">
-            <button class="btn-primary" id="confirmVipBtn">Купить за 10$</button>
+            <button class="btn-primary" id="confirmVipBtn">Оплатить криптовалютой</button>
             <button class="btn-outline" id="closeVipBtn">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay hidden" id="paymentModal">
+    <div class="modal" style="max-width: 450px;">
+        <h2>💳 Оплата VIP статуса</h2>
+        <div class="input-group">
+            <label>Выберите криптовалюту</label>
+            <select id="paymentCrypto">
+                <option value="usdttrc20">USDT (TRC20)</option>
+                <option value="usdterc20">USDT (ERC20)</option>
+                <option value="btc">Bitcoin (BTC)</option>
+                <option value="eth">Ethereum (ETH)</option>
+                <option value="ltc">Litecoin (LTC)</option>
+            </select>
+        </div>
+        <div id="paymentInfo" class="payment-info" style="display: none;">
+            <p style="color: #b9b09a;">Отправьте <strong id="paymentCryptoAmount" style="color: #f5d78c;">0</strong> на адрес:</p>
+            <div class="payment-address" id="paymentAddress"></div>
+            <p class="payment-status" id="paymentStatus" style="color: #ffc107;">⏳ Ожидание оплаты...</p>
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-vip" id="createPaymentBtn">💰 Создать платёж</button>
+            <button class="btn-outline" id="closePaymentBtn">Отмена</button>
         </div>
     </div>
 </div>
@@ -1315,6 +1363,7 @@
         const supabaseUrl = 'https://zvneiyhsoivaozzhzeoy.supabase.co';
         const supabaseKey = 'sb_publishable_CFPn1BIheE6L8wS89l0LtA_G9GofNzt';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        const API_URL = '/api';
 
         const stageRegister = document.getElementById('stageRegister');
         const stageHome = document.getElementById('stageHome');
@@ -1328,6 +1377,7 @@
         let lastWithdrawId = null;
         let lastFeedUpdate = 0;
         let captchaAnswer = 0;
+        let paymentCheckInterval = null;
 
         let allNicks = [];
         let namesLoaded = false;
@@ -1375,6 +1425,7 @@
             return num.toString();
         }
 
+        // ===== ПОДДЕРЖКА =====
         function initSupport() {
             const supportBtn = document.getElementById('supportBtn');
             const supportChat = document.getElementById('supportChat');
@@ -1431,6 +1482,73 @@
             setInterval(checkForAdminResponse, 5000);
         }
 
+        // ===== NOWPAYMENTS ИНТЕГРАЦИЯ =====
+        async function createCryptoPayment() {
+            const cryptoType = document.getElementById('paymentCrypto').value;
+            try {
+                const response = await fetch(`${API_URL}/create-payment.php`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: userData.id,
+                        crypto_type: cryptoType
+                    })
+                });
+                const data = await response.json();
+                
+                if (data.pay_address) {
+                    document.getElementById('paymentInfo').style.display = 'block';
+                    document.getElementById('paymentCryptoAmount').textContent = data.pay_amount + ' ' + data.pay_currency;
+                    document.getElementById('paymentAddress').textContent = data.pay_address;
+                    document.getElementById('paymentStatus').textContent = '⏳ Ожидание оплаты...';
+                    document.getElementById('paymentStatus').style.color = '#ffc107';
+                    document.getElementById('createPaymentBtn').style.display = 'none';
+                    startPaymentCheck(data.payment_id);
+                } else {
+                    showToast('Ошибка создания платежа', 'error');
+                }
+            } catch(e) {
+                console.error('Payment error:', e);
+                showToast('Ошибка соединения', 'error');
+            }
+        }
+
+        function startPaymentCheck(paymentId) {
+            if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+            
+            paymentCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_URL}/check-payment.php?payment_id=${paymentId}`);
+                    const data = await response.json();
+                    
+                    if (data.payment_status === 'finished') {
+                        clearInterval(paymentCheckInterval);
+                        document.getElementById('paymentStatus').textContent = '✅ Оплата получена!';
+                        document.getElementById('paymentStatus').style.color = '#4caf50';
+                        
+                        setTimeout(async () => {
+                            await loadUserData();
+                            document.getElementById('paymentModal').classList.add('hidden');
+                            document.getElementById('createPaymentBtn').style.display = 'inline-block';
+                            document.getElementById('paymentInfo').style.display = 'none';
+                            if (userData.vip_paid) {
+                                showToast('🎉 VIP статус успешно активирован!', 'success');
+                                await loadReferrals();
+                            }
+                        }, 3000);
+                    } else if (data.payment_status === 'expired') {
+                        clearInterval(paymentCheckInterval);
+                        document.getElementById('paymentStatus').textContent = '❌ Время оплаты истекло';
+                        document.getElementById('paymentStatus').style.color = '#ff7043';
+                        document.getElementById('createPaymentBtn').style.display = 'inline-block';
+                    }
+                } catch(e) {
+                    console.error('Check error:', e);
+                }
+            }, 5000);
+        }
+
+        // ===== ЗАГРУЗКА ДАННЫХ =====
         async function loadPlatformStats() {
             const { data } = await supabase.rpc('get_platform_stats');
             if (data) {
@@ -1449,7 +1567,9 @@
         async function addNewUserToDB() {
             const nickname = randomNick();
             const password = 'auto' + Math.floor(Math.random() * 9999);
-            await supabase.rpc('register_user', { p_nickname: nickname, p_password: password, p_referral_code: null });
+            await supabase.rpc('register_user', {
+                p_nickname: nickname, p_password: password, p_referral_code: null
+            });
             loadPlatformStats();
         }
 
@@ -1483,28 +1603,35 @@
             const now = Date.now();
             if (now - lastFeedUpdate < 3000) return;
             lastFeedUpdate = now;
+
             const [depositResult, withdrawResult] = await Promise.all([
                 supabase.rpc('get_feed_items', { p_type: 'deposit', p_limit: 10 }),
                 supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
             ]);
+
             let hasNewDeposit = false;
             let hasNewWithdraw = false;
+
             if (depositResult.data && depositResult.data.length > 0) {
                 const newFirstId = depositResult.data[0].nickname + '_' + depositResult.data[0].created_at;
                 if (newFirstId !== lastDepositId) { hasNewDeposit = true; lastDepositId = newFirstId; }
                 feedCache.deposits = depositResult.data.map(item => ({
-                    nickname: item.nickname, amount: item.amount,
+                    nickname: item.nickname,
+                    amount: item.amount,
                     time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 }));
             }
+
             if (withdrawResult.data && withdrawResult.data.length > 0) {
                 const newFirstId = withdrawResult.data[0].nickname + '_' + withdrawResult.data[0].created_at;
                 if (newFirstId !== lastWithdrawId) { hasNewWithdraw = true; lastWithdrawId = newFirstId; }
                 feedCache.withdrawals = withdrawResult.data.map(item => ({
-                    nickname: item.nickname, amount: item.amount,
+                    nickname: item.nickname,
+                    amount: item.amount,
                     time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
                 }));
             }
+
             renderAllFeeds(hasNewDeposit, hasNewWithdraw);
         }
 
@@ -1531,26 +1658,51 @@
 
         function showStage(stage) {
             if (stage === 'home') {
-                stageRegister.style.display = 'none'; regLiveFeed.style.display = 'none';
-                stageHome.style.display = 'flex'; stageHome.classList.remove('hidden');
-                homeLiveFeed.style.display = 'flex'; initHomeStage();
+                stageRegister.style.display = 'none';
+                regLiveFeed.style.display = 'none';
+                stageHome.style.display = 'flex';
+                stageHome.classList.remove('hidden');
+                homeLiveFeed.style.display = 'flex';
+                initHomeStage();
             } else {
-                stageHome.style.display = 'none'; stageHome.classList.add('hidden');
-                homeLiveFeed.style.display = 'none'; stageRegister.style.display = 'flex';
-                regLiveFeed.style.display = 'flex'; initRegStage();
+                stageHome.style.display = 'none';
+                stageHome.classList.add('hidden');
+                homeLiveFeed.style.display = 'none';
+                stageRegister.style.display = 'flex';
+                regLiveFeed.style.display = 'flex';
+                initRegStage();
             }
-            loadFeedFromDB(); loadPlatformStats();
+            loadFeedFromDB();
+            loadPlatformStats();
         }
 
         async function initialize() {
-            await loadNames(); await loadPlatformStats(); await loadFeedFromDB();
-            initSupport(); scheduleNewUser(); scheduleDeposit(); scheduleWithdraw();
-            setInterval(loadPlatformStats, 10000); setInterval(() => loadFeedFromDB(), 5000);
-            if (userData && userData.id) { showStage('home'); } else { showStage('register'); }
+            await loadNames();
+            await loadPlatformStats();
+            await loadFeedFromDB();
+            initSupport();
+            scheduleNewUser();
+            scheduleDeposit();
+            scheduleWithdraw();
+            setInterval(loadPlatformStats, 10000);
+            setInterval(() => loadFeedFromDB(), 5000);
+
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('payment') === 'success') {
+                showToast('Оплата получена! Проверьте статус VIP.', 'success');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            if (userData && userData.id) {
+                showStage('home');
+            } else {
+                showStage('register');
+            }
         }
 
         initialize();
 
+        // ===== ЭКРАН РЕГИСТРАЦИИ =====
         function initRegStage() {
             const password2Group = document.getElementById('password2Group');
             const captchaGroup = document.getElementById('captchaGroup');
@@ -1562,12 +1714,17 @@
             function updateUIForMode() {
                 errorMessage.classList.remove('visible');
                 if (isLoginMode) {
-                    password2Group.classList.remove('visible-password'); password2Group.classList.add('hidden-password');
-                    captchaGroup.classList.remove('visible'); actionButton.textContent = 'Войти';
+                    password2Group.classList.remove('visible-password');
+                    password2Group.classList.add('hidden-password');
+                    captchaGroup.classList.remove('visible');
+                    actionButton.textContent = 'Войти';
                     switchTextBlock.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
                 } else {
-                    password2Group.classList.remove('hidden-password'); password2Group.classList.add('visible-password');
-                    captchaGroup.classList.add('visible'); generateCaptcha(); actionButton.textContent = 'Зарегистрироваться';
+                    password2Group.classList.remove('hidden-password');
+                    password2Group.classList.add('visible-password');
+                    captchaGroup.classList.add('visible');
+                    generateCaptcha();
+                    actionButton.textContent = 'Зарегистрироваться';
                     switchTextBlock.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
                 }
                 const toggleLink = document.getElementById('toggleModeLink');
@@ -1586,26 +1743,33 @@
                 if (!isLoginMode) {
                     const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
                     if (userAnswer !== captchaAnswer) {
-                        errorMessage.textContent = '❌ Неверный ответ капчи'; errorMessage.classList.add('visible');
-                        generateCaptcha(); return;
+                        errorMessage.textContent = '❌ Неверный ответ капчи';
+                        errorMessage.classList.add('visible');
+                        generateCaptcha();
+                        return;
                     }
                 }
 
                 if (isLoginMode) {
                     const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
                     if (error || !data || !data.success) {
-                        errorMessage.textContent = '❌ Данные неверны'; errorMessage.classList.add('visible'); return;
+                        errorMessage.textContent = '❌ Данные неверны';
+                        errorMessage.classList.add('visible');
+                        return;
                     }
                     localStorage.setItem('pirxmix_user', JSON.stringify({
                         id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid,
                         referral_code: data.referral_code, balance: data.balance
                     }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home');
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+                    showStage('home');
                 } else {
                     const password2 = document.getElementById('password2').value;
                     if (password !== password2) {
-                        errorMessage.textContent = '❌ Пароли не совпадают'; errorMessage.classList.add('visible');
-                        generateCaptcha(); return;
+                        errorMessage.textContent = '❌ Пароли не совпадают';
+                        errorMessage.classList.add('visible');
+                        generateCaptcha();
+                        return;
                     }
                     const urlParams = new URLSearchParams(window.location.search);
                     const refCode = urlParams.get('ref') || null;
@@ -1614,27 +1778,38 @@
                     });
                     if (error || !data || !data.success) {
                         errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
-                        errorMessage.classList.add('visible'); generateCaptcha(); return;
+                        errorMessage.classList.add('visible');
+                        generateCaptcha();
+                        return;
                     }
                     localStorage.setItem('pirxmix_user', JSON.stringify({
                         id: data.user_id, nickname: data.nickname, vip_paid: false,
                         referral_code: data.referral_code, balance: 0
                     }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home');
+                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+                    showStage('home');
                 }
             };
         }
 
+        // ===== ЭКРАН КАБИНЕТА =====
         function initHomeStage() {
             if (!userData || !userData.id) { showStage('register'); return; }
-            updateGreeting(); loadUserData(); loadReferrals(); loadPlatformStats(); initModals(); initCalculator();
+            updateGreeting();
+            loadUserData();
+            loadReferrals();
+            loadPlatformStats();
+            initModals();
+            initCalculator();
             setInterval(() => { loadUserData(); loadReferrals(); loadPlatformStats(); }, 30000);
         }
 
         function updateGreeting() {
             const greetingEl = document.getElementById('userGreeting');
             let html = '👋 ' + userData.nickname;
-            if (userData.vip_paid) { html += ' <span class="vip-badge">VIP</span>'; }
+            if (userData.vip_paid) {
+                html += ' <span class="vip-badge">VIP</span>';
+            }
             greetingEl.innerHTML = html;
         }
 
@@ -1642,9 +1817,11 @@
             const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
             if (data && data.success) {
                 document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
-                userData.vip_paid = data.vip_paid; userData.balance = data.balance;
+                userData.vip_paid = data.vip_paid;
+                userData.balance = data.balance;
                 userData.referral_code = data.referral_code;
-                localStorage.setItem('pirxmix_user', JSON.stringify(userData)); updateGreeting();
+                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
+                updateGreeting();
             }
         }
 
@@ -1665,14 +1842,19 @@
             const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
 
             window.calcChange = function(id, delta) {
-                const el = document.getElementById(id); if (!el) return;
+                const el = document.getElementById(id);
+                if (!el) return;
                 let val = Math.max(0, (parseInt(el.textContent) || 0) + delta);
-                el.textContent = val; updateCalcTotal();
+                el.textContent = val;
+                updateCalcTotal();
             };
 
             function updateCalcTotal() {
                 let total = 0;
-                calcLevels.forEach((id, i) => { const el = document.getElementById(id); if (el) total += (parseInt(el.textContent) || 0) * percents[i]; });
+                calcLevels.forEach((id, i) => {
+                    const el = document.getElementById(id);
+                    if (el) total += (parseInt(el.textContent) || 0) * percents[i];
+                });
                 document.getElementById('calcTotal').textContent = total.toFixed(2) + ' $';
             }
 
@@ -1681,17 +1863,28 @@
                 document.getElementById('calcTotal').textContent = '0.00 $';
                 document.getElementById('calculatorModal').classList.remove('hidden');
             };
-            document.getElementById('closeCalculatorBtn').onclick = () => document.getElementById('calculatorModal').classList.add('hidden');
-            document.getElementById('calculatorModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
+
+            document.getElementById('closeCalculatorBtn').onclick = function() {
+                document.getElementById('calculatorModal').classList.add('hidden');
+            };
+            document.getElementById('calculatorModal').onclick = function(e) {
+                if (e.target === this) this.classList.add('hidden');
+            };
         }
 
         function initModals() {
             document.getElementById('logoutBtn').onclick = function() {
-                localStorage.removeItem('pirxmix_user'); userData = null; showStage('register');
+                if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+                localStorage.removeItem('pirxmix_user');
+                userData = null;
+                showStage('register');
             };
 
             function handleRefAction() {
-                if (!userData || !userData.vip_paid) { showToast('Доступ получают владельцы статуса VIP', 'error'); return; }
+                if (!userData || !userData.vip_paid) {
+                    showToast('Доступ получают владельцы статуса VIP', 'error');
+                    return;
+                }
                 const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
                 navigator.clipboard.writeText(refLink).then(() => showToast('Реферальная ссылка скопирована!', 'success'));
             }
@@ -1700,7 +1893,8 @@
 
             document.getElementById('manualBtn').onclick = function() {
                 if (!userData || !userData.vip_paid) {
-                    showToast('Доступ получают владельцы статуса VIP', 'error'); return;
+                    showToast('Доступ получают владельцы статуса VIP', 'error');
+                    return;
                 }
                 window.open('info.html', '_blank');
             };
@@ -1709,6 +1903,7 @@
             document.getElementById('closePolicyBtn').onclick = () => document.getElementById('policyModal').classList.add('hidden');
             document.getElementById('policyModal').onclick = function(e) { if (e.target === this) this.classList.add('hidden'); };
 
+            // Профиль
             document.getElementById('profileBtn').onclick = function() {
                 document.getElementById('profileNicknameText').textContent = userData.nickname;
                 document.getElementById('profileNicknameDisplay').style.display = 'flex';
@@ -1718,16 +1913,13 @@
                 document.getElementById('profilePassword2').value = '';
                 document.getElementById('profileModal').classList.remove('hidden');
             };
-
             document.getElementById('closeProfileBtn').onclick = () => document.getElementById('profileModal').classList.add('hidden');
-
             document.getElementById('editNicknameIcon').onclick = function() {
                 document.getElementById('profileNicknameDisplay').style.display = 'none';
                 document.getElementById('profileNicknameInputRow').classList.add('visible');
                 document.getElementById('profileNicknameInput').focus();
                 document.getElementById('profileNicknameInput').select();
             };
-
             document.getElementById('saveNicknameIcon').onclick = function() {
                 const newNickname = document.getElementById('profileNicknameInput').value.trim();
                 if (!newNickname) { showToast('Никнейм не может быть пустым', 'error'); return; }
@@ -1735,12 +1927,10 @@
                 document.getElementById('profileNicknameDisplay').style.display = 'flex';
                 document.getElementById('profileNicknameInputRow').classList.remove('visible');
             };
-
             document.getElementById('cancelNicknameIcon').onclick = function() {
                 document.getElementById('profileNicknameDisplay').style.display = 'flex';
                 document.getElementById('profileNicknameInputRow').classList.remove('visible');
             };
-
             document.getElementById('saveProfileBtn').onclick = async function() {
                 const newNickname = document.getElementById('profileNicknameText').textContent.trim();
                 const newPassword = document.getElementById('profilePassword').value;
@@ -1756,12 +1946,17 @@
                 showToast('Профиль обновлён!', 'success');
             };
 
+            // Вывод
             document.getElementById('withdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.remove('hidden');
             document.getElementById('closeWithdrawBtn').onclick = () => document.getElementById('withdrawModal').classList.add('hidden');
             document.getElementById('confirmWithdrawBtn').onclick = async function() {
                 const crypto = document.getElementById('withdrawCrypto').value;
                 const amount = parseFloat(document.getElementById('withdrawAmount').value);
-                if (!crypto || !amount || amount < 1 || amount > 25) return;
+                const address = document.getElementById('withdrawAddress').value.trim();
+                if (!crypto || !amount || amount < 1 || amount > 25 || !address) {
+                    showToast('Заполните все поля', 'error');
+                    return;
+                }
                 const { data } = await supabase.rpc('withdraw_funds', {
                     p_user_id: userData.id, p_amount: amount, p_crypto_type: crypto,
                     p_comment: document.getElementById('withdrawComment').value || null
@@ -1770,14 +1965,17 @@
                 document.getElementById('withdrawModal').classList.add('hidden');
             };
 
+            // VIP
             document.getElementById('vipBtn').onclick = async function() {
                 const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
                 const vipInfoBox = document.getElementById('vipInfoBox');
                 const confirmVipBtn = document.getElementById('confirmVipBtn');
                 const vipBenefitsText = document.getElementById('vipBenefitsText');
+
                 if (data && data.vip_paid) {
                     vipInfoBox.innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
-                    confirmVipBtn.style.display = 'none'; vipBenefitsText.textContent = '';
+                    confirmVipBtn.style.display = 'none';
+                    vipBenefitsText.textContent = '';
                 } else {
                     vipInfoBox.innerHTML = '<p>Цена:</p><div class="vip-price">10$</div>';
                     confirmVipBtn.style.display = 'inline-block';
@@ -1786,15 +1984,28 @@
                 document.getElementById('vipModal').classList.remove('hidden');
             };
             document.getElementById('closeVipBtn').onclick = () => document.getElementById('vipModal').classList.add('hidden');
-            document.getElementById('confirmVipBtn').onclick = async function() {
-                const { data } = await supabase.rpc('purchase_vip', { p_user_id: userData.id });
-                if (data && data.success) {
-                    document.getElementById('vipInfoBox').innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
-                    document.getElementById('confirmVipBtn').style.display = 'none';
-                    document.getElementById('vipBenefitsText').textContent = '';
-                    await loadUserData(); await loadReferrals();
-                    showToast('VIP активирован!', 'success');
-                } else if (data && data.error) { showToast(data.error, 'error'); }
+            document.getElementById('confirmVipBtn').onclick = function() {
+                document.getElementById('vipModal').classList.add('hidden');
+                document.getElementById('paymentModal').classList.remove('hidden');
+                document.getElementById('paymentInfo').style.display = 'none';
+                document.getElementById('createPaymentBtn').style.display = 'inline-block';
+            };
+
+            // Оплата
+            document.getElementById('createPaymentBtn').onclick = createCryptoPayment;
+            document.getElementById('closePaymentBtn').onclick = function() {
+                if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+                document.getElementById('paymentModal').classList.add('hidden');
+                document.getElementById('paymentInfo').style.display = 'none';
+                document.getElementById('createPaymentBtn').style.display = 'inline-block';
+            };
+            document.getElementById('paymentModal').onclick = function(e) {
+                if (e.target === this) {
+                    if (paymentCheckInterval) clearInterval(paymentCheckInterval);
+                    this.classList.add('hidden');
+                    document.getElementById('paymentInfo').style.display = 'none';
+                    document.getElementById('createPaymentBtn').style.display = 'inline-block';
+                }
             };
         }
     })();
