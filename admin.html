@@ -113,7 +113,7 @@
             text-transform: uppercase;
         }
 
-        .input-group input, .input-group textarea {
+        .input-group input, .input-group textarea, .input-group select {
             width: 100%;
             background: rgba(15, 16, 20, 0.8);
             border: 1px solid rgba(220, 180, 100, 0.25);
@@ -126,11 +126,21 @@
             resize: vertical;
         }
 
+        .input-group select {
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .input-group select option {
+            background: #1a1c22;
+            color: #f5e7cc;
+        }
+
         .input-group textarea {
             min-height: 60px;
         }
 
-        .input-group input:focus, .input-group textarea:focus {
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
             border-color: #c084fc;
             box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
         }
@@ -194,6 +204,16 @@
             box-shadow: 0 8px 20px rgba(249, 168, 37, 0.6);
         }
 
+        .btn-info {
+            background: linear-gradient(135deg, #0288d1, #01579b);
+            box-shadow: 0 6px 15px rgba(2, 136, 209, 0.4);
+        }
+
+        .btn-info:hover {
+            background: linear-gradient(135deg, #039be5, #0277bd);
+            box-shadow: 0 8px 20px rgba(2, 136, 209, 0.6);
+        }
+
         .btn-sm {
             padding: 0.4rem 1rem;
             font-size: 0.75rem;
@@ -221,6 +241,68 @@
             padding: 0.2rem 0.5rem;
             border-radius: 0.3rem;
         }
+
+        /* ===== ТЕСТОВАЯ ПАНЕЛЬ ===== */
+        .test-panel {
+            background: rgba(20, 22, 27, 0.8);
+            backdrop-filter: blur(16px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 2px solid rgba(249, 168, 37, 0.5);
+            margin-bottom: 1.5rem;
+        }
+
+        .test-panel h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #f9a825;
+        }
+
+        .test-log {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #b9b09a;
+            line-height: 1.6;
+        }
+
+        .test-log .log-entry {
+            padding: 0.3rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .test-log .log-success { color: #81c784; }
+        .test-log .log-error { color: #ff7043; }
+        .test-log .log-info { color: #64b5f6; }
+        .test-log .log-warning { color: #ffb74d; }
+        .test-log .log-time { color: #8b8a7a; font-size: 0.65rem; }
+
+        .test-buttons {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .test-status {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .test-status.success { background: rgba(76, 175, 80, 0.3); color: #81c784; }
+        .test-status.pending { background: rgba(255, 193, 7, 0.3); color: #ffb74d; }
+        .test-status.error { background: rgba(255, 112, 67, 0.3); color: #ff7043; }
 
         /* ===== ДИАЛОГИ ===== */
         .dialog-list {
@@ -454,6 +536,7 @@
 
         .toast-success { background: rgba(76, 175, 80, 0.9); border: 1px solid #4caf50; }
         .toast-error { background: rgba(255, 112, 67, 0.9); border: 1px solid #ff7043; }
+        .toast-info { background: rgba(2, 136, 209, 0.9); border: 1px solid #0288d1; }
 
         @keyframes slideInRight {
             from { transform: translateX(100%); opacity: 0; }
@@ -481,6 +564,7 @@
                 min-width: auto !important;
                 max-width: 95vw !important;
             }
+            .test-buttons { flex-direction: column; }
         }
     </style>
 </head>
@@ -508,6 +592,52 @@
             <div class="stat-card">
                 <div class="stat-label">💬 Диалогов</div>
                 <div class="stat-value" id="statUnread">0</div>
+            </div>
+        </div>
+
+        <!-- ===== ТЕСТИРОВАНИЕ ОПЛАТЫ VIP ===== -->
+        <div class="test-panel">
+            <h2>🧪 Тестирование оплаты VIP <span class="test-status pending" id="testGlobalStatus">Ожидание</span></h2>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Никнейм тестового пользователя</label>
+                    <input type="text" id="testNickname" placeholder="Введите никнейм пользователя для теста">
+                </div>
+                <div class="input-group">
+                    <label>Криптовалюта</label>
+                    <select id="testCrypto">
+                        <option value="trx">TRON (TRX)</option>
+                        <option value="ltc">Litecoin (LTC)</option>
+                        <option value="eth">Ethereum (ETH)</option>
+                        <option value="usdterc20">USDT (ERC20)</option>
+                        <option value="usdtbsc">USDT (BEP20)</option>
+                        <option value="doge">Dogecoin (DOGE)</option>
+                        <option value="bch">Bitcoin Cash (BCH)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="test-buttons">
+                <button class="btn btn-success" onclick="testVipPayment('success')">
+                    ✅ Тест: Успешная оплата
+                </button>
+                <button class="btn btn-warning" onclick="testVipPayment('expired')">
+                    ⏰ Тест: Истечение / Отмена
+                </button>
+                <button class="btn btn-danger" onclick="testVipPayment('error')">
+                    ❌ Тест: Ошибка оплаты
+                </button>
+                <button class="btn btn-info btn-sm" onclick="clearTestLog()">
+                    🧹 Очистить лог
+                </button>
+            </div>
+            
+            <div class="test-log" id="testLog">
+                <div class="log-entry">
+                    <span class="log-time">[Ожидание]</span> 
+                    <span class="log-info">🧪 Панель тестирования готова. Выберите действие для проверки оплаты VIP.</span>
+                </div>
             </div>
         </div>
 
@@ -556,9 +686,163 @@
 
             let currentUser = null;
             let currentUserId = null;
-            
-            // Массив активных диалогов (можно открыть несколько)
             let activeDialogs = {};
+
+            // ========== ТЕСТОВЫЙ ЛОГ ==========
+            function addTestLog(message, type = 'info') {
+                const logContainer = document.getElementById('testLog');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                const time = new Date().toLocaleTimeString('ru-RU');
+                entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-${type}">${message}</span>`;
+                logContainer.appendChild(entry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+            }
+
+            window.clearTestLog = function() {
+                document.getElementById('testLog').innerHTML = `
+                    <div class="log-entry">
+                        <span class="log-time">[${new Date().toLocaleTimeString('ru-RU')}]</span> 
+                        <span class="log-info">🧹 Лог очищен.</span>
+                    </div>
+                `;
+            };
+
+            // ========== ТЕСТИРОВАНИЕ VIP ОПЛАТЫ ==========
+            window.testVipPayment = async function(scenario) {
+                const nickname = document.getElementById('testNickname').value.trim();
+                const crypto = document.getElementById('testCrypto').value;
+                const statusEl = document.getElementById('testGlobalStatus');
+
+                if (!nickname) {
+                    showToast('Введите никнейм пользователя для теста', 'error');
+                    addTestLog('❌ Ошибка: Не указан никнейм пользователя', 'error');
+                    return;
+                }
+
+                // Ищем пользователя
+                addTestLog(`🔍 Поиск пользователя: "${nickname}"...`, 'info');
+                const { data: userData, error: userError } = await supabase.rpc('admin_find_user', { p_nickname: nickname });
+
+                if (!userData || !userData.success) {
+                    addTestLog(`❌ Пользователь "${nickname}" не найден в базе данных`, 'error');
+                    showToast('Пользователь не найден', 'error');
+                    return;
+                }
+
+                const user = userData;
+                addTestLog(`✅ Пользователь найден: ID=${user.id}, VIP=${user.vip_paid ? 'активен' : 'не активен'}, Баланс=${parseFloat(user.balance).toFixed(2)}$`, 'success');
+
+                if (user.vip_paid) {
+                    addTestLog(`⚠️ Внимание: У пользователя "${nickname}" уже активирован VIP статус`, 'warning');
+                }
+
+                // Симуляция разных сценариев
+                if (scenario === 'success') {
+                    statusEl.textContent = 'Тестирование...';
+                    statusEl.className = 'test-status pending';
+                    
+                    addTestLog(`🧪 Запуск теста: УСПЕШНАЯ ОПЛАТА VIP`, 'info');
+                    addTestLog(`💳 Симуляция: создание платежа ${crypto.toUpperCase()} на 10$...`, 'info');
+                    
+                    // Имитация задержки обработки платежа
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    addTestLog(`⏳ Платёж обрабатывается...`, 'info');
+                    
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    addTestLog(`✅ Платёж подтверждён! Сумма: 10$ (${crypto.toUpperCase()})`, 'success');
+                    
+                    // Активируем VIP через RPC
+                    addTestLog(`🔄 Вызов purchase_vip_crypto для пользователя ID=${user.id}...`, 'info');
+                    const { data: vipData, error: vipError } = await supabase.rpc('purchase_vip_crypto', {
+                        p_user_id: user.id
+                    });
+
+                    if (vipError) {
+                        addTestLog(`❌ Ошибка RPC purchase_vip_crypto: ${vipError.message}`, 'error');
+                        addTestLog(`💡 Возможные причины:`, 'warning');
+                        addTestLog(`   • Функция не существует в Supabase`, 'warning');
+                        addTestLog(`   • У пользователя уже есть VIP`, 'warning');
+                        addTestLog(`   • Ошибка в логике функции`, 'warning');
+                        statusEl.textContent = 'Ошибка RPC';
+                        statusEl.className = 'test-status error';
+                        showToast('Ошибка при вызове RPC функции', 'error');
+                    } else if (vipData && vipData.success) {
+                        addTestLog(`🎉 VIP статус успешно активирован для "${nickname}"!`, 'success');
+                        
+                        // Проверяем результат
+                        const { data: verifyData } = await supabase.rpc('admin_find_user', { p_nickname: nickname });
+                        if (verifyData && verifyData.vip_paid) {
+                            addTestLog(`✅ Проверка: VIP статус подтверждён в базе данных`, 'success');
+                            addTestLog(`📋 Реферальный код: ${verifyData.referral_code}`, 'info');
+                            statusEl.textContent = '✅ Успешно';
+                            statusEl.className = 'test-status success';
+                            showToast('🎉 VIP успешно активирован! Проверьте пользователя', 'success');
+                        } else {
+                            addTestLog(`⚠️ Проверка: Статус VIP не изменился в базе данных`, 'warning');
+                            statusEl.textContent = '⚠️ Требует проверки';
+                            statusEl.className = 'test-status pending';
+                        }
+                    } else {
+                        addTestLog(`❌ RPC вернул: ${JSON.stringify(vipData)}`, 'error');
+                        statusEl.textContent = '❌ Ошибка';
+                        statusEl.className = 'test-status error';
+                        showToast('RPC функция не активировала VIP', 'error');
+                    }
+
+                    // Обновляем статистику
+                    loadStats();
+
+                } else if (scenario === 'expired') {
+                    statusEl.textContent = 'Тестирование...';
+                    statusEl.className = 'test-status pending';
+                    
+                    addTestLog(`🧪 Запуск теста: ИСТЕЧЕНИЕ / ОТМЕНА ПЛАТЕЖА`, 'info');
+                    addTestLog(`💳 Симуляция: создание платежа ${crypto.toUpperCase()} на 10$...`, 'info');
+                    
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    addTestLog(`⏳ Ожидание оплаты...`, 'info');
+                    
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    addTestLog(`⏰ Время оплаты истекло (таймаут 15 минут)`, 'warning');
+                    addTestLog(`🔄 Статус платежа: EXPIRED`, 'warning');
+                    addTestLog(`ℹ️ VIP статус НЕ активирован (платёж не получен)`, 'info');
+                    
+                    // Проверяем что VIP не активировался
+                    const { data: verifyData } = await supabase.rpc('admin_find_user', { p_nickname: nickname });
+                    if (verifyData && !verifyData.vip_paid) {
+                        addTestLog(`✅ Проверка: VIP статус корректно не активирован`, 'success');
+                    }
+                    
+                    statusEl.textContent = '⏰ Истекло (OK)';
+                    statusEl.className = 'test-status pending';
+                    showToast('Тест истечения завершён', 'info');
+
+                } else if (scenario === 'error') {
+                    statusEl.textContent = 'Тестирование...';
+                    statusEl.className = 'test-status pending';
+                    
+                    addTestLog(`🧪 Запуск теста: ОШИБКА ОПЛАТЫ`, 'info');
+                    addTestLog(`💳 Симуляция: попытка создания платежа ${crypto.toUpperCase()}...`, 'info');
+                    
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    addTestLog(`❌ Ошибка платёжного шлюза: Недостаточно средств / Отклонено банком`, 'error');
+                    addTestLog(`🔄 Статус платежа: FAILED`, 'error');
+                    addTestLog(`ℹ️ VIP статус НЕ активирован`, 'info');
+                    
+                    // Проверяем что VIP не активировался
+                    const { data: verifyData } = await supabase.rpc('admin_find_user', { p_nickname: nickname });
+                    if (verifyData && !verifyData.vip_paid) {
+                        addTestLog(`✅ Проверка: VIP статус корректно не активирован при ошибке`, 'success');
+                    }
+                    
+                    statusEl.textContent = '❌ Ошибка (OK)';
+                    statusEl.className = 'test-status error';
+                    showToast('Тест ошибки завершён', 'info');
+                }
+
+                addTestLog(`📊 Тест завершён. Проверьте пользователя "${nickname}" в панели поиска`, 'info');
+            };
 
             function checkAuth() {
                 const adminAuth = sessionStorage.getItem('piramix_admin_auth');
@@ -618,7 +902,6 @@
             };
 
             window.logout = function() {
-                // Закрываем все открытые диалоги
                 Object.values(activeDialogs).forEach(d => d.close());
                 activeDialogs = {};
                 sessionStorage.removeItem('piramix_admin_auth');
@@ -671,7 +954,6 @@
             function openDialog(dialog) {
                 const dialogKey = dialog.nickname;
                 
-                // Если диалог уже открыт — фокусируемся на нём
                 if (activeDialogs[dialogKey]) {
                     const existing = activeDialogs[dialogKey];
                     existing.modal.style.zIndex = getMaxZIndex() + 1;
@@ -690,7 +972,6 @@
                 modal.style.top = (40 + Object.keys(activeDialogs).length * 30) + 'px';
                 modal.style.left = (60 + Object.keys(activeDialogs).length * 30) + 'px';
                 
-                // Сортируем сообщения по возрастанию даты (старые вверху, новые внизу)
                 const sortedMessages = [...dialog.messages].sort((a, b) => 
                     new Date(a.created_at) - new Date(b.created_at)
                 );
@@ -734,7 +1015,6 @@
                 overlay.appendChild(modal);
                 document.body.appendChild(overlay);
                 
-                // Сохраняем ссылки
                 const dialogObj = {
                     overlay: overlay,
                     modal: modal,
@@ -747,16 +1027,13 @@
                 };
                 activeDialogs[dialogKey] = dialogObj;
 
-                // Скролл вниз
                 setTimeout(() => {
                     const msgContainer = modal.querySelector(`#modalMessages-${dialogKey}`);
                     if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
                 }, 100);
 
-                // Фокус на поле ввода
                 setTimeout(() => dialogObj.input.focus(), 200);
 
-                // При клике на оверлей — поднимаем окно наверх (не закрываем)
                 overlay.addEventListener('mousedown', function(e) {
                     if (e.target === overlay) {
                         modal.style.zIndex = getMaxZIndex() + 1;
@@ -764,12 +1041,10 @@
                     }
                 });
 
-                // Закрытие
                 modal.querySelector('.modal-close-btn').addEventListener('click', function() {
                     dialogObj.close();
                 });
 
-                // Кнопка удаления
                 modal.querySelector('.modal-delete-btn').addEventListener('click', async function() {
                     const choice = confirm(
                         `Удалить диалог с "${dialog.nickname}"?\n\n` +
@@ -798,12 +1073,10 @@
                     loadStats();
                 });
 
-                // Отправка сообщения
                 modal.querySelector('.modal-send-btn').addEventListener('click', async function() {
                     await sendAdminMessage(dialogKey, dialogObj);
                 });
 
-                // Enter — отправить
                 dialogObj.input.addEventListener('keydown', function(e) {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
@@ -811,7 +1084,6 @@
                     }
                 });
 
-                // Перетаскивание
                 makeDraggable(modal, overlay);
             }
 
@@ -877,7 +1149,6 @@
                 if (data && data.success) {
                     input.value = '';
                     
-                    // Добавляем сообщение админа в окно
                     const msgContainer = document.getElementById(`modalMessages-${dialogKey}`);
                     if (msgContainer) {
                         const msgDiv = document.createElement('div');
