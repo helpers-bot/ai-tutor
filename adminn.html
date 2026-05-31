@@ -50,22 +50,52 @@
         }
         .game-container{
             width:95%;max-width:500px;height:80vh;
-            background:linear-gradient(to bottom,#87CEEB 0%,#98FB98 40%,#228B22 100%);
             border-radius:20px;position:relative;overflow:hidden;
             border:2px solid rgba(255,255,255,0.3);
-            box-shadow:0 0 60px rgba(100,200,100,0.2);
+        }
+        .butterfly-bg{
+            background:linear-gradient(to bottom,#87CEEB 0%,#98FB98 40%,#228B22 100%);
+        }
+        .pegs-bg{
+            background:linear-gradient(to bottom,#2c1810 0%,#5c3a28 60%,#3d2010 100%);
         }
         .game-header{
             position:absolute;top:0;left:0;right:0;
-            padding:10px 16px;
+            padding:8px 12px;
             display:flex;justify-content:space-between;align-items:center;
-            z-index:10;background:rgba(0,0,0,0.4);
+            z-index:10;background:rgba(0,0,0,0.5);
+            height:40px;
         }
-        .timer{color:#ffd700;font-size:1.4em;font-weight:bold;}
+        .timer{color:#ffd700;font-size:1.3em;font-weight:bold;}
         .timer.urgent{color:#ff4757;animation:pulse 0.5s ease-in-out infinite;}
         @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
-        .game-close{background:none;border:none;color:#fff;font-size:1.5em;cursor:pointer;z-index:20;}
-        .game-title{color:#fff;font-size:0.9em;}
+        .game-close{
+            background:none;border:none;color:#fff;
+            font-size:1.3em;cursor:pointer;z-index:20;
+            padding:4px 8px;
+        }
+        .game-title{color:#fff;font-size:0.85em;}
+
+        /* Инструкция */
+        .instruction-overlay{
+            position:absolute;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.85);z-index:50;
+            display:flex;align-items:center;justify-content:center;
+            border-radius:20px;
+        }
+        .instruction-box{
+            background:#1e1e38;border-radius:20px;
+            padding:28px 22px;text-align:center;
+            width:85%;max-width:380px;
+            border:2px solid rgba(255,255,255,0.15);
+        }
+        .instruction-box h3{color:#ff6b9d;margin-bottom:12px;font-size:1.2em;}
+        .instruction-box p{color:rgba(255,255,255,0.8);font-size:0.9em;line-height:1.6;margin-bottom:8px;}
+        .instruction-box .demo-icon{font-size:3em;margin:8px 0;}
+        .instruction-box .color-dot{
+            display:inline-block;width:18px;height:18px;
+            border-radius:50%;margin:0 3px;vertical-align:middle;
+        }
 
         /* Трава */
         .grass{
@@ -90,16 +120,12 @@
             display:flex;align-items:center;justify-content:center;
             animation:flowerBreathe 2s ease-in-out infinite;
         }
-        @keyframes flowerBreathe{
-            0%,100%{transform:scale(1);}
-            50%{transform:scale(1.08);}
-        }
+        @keyframes flowerBreathe{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
         .flower-center{
             width:28px;height:28px;
             border-radius:50%;
             background:#ffd700;
-            position:absolute;
-            z-index:1;
+            position:absolute;z-index:1;
             box-shadow:0 0 10px rgba(255,215,0,0.5);
         }
         .petal{
@@ -113,20 +139,8 @@
         .petal:nth-child(3){transform:rotate(144deg) translate(12px,-12px);}
         .petal:nth-child(4){transform:rotate(216deg) translate(12px,-12px);}
         .petal:nth-child(5){transform:rotate(288deg) translate(12px,-12px);}
-        .flower.filled .petal{
-            animation:petalGlow 0.6s ease-out;
-        }
-        @keyframes petalGlow{
-            0%{filter:brightness(2);}
-            100%{filter:brightness(1);}
-        }
-        .flower.filled{
-            animation:flowerHappy 0.8s ease-out;
-        }
-        @keyframes flowerHappy{
-            0%{transform:scale(1.3);}
-            100%{transform:scale(1);}
-        }
+        .flower.filled{animation:flowerHappy 0.8s ease-out;}
+        @keyframes flowerHappy{0%{transform:scale(1.3);}100%{transform:scale(1);}}
 
         /* Бабочки */
         .butterfly{
@@ -152,25 +166,19 @@
         .butterfly:active{
             cursor:grabbing;
             z-index:15;
-            filter:drop-shadow(0 8px 16px rgba(0,0,0,0.5)) brightness(1.3);
+            filter:drop-shadow(0 8px 16px rgba(0,0,0,0.5)) brightness(1.2);
         }
         .butterfly.placed{
             animation:butterflyLand 0.8s ease-out forwards;
             pointer-events:none;
             cursor:default;
         }
-        @keyframes butterflyLand{
-            0%{transform:scale(1.2);}
-            60%{transform:scale(0.9);}
-            100%{transform:scale(1);}
-        }
+        @keyframes butterflyLand{0%{transform:scale(1.2);}60%{transform:scale(0.9);}100%{transform:scale(1);}}
 
         /* Пыльца */
         .pollen{
-            position:absolute;
-            width:6px;height:6px;
-            border-radius:50%;
-            pointer-events:none;
+            position:absolute;width:6px;height:6px;
+            border-radius:50%;pointer-events:none;
             z-index:20;
             animation:pollenFloat 0.8s ease-out forwards;
         }
@@ -179,9 +187,9 @@
             100%{transform:translate(var(--px),var(--py)) scale(0);opacity:0;}
         }
 
-        /* Штыри и круги (шаг 3) */
+        /* Штыри */
         .peg{
-            position:absolute;bottom:30px;
+            position:absolute;bottom:20px;
             width:22px;height:100px;
             border-radius:11px 11px 0 0;
             z-index:2;
@@ -250,17 +258,12 @@
             to{transform:translateX(-50%) translateY(100px);opacity:0;}
         }
 
-        /* Облака */
         .cloud{
             position:absolute;
             background:white;
             border-radius:50%;
             opacity:0.7;
             z-index:1;
-        }
-        .cloud::before,.cloud::after{
-            content:'';position:absolute;
-            background:white;border-radius:50%;
         }
     </style>
 </head>
@@ -291,10 +294,10 @@
 
     <div class="game-overlay" id="gameOverlay" style="display:none;">
         <div class="game-container" id="gameContainer">
-            <div class="game-header">
+            <div class="game-header" style="pointer-events:none;">
                 <span class="game-title" id="gameTitle">Шаг 1</span>
                 <span class="timer" id="gameTimer">60</span>
-                <button class="game-close" onclick="stopGame()">✕</button>
+                <button class="game-close" onclick="stopGame()" style="pointer-events:auto;">✕</button>
             </div>
         </div>
     </div>
@@ -314,16 +317,12 @@
             }, {
                 type: 'butterflies',
                 title: '🦋 Бабочки и цветы',
-                question: 'Посади бабочек на цветки их цвета!',
-                answer: null,
                 timeLimit: 60,
                 colors: ['#ff6b9d', '#ffd700', '#4effb4', '#ff9f43', '#54a0ff', '#a29bfe', '#fd79a8'],
                 butterflyCount: 7,
             }, {
                 type: 'pegs',
                 title: '📌 Штыри и круги',
-                question: 'Затяни круги на штыри нужного цвета!',
-                answer: null,
                 timeLimit: 30,
                 colors: ['#ff4757', '#ffd700', '#54a0ff', '#4effb4'],
                 circleCount: 16,
@@ -394,6 +393,7 @@
         let dragTarget = null;
         let dragOffsetX = 0;
         let dragOffsetY = 0;
+        let gameActive = false;
 
         function testQuest() {
             gameState = { currentStep: 0, stepData: {} };
@@ -405,6 +405,7 @@
 
         function stopGame() {
             clearInterval(gameTimerInterval);
+            gameActive = false;
             document.getElementById('gameOverlay').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
             document.getElementById('prizeOverlay').innerHTML = '';
@@ -413,12 +414,14 @@
 
         function loadStep(stepIndex) {
             clearInterval(gameTimerInterval);
+            gameActive = false;
             const container = document.getElementById('gameContainer');
             container.querySelectorAll(
-                '.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,div[style]'
+                '.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,.instruction-overlay,div[style]'
             ).forEach(el => {
                 if (!el.closest('.game-header')) el.remove();
             });
+            container.className = 'game-container';
 
             const step = QUEST_CONFIG.steps[stepIndex];
             document.getElementById('gameTitle').textContent = step.title;
@@ -429,19 +432,63 @@
 
             if (step.type === 'text') {
                 renderTextStep(container, step);
+                gameActive = true;
             } else if (step.type === 'butterflies') {
+                container.classList.add('butterfly-bg');
                 renderButterflyStep(container, step);
-                startTimer(step.timeLimit, () => {
-                    showToast('Время вышло! Попробуй ещё раз.', 'error');
-                    setTimeout(() => loadStep(stepIndex), 1500);
-                });
             } else if (step.type === 'pegs') {
+                container.classList.add('pegs-bg');
                 renderPegStep(container, step);
+            }
+        }
+
+        function showInstruction(container, step, callback) {
+            const overlay = document.createElement('div');
+            overlay.className = 'instruction-overlay';
+
+            let demoHtml = '';
+            if (step.type === 'butterflies') {
+                demoHtml = `
+                    <div class="demo-icon">🦋 ➡️ 🌸</div>
+                    <p>Перетаскивай <strong>бабочек</strong> на <strong>цветки</strong></p>
+                    <p>Бабочка должна сесть на цветок <strong>такого же цвета</strong>!</p>
+                    <div style="margin:8px 0;">
+                        ${step.colors.slice(0,4).map(c => `<span class="color-dot" style="background:${c};"></span>`).join('')}
+                        <span style="margin:0 6px;">— цвета цветков</span>
+                    </div>
+                `;
+            } else if (step.type === 'pegs') {
+                demoHtml = `
+                    <div class="demo-icon">🔴 ➡️ 📍</div>
+                    <p>Перетаскивай <strong>круги</strong> на <strong>штыри</strong></p>
+                    <p>Круг должен попасть на штырь <strong>такого же цвета</strong>!</p>
+                    <p style="font-size:0.8em;">На каждый штырь надо надеть по 4 круга</p>
+                    <div style="margin:8px 0;">
+                        ${step.colors.map(c => `<span class="color-dot" style="background:${c};"></span>`).join('')}
+                        <span style="margin:0 6px;">— цвета штырей</span>
+                    </div>
+                `;
+            }
+
+            overlay.innerHTML = `
+                <div class="instruction-box">
+                    <h3>📋 ${step.title}</h3>
+                    ${demoHtml}
+                    <p style="color:#ffd700;font-size:0.85em;margin-top:6px;">⏱ Время: ${step.timeLimit} секунд</p>
+                    <button class="btn btn-pink" style="margin-top:16px;" id="startGameBtn">▶ Начать!</button>
+                </div>
+            `;
+            container.appendChild(overlay);
+
+            document.getElementById('startGameBtn').addEventListener('click', () => {
+                overlay.remove();
+                gameActive = true;
                 startTimer(step.timeLimit, () => {
+                    gameActive = false;
                     showToast('Время вышло! Попробуй ещё раз.', 'error');
                     setTimeout(() => loadStep(stepIndex), 1500);
                 });
-            }
+            });
         }
 
         function startTimer(seconds, onEnd) {
@@ -461,11 +508,12 @@
 
         // ============ ШАГ 1: ТЕКСТ ============
         function renderTextStep(container, step) {
+            container.style.background = 'linear-gradient(135deg,#1a1a2e,#16213e)';
             const box = document.createElement('div');
             box.style.cssText =
                 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:85%;z-index:10;';
             box.innerHTML = `
-                <p style="color:#fff;font-size:1.1em;margin-bottom:8px;text-shadow:0 2px 4px rgba(0,0,0,0.5);">${step.question}</p>
+                <p style="color:#fff;font-size:1.1em;margin-bottom:8px;">${step.question}</p>
                 <input type="text" id="textAnswer" placeholder="Твой ответ..." 
                        style="width:100%;padding:14px;border-radius:50px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;text-align:center;font-size:1.1em;outline:none;">
                 <div id="textError" style="color:#ff4757;font-size:0.8em;margin-top:8px;min-height:20px;"></div>
@@ -494,8 +542,6 @@
             const containerRect = container.getBoundingClientRect();
             const margin = 40;
             const areaW = containerRect.width - margin * 2;
-            const areaH = containerRect.height - 140;
-            const topOffset = 110;
 
             gameState.stepData.butterfliesPlaced = 0;
             gameState.stepData.totalButterflies = step.butterflyCount;
@@ -520,25 +566,22 @@
                 const cloud = document.createElement('div');
                 cloud.className = 'cloud';
                 const cw = 40 + Math.random() * 60;
-                const ch = 20 + Math.random() * 20;
                 cloud.style.width = cw + 'px';
-                cloud.style.height = ch + 'px';
+                cloud.style.height = (20 + Math.random() * 15) + 'px';
                 cloud.style.left = (10 + Math.random() * (containerRect.width - 100)) + 'px';
-                cloud.style.top = (5 + Math.random() * 30) + 'px';
-                cloud.style.opacity = (0.3 + Math.random() * 0.4);
+                cloud.style.top = (5 + Math.random() * 25) + 'px';
                 container.appendChild(cloud);
-                // Дочерние круги для пушистости
-                const before = document.createElement('div');
-                before.style.cssText =
-                    `position:absolute;width:${cw*0.6}px;height:${ch*0.8}px;background:white;border-radius:50%;top:-${ch*0.3}px;left:${cw*0.15}px;`;
-                cloud.appendChild(before);
-                const after = document.createElement('div');
-                after.style.cssText =
-                    `position:absolute;width:${cw*0.5}px;height:${ch*0.7}px;background:white;border-radius:50%;top:-${ch*0.2}px;right:${cw*0.1}px;`;
-                cloud.appendChild(after);
+                const b1 = document.createElement('div');
+                b1.style.cssText =
+                    `position:absolute;width:${cw*0.6}px;height:${cw*0.5}px;background:white;border-radius:50%;top:-${cw*0.2}px;left:${cw*0.15}px;`;
+                cloud.appendChild(b1);
+                const b2 = document.createElement('div');
+                b2.style.cssText =
+                    `position:absolute;width:${cw*0.5}px;height:${cw*0.4}px;background:white;border-radius:50%;top:-${cw*0.15}px;right:${cw*0.1}px;`;
+                cloud.appendChild(b2);
             }
 
-            // Цветы (располагаем в нижней части, над травой)
+            // Цветы (всегда все цвета)
             const flowerAreaTop = containerRect.height * 0.45;
             const flowerAreaBottom = containerRect.height * 0.78;
             const flowerAreaH = flowerAreaBottom - flowerAreaTop;
@@ -555,19 +598,17 @@
                 flower.dataset.color = colors[i];
                 flower.dataset.index = i;
 
-                // Лепестки
                 for (let p = 0; p < 5; p++) {
                     const petal = document.createElement('div');
                     petal.className = 'petal';
                     petal.style.backgroundColor = colors[i];
                     flower.appendChild(petal);
                 }
-                // Центр цветка
                 const center = document.createElement('div');
                 center.className = 'flower-center';
                 flower.appendChild(center);
-
                 container.appendChild(flower);
+
                 gameState.stepData.flowerPositions.push({
                     x: fx + 37,
                     y: fy + 37,
@@ -577,19 +618,19 @@
                 });
             }
 
-            // Бабочки
-            const butterflyEmojis = ['🦋', '🦋', '🦋', '🦋', '🦋', '🦋', '🦋'];
+            // Бабочки (все одинаковые 🦋, цвет задаём через CSS)
             for (let i = 0; i < step.butterflyCount; i++) {
                 let bx, by;
                 const flowerPos = gameState.stepData.flowerPositions[i];
                 do {
                     bx = margin + Math.random() * areaW;
-                    by = topOffset + Math.random() * (containerRect.height - topOffset - 60);
+                    by = 60 + Math.random() * (containerRect.height - 120);
                 } while (Math.hypot(bx - flowerPos.x, by - flowerPos.y) < 90);
 
                 const butterfly = document.createElement('div');
                 butterfly.className = 'butterfly';
-                butterfly.textContent = butterflyEmojis[i];
+                butterfly.textContent = '🦋';
+                // Бабочка окрашивается в цвет своего цветка
                 butterfly.style.color = colors[i];
                 butterfly.style.left = bx + 'px';
                 butterfly.style.top = by + 'px';
@@ -600,7 +641,7 @@
                 container.appendChild(butterfly);
 
                 butterfly.addEventListener('pointerdown', (e) => {
-                    if (butterfly.classList.contains('placed')) return;
+                    if (!gameActive || butterfly.classList.contains('placed')) return;
                     dragTarget = butterfly;
                     const rect = butterfly.getBoundingClientRect();
                     dragOffsetX = e.clientX - rect.left;
@@ -611,20 +652,20 @@
                 });
             }
 
-            // Глобальные move/up
+            // Move/up на контейнере
             container.addEventListener('pointermove', (e) => {
-                if (!dragTarget || !dragTarget.classList.contains('butterfly')) return;
+                if (!dragTarget || !dragTarget.classList.contains('butterfly') || !gameActive) return;
                 const cRect = container.getBoundingClientRect();
                 let nx = e.clientX - cRect.left - dragOffsetX;
                 let ny = e.clientY - cRect.top - dragOffsetY;
                 nx = Math.max(0, Math.min(nx, cRect.width - 50));
-                ny = Math.max(100, Math.min(ny, cRect.height - 50));
+                ny = Math.max(40, Math.min(ny, cRect.height - 50));
                 dragTarget.style.left = nx + 'px';
                 dragTarget.style.top = ny + 'px';
             });
 
             container.addEventListener('pointerup', (e) => {
-                if (!dragTarget || !dragTarget.classList.contains('butterfly')) return;
+                if (!dragTarget || !dragTarget.classList.contains('butterfly') || !gameActive) return;
                 const butterflyEl = dragTarget;
                 const butterflyColor = butterflyEl.dataset.color;
                 dragTarget = null;
@@ -644,13 +685,12 @@
                             butterflyEl.classList.add('placed');
                             butterflyEl.style.left = (flower.x - 25) + 'px';
                             butterflyEl.style.top = (flower.y - 30) + 'px';
-                            butterflyEl.style.color = flower.color;
                             gameState.stepData.butterfliesPlaced++;
                             createLandSound();
                             spawnPollen(container, flower.x, flower.y, flower.color);
-                            if (gameState.stepData.butterfliesPlaced >= gameState.stepData
-                                .totalButterflies) {
+                            if (gameState.stepData.butterfliesPlaced >= gameState.stepData.totalButterflies) {
                                 clearInterval(gameTimerInterval);
+                                gameActive = false;
                                 setTimeout(() => {
                                     celebrateButterflies(container);
                                     setTimeout(() => advanceStep(), 1500);
@@ -665,6 +705,9 @@
                     butterflyEl.style.zIndex = '5';
                 }
             });
+
+            // Показываем инструкцию
+            showInstruction(container, step, () => {});
         }
 
         function spawnPollen(container, x, y, color) {
@@ -686,7 +729,6 @@
                 flower.el.style.filter = 'brightness(1.5)';
                 flower.el.style.transition = 'filter 0.5s ease';
             });
-            // Дополнительная пыльца
             for (let i = 0; i < 30; i++) {
                 const pollen = document.createElement('div');
                 pollen.className = 'pollen';
@@ -710,11 +752,13 @@
             gameState.stepData.circlesPlaced = 0;
             gameState.stepData.totalCircles = step.circleCount;
 
+            // Стол
             const table = document.createElement('div');
             table.style.cssText =
-                'position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,rgba(139,90,43,0.3),transparent);z-index:0;border-radius:0 0 20px 20px;';
+                'position:absolute;bottom:0;left:0;right:0;height:35%;background:linear-gradient(to top,rgba(139,90,43,0.4),transparent);z-index:0;border-radius:0 0 20px 20px;pointer-events:none;';
             container.appendChild(table);
 
+            // Штыри
             for (let i = 0; i < step.pegsCount; i++) {
                 const peg = document.createElement('div');
                 peg.className = 'peg';
@@ -726,20 +770,21 @@
                 container.appendChild(peg);
             }
 
+            // Летающие круги
             for (let i = 0; i < step.circleCount; i++) {
                 const color = colors[i % step.pegsCount];
                 const circle = document.createElement('div');
                 circle.className = 'floating-circle';
                 circle.style.backgroundColor = color;
                 circle.style.left = (20 + Math.random() * (containerRect.width - 70)) + 'px';
-                circle.style.top = (20 + Math.random() * 100) + 'px';
+                circle.style.top = (20 + Math.random() * (containerRect.height * 0.45)) + 'px';
                 circle.style.animationDelay = (Math.random() * 3) + 's';
                 circle.style.animationDuration = (2 + Math.random() * 3) + 's';
                 circle.dataset.color = color;
                 container.appendChild(circle);
 
                 circle.addEventListener('pointerdown', (e) => {
-                    if (circle.classList.contains('placed')) return;
+                    if (!gameActive || circle.classList.contains('placed')) return;
                     dragTarget = circle;
                     const rect = circle.getBoundingClientRect();
                     dragOffsetX = e.clientX - rect.left;
@@ -751,7 +796,7 @@
             }
 
             container.addEventListener('pointermove', (e) => {
-                if (!dragTarget || !dragTarget.classList.contains('floating-circle')) return;
+                if (!dragTarget || !dragTarget.classList.contains('floating-circle') || !gameActive) return;
                 const cRect = container.getBoundingClientRect();
                 let nx = e.clientX - cRect.left - dragOffsetX;
                 let ny = e.clientY - cRect.top - dragOffsetY;
@@ -760,7 +805,7 @@
             });
 
             container.addEventListener('pointerup', (e) => {
-                if (!dragTarget || !dragTarget.classList.contains('floating-circle')) return;
+                if (!dragTarget || !dragTarget.classList.contains('floating-circle') || !gameActive) return;
                 const circleEl = dragTarget;
                 const circleColor = circleEl.dataset.color;
                 dragTarget = null;
@@ -773,8 +818,7 @@
 
                 let placed = false;
                 container.querySelectorAll('.peg').forEach(peg => {
-                    if (peg.dataset.color === circleColor && parseInt(peg.dataset.count) < parseInt(
-                            peg.dataset.need)) {
+                    if (peg.dataset.color === circleColor && parseInt(peg.dataset.count) < parseInt(peg.dataset.need)) {
                         const pRect = peg.getBoundingClientRect();
                         const pCX = pRect.left + pRect.width / 2 - contRect.left;
                         const pCY = pRect.top - contRect.top;
@@ -784,13 +828,12 @@
                             peg.dataset.count = parseInt(peg.dataset.count) + 1;
                             circleEl.classList.add('placed');
                             circleEl.style.left = (pCX - 22) + 'px';
-                            circleEl.style.top = (pCY - 30 - parseInt(peg.dataset.count) * 24) +
-                                'px';
+                            circleEl.style.top = (pCY - 30 - parseInt(peg.dataset.count) * 24) + 'px';
                             createPopSound();
                             gameState.stepData.circlesPlaced++;
-                            if (gameState.stepData.circlesPlaced >= gameState.stepData
-                                .totalCircles) {
+                            if (gameState.stepData.circlesPlaced >= gameState.stepData.totalCircles) {
                                 clearInterval(gameTimerInterval);
+                                gameActive = false;
                                 setTimeout(() => advanceStep(), 800);
                             }
                         }
@@ -801,22 +844,24 @@
                     circleEl.style.animationDelay = '0s';
                 }
             });
+
+            // Инструкция
+            showInstruction(container, step, () => {});
         }
 
         // ============ ПЕРЕХОД ============
         function advanceStep() {
             clearInterval(gameTimerInterval);
+            gameActive = false;
             if (gameState.currentStep < QUEST_CONFIG.steps.length - 1) {
                 const container = document.getElementById('gameContainer');
                 container.querySelectorAll(
-                    '.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen'
+                    '.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,.instruction-overlay'
                 ).forEach(el => el.remove());
                 container.querySelectorAll('div').forEach(el => {
                     if (!el.closest('.game-header') && el !== container && el.parentElement === container) {
-                        if (!el.classList.contains('butterfly') && !el.classList.contains('flower') &&
-                            !el.classList.contains('grass') && !el.classList.contains('grass-blade') &&
-                            !el.classList.contains('cloud') && !el.classList.contains('peg') &&
-                            !el.classList.contains('floating-circle') && !el.classList.contains('pollen')) {
+                        const cls = el.className || '';
+                        if (!cls.match(/butterfly|flower|grass|peg|floating-circle|pollen|instruction|cloud/)) {
                             el.remove();
                         }
                     }
@@ -830,10 +875,13 @@
         // ============ ПРИЗ ============
         function showPrize() {
             clearInterval(gameTimerInterval);
+            gameActive = false;
             const container = document.getElementById('gameContainer');
             container.querySelectorAll(
-                '.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen'
+                '.butterfly,.flower,.grass,.grass-blade,.cloud,.peg,.floating-circle,.pollen,.instruction-overlay'
             ).forEach(el => el.remove());
+            container.className = 'game-container';
+            container.style.background = 'linear-gradient(135deg,#1a1a2e,#16213e)';
             document.getElementById('gameTitle').textContent = '🎁 Приз!';
             document.getElementById('gameTimer').textContent = '🎉';
 
