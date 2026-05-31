@@ -480,26 +480,10 @@
         .user-greeting {
             font-weight: 600;
             font-size: 0.9rem;
-        }
-
-        .user-greeting .animated-letter {
-            display: inline-block;
-            background: linear-gradient(135deg, #fad974, #ebaa5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: letterGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes letterGlow {
-            0%, 100% { 
-                filter: brightness(1);
-                transform: translateY(0);
-            }
-            50% { 
-                filter: brightness(1.5);
-                transform: translateY(-2px);
-            }
+            color: #f5d78c;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .vip-badge {
@@ -727,30 +711,10 @@
         }
 
         @keyframes highlightNewItem {
-            0% { 
-                background: rgba(76, 175, 80, 0.4);
-                border-color: rgba(76, 175, 80, 0.8);
-                box-shadow: 0 0 20px rgba(76, 175, 80, 0.6);
-                transform: scale(1.03);
-            }
-            30% {
-                background: rgba(76, 175, 80, 0.3);
-                border-color: rgba(76, 175, 80, 0.7);
-                box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
-                transform: scale(1.02);
-            }
-            60% {
-                background: rgba(76, 175, 80, 0.15);
-                border-color: rgba(76, 175, 80, 0.4);
-                box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
-                transform: scale(1.01);
-            }
-            100% {
-                background: rgba(25, 22, 17, 0.6);
-                border-color: rgba(212, 165, 60, 0.2);
-                box-shadow: none;
-                transform: scale(1);
-            }
+            0% { background: rgba(76, 175, 80, 0.4); border-color: rgba(76, 175, 80, 0.8); box-shadow: 0 0 20px rgba(76, 175, 80, 0.6); transform: scale(1.03); }
+            30% { background: rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.7); box-shadow: 0 0 15px rgba(76, 175, 80, 0.5); transform: scale(1.02); }
+            60% { background: rgba(76, 175, 80, 0.15); border-color: rgba(76, 175, 80, 0.4); box-shadow: 0 0 8px rgba(76, 175, 80, 0.3); transform: scale(1.01); }
+            100% { background: rgba(25, 22, 17, 0.6); border-color: rgba(212, 165, 60, 0.2); box-shadow: none; transform: scale(1); }
         }
 
         .feed-user { font-weight: 600; color: #f5d78c; font-size: 0.78rem; }
@@ -798,19 +762,9 @@
             font-size: 1.3rem;
         }
 
-        .modal .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .modal .input-group label {
-            font-size: 0.7rem;
-        }
-
-        .modal .input-group input,
-        .modal .input-group select {
-            font-size: 0.85rem;
-            padding: 0.65rem 0.9rem;
-        }
+        .modal .input-group { margin-bottom: 1rem; }
+        .modal .input-group label { font-size: 0.7rem; }
+        .modal .input-group input, .modal .input-group select { font-size: 0.85rem; padding: 0.65rem 0.9rem; }
 
         .modal-buttons {
             display: flex;
@@ -818,8 +772,7 @@
             margin-top: 1.2rem;
         }
 
-        .modal-buttons .btn-primary,
-        .modal-buttons .btn-outline {
+        .modal-buttons .btn-primary, .modal-buttons .btn-outline {
             flex: 1;
             text-align: center;
             font-size: 0.85rem;
@@ -940,9 +893,7 @@
             transition: color 0.2s;
         }
 
-        .footer-link:hover {
-            color: #f3b95b;
-        }
+        .footer-link:hover { color: #f3b95b; }
 
         .policy-modal {
             max-width: 650px;
@@ -953,23 +904,9 @@
             font-size: 0.8rem;
         }
 
-        .policy-modal h2 {
-            text-align: center;
-            margin-bottom: 1.2rem;
-            font-size: 1.2rem;
-        }
-
-        .policy-modal h3 {
-            color: #e9c274;
-            margin: 1rem 0 0.4rem;
-            font-size: 0.95rem;
-        }
-
-        .policy-modal p {
-            color: #b9b09a;
-            font-size: 0.78rem;
-            margin-bottom: 0.6rem;
-        }
+        .policy-modal h2 { text-align: center; margin-bottom: 1.2rem; font-size: 1.2rem; }
+        .policy-modal h3 { color: #e9c274; margin: 1rem 0 0.4rem; font-size: 0.95rem; }
+        .policy-modal p { color: #b9b09a; font-size: 0.78rem; margin-bottom: 0.6rem; }
 
         .calc-row {
             display: flex;
@@ -979,17 +916,8 @@
             gap: 0.5rem;
         }
 
-        .calc-label {
-            color: #b9b09a;
-            font-size: 0.8rem;
-            flex: 1;
-        }
-
-        .calc-controls {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
+        .calc-label { color: #b9b09a; font-size: 0.8rem; flex: 1; }
+        .calc-controls { display: flex; align-items: center; gap: 0.5rem; }
 
         .calc-btn {
             width: 32px;
@@ -1048,29 +976,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: pulseSupport 2s infinite;
         }
 
-        .support-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 30px rgba(192, 132, 252, 0.8);
-        }
-
-        .support-btn.has-response {
-            animation: pulseNotification 1s infinite;
-            background: linear-gradient(135deg, #4caf50, #2e7d32);
-            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.7);
-        }
-
-        @keyframes pulseSupport {
-            0%, 100% { box-shadow: 0 6px 20px rgba(124, 58, 237, 0.5); }
-            50% { box-shadow: 0 6px 35px rgba(192, 132, 252, 0.9); }
-        }
-
-        @keyframes pulseNotification {
-            0%, 100% { box-shadow: 0 6px 20px rgba(76, 175, 80, 0.7); transform: scale(1); }
-            50% { box-shadow: 0 6px 35px rgba(76, 175, 80, 1); transform: scale(1.08); }
-        }
+        .support-btn:hover { transform: scale(1.1); }
 
         .support-chat {
             position: fixed;
@@ -1080,7 +988,6 @@
             max-width: 90vw;
             background: rgba(20, 22, 27, 0.97);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(192, 132, 252, 0.4);
             border-radius: 1.5rem;
             box-shadow: 0 15px 40px rgba(0,0,0,0.8);
@@ -1088,13 +995,7 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            animation: slideUp 0.3s ease-out;
             max-height: 500px;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .support-chat-header {
@@ -1106,26 +1007,9 @@
             border-bottom: 1px solid rgba(192, 132, 252, 0.3);
         }
 
-        .support-chat-header h3 {
-            font-size: 0.95rem;
-            color: #e9c274;
-            margin: 0;
-        }
-
-        .support-close-btn {
-            background: transparent;
-            border: none;
-            color: #b9b09a;
-            font-size: 1.3rem;
-            cursor: pointer;
-            padding: 0;
-            line-height: 1;
-            transition: color 0.2s;
-        }
-
-        .support-close-btn:hover {
-            color: #ff7043;
-        }
+        .support-chat-header h3 { font-size: 0.95rem; color: #e9c274; margin: 0; }
+        .support-close-btn { background: transparent; border: none; color: #b9b09a; font-size: 1.3rem; cursor: pointer; }
+        .support-close-btn:hover { color: #ff7043; }
 
         .support-chat-messages {
             flex: 1;
@@ -1145,20 +1029,11 @@
             max-width: 85%;
         }
 
-        .support-message.operator {
-            background: rgba(192, 132, 252, 0.2);
-            border: 1px solid rgba(192, 132, 252, 0.3);
-            color: #f5efe0;
-            align-self: flex-start;
-            border-bottom-left-radius: 0.3rem;
-        }
-
         .support-message.user {
             background: rgba(243, 185, 91, 0.2);
             border: 1px solid rgba(243, 185, 91, 0.3);
             color: #f5efe0;
             align-self: flex-end;
-            border-bottom-right-radius: 0.3rem;
         }
 
         .support-message.admin-response {
@@ -1166,13 +1041,6 @@
             border: 1px solid rgba(76, 175, 80, 0.5);
             color: #81c784;
             align-self: flex-start;
-            border-bottom-left-radius: 0.3rem;
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .support-message-time {
@@ -1202,11 +1070,6 @@
             resize: none;
         }
 
-        .support-chat-input:focus {
-            border-color: #c084fc;
-            box-shadow: 0 0 10px rgba(192, 132, 252, 0.3);
-        }
-
         .support-send-btn {
             background: linear-gradient(135deg, #c084fc, #7c3aed);
             border: none;
@@ -1219,53 +1082,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.2s;
             flex-shrink: 0;
-        }
-
-        .support-send-btn:hover {
-            background: linear-gradient(135deg, #d8b4fe, #9333ea);
-            box-shadow: 0 0 15px rgba(192, 132, 252, 0.5);
-        }
-
-        @media (max-width: 1024px) {
-            .reg-container { gap: 1rem; }
-            .info-section { flex: 1 1 100%; }
         }
 
         @media (max-width: 900px) {
             .live-feed { flex-direction: column; }
             .feed-list { height: 160px; }
             .header { flex-direction: column; text-align: center; }
-            .header-right { justify-content: center; }
-            .balance { font-size: 1.6rem; }
         }
 
         @media (max-width: 780px) {
             .reg-container { flex-direction: column; align-items: center; }
-            .form-wrapper { flex: 0 0 auto; width: 100%; max-width: 340px; }
-            .stats-panel { flex: 0 0 auto; width: 100%; max-width: 340px; }
+            .form-wrapper { width: 100%; max-width: 340px; }
+            .stats-panel { width: 100%; max-width: 340px; }
             .info-section { width: 100%; }
-            .auth-card { margin-left: auto; margin-right: auto; animation: slideFromTopMobile 0.8s ease-out forwards; }
-            @keyframes slideFromTopMobile {
-                0% { transform: translate(10px, -60px); opacity: 0; }
-                100% { transform: translate(0,0); opacity: 1; }
-            }
-            .stat-value { font-size: 1.3rem; }
-            .stat-row .stat-label { font-size: 0.7rem; }
-            .stat-row .stat-value { font-size: 0.75rem; }
-            .stat-earn { font-size: 0.7rem; }
             .dashboard { grid-template-columns: 1fr; }
-        }
-        
-        @media (max-width: 480px) {
-            body { padding: 8px; font-size: 13px; }
-            .auth-card { padding: 1.4rem; border-radius: 1.5rem; }
-            .btn-primary, .action-btn { font-size: 0.8rem; padding: 0.6rem 1.4rem; }
-            .logo { font-size: 1.3rem; }
-            .feed-list { height: 140px; }
-            .support-btn { width: 48px; height: 48px; bottom: 16px; right: 16px; font-size: 1.3rem; }
-            .support-chat { width: 300px; bottom: 75px; right: 16px; }
         }
     </style>
 </head>
@@ -1346,7 +1177,7 @@
             </div>
             <div class="legend"><span>Процент от дохода рефералов</span></div>
         </div>
-        <div class="graph-note">📊 Чем глубже уровень — тем выше процент. <br> Приглашайте активных партнёров и увеличивайте прибыль.</div>
+        <div class="graph-note">📊 Чем глубже уровень — тем выше процент.</div>
     </div>
 </div>
 
@@ -1401,7 +1232,7 @@
             <h3>📈 Система заработка</h3>
             <p class="earn-info-text">
                 Вы получаете <span class="earn-highlight">1%–5%</span> от покупки VIP вашими рефералами на 5 уровнях.
-                Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент от этой суммы.
+                Каждый реферал покупает VIP за <span class="earn-highlight">10$</span>, а вы получаете процент.
             </p>
             <div class="stat-row"><span class="stat-label">1 ур. — 1%</span><span class="stat-value">0.10$ с чел.</span></div>
             <div class="stat-row"><span class="stat-label">2 ур. — 2%</span><span class="stat-value">0.20$ с чел.</span></div>
@@ -1432,14 +1263,11 @@
     <div class="modal">
         <h2>💸 Вывод средств</h2>
         <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Минимальная сумма: <strong style="color: #f5d78c;">1$</strong></p>
-        <div class="input-group"><label>💎 Криптовалюта</label><select id="withdrawCrypto"><option value="">-- Выберите --</option><option value="BTC">Bitcoin (BTC)</option><option value="ETH">Ethereum (ETH)</option><option value="USDT">Tether (USDT TRC20)</option><option value="LTC">Litecoin (LTC)</option></select></div>
-        <div class="input-group"><label>💲 Сумма (мин. 1$)</label><input type="number" id="withdrawAmount" placeholder="От 1$" min="1" step="0.01"></div>
-        <div class="input-group"><label>📝 Адрес кошелька</label><input type="text" id="withdrawAddress" placeholder="Введите адрес кошелька"></div>
+        <div class="input-group"><label>💎 Криптовалюта</label><select id="withdrawCrypto"><option value="">Выберите</option><option value="BTC">BTC</option><option value="ETH">ETH</option><option value="USDT">USDT</option><option value="LTC">LTC</option></select></div>
+        <div class="input-group"><label>💲 Сумма (мин. 1$)</label><input type="number" id="withdrawAmount" min="1" step="0.01"></div>
+        <div class="input-group"><label>📝 Адрес кошелька</label><input type="text" id="withdrawAddress" placeholder="Введите адрес"></div>
         <div class="input-group"><label>📝 Комментарий</label><input type="text" id="withdrawComment" placeholder="По желанию"></div>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="confirmWithdrawBtn">💸 Вывести</button>
-            <button class="btn-outline" id="closeWithdrawBtn">Отмена</button>
-        </div>
+        <div class="modal-buttons"><button class="btn-primary" id="confirmWithdrawBtn">Вывести</button><button class="btn-outline" id="closeWithdrawBtn">Отмена</button></div>
     </div>
 </div>
 
@@ -1450,927 +1278,300 @@
             <label>Никнейм</label>
             <div class="profile-nickname-display" id="profileNicknameDisplay">
                 <span class="profile-nickname-text" id="profileNicknameText"></span>
-                <span class="edit-icon" id="editNicknameIcon" title="Редактировать никнейм">✏️</span>
+                <span class="edit-icon" id="editNicknameIcon" title="Редактировать">✏️</span>
             </div>
             <div class="profile-nickname-input-row" id="profileNicknameInputRow">
-                <input type="text" id="profileNicknameInput" placeholder="Введите новый никнейм">
-                <span class="edit-icon" id="saveNicknameIcon" title="Сохранить">✅</span>
-                <span class="edit-icon" id="cancelNicknameIcon" title="Отмена">❌</span>
+                <input type="text" id="profileNicknameInput" placeholder="Новый никнейм">
+                <span class="edit-icon" id="saveNicknameIcon">✅</span>
+                <span class="edit-icon" id="cancelNicknameIcon">❌</span>
             </div>
         </div>
-        <div class="input-group">
-            <label>Новый пароль</label>
-            <input type="password" id="profilePassword" placeholder="Оставьте пустым, если не меняете">
-        </div>
-        <div class="input-group">
-            <label>Повторите пароль</label>
-            <input type="password" id="profilePassword2" placeholder="Оставьте пустым, если не меняете">
-        </div>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button>
-            <button class="btn-outline" id="closeProfileBtn">Отмена</button>
-        </div>
+        <div class="input-group"><label>Новый пароль</label><input type="password" id="profilePassword" placeholder="Не меняйте"></div>
+        <div class="input-group"><label>Повторите пароль</label><input type="password" id="profilePassword2" placeholder="Не меняйте"></div>
+        <div class="modal-buttons"><button class="btn-primary" id="saveProfileBtn">💾 Сохранить</button><button class="btn-outline" id="closeProfileBtn">Отмена</button></div>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="vipModal">
     <div class="modal">
         <h2>👑 VIP статус</h2>
-        <div class="vip-info-box" id="vipInfoBox">
-            <p style="color: #b9b09a; margin-bottom: 0.4rem; font-size: 0.8rem;">Цена VIP статуса</p>
-            <div class="vip-price">10$</div>
-            <p style="color: #9b927a; font-size: 0.78rem; margin-top: 0.6rem;">Покупая VIP, вы получаете уникальный 8-значный ID<br>и реферальную ссылку для заработка.</p>
-        </div>
+        <div class="vip-info-box" id="vipInfoBox"><p>Цена: <span class="vip-price">10$</span></p></div>
         <p style="color: #81c784; font-size: 0.78rem; margin-top: 0.6rem; text-align: center;" id="vipBenefitsText"></p>
-        <div class="modal-buttons">
-            <button class="btn-primary" id="confirmVipBtn">💳 Оплатить криптовалютой</button>
-            <button class="btn-outline" id="closeVipBtn">Отмена</button>
-        </div>
+        <div class="modal-buttons"><button class="btn-primary" id="confirmVipBtn">Оплатить криптовалютой</button><button class="btn-outline" id="closeVipBtn">Отмена</button></div>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="paymentModal">
     <div class="modal" style="max-width: 450px;">
-        <h2>💳 Оплата VIP статуса</h2>
-        <p style="color: #b9b09a; font-size: 0.8rem; margin-bottom: 1rem;">Оплатите <strong style="color: #f5d78c;">10$</strong> в криптовалюте</p>
-        <div class="input-group">
-            <label>Выберите криптовалюту</label>
-            <select id="paymentCrypto">
-                <option value="usdttrc20">USDT (TRC20)</option>
-                <option value="usdterc20">USDT (ERC20)</option>
-                <option value="btc">Bitcoin (BTC)</option>
-                <option value="eth">Ethereum (ETH)</option>
-                <option value="ltc">Litecoin (LTC)</option>
-            </select>
-        </div>
+        <h2>💳 Оплата VIP</h2>
+        <div class="input-group"><label>Криптовалюта</label><select id="paymentCrypto"><option value="usdttrc20">USDT (TRC20)</option><option value="usdterc20">USDT (ERC20)</option><option value="btc">BTC</option><option value="eth">ETH</option><option value="ltc">LTC</option></select></div>
         <div id="paymentInfo" class="payment-info" style="display: none;">
-            <p style="color: #b9b09a;">Отправьте <strong id="paymentCryptoAmount" style="color: #f5d78c;">0</strong> на адрес:</p>
+            <p>Отправьте <strong id="paymentCryptoAmount" style="color: #f5d78c;">0</strong> на:</p>
             <div class="payment-address" id="paymentAddress"></div>
-            <p class="payment-status" id="paymentStatus" style="color: #ffc107;">⏳ Ожидание оплаты...</p>
+            <p class="payment-status" id="paymentStatus" style="color: #ffc107;">⏳ Ожидание...</p>
         </div>
-        <div class="modal-buttons">
-            <button class="btn-vip" id="createPaymentBtn">💰 Создать платёж</button>
-            <button class="btn-outline" id="closePaymentBtn">Отмена</button>
-        </div>
+        <div class="modal-buttons"><button class="btn-vip" id="createPaymentBtn">💰 Создать платёж</button><button class="btn-outline" id="closePaymentBtn">Отмена</button></div>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="policyModal">
     <div class="modal policy-modal">
-        <h2>📄 Политика конфиденциальности и правила пользования</h2>
+        <h2>📄 Политика конфиденциальности</h2>
         <h3>1. Общие положения</h3>
-        <p>Настоящая Политика регулирует отношения между платформой «Пирамикс» и пользователями. Используя Платформу, Пользователь соглашается с Правилами.</p>
+        <p>Настоящая Политика регулирует отношения между платформой «Пирамикс» и пользователями.</p>
         <h3>2. Регистрация</h3>
-        <p>Пользователь обязан указать уникальный никнейм и пароль. Запрещается создание более одного аккаунта.</p>
+        <p>Пользователь обязан указать уникальный никнейм и пароль.</p>
         <h3>3. VIP статус</h3>
-        <p>Стоимость — 10$. Оплата криптовалютой через NOWPayments. Средства не возвращаются.</p>
+        <p>Стоимость — 10$. Оплата криптовалютой.</p>
         <h3>4. Вывод средств</h3>
-        <p>Минимальная сумма: 1$. Заявки обрабатываются до 24 часов.</p>
-        <h3>5. Конфиденциальность</h3>
-        <p>Платформа не разглашает данные пользователей. IP-адреса не сохраняются.</p>
-        <div class="modal-buttons" style="justify-content: center;">
-            <button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button>
-        </div>
+        <p>Минимальная сумма: 1$.</p>
+        <div class="modal-buttons" style="justify-content: center;"><button class="btn-outline" id="closePolicyBtn">❌ Закрыть</button></div>
     </div>
 </div>
 
 <div class="modal-overlay hidden" id="calculatorModal">
     <div class="modal" style="max-width: 400px;">
         <h2>🧮 Калькулятор дохода</h2>
-        <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов на каждом уровне, которые купили VIP (10$).</p>
-        <div class="calc-row"><span class="calc-label">1 уровень (1% = 0.10$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc1', -1)">−</button><span class="calc-value" id="calc1">0</span><button class="calc-btn" onclick="window.calcChange('calc1', 1)">+</button></div></div>
-        <div class="calc-row"><span class="calc-label">2 уровень (2% = 0.20$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc2', -1)">−</button><span class="calc-value" id="calc2">0</span><button class="calc-btn" onclick="window.calcChange('calc2', 1)">+</button></div></div>
-        <div class="calc-row"><span class="calc-label">3 уровень (3% = 0.30$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc3', -1)">−</button><span class="calc-value" id="calc3">0</span><button class="calc-btn" onclick="window.calcChange('calc3', 1)">+</button></div></div>
-        <div class="calc-row"><span class="calc-label">4 уровень (4% = 0.40$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc4', -1)">−</button><span class="calc-value" id="calc4">0</span><button class="calc-btn" onclick="window.calcChange('calc4', 1)">+</button></div></div>
-        <div class="calc-row"><span class="calc-label">5 уровень (5% = 0.50$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc5', -1)">−</button><span class="calc-value" id="calc5">0</span><button class="calc-btn" onclick="window.calcChange('calc5', 1)">+</button></div></div>
-        <div class="calc-result"><p style="color: #b9b09a; font-size: 0.8rem;">Ваш доход составит:</p><div class="calc-total" id="calcTotal">0.00 $</div></div>
+        <p style="color: #b9b09a; font-size: 0.75rem; margin-bottom: 1rem;">Укажите количество рефералов, купивших VIP (10$).</p>
+        <div class="calc-row"><span class="calc-label">1 уровень (1% = 0.10$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc1',-1)">−</button><span class="calc-value" id="calc1">0</span><button class="calc-btn" onclick="window.calcChange('calc1',1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">2 уровень (2% = 0.20$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc2',-1)">−</button><span class="calc-value" id="calc2">0</span><button class="calc-btn" onclick="window.calcChange('calc2',1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">3 уровень (3% = 0.30$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc3',-1)">−</button><span class="calc-value" id="calc3">0</span><button class="calc-btn" onclick="window.calcChange('calc3',1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">4 уровень (4% = 0.40$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc4',-1)">−</button><span class="calc-value" id="calc4">0</span><button class="calc-btn" onclick="window.calcChange('calc4',1)">+</button></div></div>
+        <div class="calc-row"><span class="calc-label">5 уровень (5% = 0.50$)</span><div class="calc-controls"><button class="calc-btn" onclick="window.calcChange('calc5',-1)">−</button><span class="calc-value" id="calc5">0</span><button class="calc-btn" onclick="window.calcChange('calc5',1)">+</button></div></div>
+        <div class="calc-result"><p>Доход:</p><div class="calc-total" id="calcTotal">0.00 $</div></div>
         <div class="modal-buttons"><button class="btn-outline" id="closeCalculatorBtn" style="flex: 1;">❌ Закрыть</button></div>
     </div>
 </div>
 
 <script>
-    (function() {
-        const supabaseUrl = 'https://zvneiyhsoivaozzhzeoy.supabase.co';
-        const supabaseKey = 'sb_publishable_CFPn1BIheE6L8wS89l0LtA_G9GofNzt';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-        const API_URL = '/api';
+(function() {
+    const supabaseUrl = 'https://zvneiyhsoivaozzhzeoy.supabase.co';
+    const supabaseKey = 'sb_publishable_CFPn1BIheE6L8wS89l0LtA_G9GofNzt';
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const NOWPAYMENTS_API_KEY = '2cf60623-8bb3-41bb-8a4b-07d205c38bfa';
 
-        const stageRegister = document.getElementById('stageRegister');
-        const stageHome = document.getElementById('stageHome');
-        const regLiveFeed = document.getElementById('regLiveFeed');
-        const homeLiveFeed = document.getElementById('homeLiveFeed');
-        const toastContainer = document.getElementById('toastContainer');
+    const stageRegister = document.getElementById('stageRegister');
+    const stageHome = document.getElementById('stageHome');
+    const regLiveFeed = document.getElementById('regLiveFeed');
+    const homeLiveFeed = document.getElementById('homeLiveFeed');
+    const toastContainer = document.getElementById('toastContainer');
 
-        let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-        let feedCache = { deposits: [], withdrawals: [] };
-        let lastDepositId = null;
-        let lastWithdrawId = null;
-        let lastFeedUpdate = 0;
-        let captchaAnswer = 0;
-        let paymentCheckInterval = null;
+    let userData = JSON.parse(localStorage.getItem('pirxmix_user'));
+    let feedCache = { deposits: [], withdrawals: [] };
+    let lastDepositId = null, lastWithdrawId = null, lastFeedUpdate = 0, captchaAnswer = 0;
+    let paymentCheckInterval = null;
+    let allNicks = [], namesLoaded = false;
 
-        let allNicks = [];
-        let namesLoaded = false;
+    async function loadNames() {
+        if (namesLoaded) return;
+        try { const r = await fetch('name.html'); const t = await r.text(); const m = t.match(/const allNicks = (\[[\s\S]*?\]);/); if (m?.[1]) { allNicks = eval(m[1]); namesLoaded = true; } } catch(e) { namesLoaded = true; }
+    }
 
-        async function loadNames() {
-            if (namesLoaded) return;
-            try {
-                const response = await fetch('name.html');
-                const text = await response.text();
-                const match = text.match(/const allNicks = (\[[\s\S]*?\]);/);
-                if (match && match[1]) {
-                    allNicks = eval(match[1]);
-                    namesLoaded = true;
-                    console.log('✅ Загружено никнеймов из name.html:', allNicks.length);
-                }
-            } catch(e) {
-                console.error('Ошибка загрузки никнеймов из name.html:', e);
-                namesLoaded = true;
-            }
-        }
+    function randomNick() { return (!namesLoaded || !allNicks.length) ? 'User' : allNicks[Math.floor(Math.random() * allNicks.length)]; }
 
-        function randomNick() {
-            if (!namesLoaded || allNicks.length === 0) return 'User';
-            return allNicks[Math.floor(Math.random() * allNicks.length)];
-        }
+    function generateCaptcha() { const a = Math.floor(Math.random()*10)+1, b = Math.floor(Math.random()*10)+1; captchaAnswer = a+b; document.getElementById('captchaQuestion').textContent = `${a} + ${b} = ?`; document.getElementById('captchaAnswer').value = ''; }
 
-        function generateCaptcha() {
-            const a = Math.floor(Math.random() * 10) + 1;
-            const b = Math.floor(Math.random() * 10) + 1;
-            captchaAnswer = a + b;
-            document.getElementById('captchaQuestion').textContent = `${a} + ${b} = ?`;
-            document.getElementById('captchaAnswer').value = '';
-        }
+    function showToast(msg, type='error') { const t = document.createElement('div'); t.className = `toast toast-${type}`; t.textContent = msg; toastContainer.appendChild(t); setTimeout(() => { if(t.parentNode) t.remove(); }, 4000); }
 
-        function showToast(message, type = 'error') {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.textContent = message;
-            toastContainer.appendChild(toast);
-            setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
-        }
+    function formatNumber(n) { return n >= 1000 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : n.toString(); }
 
-        function formatNumber(num) {
-            if (num >= 1000) {
-                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            }
-            return num.toString();
-        }
+    // Поддержка
+    function initSupport() {
+        const sb = document.getElementById('supportBtn'), sc = document.getElementById('supportChat'), scb = document.getElementById('supportCloseBtn'), sm = document.getElementById('supportMessages'), si = document.getElementById('supportInput'), ssb = document.getElementById('supportSendBtn');
+        function am(text, type) { const d = document.createElement('div'); d.className = `support-message ${type}`; d.innerHTML = `${text}<div class="support-message-time">${new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</div>`; sm.appendChild(d); sm.scrollTop = sm.scrollHeight; }
+        async function snd() { const t = si.value.trim(); if(!t) return; am(t, 'user'); si.value = ''; await supabase.rpc('send_support_message',{p_message:t,p_nickname:userData?.nickname||'User'}); }
+        async function chk() { const {data} = await supabase.rpc('get_support_messages'); if(data?.length){ sm.innerHTML = ''; const nick = userData?.nickname||'User'; const msgs = data.filter(m=>m.nickname===nick); const disp = msgs.length?msgs:data.filter(m=>m.nickname==='User'); [...disp].reverse().forEach(m=>{am(m.user_message,'user'); if(m.admin_response) am(m.admin_response,'admin-response');}); } }
+        sb.onclick = () => { if(sc.classList.contains('hidden')){ sc.classList.remove('hidden'); chk(); } else sc.classList.add('hidden'); };
+        scb.onclick = () => sc.classList.add('hidden');
+        ssb.onclick = snd;
+        si.addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); snd(); } });
+        setInterval(chk, 5000);
+    }
 
-        function playNotificationSound() {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const notes = [523.25, 659.25, 783.99];
-                notes.forEach((freq, i) => {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.frequency.value = freq;
-                    osc.type = 'sine';
-                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + i * 0.15);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + i * 0.15 + 0.3);
-                    osc.start(audioCtx.currentTime + i * 0.15);
-                    osc.stop(audioCtx.currentTime + i * 0.15 + 0.3);
-                });
-            } catch(e) {}
-        }
-
-        let supportCheckInterval = null;
-
-        function initSupport() {
-            const supportBtn = document.getElementById('supportBtn');
-            const supportChat = document.getElementById('supportChat');
-            const supportCloseBtn = document.getElementById('supportCloseBtn');
-            const supportMessages = document.getElementById('supportMessages');
-            const supportInput = document.getElementById('supportInput');
-            const supportSendBtn = document.getElementById('supportSendBtn');
-
-            function addMessageToChat(text, type) {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = `support-message ${type}`;
-                const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-                msgDiv.innerHTML = `${text}<div class="support-message-time">${time}</div>`;
-                supportMessages.appendChild(msgDiv);
-                supportMessages.scrollTop = supportMessages.scrollHeight;
-            }
-
-            async function sendMessageToDB() {
-                const text = supportInput.value.trim();
-                if (!text) return;
-                
-                addMessageToChat(text, 'user');
-                supportInput.value = '';
-                supportInput.style.height = 'auto';
-
-                const nickname = (userData && userData.nickname) ? userData.nickname : 'User';
-                const { data, error } = await supabase.rpc('send_support_message', { 
-                    p_message: text,
-                    p_nickname: nickname 
-                });
-                
-                if (error) {
-                    console.error('Ошибка отправки сообщения:', error);
-                }
-            }
-
-            async function checkForAdminResponse() {
-                try {
-                    const { data, error } = await supabase.rpc('get_support_messages');
-                    
-                    if (error) return;
-                    
-                    if (data && data.length > 0) {
-                        supportMessages.innerHTML = '';
-                        
-                        const currentNickname = (userData && userData.nickname) ? userData.nickname : 'User';
-                        const userMessages = data.filter(msg => msg.nickname === currentNickname);
-                        const displayMessages = userMessages.length > 0 ? userMessages : data.filter(msg => msg.nickname === 'User');
-                        
-                        [...displayMessages].reverse().forEach(msg => {
-                            addMessageToChat(msg.user_message, 'user');
-                            if (msg.admin_response) {
-                                addMessageToChat(msg.admin_response, 'admin-response');
-                            }
-                        });
-                        
-                        if (displayMessages.length > 0) {
-                            const lastMsg = displayMessages[0];
-                            if (lastMsg.admin_response && lastMsg.is_read === false) {
-                                playNotificationSound();
-                                if (supportChat.classList.contains('hidden')) {
-                                    showToast('🔔 Получен ответ от поддержки!', 'info');
-                                    supportBtn.classList.add('has-response');
-                                }
-                            }
-                        }
-                        
-                        supportMessages.scrollTop = supportMessages.scrollHeight;
-                    }
-                } catch(e) {
-                    console.error('Ошибка проверки:', e);
-                }
-            }
-
-            supportBtn.onclick = function() {
-                const isHidden = supportChat.classList.contains('hidden');
-                if (isHidden) {
-                    supportChat.classList.remove('hidden');
-                    supportBtn.classList.remove('has-response');
-                    checkForAdminResponse();
-                } else {
-                    supportChat.classList.add('hidden');
-                }
-            };
-
-            supportCloseBtn.onclick = function() {
-                supportChat.classList.add('hidden');
-            };
-
-            supportSendBtn.onclick = sendMessageToDB;
-
-            supportInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessageToDB();
-                }
+    // NOWPayments
+    async function createCryptoPayment() {
+        const cryptoType = document.getElementById('paymentCrypto').value;
+        try {
+            const response = await fetch('https://api.nowpayments.io/v1/payment', {
+                method: 'POST',
+                headers: { 'x-api-key': NOWPAYMENTS_API_KEY, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ price_amount: 10, price_currency: 'usd', pay_currency: cryptoType, ipn_callback_url: 'https://vds-game.ink/api/ipn.php', order_id: 'vip_' + userData.id + '_' + Date.now(), order_description: 'VIP Пирамикс' })
             });
+            const data = await response.json();
+            if (data.pay_address) {
+                document.getElementById('paymentInfo').style.display = 'block';
+                document.getElementById('paymentCryptoAmount').textContent = data.pay_amount + ' ' + data.pay_currency;
+                document.getElementById('paymentAddress').textContent = data.pay_address;
+                document.getElementById('paymentStatus').textContent = '⏳ Ожидание оплаты...';
+                document.getElementById('paymentStatus').style.color = '#ffc107';
+                document.getElementById('createPaymentBtn').style.display = 'none';
+                startPaymentCheck(data.payment_id);
+            } else { showToast('Ошибка: ' + (data.message || 'Неизвестная ошибка'), 'error'); }
+        } catch(e) { showToast('Ошибка соединения', 'error'); }
+    }
 
-            supportInput.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-            });
-
-            supportCheckInterval = setInterval(checkForAdminResponse, 5000);
-            checkForAdminResponse();
-        }
-
-        async function createCryptoPayment() {
-            const cryptoType = document.getElementById('paymentCrypto').value;
+    function startPaymentCheck(pid) {
+        if(paymentCheckInterval) clearInterval(paymentCheckInterval);
+        paymentCheckInterval = setInterval(async () => {
             try {
-                const response = await fetch(`${API_URL}/create-payment.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: userData.id, crypto_type: cryptoType })
-                });
-                const data = await response.json();
-                if (data.pay_address) {
-                    document.getElementById('paymentInfo').style.display = 'block';
-                    document.getElementById('paymentCryptoAmount').textContent = data.pay_amount + ' ' + data.pay_currency;
-                    document.getElementById('paymentAddress').textContent = data.pay_address;
-                    document.getElementById('paymentStatus').textContent = '⏳ Ожидание оплаты...';
-                    document.getElementById('paymentStatus').style.color = '#ffc107';
-                    document.getElementById('createPaymentBtn').style.display = 'none';
-                    startPaymentCheck(data.payment_id);
-                } else {
-                    showToast('Ошибка создания платежа. Проверьте API ключ.', 'error');
-                }
-            } catch(e) {
-                console.error('Payment error:', e);
-                showToast('Ошибка соединения с платёжным шлюзом', 'error');
-            }
-        }
-
-        function startPaymentCheck(paymentId) {
-            if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-            paymentCheckInterval = setInterval(async () => {
-                try {
-                    const response = await fetch(`${API_URL}/check-payment.php?payment_id=${paymentId}`);
-                    const data = await response.json();
-                    if (data.payment_status === 'finished' || data.payment_status === 'confirmed') {
-                        clearInterval(paymentCheckInterval);
-                        document.getElementById('paymentStatus').textContent = '✅ Оплата получена!';
-                        document.getElementById('paymentStatus').style.color = '#4caf50';
+                const r = await fetch(`https://api.nowpayments.io/v1/payment/${pid}`, { headers: { 'x-api-key': NOWPAYMENTS_API_KEY } });
+                const d = await r.json();
+                if (d.payment_status === 'finished' || d.payment_status === 'confirmed') {
+                    clearInterval(paymentCheckInterval);
+                    document.getElementById('paymentStatus').textContent = '✅ Оплата получена!';
+                    document.getElementById('paymentStatus').style.color = '#4caf50';
+                    const { data: vipData } = await supabase.rpc('purchase_vip_crypto', { p_user_id: userData.id });
+                    if (vipData?.success) {
                         setTimeout(async () => {
                             await loadUserData();
                             document.getElementById('paymentModal').classList.add('hidden');
                             document.getElementById('createPaymentBtn').style.display = 'inline-block';
                             document.getElementById('paymentInfo').style.display = 'none';
-                            if (userData.vip_paid) {
-                                showToast('🎉 VIP статус успешно активирован!', 'success');
-                                await loadReferrals();
-                            }
-                        }, 3000);
-                    } else if (data.payment_status === 'expired') {
-                        clearInterval(paymentCheckInterval);
-                        document.getElementById('paymentStatus').textContent = '❌ Время оплаты истекло';
-                        document.getElementById('paymentStatus').style.color = '#ff7043';
-                        document.getElementById('createPaymentBtn').style.display = 'inline-block';
+                            showToast('🎉 VIP активирован!', 'success');
+                            await loadReferrals();
+                        }, 2000);
                     }
-                } catch(e) {
-                    console.error('Check error:', e);
-                }
-            }, 5000);
-        }
-
-        async function loadPlatformStats() {
-            const { data, error } = await supabase.rpc('get_platform_stats');
-            if (data) {
-                const regTotalUsersEl = document.getElementById('regTotalUsers');
-                const regTodayUsersEl = document.getElementById('regTodayUsers');
-                const regTotalWithdrawnEl = document.getElementById('regTotalWithdrawn');
-                
-                if (regTotalUsersEl) regTotalUsersEl.textContent = formatNumber(data.total_users);
-                if (regTodayUsersEl) regTodayUsersEl.textContent = data.today_users;
-                if (regTotalWithdrawnEl) regTotalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
-
-                const totalUsersEl = document.getElementById('totalUsers');
-                const todayUsersEl = document.getElementById('todayUsers');
-                const totalWithdrawnEl = document.getElementById('totalWithdrawn');
-                
-                if (totalUsersEl) totalUsersEl.textContent = formatNumber(data.total_users);
-                if (todayUsersEl) todayUsersEl.textContent = data.today_users;
-                if (totalWithdrawnEl) totalWithdrawnEl.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
-            }
-        }
-
-        async function addNewUserToDB() {
-            const nickname = randomNick();
-            const password = 'auto' + Math.floor(Math.random() * 9999);
-            
-            const { data, error } = await supabase.rpc('register_user', {
-                p_nickname: nickname,
-                p_password: password,
-                p_referral_code: null
-            });
-            
-            if (data && data.success) {
-                loadPlatformStats();
-            }
-        }
-
-        async function addFeedItemToDB(type, nickname, amount) {
-            const { data, error } = await supabase.rpc('add_feed_item', {
-                p_type: type,
-                p_nickname: nickname,
-                p_amount: amount
-            });
-            
-            if (data && data.success) {
-                loadPlatformStats();
-                lastFeedUpdate = 0;
-                loadFeedFromDB();
-            }
-        }
-
-        function scheduleNewUser() {
-            const delay = Math.floor(Math.random() * (140000 - 45000) + 45000);
-            setTimeout(() => {
-                addNewUserToDB();
-                scheduleNewUser();
-            }, delay);
-        }
-
-        function scheduleDeposit() {
-            const delay = Math.floor(Math.random() * (190000 - 75000) + 75000);
-            setTimeout(() => {
-                addFeedItemToDB('deposit', randomNick(), 10);
-                scheduleDeposit();
-            }, delay);
-        }
-        
-        function scheduleWithdraw() {
-            const delay = Math.floor(Math.random() * (240000 - 95000) + 95000);
-            setTimeout(() => {
-                const amount = Math.floor(Math.random() * 25) + 1;
-                addFeedItemToDB('withdraw', randomNick(), amount);
-                scheduleWithdraw();
-            }, delay);
-        }
-
-        async function loadFeedFromDB() {
-            const now = Date.now();
-            if (now - lastFeedUpdate < 3000) {
-                return;
-            }
-            lastFeedUpdate = now;
-
-            const [depositResult, withdrawResult] = await Promise.all([
-                supabase.rpc('get_feed_items', { p_type: 'deposit', p_limit: 10 }),
-                supabase.rpc('get_feed_items', { p_type: 'withdraw', p_limit: 10 })
-            ]);
-
-            let hasNewDeposit = false;
-            let hasNewWithdraw = false;
-
-            if (depositResult.data && depositResult.data.length > 0) {
-                const newFirstId = depositResult.data[0].nickname + '_' + depositResult.data[0].created_at;
-                if (newFirstId !== lastDepositId) {
-                    hasNewDeposit = true;
-                    lastDepositId = newFirstId;
-                }
-                
-                feedCache.deposits = depositResult.data.map(item => ({
-                    nickname: item.nickname,
-                    amount: item.amount,
-                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                }));
-            }
-
-            if (withdrawResult.data && withdrawResult.data.length > 0) {
-                const newFirstId = withdrawResult.data[0].nickname + '_' + withdrawResult.data[0].created_at;
-                if (newFirstId !== lastWithdrawId) {
-                    hasNewWithdraw = true;
-                    lastWithdrawId = newFirstId;
-                }
-                
-                feedCache.withdrawals = withdrawResult.data.map(item => ({
-                    nickname: item.nickname,
-                    amount: item.amount,
-                    time: new Date(item.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-                }));
-            }
-
-            renderAllFeeds(hasNewDeposit, hasNewWithdraw);
-        }
-
-        function renderFeedList(containerId, items, isNew) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            
-            container.innerHTML = '';
-            items.forEach((item, index) => {
-                const div = document.createElement('div');
-                const isDeposit = containerId.includes('Deposit');
-                div.className = `feed-item ${isDeposit ? 'deposit' : 'withdraw'}`;
-                
-                if (index === 0 && isNew) {
-                    div.classList.add('new-item-highlight');
-                }
-                
-                div.innerHTML = `<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`;
-                container.appendChild(div);
-            });
-        }
-        
-        function renderAllFeeds(hasNewDeposit = false, hasNewWithdraw = false) {
-            renderFeedList('regDepositList', feedCache.deposits, hasNewDeposit);
-            renderFeedList('depositList', feedCache.deposits, hasNewDeposit);
-            renderFeedList('regWithdrawList', feedCache.withdrawals, hasNewWithdraw);
-            renderFeedList('withdrawList', feedCache.withdrawals, hasNewWithdraw);
-        }
-
-        function showStage(stage) {
-            if (stage === 'home') {
-                stageRegister.style.display = 'none';
-                regLiveFeed.style.display = 'none';
-                stageHome.style.display = 'flex';
-                stageHome.classList.remove('hidden');
-                homeLiveFeed.style.display = 'flex';
-                initHomeStage();
-            } else {
-                stageHome.style.display = 'none';
-                stageHome.classList.add('hidden');
-                homeLiveFeed.style.display = 'none';
-                stageRegister.style.display = 'flex';
-                regLiveFeed.style.display = 'flex';
-                initRegStage();
-            }
-            loadFeedFromDB();
-            loadPlatformStats();
-        }
-
-        async function initialize() {
-            await loadNames();
-            await loadPlatformStats();
-            await loadFeedFromDB();
-            
-            initSupport();
-            
-            scheduleNewUser();
-            scheduleDeposit();
-            scheduleWithdraw();
-            
-            setInterval(loadPlatformStats, 10000);
-            setInterval(() => loadFeedFromDB(), 5000);
-
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('payment') === 'success') {
-                showToast('Оплата получена! Проверьте статус VIP.', 'success');
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-
-            if (userData && userData.id) {
-                showStage('home');
-            } else {
-                showStage('register');
-            }
-        }
-
-        initialize();
-
-        function initRegStage() {
-            const password2Group = document.getElementById('password2Group');
-            const actionButton = document.getElementById('actionButton');
-            const errorMessage = document.getElementById('errorMessage');
-            const switchTextBlock = document.getElementById('switchTextBlock');
-            let isLoginMode = false;
-
-            function updateUIForMode() {
-                errorMessage.classList.remove('visible');
-                if (isLoginMode) {
-                    password2Group.classList.remove('visible-password');
-                    password2Group.classList.add('hidden-password');
-                    document.getElementById('captchaGroup').classList.remove('visible');
-                    actionButton.textContent = 'Войти';
-                    switchTextBlock.innerHTML = 'Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>';
-                } else {
-                    password2Group.classList.remove('hidden-password');
-                    password2Group.classList.add('visible-password');
-                    document.getElementById('captchaGroup').classList.add('visible');
-                    generateCaptcha();
-                    actionButton.textContent = 'Зарегистрироваться';
-                    switchTextBlock.innerHTML = 'Если есть аккаунт, <span id="toggleModeLink">вход</span>';
-                }
-                const toggleLink = document.getElementById('toggleModeLink');
-                if (toggleLink) {
-                    toggleLink.onclick = () => {
-                        isLoginMode = !isLoginMode;
-                        updateUIForMode();
-                    };
-                }
-            }
-
-            updateUIForMode();
-            loadPlatformStats();
-
-            actionButton.onclick = async function(e) {
-                e.preventDefault();
-                const nickname = document.getElementById('nickname').value.trim();
-                const password = document.getElementById('password1').value;
-                errorMessage.classList.remove('visible');
-                if (!nickname || !password) return;
-
-                if (isLoginMode) {
-                    const { data, error } = await supabase.rpc('login_user', { p_nickname: nickname, p_password: password });
-                    if (error || !data || !data.success) {
-                        errorMessage.textContent = '❌ Данные неверны';
-                        errorMessage.classList.add('visible');
-                        return;
-                    }
-                    localStorage.setItem('pirxmix_user', JSON.stringify({
-                        id: data.user_id, nickname: data.nickname, vip_paid: data.vip_paid,
-                        referral_code: data.referral_code, balance: data.balance
-                    }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-                    showStage('home');
-                } else {
-                    const password2 = document.getElementById('password2').value;
-                    if (password !== password2) {
-                        errorMessage.textContent = '❌ Пароли не совпадают';
-                        errorMessage.classList.add('visible');
-                        return;
-                    }
-                    const userAnswer = parseInt(document.getElementById('captchaAnswer').value);
-                    if (userAnswer !== captchaAnswer) {
-                        errorMessage.textContent = '❌ Неверный ответ капчи';
-                        errorMessage.classList.add('visible');
-                        generateCaptcha();
-                        return;
-                    }
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const refCode = urlParams.get('ref') || null;
-                    const { data, error } = await supabase.rpc('register_user', {
-                        p_nickname: nickname, p_password: password, p_referral_code: refCode
-                    });
-                    if (error || !data || !data.success) {
-                        errorMessage.textContent = '❌ ' + (data?.error || 'Ошибка регистрации');
-                        errorMessage.classList.add('visible');
-                        return;
-                    }
-                    localStorage.setItem('pirxmix_user', JSON.stringify({
-                        id: data.user_id, nickname: data.nickname, vip_paid: false,
-                        referral_code: data.referral_code, balance: 0
-                    }));
-                    userData = JSON.parse(localStorage.getItem('pirxmix_user'));
-                    showStage('home');
-                }
-            };
-        }
-
-        function initHomeStage() {
-            if (!userData || !userData.id) {
-                showStage('register');
-                return;
-            }
-
-            updateGreeting();
-            loadUserData();
-            loadReferrals();
-            loadPlatformStats();
-            initModals();
-            initCalculator();
-
-            setInterval(() => {
-                loadUserData();
-                loadReferrals();
-                loadPlatformStats();
-            }, 30000);
-        }
-
-        function updateGreeting() {
-            const greetingEl = document.getElementById('userGreeting');
-            let html = '👋 ' + userData.nickname;
-            if (userData.vip_paid) {
-                html += ' <span class="vip-badge">VIP</span>';
-            }
-            greetingEl.innerHTML = html;
-        }
-
-        async function loadUserData() {
-            const { data, error } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
-            if (data && data.success) {
-                document.getElementById('balance').textContent = parseFloat(data.balance).toFixed(2) + ' $';
-                
-                userData.vip_paid = data.vip_paid;
-                userData.referral_code = data.referral_code;
-                userData.balance = data.balance;
-                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
-            }
-        }
-
-        async function loadReferrals() {
-            const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
-            if (data) {
-                document.getElementById('lvl1').textContent = (data.level_1?.count || 0);
-                document.getElementById('lvl2').textContent = (data.level_2?.count || 0);
-                document.getElementById('lvl3').textContent = (data.level_3?.count || 0);
-                document.getElementById('lvl4').textContent = (data.level_4?.count || 0);
-                document.getElementById('lvl5').textContent = (data.level_5?.count || 0);
-            }
-        }
-
-        function initCalculator() {
-            const calcLevels = ['calc1', 'calc2', 'calc3', 'calc4', 'calc5'];
-            const percents = [0.10, 0.20, 0.30, 0.40, 0.50];
-
-            window.calcChange = function(id, delta) {
-                const el = document.getElementById(id);
-                if (!el) return;
-                let val = parseInt(el.textContent) || 0;
-                val = Math.max(0, val + delta);
-                el.textContent = val;
-                updateCalcTotal();
-            };
-
-            function updateCalcTotal() {
-                let total = 0;
-                calcLevels.forEach((id, i) => {
-                    const el = document.getElementById(id);
-                    if (el) {
-                        const val = parseInt(el.textContent) || 0;
-                        total += val * percents[i];
-                    }
-                });
-                const totalEl = document.getElementById('calcTotal');
-                if (totalEl) totalEl.textContent = total.toFixed(2) + ' $';
-            }
-
-            function openCalculator() {
-                calcLevels.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = '0';
-                });
-                const totalEl = document.getElementById('calcTotal');
-                if (totalEl) totalEl.textContent = '0.00 $';
-                document.getElementById('calculatorModal').classList.remove('hidden');
-            }
-
-            const calculatorBtn = document.getElementById('calculatorBtn');
-            if (calculatorBtn) calculatorBtn.onclick = openCalculator;
-
-            const closeCalculatorBtn = document.getElementById('closeCalculatorBtn');
-            if (closeCalculatorBtn) {
-                closeCalculatorBtn.onclick = function() {
-                    document.getElementById('calculatorModal').classList.add('hidden');
-                };
-            }
-
-            const calculatorModal = document.getElementById('calculatorModal');
-            if (calculatorModal) {
-                calculatorModal.onclick = function(e) {
-                    if (e.target === calculatorModal) calculatorModal.classList.add('hidden');
-                };
-            }
-        }
-
-        function initModals() {
-            function copyReferralLink() {
-                if (!userData || !userData.vip_paid) {
-                    showToast('Доступ получают владельцы статуса VIP', 'error');
-                    return;
-                }
-                
-                const refLink = `https://vds-game.ink/?ref=${userData.referral_code}`;
-                navigator.clipboard.writeText(refLink).then(() => {
-                    showToast('Реферальная ссылка скопирована!', 'success');
-                }).catch(() => {
-                    showToast('Не удалось скопировать ссылку', 'error');
-                });
-            }
-
-            const copyRefBtn = document.getElementById('copyRefBtn');
-            if (copyRefBtn) copyRefBtn.onclick = copyReferralLink;
-
-            const manualBtn = document.getElementById('manualBtn');
-            if (manualBtn) manualBtn.onclick = function() {
-                if (!userData || !userData.vip_paid) {
-                    showToast('Доступ получают владельцы статуса VIP', 'error');
-                    return;
-                }
-                window.open('info.html', '_blank');
-            };
-
-            document.getElementById('logoutBtn').onclick = function() {
-                localStorage.removeItem('pirxmix_user');
-                userData = null;
-                showStage('register');
-            };
-
-            document.getElementById('policyLink').onclick = function() {
-                document.getElementById('policyModal').classList.remove('hidden');
-            };
-            document.getElementById('closePolicyBtn').onclick = function() {
-                document.getElementById('policyModal').classList.add('hidden');
-            };
-            document.getElementById('policyModal').onclick = function(e) {
-                if (e.target === document.getElementById('policyModal')) document.getElementById('policyModal').classList.add('hidden');
-            };
-
-            document.getElementById('profileBtn').onclick = function() {
-                document.getElementById('profileNicknameText').textContent = userData.nickname;
-                document.getElementById('profilePassword').value = '';
-                document.getElementById('profilePassword2').value = '';
-                document.getElementById('profileNicknameDisplay').style.display = 'flex';
-                document.getElementById('profileNicknameInputRow').classList.remove('visible');
-                document.getElementById('profileModal').classList.remove('hidden');
-            };
-            document.getElementById('closeProfileBtn').onclick = function() {
-                document.getElementById('profileModal').classList.add('hidden');
-            };
-            document.getElementById('profileModal').onclick = function(e) {
-                if (e.target === document.getElementById('profileModal')) document.getElementById('profileModal').classList.add('hidden');
-            };
-            
-            document.getElementById('editNicknameIcon').onclick = function() {
-                document.getElementById('profileNicknameDisplay').style.display = 'none';
-                document.getElementById('profileNicknameInputRow').classList.add('visible');
-                document.getElementById('profileNicknameInput').value = userData.nickname;
-                document.getElementById('profileNicknameInput').focus();
-            };
-            document.getElementById('saveNicknameIcon').onclick = function() {
-                const newNickname = document.getElementById('profileNicknameInput').value.trim();
-                if (!newNickname) { showToast('Никнейм не может быть пустым', 'error'); return; }
-                document.getElementById('profileNicknameText').textContent = newNickname;
-                document.getElementById('profileNicknameDisplay').style.display = 'flex';
-                document.getElementById('profileNicknameInputRow').classList.remove('visible');
-            };
-            document.getElementById('cancelNicknameIcon').onclick = function() {
-                document.getElementById('profileNicknameDisplay').style.display = 'flex';
-                document.getElementById('profileNicknameInputRow').classList.remove('visible');
-            };
-            
-            document.getElementById('saveProfileBtn').onclick = function() {
-                const newNickname = document.getElementById('profileNicknameText').textContent.trim();
-                const newPassword = document.getElementById('profilePassword').value;
-                const newPassword2 = document.getElementById('profilePassword2').value;
-                if (!newNickname) return;
-                if (newPassword || newPassword2) {
-                    if (newPassword !== newPassword2) {
-                        showToast('Пароли не совпадают', 'error');
-                        return;
-                    }
-                }
-                userData.nickname = newNickname;
-                localStorage.setItem('pirxmix_user', JSON.stringify(userData));
-                updateGreeting();
-                document.getElementById('profileModal').classList.add('hidden');
-                showToast('Профиль обновлён!', 'success');
-            };
-
-            document.getElementById('withdrawBtn').onclick = function() {
-                document.getElementById('withdrawCrypto').value = '';
-                document.getElementById('withdrawAmount').value = '';
-                document.getElementById('withdrawAddress').value = '';
-                document.getElementById('withdrawComment').value = '';
-                document.getElementById('withdrawModal').classList.remove('hidden');
-            };
-            document.getElementById('closeWithdrawBtn').onclick = function() {
-                document.getElementById('withdrawModal').classList.add('hidden');
-            };
-            document.getElementById('withdrawModal').onclick = function(e) {
-                if (e.target === document.getElementById('withdrawModal')) document.getElementById('withdrawModal').classList.add('hidden');
-            };
-            document.getElementById('confirmWithdrawBtn').onclick = async function() {
-                const crypto = document.getElementById('withdrawCrypto').value;
-                const amount = parseFloat(document.getElementById('withdrawAmount').value);
-                const address = document.getElementById('withdrawAddress').value.trim();
-                if (!crypto || !amount || amount < 1 || !address) {
-                    showToast('Заполните все поля', 'error');
-                    return;
-                }
-                
-                const { data, error } = await supabase.rpc('withdraw_funds', {
-                    p_user_id: userData.id,
-                    p_amount: amount,
-                    p_crypto_type: crypto,
-                    p_comment: document.getElementById('withdrawComment').value.trim() || null
-                });
-                
-                if (!error && data && data.success) {
-                    await loadUserData();
-                    showToast('Заявка на вывод создана!', 'success');
-                }
-                document.getElementById('withdrawModal').classList.add('hidden');
-            };
-
-            document.getElementById('vipBtn').onclick = async function() {
-                const { data } = await supabase.rpc('get_user_by_id', { p_user_id: userData.id });
-                const vipInfoBox = document.getElementById('vipInfoBox');
-                const confirmVipBtn = document.getElementById('confirmVipBtn');
-                const vipBenefitsText = document.getElementById('vipBenefitsText');
-                
-                if (data && data.vip_paid) {
-                    vipInfoBox.innerHTML = '<p style="color:#4caf50;">✅ VIP активирован!</p><p>Ваш ID:</p><div class="vip-id">' + data.referral_code + '</div>';
-                    confirmVipBtn.style.display = 'none';
-                    vipBenefitsText.textContent = '';
-                } else {
-                    vipInfoBox.innerHTML = '<p style="color:#b9b09a;">Цена VIP статуса</p><div class="vip-price">10$</div>';
-                    confirmVipBtn.style.display = 'inline-block';
-                    vipBenefitsText.textContent = 'При покупке статуса вы получаете доступ к реферальной ссылке и инструкции по сбору команды.';
-                }
-                document.getElementById('vipModal').classList.remove('hidden');
-            };
-            document.getElementById('closeVipBtn').onclick = function() {
-                document.getElementById('vipModal').classList.add('hidden');
-            };
-            document.getElementById('vipModal').onclick = function(e) {
-                if (e.target === document.getElementById('vipModal')) document.getElementById('vipModal').classList.add('hidden');
-            };
-            document.getElementById('confirmVipBtn').onclick = function() {
-                document.getElementById('vipModal').classList.add('hidden');
-                document.getElementById('paymentModal').classList.remove('hidden');
-                document.getElementById('paymentInfo').style.display = 'none';
-                document.getElementById('createPaymentBtn').style.display = 'inline-block';
-            };
-
-            document.getElementById('createPaymentBtn').onclick = createCryptoPayment;
-            document.getElementById('closePaymentBtn').onclick = function() {
-                if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-                document.getElementById('paymentModal').classList.add('hidden');
-                document.getElementById('paymentInfo').style.display = 'none';
-                document.getElementById('createPaymentBtn').style.display = 'inline-block';
-            };
-            document.getElementById('paymentModal').onclick = function(e) {
-                if (e.target === this) {
-                    if (paymentCheckInterval) clearInterval(paymentCheckInterval);
-                    this.classList.add('hidden');
-                    document.getElementById('paymentInfo').style.display = 'none';
+                } else if (d.payment_status === 'expired') {
+                    clearInterval(paymentCheckInterval);
+                    document.getElementById('paymentStatus').textContent = '❌ Время истекло';
+                    document.getElementById('paymentStatus').style.color = '#ff7043';
                     document.getElementById('createPaymentBtn').style.display = 'inline-block';
                 }
-            };
+            } catch(e) {}
+        }, 5000);
+    }
+
+    async function loadPlatformStats() {
+        const {data} = await supabase.rpc('get_platform_stats');
+        if(data) {
+            document.getElementById('regTotalUsers').textContent = formatNumber(data.total_users);
+            document.getElementById('regTodayUsers').textContent = data.today_users;
+            document.getElementById('regTotalWithdrawn').textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
+            const tU=document.getElementById('totalUsers'), tU2=document.getElementById('todayUsers'), tW=document.getElementById('totalWithdrawn');
+            if(tU) tU.textContent = formatNumber(data.total_users);
+            if(tU2) tU2.textContent = data.today_users;
+            if(tW) tW.textContent = formatNumber(Math.floor(data.total_withdrawn)) + ' $';
         }
-    })();
+    }
+
+    async function addNewUserToDB() { await supabase.rpc('register_user',{p_nickname:randomNick(),p_password:'auto'+Math.floor(Math.random()*9999),p_referral_code:null}); loadPlatformStats(); }
+    function scheduleNewUser() { setTimeout(()=>{addNewUserToDB();scheduleNewUser();}, Math.floor(Math.random()*(150000-75000)+75000)); }
+    async function addFeedItemToDB(type,nick,amt) { await supabase.rpc('add_feed_item',{p_type:type,p_nickname:nick,p_amount:amt}); loadPlatformStats(); lastFeedUpdate=0; loadFeedFromDB(); }
+    function scheduleDeposit() { setTimeout(()=>{addFeedItemToDB('deposit',randomNick(),10);scheduleDeposit();}, Math.floor(Math.random()*(190000-75000)+75000)); }
+    function scheduleWithdraw() { setTimeout(()=>{addFeedItemToDB('withdraw',randomNick(),Math.floor(Math.random()*25)+1);scheduleWithdraw();}, Math.floor(Math.random()*(240000-95000)+95000)); }
+
+    async function loadFeedFromDB() {
+        if(Date.now()-lastFeedUpdate < 3000) return;
+        lastFeedUpdate = Date.now();
+        const [dR,wR] = await Promise.all([supabase.rpc('get_feed_items',{p_type:'deposit',p_limit:10}), supabase.rpc('get_feed_items',{p_type:'withdraw',p_limit:10})]);
+        let hD=false,hW=false;
+        if(dR.data?.length){ const n=dR.data[0].nickname+'_'+dR.data[0].created_at; if(n!==lastDepositId){hD=true;lastDepositId=n;} feedCache.deposits=dR.data.map(i=>({nickname:i.nickname,amount:i.amount,time:new Date(i.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})})); }
+        if(wR.data?.length){ const n=wR.data[0].nickname+'_'+wR.data[0].created_at; if(n!==lastWithdrawId){hW=true;lastWithdrawId=n;} feedCache.withdrawals=wR.data.map(i=>({nickname:i.nickname,amount:i.amount,time:new Date(i.created_at).toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})})); }
+        renderAllFeeds(hD,hW);
+    }
+
+    function renderFeedList(cId,items,isNew){ const c=document.getElementById(cId); if(!c) return; c.innerHTML=''; items.forEach((item,i)=>{ const d=document.createElement('div'); d.className=`feed-item ${cId.includes('Deposit')?'deposit':'withdraw'}`; if(i===0&&isNew) d.classList.add('new-item-highlight'); d.innerHTML=`<span><span class="feed-user">${item.nickname}</span><span class="feed-time">${item.time}</span></span><span class="feed-amount">${item.amount}$</span>`; c.appendChild(d); }); }
+    function renderAllFeeds(hD,hW){ renderFeedList('regDepositList',feedCache.deposits,hD); renderFeedList('depositList',feedCache.deposits,hD); renderFeedList('regWithdrawList',feedCache.withdrawals,hW); renderFeedList('withdrawList',feedCache.withdrawals,hW); }
+
+    function showStage(stage) {
+        if(stage==='home'){ stageRegister.style.display='none'; regLiveFeed.style.display='none'; stageHome.style.display='flex'; stageHome.classList.remove('hidden'); homeLiveFeed.style.display='flex'; initHomeStage(); }
+        else { stageHome.style.display='none'; stageHome.classList.add('hidden'); homeLiveFeed.style.display='none'; stageRegister.style.display='flex'; regLiveFeed.style.display='flex'; initRegStage(); }
+        loadFeedFromDB(); loadPlatformStats();
+    }
+
+    async function initialize() {
+        await loadNames(); await loadPlatformStats(); await loadFeedFromDB();
+        initSupport(); scheduleNewUser(); scheduleDeposit(); scheduleWithdraw();
+        setInterval(loadPlatformStats, 10000); setInterval(()=>loadFeedFromDB(), 5000);
+        if(userData?.id) showStage('home'); else showStage('register');
+    }
+    initialize();
+
+    function initRegStage() {
+        const p2g=document.getElementById('password2Group'), cg=document.getElementById('captchaGroup'), ab=document.getElementById('actionButton'), em=document.getElementById('errorMessage'), stb=document.getElementById('switchTextBlock');
+        let isLogin=false;
+        function upd(){
+            em.classList.remove('visible');
+            if(isLogin){ p2g.classList.remove('visible-password'); p2g.classList.add('hidden-password'); cg.classList.remove('visible'); ab.textContent='Войти'; stb.innerHTML='Нет аккаунта? <span id="toggleModeLink">Зарегистрироваться</span>'; }
+            else { p2g.classList.remove('hidden-password'); p2g.classList.add('visible-password'); cg.classList.add('visible'); generateCaptcha(); ab.textContent='Зарегистрироваться'; stb.innerHTML='Если есть аккаунт, <span id="toggleModeLink">вход</span>'; }
+            const tl=document.getElementById('toggleModeLink'); if(tl) tl.onclick=()=>{isLogin=!isLogin;upd();};
+        }
+        upd();
+        ab.onclick=async function(e){
+            e.preventDefault();
+            const nn=document.getElementById('nickname').value.trim(), pw=document.getElementById('password1').value;
+            em.classList.remove('visible'); if(!nn||!pw) return;
+            if(!isLogin){ if(parseInt(document.getElementById('captchaAnswer').value)!==captchaAnswer){ em.textContent='❌ Неверный ответ капчи'; em.classList.add('visible'); generateCaptcha(); return; } }
+            if(isLogin){
+                const {data,error}=await supabase.rpc('login_user',{p_nickname:nn,p_password:pw});
+                if(error||!data?.success){ em.textContent='❌ Данные неверны'; em.classList.add('visible'); return; }
+                localStorage.setItem('pirxmix_user',JSON.stringify({id:data.user_id,nickname:data.nickname,vip_paid:data.vip_paid,referral_code:data.referral_code,balance:data.balance}));
+                userData=JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home');
+            } else {
+                const pw2=document.getElementById('password2').value;
+                if(pw!==pw2){ em.textContent='❌ Пароли не совпадают'; em.classList.add('visible'); generateCaptcha(); return; }
+                const ref=new URLSearchParams(window.location.search).get('ref')||null;
+                const {data,error}=await supabase.rpc('register_user',{p_nickname:nn,p_password:pw,p_referral_code:ref});
+                if(error||!data?.success){ em.textContent='❌ '+(data?.error||'Ошибка'); em.classList.add('visible'); generateCaptcha(); return; }
+                localStorage.setItem('pirxmix_user',JSON.stringify({id:data.user_id,nickname:data.nickname,vip_paid:false,referral_code:data.referral_code,balance:0}));
+                userData=JSON.parse(localStorage.getItem('pirxmix_user')); showStage('home');
+            }
+        };
+    }
+
+    function initHomeStage() { if(!userData?.id){ showStage('register'); return; } updateGreeting(); loadUserData(); loadReferrals(); loadPlatformStats(); initModals(); initCalculator(); setInterval(()=>{loadUserData();loadReferrals();loadPlatformStats();},30000); }
+    function updateGreeting(){ const el=document.getElementById('userGreeting'); el.innerHTML='👋 '+userData.nickname+(userData.vip_paid?' <span class="vip-badge">VIP</span>':''); }
+    async function loadUserData(){ const {data}=await supabase.rpc('get_user_by_id',{p_user_id:userData.id}); if(data?.success){ document.getElementById('balance').textContent=parseFloat(data.balance).toFixed(2)+' $'; userData.vip_paid=data.vip_paid; userData.balance=data.balance; userData.referral_code=data.referral_code; localStorage.setItem('pirxmix_user',JSON.stringify(userData)); updateGreeting(); } }
+    async function loadReferrals(){ const {data}=await supabase.rpc('get_user_referrals',{p_user_id:userData.id}); if(data){ const p=[0.10,0.20,0.30,0.40,0.50]; for(let i=1;i<=5;i++){ const c=data['level_'+i]?.count||0; document.getElementById('lvl'+i).textContent=c; document.getElementById('earn'+i).textContent=(c*p[i-1]).toFixed(2)+' $'; } } }
+
+    function initCalculator(){
+        const lvls=['calc1','calc2','calc3','calc4','calc5'], pcts=[0.10,0.20,0.30,0.40,0.50];
+        window.calcChange=function(id,delta){ const el=document.getElementById(id); if(!el)return; el.textContent=Math.max(0,(parseInt(el.textContent)||0)+delta); let t=0; lvls.forEach((id,i)=>{t+=(parseInt(document.getElementById(id)?.textContent)||0)*pcts[i];}); document.getElementById('calcTotal').textContent=t.toFixed(2)+' $'; };
+        document.getElementById('calculatorBtn').onclick=()=>{ lvls.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='0';}); document.getElementById('calcTotal').textContent='0.00 $'; document.getElementById('calculatorModal').classList.remove('hidden'); };
+        document.getElementById('closeCalculatorBtn').onclick=()=>document.getElementById('calculatorModal').classList.add('hidden');
+        document.getElementById('calculatorModal').onclick=function(e){if(e.target===this)this.classList.add('hidden');};
+    }
+
+    function initModals(){
+        document.getElementById('logoutBtn').onclick=()=>{if(paymentCheckInterval)clearInterval(paymentCheckInterval);localStorage.removeItem('pirxmix_user');userData=null;showStage('register');};
+        document.getElementById('copyRefBtn').onclick=()=>{if(!userData?.vip_paid){showToast('Доступ получают владельцы VIP','error');return;}navigator.clipboard.writeText(`https://vds-game.ink/?ref=${userData.referral_code}`).then(()=>showToast('Ссылка скопирована!','success'));};
+        document.getElementById('manualBtn').onclick=()=>{if(!userData?.vip_paid){showToast('Доступ получают владельцы VIP','error');return;}window.open('info.html','_blank');};
+        document.getElementById('policyLink').onclick=()=>document.getElementById('policyModal').classList.remove('hidden');
+        document.getElementById('closePolicyBtn').onclick=()=>document.getElementById('policyModal').classList.add('hidden');
+        document.getElementById('policyModal').onclick=function(e){if(e.target===this)this.classList.add('hidden');};
+
+        document.getElementById('profileBtn').onclick=()=>{document.getElementById('profileNicknameText').textContent=userData.nickname;document.getElementById('profileNicknameDisplay').style.display='flex';document.getElementById('profileNicknameInputRow').classList.remove('visible');document.getElementById('profilePassword').value='';document.getElementById('profilePassword2').value='';document.getElementById('profileModal').classList.remove('hidden');};
+        document.getElementById('closeProfileBtn').onclick=()=>document.getElementById('profileModal').classList.add('hidden');
+        document.getElementById('editNicknameIcon').onclick=()=>{document.getElementById('profileNicknameDisplay').style.display='none';document.getElementById('profileNicknameInputRow').classList.add('visible');document.getElementById('profileNicknameInput').value=userData.nickname;document.getElementById('profileNicknameInput').focus();};
+        document.getElementById('saveNicknameIcon').onclick=()=>{const n=document.getElementById('profileNicknameInput').value.trim();if(!n){showToast('Никнейм не может быть пустым','error');return;}document.getElementById('profileNicknameText').textContent=n;document.getElementById('profileNicknameDisplay').style.display='flex';document.getElementById('profileNicknameInputRow').classList.remove('visible');};
+        document.getElementById('cancelNicknameIcon').onclick=()=>{document.getElementById('profileNicknameDisplay').style.display='flex';document.getElementById('profileNicknameInputRow').classList.remove('visible');};
+        document.getElementById('saveProfileBtn').onclick=async()=>{const nn=document.getElementById('profileNicknameText').textContent.trim(),pw=document.getElementById('profilePassword').value,pw2=document.getElementById('profilePassword2').value;if(!nn)return;if((pw||pw2)&&pw!==pw2){showToast('Пароли не совпадают','error');return;}userData.nickname=nn;localStorage.setItem('pirxmix_user',JSON.stringify(userData));updateGreeting();document.getElementById('profileModal').classList.add('hidden');showToast('Профиль обновлён!','success');};
+
+        document.getElementById('withdrawBtn').onclick=()=>document.getElementById('withdrawModal').classList.remove('hidden');
+        document.getElementById('closeWithdrawBtn').onclick=()=>document.getElementById('withdrawModal').classList.add('hidden');
+        document.getElementById('confirmWithdrawBtn').onclick=async()=>{
+            const crypto=document.getElementById('withdrawCrypto').value, amount=parseFloat(document.getElementById('withdrawAmount').value), address=document.getElementById('withdrawAddress').value.trim();
+            if(!crypto||!amount||amount<1||!address){showToast('Заполните все поля','error');return;}
+            const {data}=await supabase.rpc('withdraw_funds',{p_user_id:userData.id,p_amount:amount,p_crypto_type:crypto,p_comment:document.getElementById('withdrawComment').value||null});
+            if(data?.success){await loadUserData();showToast('Заявка создана!','success');}
+            document.getElementById('withdrawModal').classList.add('hidden');
+        };
+
+        document.getElementById('vipBtn').onclick=async()=>{
+            const {data}=await supabase.rpc('get_user_by_id',{p_user_id:userData.id});
+            const box=document.getElementById('vipInfoBox'), btn=document.getElementById('confirmVipBtn'), txt=document.getElementById('vipBenefitsText');
+            if(data?.vip_paid){box.innerHTML='<p style="color:#4caf50;">✅ VIP активирован!</p><p>ID:</p><div class="vip-id">'+data.referral_code+'</div>';btn.style.display='none';txt.textContent='';}
+            else {box.innerHTML='<p>Цена:</p><div class="vip-price">10$</div>';btn.style.display='inline-block';txt.textContent='Оплатите 10$ в криптовалюте. VIP активируется автоматически после оплаты.';}
+            document.getElementById('vipModal').classList.remove('hidden');
+        };
+        document.getElementById('closeVipBtn').onclick=()=>document.getElementById('vipModal').classList.add('hidden');
+        document.getElementById('confirmVipBtn').onclick=()=>{document.getElementById('vipModal').classList.add('hidden');document.getElementById('paymentModal').classList.remove('hidden');document.getElementById('paymentInfo').style.display='none';document.getElementById('createPaymentBtn').style.display='inline-block';};
+
+        document.getElementById('createPaymentBtn').onclick=createCryptoPayment;
+        document.getElementById('closePaymentBtn').onclick=()=>{if(paymentCheckInterval)clearInterval(paymentCheckInterval);document.getElementById('paymentModal').classList.add('hidden');document.getElementById('paymentInfo').style.display='none';document.getElementById('createPaymentBtn').style.display='inline-block';};
+        document.getElementById('paymentModal').onclick=function(e){if(e.target===this){if(paymentCheckInterval)clearInterval(paymentCheckInterval);this.classList.add('hidden');document.getElementById('paymentInfo').style.display='none';document.getElementById('createPaymentBtn').style.display='inline-block';}};
+    }
+})();
 </script>
 </body>
 </html>
