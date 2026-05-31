@@ -113,7 +113,7 @@
             text-transform: uppercase;
         }
 
-        .input-group input {
+        .input-group input, .input-group textarea {
             width: 100%;
             background: rgba(15, 16, 20, 0.8);
             border: 1px solid rgba(220, 180, 100, 0.25);
@@ -123,9 +123,14 @@
             color: #f5e7cc;
             outline: none;
             font-family: 'Inter', sans-serif;
+            resize: vertical;
         }
 
-        .input-group input:focus {
+        .input-group textarea {
+            min-height: 60px;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
             border-color: #c084fc;
             box-shadow: 0 0 12px rgba(192, 132, 252, 0.4);
         }
@@ -332,6 +337,7 @@
             align-items: center;
             cursor: move;
             border-bottom: 1px solid rgba(192, 132, 252, 0.3);
+            gap: 0.5rem;
         }
 
         .dialog-modal-header h3 {
@@ -339,6 +345,13 @@
             color: #e9c274;
             margin: 0;
             pointer-events: none;
+            flex: 1;
+        }
+
+        .dialog-modal-header-btns {
+            display: flex;
+            gap: 0.4rem;
+            pointer-events: all;
         }
 
         .dialog-modal-close {
@@ -401,21 +414,25 @@
             border-top: 1px solid rgba(192, 132, 252, 0.2);
             display: flex;
             gap: 0.5rem;
+            align-items: flex-end;
         }
 
-        .dialog-modal-footer input {
+        .dialog-modal-footer textarea {
             flex: 1;
             background: rgba(15, 16, 20, 0.8);
             border: 1px solid rgba(220, 180, 100, 0.25);
-            border-radius: 1.5rem;
+            border-radius: 1rem;
             padding: 0.6rem 1rem;
             font-size: 0.8rem;
             color: #f5e7cc;
             outline: none;
             font-family: 'Inter', sans-serif;
+            resize: vertical;
+            min-height: 42px;
+            max-height: 120px;
         }
 
-        .dialog-modal-footer input:focus {
+        .dialog-modal-footer textarea:focus {
             border-color: #c084fc;
         }
 
@@ -670,31 +687,42 @@
                 modal.style.top = '40px';
                 modal.style.left = '60px';
                 
-                let messagesHTML = dialog.messages.map(msg => `
-                    <div class="dialog-msg user">
-                        ${msg.user_message}
-                        <div class="dialog-msg-time">📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</div>
-                    </div>
-                    ${msg.admin_response ? `
-                        <div class="dialog-msg admin">
-                            ${msg.admin_response}
-                            <div class="dialog-msg-time">✅ Отвечено</div>
+                // Показываем все сообщения: и от пользователя и ответы админа
+                let messagesHTML = dialog.messages.map(msg => {
+                    let html = '';
+                    // Сообщение пользователя
+                    html += `
+                        <div class="dialog-msg user">
+                            ${msg.user_message}
+                            <div class="dialog-msg-time">📅 ${new Date(msg.created_at).toLocaleString('ru-RU')}</div>
                         </div>
-                    ` : ''}
-                `).join('');
+                    `;
+                    // Ответ админа (если есть)
+                    if (msg.admin_response) {
+                        html += `
+                            <div class="dialog-msg admin">
+                                ${msg.admin_response}
+                                <div class="dialog-msg-time">✅ ${msg.responded_at ? new Date(msg.responded_at).toLocaleString('ru-RU') : ''}</div>
+                            </div>
+                        `;
+                    }
+                    return html;
+                }).join('');
 
                 modal.innerHTML = `
                     <div class="dialog-modal-header" id="modalHeader">
                         <h3>💬 ${dialog.nickname}</h3>
-                        <button class="dialog-modal-close" id="modalClose">✕</button>
+                        <div class="dialog-modal-header-btns">
+                            <button class="btn btn-danger btn-sm" id="modalDeleteDialogBtn" title="Удалить диалог">🗑</button>
+                            <button class="dialog-modal-close" id="modalClose">✕</button>
+                        </div>
                     </div>
                     <div class="dialog-modal-messages" id="modalMessages">
                         ${messagesHTML}
                     </div>
                     <div class="dialog-modal-footer">
-                        <input type="text" id="modalResponseInput" placeholder="Введите ответ...">
-                        <button class="btn btn-success btn-sm" id="modalSendBtn">📤</button>
-                        <button class="btn btn-danger btn-sm" id="modalDeleteDialogBtn">🗑 Удалить диалог</button>
+                        <textarea id="modalResponseInput" placeholder="Введите сообщение пользователю..." rows="2"></textarea>
+                        <button class="btn btn-success" id="modalSendBtn" style="flex-shrink: 0;">📤 Отправить</button>
                     </div>
                     <div class="resize-handle" id="resizeHandle"></div>
                 `;
@@ -708,20 +736,26 @@
                     if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
                 }, 100);
 
+                // Закрытие по клику на оверлей
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
                         overlay.remove();
                         currentDialogModal = null;
                     }
                 });
+                
+                // Закрытие по кнопке
                 modal.querySelector('#modalClose').addEventListener('click', function() {
                     overlay.remove();
                     currentDialogModal = null;
                 });
 
+                // Перетаскивание
                 const header = modal.querySelector('#modalHeader');
                 let isDragging = false, startX, startY, startLeft, startTop;
                 header.addEventListener('mousedown', function(e) {
+                    // Не перетаскиваем при клике на кнопки
+                    if (e.target.closest('button')) return;
                     isDragging = true;
                     startX = e.clientX; startY = e.clientY;
                     startLeft = parseInt(modal.style.left) || 60;
@@ -738,6 +772,7 @@
                     document.body.style.userSelect = '';
                 });
 
+                // Изменение размера
                 const resizeHandle = modal.querySelector('#resizeHandle');
                 let isResizing = false, startW, startH, rsX, rsY;
                 resizeHandle.addEventListener('mousedown', function(e) {
@@ -757,26 +792,36 @@
                     document.body.style.userSelect = '';
                 });
 
+                // Отправка нового сообщения пользователю (без ограничений)
                 modal.querySelector('#modalSendBtn').addEventListener('click', async function() {
                     const input = modal.querySelector('#modalResponseInput');
                     const response = input.value.trim();
                     if (!response) return;
                     
-                    const unansweredMsg = dialog.messages.find(m => !m.admin_response);
-                    if (!unansweredMsg) {
-                        showToast('Все сообщения уже имеют ответ', 'error');
-                        return;
-                    }
-                    
-                    const { data, error } = await supabase.rpc('admin_respond_support', {
-                        p_message_id: unansweredMsg.id,
-                        p_response: response
+                    // Отправляем новое сообщение пользователю
+                    const { data, error } = await supabase.rpc('admin_send_message_to_user', {
+                        p_nickname: dialog.nickname,
+                        p_message: response
                     });
                     
                     if (data && data.success) {
-                        showToast('Ответ отправлен');
+                        input.value = '';
+                        showToast('Сообщение отправлено');
+                        
+                        // Перезагружаем диалог
                         overlay.remove();
                         currentDialogModal = null;
+                        setTimeout(async () => {
+                            const { data: freshData } = await supabase.rpc('get_support_messages');
+                            if (freshData) {
+                                const dialogs = groupMessagesByUser(freshData);
+                                const freshDialog = dialogs.find(d => d.nickname === dialog.nickname);
+                                if (freshDialog) {
+                                    openDialog(freshDialog);
+                                }
+                            }
+                        }, 300);
+                        
                         loadDialogs();
                         loadStats();
                     } else {
@@ -784,14 +829,42 @@
                     }
                 });
 
+                // Отправка по Enter (Ctrl+Enter для переноса строки)
+                modal.querySelector('#modalResponseInput').addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && !e.ctrlKey && !e.shiftKey) {
+                        e.preventDefault();
+                        modal.querySelector('#modalSendBtn').click();
+                    }
+                });
+
+                // Удаление диалога (кнопка в хедере)
                 modal.querySelector('#modalDeleteDialogBtn').addEventListener('click', async function() {
-                    if (!confirm(`Удалить весь диалог с пользователем "${dialog.nickname}"?`)) return;
+                    const choice = confirm(
+                        `Удалить диалог с пользователем "${dialog.nickname}"?\n\n` +
+                        `Нажмите "ОК" — удалить ТОЛЬКО у вас (в админ-панели)\n` +
+                        `Нажмите "Отмена" — чтобы выбрать другой вариант`
+                    );
                     
-                    for (const msg of dialog.messages) {
-                        await supabase.rpc('admin_delete_support_message', { p_message_id: msg.id });
+                    if (choice) {
+                        // Удаляем только у админа (все сообщения диалога)
+                        for (const msg of dialog.messages) {
+                            await supabase.rpc('admin_delete_support_message', { p_message_id: msg.id });
+                        }
+                        showToast('Диалог удалён у вас');
+                    } else {
+                        const choice2 = confirm(
+                            `Удалить диалог и у пользователя "${dialog.nickname}" тоже?\n\n` +
+                            `"ОК" — удалить у ОБОИХ\n` +
+                            `"Отмена" — ничего не удалять`
+                        );
+                        if (choice2) {
+                            for (const msg of dialog.messages) {
+                                await supabase.rpc('admin_delete_support_message', { p_message_id: msg.id });
+                            }
+                            showToast('Диалог удалён у обоих');
+                        }
                     }
                     
-                    showToast('Диалог удалён');
                     overlay.remove();
                     currentDialogModal = null;
                     loadDialogs();
