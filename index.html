@@ -833,7 +833,6 @@
             margin: 0.4rem 0;
         }
 
-        /* Стили для преимуществ VIP */
         .vip-benefits {
             background: rgba(76, 175, 80, 0.1);
             border: 1px solid rgba(76, 175, 80, 0.35);
@@ -1495,7 +1494,7 @@
     </div>
 </div>
 
-<!-- Модальное окно VIP (УВЕЛИЧЕНО + ДОБАВЛЕН ТЕКСТ) -->
+<!-- Модальное окно VIP (УВЕЛИЧЕНО + ДОБАВЛЕН ТЕКСТ ПРЕИМУЩЕСТВ) -->
 <div class="modal-overlay hidden" id="vipModal">
     <div class="modal" style="max-width: 550px;">
         <h2>👑 VIP статус</h2>
@@ -1525,7 +1524,7 @@
     </div>
 </div>
 
-<!-- Модальное окно оплаты VIP -->
+<!-- Модальное окно оплаты VIP (БЕЗ ТЕСТОВОГО РЕЖИМА, БЕЗ BTC) -->
 <div class="modal-overlay hidden" id="paymentModal">
     <div class="modal" style="max-width: 450px;">
         <h2>💳 Оплата VIP статуса</h2>
@@ -1534,17 +1533,14 @@
         <div class="input-group">
             <label>Выберите криптовалюту</label>
             <select id="paymentCrypto">
-                <option value="test">🧪 Тестовый платёж (Test) — мгновенная активация VIP</option>
                 <option value="trx">TRON (TRX)</option>
                 <option value="ltc">Litecoin (LTC)</option>
-                <!-- BTC убран, так как минимальная сумма больше 10$ -->
                 <option value="eth">Ethereum (ETH)</option>
                 <option value="usdterc20">USDT (ERC20)</option>
                 <option value="usdtbsc">USDT (BEP20)</option>
                 <option value="doge">Dogecoin (DOGE)</option>
                 <option value="bch">Bitcoin Cash (BCH)</option>
             </select>
-            <p style="color: #81c784; font-size: 0.7rem; margin-top: 0.3rem;">💡 Выберите «Тестовый платёж» для мгновенной активации VIP без реальной оплаты</p>
         </div>
 
         <div id="paymentInfo" style="display: none;">
@@ -1930,41 +1926,9 @@
             minDisplay.textContent = `${minAmount} ${currency}`;
         };
 
-        // ===== NOWPAYMENTS (с тестовым режимом) =====
+        // ===== NOWPAYMENTS (ТОЛЬКО РЕАЛЬНЫЕ ПЛАТЕЖИ, БЕЗ BTC) =====
         async function createCryptoPayment() {
             const cryptoType = document.getElementById('paymentCrypto').value;
-            
-            // ========== ТЕСТОВЫЙ ПЛАТЁЖ ==========
-            // Если выбран "test", сразу активируем VIP без реальной оплаты
-            if (cryptoType === 'test') {
-                document.getElementById('paymentInfo').style.display = 'block';
-                document.getElementById('paymentQR').innerHTML = '<p style="color: #333;">🧪 Тестовый платёж</p>';
-                document.getElementById('paymentAddress').textContent = 'Тестовый режим — оплата не требуется';
-                document.getElementById('paymentStatus').textContent = '✅ VIP активируется мгновенно...';
-                document.getElementById('paymentStatus').style.color = '#4caf50';
-                document.getElementById('createPaymentBtn').style.display = 'none';
-                
-                // Активируем VIP мгновенно
-                const { data: vipData } = await supabase.rpc('purchase_vip_crypto', {
-                    p_user_id: userData.id
-                });
-                
-                if (vipData && vipData.success) {
-                    setTimeout(async () => {
-                        await loadUserData();
-                        document.getElementById('paymentModal').classList.add('hidden');
-                        document.getElementById('createPaymentBtn').style.display = 'inline-block';
-                        document.getElementById('paymentInfo').style.display = 'none';
-                        showToast('🎉 VIP статус успешно активирован (тестовый режим)!', 'success');
-                        await loadReferrals();
-                    }, 1000);
-                } else {
-                    showToast('Ошибка активации VIP', 'error');
-                    document.getElementById('createPaymentBtn').style.display = 'inline-block';
-                }
-                return;
-            }
-            // ========== КОНЕЦ ТЕСТОВОГО ПЛАТЕЖА ==========
             
             try {
                 const response = await fetch('https://api.nowpayments.io/v1/payment', {
@@ -1992,7 +1956,6 @@
                     document.getElementById('paymentStatus').style.color = '#ffc107';
                     document.getElementById('createPaymentBtn').style.display = 'none';
                     
-                    // QR код
                     const qrEl = document.getElementById('paymentQR');
                     if (qrEl) qrEl.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data.pay_address)}" alt="QR" style="max-width:200px;">`;
                     
@@ -2021,7 +1984,6 @@
                         document.getElementById('paymentStatus').textContent = '✅ Оплата получена!';
                         document.getElementById('paymentStatus').style.color = '#4caf50';
                         
-                        // Активируем VIP
                         const { data: vipData } = await supabase.rpc('purchase_vip_crypto', {
                             p_user_id: userData.id
                         });
@@ -2559,7 +2521,6 @@
                     return;
                 }
 
-                // Проверка минимальной суммы
                 const minAmount = MIN_WITHDRAW_AMOUNTS[crypto];
                 if (minAmount && amount < minAmount) {
                     showToast(`Минимальная сумма вывода для ${crypto}: ${minAmount.toFixed(2)}$`, 'error');
