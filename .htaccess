@@ -1,0 +1,5 @@
+# .htaccess в папке api/
+<Files "config.php">
+    Order Allow,Deny
+    Deny from all
+</Files>
