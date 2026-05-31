@@ -2339,11 +2339,37 @@
         async function loadReferrals() {
             const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
             if (data) {
-                document.getElementById('lvl1').textContent = (data.level_1?.count || 0);
-                document.getElementById('lvl2').textContent = (data.level_2?.count || 0);
-                document.getElementById('lvl3').textContent = (data.level_3?.count || 0);
-                document.getElementById('lvl4').textContent = (data.level_4?.count || 0);
-                document.getElementById('lvl5').textContent = (data.level_5?.count || 0);
+                // Проценты для каждого уровня
+                const percents = [0.01, 0.02, 0.03, 0.04, 0.05]; // 1%, 2%, 3%, 4%, 5%
+                const vipPrice = 10; // стоимость VIP в долларах
+                
+                // Количество рефералов на каждом уровне
+                const level1Count = data.level_1?.count || 0;
+                const level2Count = data.level_2?.count || 0;
+                const level3Count = data.level_3?.count || 0;
+                const level4Count = data.level_4?.count || 0;
+                const level5Count = data.level_5?.count || 0;
+                
+                // Отображаем количество рефералов
+                document.getElementById('lvl1').textContent = level1Count;
+                document.getElementById('lvl2').textContent = level2Count;
+                document.getElementById('lvl3').textContent = level3Count;
+                document.getElementById('lvl4').textContent = level4Count;
+                document.getElementById('lvl5').textContent = level5Count;
+                
+                // Вычисляем и отображаем заработок с каждого уровня
+                // Формула: количество рефералов × процент × стоимость VIP
+                const earn1 = level1Count * percents[0] * vipPrice;
+                const earn2 = level2Count * percents[1] * vipPrice;
+                const earn3 = level3Count * percents[2] * vipPrice;
+                const earn4 = level4Count * percents[3] * vipPrice;
+                const earn5 = level5Count * percents[4] * vipPrice;
+                
+                document.getElementById('earn1').textContent = earn1.toFixed(2) + ' $';
+                document.getElementById('earn2').textContent = earn2.toFixed(2) + ' $';
+                document.getElementById('earn3').textContent = earn3.toFixed(2) + ' $';
+                document.getElementById('earn4').textContent = earn4.toFixed(2) + ' $';
+                document.getElementById('earn5').textContent = earn5.toFixed(2) + ' $';
             }
         }
 
