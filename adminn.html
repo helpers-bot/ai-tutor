@@ -5,383 +5,299 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🔧 Админ-панель</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{
+            font-family:'Georgia',serif;
+            background:#0d0d1a;
+            color:#fff;
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            overflow-y:auto;
         }
-        body {
-            font-family: 'Georgia', serif;
-            background: #0d0d1a;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow-y: auto;
+        .admin-container{
+            width:100%;
+            max-width:600px;
+            padding:20px;
         }
-        .admin-container {
-            width: 100%;
-            max-width: 600px;
-            padding: 20px;
+        h1{
+            text-align:center;
+            color:#ff6b9d;
+            margin-bottom:8px;
         }
-        h1 {
-            text-align: center;
-            color: #ff6b9d;
-            margin-bottom: 8px;
+        .subtitle{
+            text-align:center;
+            color:rgba(255,255,255,0.4);
+            margin-bottom:24px;
+            font-size:0.85em;
         }
-        .subtitle {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.4);
-            margin-bottom: 24px;
-            font-size: 0.85em;
+        .panel{
+            background:rgba(255,255,255,0.03);
+            border-radius:20px;
+            padding:20px;
+            margin-bottom:16px;
+            border:1px solid rgba(255,255,255,0.08);
+        }
+        .panel h3{
+            color:#ffd700;
+            margin-bottom:12px;
+            font-size:1em;
+        }
+        .btn{
+            padding:12px 20px;
+            border-radius:50px;
+            border:none;
+            cursor:pointer;
+            font-family:'Georgia',serif;
+            font-size:0.9em;
+            letter-spacing:1px;
+            transition:all 0.3s;
+            margin:4px;
+            width:100%;
+        }
+        .btn-gold{background:#ffd700;color:#1a1a2e;font-weight:bold;}
+        .btn-pink{background:linear-gradient(135deg,#ff6b9d,#c44569);color:#fff;}
+        .btn-outline{background:transparent;border:1px solid rgba(255,255,255,0.3);color:#fff;}
+        .btn:active{transform:scale(0.95);}
+        .status{
+            display:inline-block;
+            padding:8px 16px;
+            border-radius:50px;
+            font-size:0.8em;
+            text-align:center;
+            width:100%;
+        }
+        .status-active{background:#4effb4;color:#1a1a2e;}
+        .status-inactive{background:#555;color:#aaa;}
+
+        /* Игровой оверлей */
+        .game-overlay{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:rgba(0,0,0,0.97);z-index:1000;
+            display:flex;align-items:center;justify-content:center;flex-direction:column;
+        }
+        .game-container{
+            width:95%;max-width:500px;height:80vh;
+            background:radial-gradient(ellipse at center,#0a0a2e 0%,#000010 100%);
+            border-radius:20px;position:relative;overflow:hidden;
+            border:2px solid rgba(255,255,255,0.15);
+            box-shadow:0 0 60px rgba(100,100,255,0.2);
+        }
+        .game-header{
+            position:absolute;top:0;left:0;right:0;
+            padding:10px 16px;
+            display:flex;justify-content:space-between;align-items:center;
+            z-index:10;
+            background:rgba(0,0,0,0.5);
+        }
+        .timer{
+            color:#ffd700;
+            font-size:1.4em;
+            font-weight:bold;
+        }
+        .timer.urgent{
+            color:#ff4757;
+            animation:pulse 0.5s ease-in-out infinite;
+        }
+        @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.2);}}
+        .game-close{
+            background:none;border:none;color:#fff;
+            font-size:1.5em;cursor:pointer;z-index:20;
+        }
+        .game-title{
+            color:#fff;
+            font-size:0.9em;
         }
 
-        .panel {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        /* Звёзды (перетаскиваемые) */
+        .draggable-star{
+            position:absolute;
+            width:55px;
+            height:55px;
+            cursor:grab;
+            z-index:5;
+            touch-action:none;
+            user-select:none;
+            font-size:2.8em;
+            text-align:center;
+            line-height:55px;
+            animation:starFloat 3s ease-in-out infinite;
+            filter:drop-shadow(0 0 12px currentColor);
+            transition:filter 0.3s;
         }
-        .panel h3 {
-            color: #ffd700;
-            margin-bottom: 12px;
-            font-size: 1em;
+        .draggable-star:active{
+            cursor:grabbing;
+            z-index:15;
+            filter:drop-shadow(0 0 25px currentColor) brightness(1.5);
         }
-
-        .btn {
-            padding: 12px 20px;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            font-family: 'Georgia', serif;
-            font-size: 0.9em;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            margin: 4px;
-            width: 100%;
+        @keyframes starFloat{
+            0%,100%{transform:translateY(0) scale(1);}
+            50%{transform:translateY(-12px) scale(1.1);}
         }
-        .btn-gold {
-            background: #ffd700;
-            color: #1a1a2e;
-            font-weight: bold;
+        .draggable-star.placed{
+            animation:starSnap 0.6s ease-out forwards;
+            pointer-events:none;
+            cursor:default;
         }
-        .btn-pink {
-            background: linear-gradient(135deg, #ff6b9d, #c44569);
-            color: #fff;
-        }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
-        }
-        .btn:active {
-            transform: scale(0.95);
+        @keyframes starSnap{
+            0%{transform:scale(1.3);filter:brightness(2);}
+            100%{transform:scale(1);filter:brightness(1.2);}
         }
 
-        .status {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 50px;
-            font-size: 0.8em;
-            text-align: center;
-            width: 100%;
+        /* Контуры созвездий (цели) */
+        .constellation-slot{
+            position:absolute;
+            width:70px;
+            height:70px;
+            border-radius:50%;
+            border:2px dashed rgba(255,255,255,0.3);
+            z-index:2;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            animation:slotPulse 2s ease-in-out infinite;
         }
-        .status-active {
-            background: #4effb4;
-            color: #1a1a2e;
+        @keyframes slotPulse{
+            0%,100%{border-color:rgba(255,255,255,0.3);box-shadow:0 0 8px transparent;}
+            50%{border-color:rgba(255,255,255,0.6);box-shadow:0 0 20px rgba(255,255,255,0.1);}
         }
-        .status-inactive {
-            background: #555;
-            color: #aaa;
+        .constellation-slot.filled{
+            border-style:solid;
+            border-color:currentColor;
+            animation:none;
+            box-shadow:0 0 30px currentColor;
         }
-
-        /* Игровой экран */
-        .game-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
+        .constellation-slot .inner-glow{
+            display:none;
         }
-        .game-container {
-            width: 95%;
-            max-width: 500px;
-            height: 80vh;
-            background: #1a1a2e;
-            border-radius: 20px;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+        .constellation-slot.filled .inner-glow{
+            display:block;
+            width:20px;
+            height:20px;
+            border-radius:50%;
+            background:currentColor;
+            animation:innerGlow 1s ease-in-out infinite;
         }
-        .game-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 10px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.6);
-        }
-        .timer {
-            color: #ffd700;
-            font-size: 1.4em;
-            font-weight: bold;
-        }
-        .timer.urgent {
-            color: #ff4757;
-            animation: pulse 0.5s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.2);
-            }
-        }
-        .game-close {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.5em;
-            cursor: pointer;
-            z-index: 20;
-        }
-        .game-title {
-            color: #fff;
-            font-size: 0.9em;
+        @keyframes innerGlow{
+            0%,100%{box-shadow:0 0 10px currentColor,0 0 20px currentColor;}
+            50%{box-shadow:0 0 20px currentColor,0 0 40px currentColor;}
         }
 
-        /* Змея */
-        .snake {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            cursor: grab;
-            z-index: 5;
-            transition: none;
-            touch-action: none;
-            font-size: 2.5em;
-            text-align: center;
-            line-height: 50px;
-            animation: wiggle 0.8s ease-in-out infinite;
-            user-select: none;
+        /* Линии созвездия */
+        .constellation-line{
+            position:absolute;
+            height:1.5px;
+            background:rgba(255,255,255,0.2);
+            z-index:1;
+            transform-origin:left center;
+            transition:all 0.8s ease;
         }
-        .snake:active {
-            cursor: grabbing;
-            z-index: 15;
-        }
-        @keyframes wiggle {
-            0%,
-            100% {
-                transform: rotate(-5deg) scale(1);
-            }
-            25% {
-                transform: rotate(5deg) scale(1.1);
-            }
-            50% {
-                transform: rotate(-3deg) scale(1);
-            }
-            75% {
-                transform: rotate(3deg) scale(1.05);
-            }
-        }
-        .snake.caught {
-            animation: suckIn 0.6s ease-in forwards;
-            pointer-events: none;
-        }
-        @keyframes suckIn {
-            0% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(0);
-                opacity: 0;
-            }
+        .constellation-line.active{
+            background:rgba(255,255,255,0.8);
+            box-shadow:0 0 6px rgba(255,255,255,0.5);
         }
 
-        /* Круг */
-        .circle {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            z-index: 2;
-            border: 3px dashed rgba(255, 255, 255, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5em;
+        /* Мерцающие звёзды фона */
+        .bg-star{
+            position:absolute;
+            border-radius:50%;
+            background:white;
+            animation:bgTwinkle var(--bd) ease-in-out infinite;
+            animation-delay:var(--bdel);
+            opacity:0;
+        }
+        @keyframes bgTwinkle{
+            0%,100%{opacity:0.1;}
+            50%{opacity:0.6;}
         }
 
-        /* Штыри (шаг 3) */
-        .peg {
-            position: absolute;
-            bottom: 30px;
-            width: 20px;
-            height: 100px;
-            border-radius: 10px 10px 0 0;
-            z-index: 2;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        /* Штыри и круги (шаг 3) */
+        .peg{
+            position:absolute;
+            bottom:30px;
+            width:22px;
+            height:100px;
+            border-radius:11px 11px 0 0;
+            z-index:2;
+            box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.2);
         }
-        .peg::after {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            background: inherit;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        .peg::after{
+            content:'';
+            position:absolute;
+            top:-18px;
+            left:50%;
+            transform:translateX(-50%);
+            width:34px;
+            height:34px;
+            border-radius:50%;
+            background:inherit;
+            box-shadow:0 2px 8px rgba(0,0,0,0.3),inset 0 2px 4px rgba(255,255,255,0.3);
         }
-        .floating-circle {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: grab;
-            z-index: 5;
-            animation: floatAround 3s ease-in-out infinite;
-            touch-action: none;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        .floating-circle{
+            position:absolute;
+            width:44px;
+            height:44px;
+            border-radius:50%;
+            cursor:grab;
+            z-index:5;
+            animation:floatAround 3s ease-in-out infinite;
+            touch-action:none;
+            box-shadow:0 4px 16px rgba(0,0,0,0.4),inset 0 -2px 6px rgba(0,0,0,0.3),inset 0 2px 6px rgba(255,255,255,0.3);
         }
-        .floating-circle:active {
-            cursor: grabbing;
-            z-index: 15;
+        .floating-circle:active{
+            cursor:grabbing;
+            z-index:15;
+            box-shadow:0 8px 24px rgba(0,0,0,0.6),inset 0 -2px 6px rgba(0,0,0,0.3),inset 0 2px 6px rgba(255,255,255,0.3);
         }
-        @keyframes floatAround {
-            0%,
-            100% {
-                transform: translate(0, 0);
-            }
-            25% {
-                transform: translate(15px, -10px);
-            }
-            50% {
-                transform: translate(-10px, -20px);
-            }
-            75% {
-                transform: translate(-15px, 5px);
-            }
+        @keyframes floatAround{
+            0%,100%{transform:translate(0,0);}
+            25%{transform:translate(15px,-10px);}
+            50%{transform:translate(-10px,-20px);}
+            75%{transform:translate(-15px,5px);}
         }
-        .floating-circle.placed {
-            animation: none;
-            pointer-events: none;
-            transition: all 0.5s ease;
-            opacity: 0.8;
+        .floating-circle.placed{
+            animation:none;
+            pointer-events:none;
+            transition:all 0.5s ease;
+            opacity:0.85;
         }
 
-        /* Победа / приз */
-        .prize-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 2000;
-            pointer-events: none;
+        /* Приз */
+        .prize-overlay{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            z-index:2000;pointer-events:none;
         }
-        .heart-particle {
-            position: absolute;
-            font-size: 2em;
-            animation: heartFall var(--hd) linear forwards;
-            animation-delay: var(--hdel);
-            opacity: 0;
+        .heart-particle{
+            position:absolute;
+            font-size:2em;
+            animation:heartFall var(--hd) linear forwards;
+            animation-delay:var(--hdel);
+            opacity:0;
         }
-        @keyframes heartFall {
-            0% {
-                transform: translateY(-100px) scale(1) rotate(0deg);
-                opacity: 1;
-            }
-            70% {
-                transform: translateY(var(--burstY)) scale(1.5) rotate(180deg);
-                opacity: 1;
-            }
-            80% {
-                transform: translateY(var(--burstY)) scale(2) rotate(200deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(110vh) scale(0.5) rotate(360deg);
-                opacity: 0;
-            }
+        @keyframes heartFall{
+            0%{transform:translateY(-100px) scale(1) rotate(0deg);opacity:1;}
+            70%{transform:translateY(var(--burstY)) scale(1.8) rotate(180deg);opacity:1;}
+            80%{transform:translateY(var(--burstY)) scale(2.5) rotate(200deg);opacity:1;}
+            100%{transform:translateY(110vh) scale(0.5) rotate(360deg);opacity:0;}
         }
 
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: bold;
-            z-index: 3000;
-            animation: slideUp 0.4s ease, slideDown 0.4s ease 2s forwards;
-            font-family: 'Georgia', serif;
-            font-size: 0.9em;
-            text-align: center;
+        .toast{
+            position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+            padding:12px 24px;border-radius:50px;font-weight:bold;
+            z-index:3000;
+            animation:slideUp 0.4s ease,slideDown 0.4s ease 2s forwards;
+            font-family:'Georgia',serif;font-size:0.9em;text-align:center;
         }
-        .toast-success {
-            background: #4effb4;
-            color: #1a1a2e;
+        .toast-success{background:#4effb4;color:#1a1a2e;}
+        .toast-error{background:#ff4757;color:#fff;}
+        @keyframes slideUp{
+            from{transform:translateX(-50%) translateY(100px);opacity:0;}
+            to{transform:translateX(-50%) translateY(0);opacity:1;}
         }
-        .toast-error {
-            background: #ff4757;
-            color: #fff;
-        }
-        @keyframes slideUp {
-            from {
-                transform: translateX(-50%) translateY(100px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideDown {
-            from {
-                transform: translateX(-50%) translateY(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(-50%) translateY(100px);
-                opacity: 0;
-            }
-        }
-
-        /* Аудио-контрол */
-        .audio-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
-            font-size: 1.5em;
-            cursor: pointer;
-            z-index: 3000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @keyframes slideDown{
+            from{transform:translateX(-50%) translateY(0);opacity:1;}
+            to{transform:translateX(-50%) translateY(100px);opacity:0;}
         }
     </style>
 </head>
@@ -395,8 +311,8 @@
             <h3>📡 Статус</h3>
             <div class="status status-inactive" id="questStatus">Нет активного квеста</div>
             <br><br>
-            <button class="btn btn-outline" onclick="checkStatus()">🔄 Обновить статус</button>
-            <button class="btn btn-outline" onclick="resetQuest()">🗑 Сбросить квест</button>
+            <button class="btn btn-outline" onclick="checkStatus()">🔄 Обновить</button>
+            <button class="btn btn-outline" onclick="resetQuest()">🗑 Сбросить</button>
         </div>
 
         <div class="panel">
@@ -424,26 +340,24 @@
     <!-- Призовой оверлей -->
     <div class="prize-overlay" id="prizeOverlay"></div>
 
-    <button class="audio-toggle" id="audioToggle" onclick="toggleAudio()" style="display:none;">🔇</button>
-
     <script>
         // ============ КОНФИГУРАЦИЯ КВЕСТА ============
         const QUEST_CONFIG = {
             title: 'Квест-сюрприз',
             steps: [{
                 type: 'text',
-                title: '🎈 Полёт в прошлое 🎈',
-                question: 'Какого числа мы отмечаем совместные отношения? (ответ из двух цифр)',
+                title: '🎈 Полёт в прошлое',
+                question: 'Какого числа мы отмечаем совместные отношения? (две цифры)',
                 answer: '11',
-                timeLimit: 0, // без таймера
+                timeLimit: 0,
             }, {
-                type: 'snakes',
-                title: '🐍 Цветные змеи',
-                question: 'Перетащи змей в круги их цвета!',
-                answer: null, // проверяется автоматически
+                type: 'stars',
+                title: '🌟 Звёзды в созвездия',
+                question: 'Собери звёзды в свои созвездия!',
+                answer: null,
                 timeLimit: 60,
-                colors: ['#ff4757', '#ff6b9d', '#ffd700', '#4effb4', '#54a0ff', '#a29bfe', '#ff9f43'],
-                snakeCount: 7,
+                colors: ['#ff6b9d', '#ffd700', '#4effb4', '#54a0ff', '#ff9f43', '#a29bfe', '#fd79a8'],
+                starCount: 7,
             }, {
                 type: 'pegs',
                 title: '📌 Штыри и круги',
@@ -482,15 +396,34 @@
             });
         }
 
-        function toggleAudio() {
-            const btn = document.getElementById('audioToggle');
-            if (audioCtx && audioCtx.state === 'running') {
-                audioCtx.suspend();
-                btn.textContent = '🔇';
-            } else if (audioCtx) {
-                audioCtx.resume();
-                btn.textContent = '🔊';
-            }
+        function createStarCaptureSound() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1760, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function createPopSound() {
+            if (!audioCtx) audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.15);
         }
 
         // ============ ТЕСТИРОВАНИЕ ============
@@ -501,17 +434,13 @@
         let dragOffsetY = 0;
 
         function testQuest() {
-            // Сбрасываем состояние
             gameState = {
                 currentStep: 0,
                 stepData: {},
             };
-
             document.getElementById('adminPanel').style.display = 'none';
             document.getElementById('gameOverlay').style.display = 'flex';
-            document.getElementById('audioToggle').style.display = 'flex';
             document.getElementById('prizeOverlay').innerHTML = '';
-
             loadStep(0);
         }
 
@@ -519,7 +448,6 @@
             clearInterval(gameTimerInterval);
             document.getElementById('gameOverlay').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('audioToggle').style.display = 'none';
             document.getElementById('prizeOverlay').innerHTML = '';
             if (audioCtx) audioCtx.suspend();
         }
@@ -527,8 +455,12 @@
         function loadStep(stepIndex) {
             clearInterval(gameTimerInterval);
             const container = document.getElementById('gameContainer');
-            // Убираем старые элементы
-            container.querySelectorAll('.snake,.circle,.peg,.floating-circle').forEach(el => el.remove());
+            // Очищаем старые элементы
+            container.querySelectorAll(
+                '.draggable-star,.constellation-slot,.constellation-line,.peg,.floating-circle,.bg-star,div[style]'
+                ).forEach(el => {
+                if (!el.closest('.game-header')) el.remove();
+            });
 
             const step = QUEST_CONFIG.steps[stepIndex];
             document.getElementById('gameTitle').textContent = step.title;
@@ -540,8 +472,8 @@
 
             if (step.type === 'text') {
                 renderTextStep(container, step);
-            } else if (step.type === 'snakes') {
-                renderSnakeStep(container, step);
+            } else if (step.type === 'stars') {
+                renderStarsStep(container, step);
                 startTimer(step.timeLimit, () => {
                     showToast('Время вышло! Попробуй ещё раз.', 'error');
                     setTimeout(() => loadStep(stepIndex), 1500);
@@ -559,7 +491,6 @@
             let remaining = seconds;
             const timerEl = document.getElementById('gameTimer');
             timerEl.textContent = remaining;
-
             gameTimerInterval = setInterval(() => {
                 remaining--;
                 timerEl.textContent = remaining;
@@ -575,7 +506,7 @@
         function renderTextStep(container, step) {
             const box = document.createElement('div');
             box.style.cssText =
-                'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:85%;';
+                'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;width:85%;z-index:10;';
             box.innerHTML = `
                 <p style="color:#fff;font-size:1.1em;margin-bottom:8px;">${step.question}</p>
                 <input type="text" id="textAnswer" placeholder="Твой ответ..." 
@@ -594,137 +525,239 @@
                     document.getElementById('textError').textContent = 'Не совсем так... 💕';
                 }
             });
-
             document.getElementById('textAnswer').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') document.getElementById('textSubmit').click();
             });
+            setTimeout(() => document.getElementById('textAnswer')?.focus(), 300);
         }
 
-        // ============ ШАГ 2: ЗМЕИ ============
-        function renderSnakeStep(container, step) {
+        // ============ ШАГ 2: ЗВЁЗДЫ В СОЗВЕЗДИЯ ============
+        function renderStarsStep(container, step) {
             const colors = step.colors;
             const containerRect = container.getBoundingClientRect();
-            const margin = 60;
+            const margin = 50;
             const areaW = containerRect.width - margin * 2;
             const areaH = containerRect.height - 120 - margin * 2;
+            const topOffset = 110;
 
-            gameState.stepData.snakesPlaced = 0;
-            gameState.stepData.totalSnakes = step.snakeCount;
-
-            // Создаём круги
-            const circlePositions = [];
-            for (let i = 0; i < step.snakeCount; i++) {
-                const circle = document.createElement('div');
-                circle.className = 'circle';
-                circle.style.backgroundColor = colors[i] + '33';
-                circle.style.borderColor = colors[i];
-                circle.style.color = colors[i];
-                circle.textContent = '○';
-                const cx = margin + Math.random() * areaW;
-                const cy = 120 + Math.random() * areaH;
-                circle.style.left = cx + 'px';
-                circle.style.top = cy + 'px';
-                circle.dataset.color = colors[i];
-                circle.dataset.index = i;
-                container.appendChild(circle);
-                circlePositions.push({ x: cx + 30, y: cy + 30, color: colors[i] });
+            // Добавляем фоновые звёзды
+            for (let i = 0; i < 50; i++) {
+                const bgStar = document.createElement('div');
+                bgStar.className = 'bg-star';
+                bgStar.style.left = Math.random() * containerRect.width + 'px';
+                bgStar.style.top = Math.random() * containerRect.height + 'px';
+                bgStar.style.width = (Math.random() * 3 + 1) + 'px';
+                bgStar.style.height = bgStar.style.width;
+                bgStar.style.setProperty('--bd', (Math.random() * 3 + 2) + 's');
+                bgStar.style.setProperty('--bdel', Math.random() * 4 + 's');
+                container.appendChild(bgStar);
             }
 
-            // Создаём змей
-            const snakePositions = [];
-            for (let i = 0; i < step.snakeCount; i++) {
-                const snake = document.createElement('div');
-                snake.className = 'snake';
-                snake.textContent = '🐍';
-                snake.style.color = colors[i];
-                snake.dataset.color = colors[i];
-                snake.dataset.index = i;
-                // Размещаем не слишком близко к кругу своего цвета
+            gameState.stepData.starsPlaced = 0;
+            gameState.stepData.totalStars = step.starCount;
+            gameState.stepData.slotPositions = [];
+            gameState.stepData.lines = [];
+
+            // Создаём слоты созвездий (располагаем по кругу для красоты)
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2 + 20;
+            const radius = Math.min(areaW, areaH) / 2.3;
+
+            for (let i = 0; i < step.starCount; i++) {
+                const angle = (i / step.starCount) * Math.PI * 2 - Math.PI / 2;
+                const sx = centerX + Math.cos(angle) * radius - 35;
+                const sy = centerY + Math.sin(angle) * radius - 35;
+
+                const slot = document.createElement('div');
+                slot.className = 'constellation-slot';
+                slot.style.left = sx + 'px';
+                slot.style.top = sy + 'px';
+                slot.style.color = colors[i];
+                slot.dataset.color = colors[i];
+                slot.dataset.index = i;
+                slot.innerHTML = '<div class="inner-glow"></div>';
+                container.appendChild(slot);
+
+                gameState.stepData.slotPositions.push({
+                    x: sx + 35,
+                    y: sy + 35,
+                    color: colors[i],
+                    index: i,
+                    el: slot,
+                });
+            }
+
+            // Создаём линии между слотами (будут активироваться по мере заполнения)
+            for (let i = 0; i < step.starCount; i++) {
+                const next = (i + 1) % step.starCount;
+                const line = document.createElement('div');
+                line.className = 'constellation-line';
+                line.dataset.from = i;
+                line.dataset.to = next;
+                container.appendChild(line);
+                gameState.stepData.lines.push(line);
+            }
+            updateConstellationLines(container);
+
+            // Создаём перетаскиваемые звёзды
+            const starSymbols = ['⭐', '🌟', '✨', '💫', '⭐', '🌟', '✨'];
+            for (let i = 0; i < step.starCount; i++) {
                 let sx, sy;
+                // Размещаем подальше от своего слота
+                const slotPos = gameState.stepData.slotPositions[i];
                 do {
                     sx = margin + Math.random() * areaW;
-                    sy = 120 + Math.random() * areaH;
-                } while (Math.hypot(sx - circlePositions[i].x, sy - circlePositions[i].y) < 100);
-                snake.style.left = sx + 'px';
-                snake.style.top = sy + 'px';
-                snake.style.animationDelay = (Math.random() * 0.5) + 's';
-                container.appendChild(snake);
-                snakePositions.push({ el: snake, color: colors[i], index: i });
+                    sy = topOffset + Math.random() * areaH;
+                } while (Math.hypot(sx - slotPos.x, sy - slotPos.y) < 100);
+
+                const star = document.createElement('div');
+                star.className = 'draggable-star';
+                star.textContent = starSymbols[i];
+                star.style.color = colors[i];
+                star.style.left = sx + 'px';
+                star.style.top = sy + 'px';
+                star.style.animationDelay = (Math.random() * 1.5) + 's';
+                star.dataset.color = colors[i];
+                star.dataset.index = i;
+                container.appendChild(star);
 
                 // Drag events
-                snake.addEventListener('pointerdown', (e) => {
-                    if (snake.classList.contains('caught')) return;
-                    dragTarget = snake;
-                    const rect = snake.getBoundingClientRect();
+                star.addEventListener('pointerdown', (e) => {
+                    if (star.classList.contains('placed')) return;
+                    dragTarget = star;
+                    const rect = star.getBoundingClientRect();
                     dragOffsetX = e.clientX - rect.left;
                     dragOffsetY = e.clientY - rect.top;
-                    snake.style.zIndex = '15';
-                    snake.style.animation = 'none';
+                    star.style.animation = 'none';
+                    star.style.zIndex = '15';
                     e.preventDefault();
                 });
             }
 
-            // Move event
+            // Глобальные move/up
             container.addEventListener('pointermove', (e) => {
-                if (!dragTarget) return;
-                const containerRect = container.getBoundingClientRect();
-                let newX = e.clientX - containerRect.left - dragOffsetX;
-                let newY = e.clientY - containerRect.top - dragOffsetY;
-                newX = Math.max(0, Math.min(newX, containerRect.width - 50));
-                newY = Math.max(100, Math.min(newY, containerRect.height - 50));
-                dragTarget.style.left = newX + 'px';
-                dragTarget.style.top = newY + 'px';
+                if (!dragTarget || !dragTarget.classList.contains('draggable-star')) return;
+                const cRect = container.getBoundingClientRect();
+                let nx = e.clientX - cRect.left - dragOffsetX;
+                let ny = e.clientY - cRect.top - dragOffsetY;
+                nx = Math.max(0, Math.min(nx, cRect.width - 55));
+                ny = Math.max(100, Math.min(ny, cRect.height - 55));
+                dragTarget.style.left = nx + 'px';
+                dragTarget.style.top = ny + 'px';
             });
 
-            // Drop event
             container.addEventListener('pointerup', (e) => {
-                if (!dragTarget) return;
-                const snakeColor = dragTarget.dataset.color;
-                const snakeEl = dragTarget;
+                if (!dragTarget || !dragTarget.classList.contains('draggable-star')) return;
+                const starEl = dragTarget;
+                const starColor = starEl.dataset.color;
                 dragTarget = null;
-                snakeEl.style.zIndex = '5';
-                snakeEl.style.animation = 'wiggle 0.8s ease-in-out infinite';
-                snakeEl.style.animationDelay = (Math.random() * 0.5) + 's';
 
-                // Проверяем, попала ли змея в круг своего цвета
-                const snakeRect = snakeEl.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                const snakeCX = snakeRect.left + snakeRect.width / 2 - containerRect.left;
-                const snakeCY = snakeRect.top + snakeRect.height / 2 - containerRect.top;
+                const sRect = starEl.getBoundingClientRect();
+                const cRect = container.getBoundingClientRect();
+                const sCX = sRect.left + sRect.width / 2 - cRect.left;
+                const sCY = sRect.top + sRect.height / 2 - cRect.top;
 
                 let caught = false;
-                container.querySelectorAll('.circle').forEach(circle => {
-                    if (circle.dataset.color === snakeColor && !circle.dataset.caught) {
-                        const cRect = circle.getBoundingClientRect();
-                        const cCX = cRect.left + cRect.width / 2 - containerRect.left;
-                        const cCY = cRect.top + cRect.height / 2 - containerRect.top;
-                        const dist = Math.hypot(snakeCX - cCX, snakeCY - cCY);
-                        if (dist < 45) {
-                            // Поймана!
+                gameState.stepData.slotPositions.forEach(slot => {
+                    if (slot.color === starColor && !slot.el.classList.contains('filled')) {
+                        const dist = Math.hypot(sCX - slot.x, sCY - slot.y);
+                        if (dist < 50) {
                             caught = true;
-                            circle.dataset.caught = 'true';
-                            snakeEl.classList.add('caught');
-                            snakeEl.style.left = (cCX - 25) + 'px';
-                            snakeEl.style.top = (cCY - 25) + 'px';
-                            gameState.stepData.snakesPlaced++;
-                            setTimeout(() => {
-                                snakeEl.remove();
-                                circle.style.opacity = '0';
-                            }, 600);
-                            // Проверка победы
-                            if (gameState.stepData.snakesPlaced >= gameState.stepData
-                                .totalSnakes) {
+                            slot.el.classList.add('filled');
+                            starEl.classList.add('placed');
+                            starEl.style.left = (slot.x - 27) + 'px';
+                            starEl.style.top = (slot.y - 27) + 'px';
+                            starEl.style.color = slot.color;
+                            gameState.stepData.starsPlaced++;
+                            createStarCaptureSound();
+                            updateConstellationLines(container);
+                            // Подсветка линии
+                            gameState.stepData.lines.forEach(line => {
+                                const from = parseInt(line.dataset.from);
+                                const to = parseInt(line.dataset.to);
+                                if (gameState.stepData.slotPositions[from].el.classList
+                                    .contains('filled') &&
+                                    gameState.stepData.slotPositions[to].el.classList
+                                    .contains('filled')) {
+                                    line.classList.add('active');
+                                }
+                            });
+                            if (gameState.stepData.starsPlaced >= gameState.stepData
+                                .totalStars) {
                                 clearInterval(gameTimerInterval);
-                                setTimeout(() => advanceStep(), 800);
+                                // Финальная вспышка всего созвездия
+                                setTimeout(() => {
+                                    flashConstellation(container);
+                                    setTimeout(() => advanceStep(), 1200);
+                                }, 400);
                             }
                         }
                     }
                 });
                 if (!caught) {
-                    // Возвращаем на место если не попала
-                    snakeEl.style.transition = 'all 0.3s ease';
+                    starEl.style.animation = 'starFloat 3s ease-in-out infinite';
+                    starEl.style.animationDelay = '0s';
+                    starEl.style.zIndex = '5';
                 }
             });
+        }
+
+        function updateConstellationLines(container) {
+            gameState.stepData.lines.forEach(line => {
+                const from = parseInt(line.dataset.from);
+                const to = parseInt(line.dataset.to);
+                const p1 = gameState.stepData.slotPositions[from];
+                const p2 = gameState.stepData.slotPositions[to];
+                const dx = p2.x - p1.x;
+                const dy = p2.y - p1.y;
+                const len = Math.hypot(dx, dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                line.style.left = p1.x + 'px';
+                line.style.top = p1.y + 'px';
+                line.style.width = len + 'px';
+                line.style.transform = `rotate(${angle}deg)`;
+            });
+        }
+
+        function flashConstellation(container) {
+            // Яркая вспышка всех звёзд
+            gameState.stepData.slotPositions.forEach(slot => {
+                slot.el.style.boxShadow = '0 0 50px ' + slot.color + ', 0 0 100px ' + slot.color;
+                slot.el.style.transition = 'box-shadow 0.5s ease';
+            });
+            gameState.stepData.lines.forEach(line => {
+                line.style.background = 'rgba(255,255,255,1)';
+                line.style.boxShadow = '0 0 10px rgba(255,255,255,0.8)';
+                line.style.transition = 'all 0.5s ease';
+            });
+            // Дополнительные искры
+            for (let i = 0; i < 20; i++) {
+                const spark = document.createElement('div');
+                spark.style.cssText = `
+                    position:absolute;
+                    width:4px;height:4px;
+                    background:white;
+                    border-radius:50%;
+                    left:${container.getBoundingClientRect().width/2}px;
+                    top:${container.getBoundingClientRect().height/2}px;
+                    z-index:20;
+                    pointer-events:none;
+                    animation:sparkBurst 1s ease-out forwards;
+                    animation-delay:${Math.random()*0.3}s;
+                `;
+                spark.style.setProperty('--sx', (Math.random() - 0.5) * 300 + 'px');
+                spark.style.setProperty('--sy', (Math.random() - 0.5) * 300 + 'px');
+                container.appendChild(spark);
+                setTimeout(() => spark.remove(), 1500);
+            }
+            // Добавляем стиль для sparkBurst если его нет
+            if (!document.getElementById('sparkStyle')) {
+                const style = document.createElement('style');
+                style.id = 'sparkStyle';
+                style.textContent =
+                    '@keyframes sparkBurst{0%{transform:translate(0,0) scale(1);opacity:1;}100%{transform:translate(var(--sx),var(--sy)) scale(0);opacity:0;}}';
+                document.head.appendChild(style);
+            }
         }
 
         // ============ ШАГ 3: ШТЫРИ ============
@@ -736,32 +769,37 @@
             gameState.stepData.circlesPlaced = 0;
             gameState.stepData.totalCircles = step.circleCount;
 
-            // Создаём штыри
+            // Фон "стола"
+            const table = document.createElement('div');
+            table.style.cssText =
+                'position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(to top,rgba(139,90,43,0.3),transparent);z-index:0;border-radius:0 0 20px 20px;';
+            container.appendChild(table);
+
+            // Штыри
             for (let i = 0; i < step.pegsCount; i++) {
                 const peg = document.createElement('div');
                 peg.className = 'peg';
                 peg.style.backgroundColor = colors[i];
-                peg.style.left = (pegSpacing * (i + 1) - 10) + 'px';
+                peg.style.left = (pegSpacing * (i + 1) - 11) + 'px';
                 peg.dataset.color = colors[i];
                 peg.dataset.count = 0;
                 peg.dataset.need = step.circleCount / step.pegsCount;
                 container.appendChild(peg);
             }
 
-            // Создаём летающие круги
+            // Летающие круги
             for (let i = 0; i < step.circleCount; i++) {
                 const color = colors[i % step.pegsCount];
                 const circle = document.createElement('div');
                 circle.className = 'floating-circle';
                 circle.style.backgroundColor = color;
-                circle.style.left = (30 + Math.random() * (containerRect.width - 80)) + 'px';
-                circle.style.top = (30 + Math.random() * 120) + 'px';
+                circle.style.left = (20 + Math.random() * (containerRect.width - 70)) + 'px';
+                circle.style.top = (20 + Math.random() * 100) + 'px';
                 circle.style.animationDelay = (Math.random() * 3) + 's';
                 circle.style.animationDuration = (2 + Math.random() * 3) + 's';
                 circle.dataset.color = color;
                 container.appendChild(circle);
 
-                // Drag
                 circle.addEventListener('pointerdown', (e) => {
                     if (circle.classList.contains('placed')) return;
                     dragTarget = circle;
@@ -776,11 +814,11 @@
 
             container.addEventListener('pointermove', (e) => {
                 if (!dragTarget || !dragTarget.classList.contains('floating-circle')) return;
-                const containerRect = container.getBoundingClientRect();
-                let newX = e.clientX - containerRect.left - dragOffsetX;
-                let newY = e.clientY - containerRect.top - dragOffsetY;
-                dragTarget.style.left = newX + 'px';
-                dragTarget.style.top = newY + 'px';
+                const cRect = container.getBoundingClientRect();
+                let nx = e.clientX - cRect.left - dragOffsetX;
+                let ny = e.clientY - cRect.top - dragOffsetY;
+                dragTarget.style.left = nx + 'px';
+                dragTarget.style.top = ny + 'px';
             });
 
             container.addEventListener('pointerup', (e) => {
@@ -791,25 +829,26 @@
                 circleEl.style.zIndex = '5';
 
                 const cRect = circleEl.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                const cCX = cRect.left + cRect.width / 2 - containerRect.left;
-                const cCY = cRect.top + cRect.height / 2 - containerRect.top;
+                const contRect = container.getBoundingClientRect();
+                const cCX = cRect.left + cRect.width / 2 - contRect.left;
+                const cCY = cRect.top + cRect.height / 2 - contRect.top;
 
                 let placed = false;
                 container.querySelectorAll('.peg').forEach(peg => {
-                    if (peg.dataset.color === circleColor && parseInt(peg.dataset.count) < parseInt(peg
-                            .dataset.need)) {
+                    if (peg.dataset.color === circleColor && parseInt(peg.dataset.count) < parseInt(
+                            peg.dataset.need)) {
                         const pRect = peg.getBoundingClientRect();
-                        const pCX = pRect.left + pRect.width / 2 - containerRect.left;
-                        const pCY = pRect.top - containerRect.top;
+                        const pCX = pRect.left + pRect.width / 2 - contRect.left;
+                        const pCY = pRect.top - contRect.top;
                         const dist = Math.hypot(cCX - pCX, cCY - pCY);
-                        if (dist < 70) {
+                        if (dist < 80) {
                             placed = true;
                             peg.dataset.count = parseInt(peg.dataset.count) + 1;
                             circleEl.classList.add('placed');
-                            circleEl.style.left = (pCX - 20) + 'px';
-                            circleEl.style.top = (pCY - 30 - parseInt(peg.dataset.count) * 22) +
+                            circleEl.style.left = (pCX - 22) + 'px';
+                            circleEl.style.top = (pCY - 30 - parseInt(peg.dataset.count) * 24) +
                                 'px';
+                            createPopSound();
                             gameState.stepData.circlesPlaced++;
                             if (gameState.stepData.circlesPlaced >= gameState.stepData
                                 .totalCircles) {
@@ -826,18 +865,20 @@
             });
         }
 
-        // ============ ПЕРЕХОД МЕЖДУ ШАГАМИ ============
+        // ============ ПЕРЕХОД ============
         function advanceStep() {
             clearInterval(gameTimerInterval);
             if (gameState.currentStep < QUEST_CONFIG.steps.length - 1) {
                 const container = document.getElementById('gameContainer');
-                container.querySelectorAll('.snake,.circle,.peg,.floating-circle,div[style]').forEach(el => {
-                    if (el.closest && !el.closest('.game-header')) el.remove();
-                });
+                container.querySelectorAll(
+                    '.draggable-star,.constellation-slot,.constellation-line,.peg,.floating-circle,.bg-star'
+                    ).forEach(el => el.remove());
                 container.querySelectorAll('div').forEach(el => {
                     if (!el.closest('.game-header') && el !== container && el.parentElement === container &&
-                        !el.classList.contains('snake') && !el.classList.contains('circle') && !el.classList
-                        .contains('peg') && !el.classList.contains('floating-circle')) {
+                        !el.classList.contains('draggable-star') && !el.classList.contains(
+                            'constellation-slot') &&
+                        !el.classList.contains('constellation-line') && !el.classList.contains('peg') &&
+                        !el.classList.contains('floating-circle') && !el.classList.contains('bg-star')) {
                         el.remove();
                     }
                 });
@@ -851,19 +892,15 @@
         function showPrize() {
             clearInterval(gameTimerInterval);
             const container = document.getElementById('gameContainer');
-            container.querySelectorAll('.snake,.circle,.peg,.floating-circle').forEach(el => el.remove());
+            container.querySelectorAll(
+                '.draggable-star,.constellation-slot,.constellation-line,.peg,.floating-circle,.bg-star').forEach(
+                el => el.remove());
             document.getElementById('gameTitle').textContent = '🎁 Приз!';
             document.getElementById('gameTimer').textContent = '🎉';
 
-            // Музыка
             createMelody();
-            document.getElementById('audioToggle').textContent = '🔊';
-            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-
-            // Сердечки
             launchHearts();
 
-            // Сообщение в контейнере
             const prizeBox = document.createElement('div');
             prizeBox.style.cssText =
                 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:20;';
@@ -874,7 +911,6 @@
             `;
             container.appendChild(prizeBox);
 
-            // Автозакрытие теста через 8 секунд
             setTimeout(() => {
                 if (confirm('Тест пройден! Закрыть?')) stopGame();
             }, 8000);
@@ -885,7 +921,6 @@
             overlay.innerHTML = '';
             const hearts = ['❤️', '💕', '💖', '💗', '💝', '💘', '💓', '💞', '🩷', '♥️'];
             const centerY = window.innerHeight * 0.45;
-
             for (let i = 0; i < 80; i++) {
                 const heart = document.createElement('div');
                 heart.className = 'heart-particle';
@@ -902,20 +937,16 @@
 
         // ============ ОТПРАВКА ============
         function sendQuest() {
-            // Сохраняем квест в localStorage (общий для всего домена)
             localStorage.setItem('activeQuest', JSON.stringify(QUEST_CONFIG));
             localStorage.removeItem('questCompleted');
-
-            // Отправляем push-уведомление через Service Worker
             sendPushNotification();
-
-            showToast('✅ Квест отправлен! Супруга получит уведомление.', 'success');
+            showToast('✅ Квест отправлен!', 'success');
             checkStatus();
         }
 
         async function sendPushNotification() {
             if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) {
-                showToast('⚠ Service Worker не активен. Уведомление не отправлено.', 'error');
+                showToast('⚠ Service Worker не активен', 'error');
                 return;
             }
             navigator.serviceWorker.controller.postMessage({
@@ -959,7 +990,6 @@
             setTimeout(() => t.remove(), 2500);
         }
 
-        // ============ ЗАПУСК ============
         checkStatus();
     </script>
 </body>
