@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🔐 Ключ к сердцу</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Звезды на фоне */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+            opacity: 0;
+        }
+        @keyframes twinkle {
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.5);
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 420px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 30px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+        }
+        .dot.active {
+            background: #ff6b9d;
+            box-shadow: 0 0 16px #ff6b9d;
+            transform: scale(1.3);
+        }
+        .dot.done {
+            background: #ff6b9d;
+        }
+
+        h2 {
+            color: #fff;
+            font-size: 1.5em;
+            margin-bottom: 6px;
+            font-weight: normal;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85em;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .hearts-float {
+            font-size: 2em;
+            margin-bottom: 16px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-12px);
+            }
+        }
+
+        /* Загадка эмодзи */
+        .emoji-riddle {
+            font-size: 3em;
+            letter-spacing: 8px;
+            margin: 10px 0 16px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.08);
+            }
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 14px 18px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.07);
+            color: #fff;
+            font-size: 1.1em;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: 'Georgia', serif;
+            letter-spacing: 2px;
+        }
+        input:focus {
+            border-color: #ff6b9d;
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+        }
+        input.correct {
+            border-color: #4effb4 !important;
+            box-shadow: 0 0 24px rgba(78, 255, 180, 0.5) !important;
+            animation: successPulse 0.6s ease;
+        }
+        input.wrong {
+            border-color: #ff4757 !important;
+            animation: shake 0.5s ease;
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            75% {
+                transform: translateX(10px);
+            }
+        }
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        button {
+            margin-top: 14px;
+            padding: 14px 36px;
+            border-radius: 50px;
+            border: none;
+            background: linear-gradient(135deg, #ff6b9d, #c44569);
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            letter-spacing: 1px;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(255, 107, 157, 0.3);
+        }
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 12px rgba(255, 107, 157, 0.5);
+        }
+        button:disabled {
+            opacity: 0.4;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Цветные сердечки (шаг 2) */
+        .hearts-row {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        .heart-drag {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            cursor: grab;
+            transition: all 0.3s ease;
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            user-select: none;
+        }
+        .heart-drag:active {
+            cursor: grabbing;
+            transform: scale(1.2);
+            z-index: 10;
+        }
+        .heart-drag.selected {
+            transform: scale(1.3);
+            box-shadow: 0 0 30px currentColor;
+            z-index: 5;
+        }
+        .heart-drag.placed {
+            opacity: 0.5;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .slots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .slot {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            transition: all 0.3s ease;
+        }
+        .slot.filled {
+            border-color: #4effb4;
+            border-style: solid;
+            box-shadow: 0 0 16px rgba(78, 255, 180, 0.3);
+        }
+
+        /* Калькулятор (шаг 3) */
+        .calc-display {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 16px;
+            margin: 12px 0;
+            color: #fff;
+            font-size: 1.3em;
+            letter-spacing: 1px;
+            word-break: break-all;
+        }
+        .calc-hint {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8em;
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* Финал */
+        .final-prize {
+            animation: revealPrize 1s ease-out;
+        }
+        @keyframes revealPrize {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+        .prize-icon {
+            font-size: 5em;
+            animation: bounce 1s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        .prize-text {
+            color: #ffd700;
+            font-size: 1.4em;
+            margin: 12px 0;
+            line-height: 1.6;
+        }
+        .hidden-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 14px 28px;
+            background: #ffd700;
+            color: #1a1a2e;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 1px;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .error-msg {
+            color: #ff4757;
+            font-size: 0.85em;
+            margin-top: 8px;
+            min-height: 20px;
+        }
+
+        /* Конфетти-контейнер */
+        #confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        .confetti-piece {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+            animation: confettiFall var(--fall-duration) linear forwards;
+            animation-delay: var(--fall-delay);
+            opacity: 0;
+        }
+        @keyframes confettiFall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(105vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Звездное небо -->
+    <div class="stars" id="stars"></div>
+    <!-- Конфетти -->
+    <div id="confetti-container"></div>
+
+    <!-- Основной контейнер -->
+    <div class="container" id="app">
+        <!-- Контент будет рендериться здесь -->
+    </div>
+
+    <script>
+        // ============ КОНФИГУРАЦИЯ КВЕСТА ============
+        // Измените эти значения под себя!
+
+        const CONFIG = {
+            // Шаг 1: Загадка-шифр (эмодзи → слово)
+            riddleEmoji: '🐝🌸🌿🌷', // пчела-цветок-лист-тюльпан → "люблю" (по первым буквам? нет, тут ассоциативно)
+            riddleAnswer: 'люблю', // ответ (строчными буквами!)
+            riddleHint: 'Подсказка: собери слово по первым буквам того, что видят твои глаза 💕',
+
+            // Шаг 2: Цветовая последовательность
+            colorSequence: ['❤️', '💜', '💙', '💚'], // правильный порядок
+            colorOptions: ['💚', '💙', '❤️', '💜', '🧡', '💛'], // все варианты (включая лишние)
+            colorHint: 'Расположи сердечки в порядке радуги любви (от теплого к холодному)',
+
+            // Шаг 3: Математика любви
+            // Замените на вашу реальную дату знакомства (год, месяц, день)
+            specialDay: 14,
+            specialMonth: 2,
+            calcQuestion: 'Сколько дней мы уже вместе?\n(Подсказка: с 14 февраля 2020 года)',
+            calcAnswer: null, // вычислится автоматически, если задать дату выше
+
+            // Приз
+            prizeMessage: 'Ты разгадала все тайны моего сердца! 🎉\nТвой приз ждет тебя...',
+            prizeLinkText: '🎁 Забрать приз',
+            prizeLinkUrl: 'https://t.me/your_username', // ЗАМЕНИТЕ на реальную ссылку или оставьте #
+        };
+
+        // Автовычисление дней вместе (от specialDate)
+        (function() {
+            const now = new Date();
+            const start = new Date(2020, CONFIG.specialMonth - 1, CONFIG.specialDay); // год
+            const diffTime = Math.abs(now - start);
+            CONFIG.calcAnswer = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        })();
+
+        // ============ СОСТОЯНИЕ ============
+        let currentStep = 1;
+        const TOTAL_STEPS = 3;
+        const placedColors = [null, null, null, null];
+
+        // ============ ГЕНЕРАЦИЯ ЗВЕЗД ============
+        function createStars() {
+            const container = document.getElementById('stars');
+            const count = 80;
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = (Math.random() * 3 + 1) + 'px';
+                star.style.height = star.style.width;
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                star.style.setProperty('--delay', Math.random() * 4 + 's');
+                container.appendChild(star);
+            }
+        }
+
+        // ============ КОНФЕТТИ ============
+        function launchConfetti() {
+            const container = document.getElementById('confetti-container');
+            const colors = ['#ff6b9d', '#ffd700', '#4effb4', '#ff9f43', '#54a0ff', '#ff4757', '#a29bfe', '#fd79a8',
+                '#00cec9', '#fdcb6e'
+            ];
+            for (let i = 0; i < 120; i++) {
+                const piece = document.createElement('div');
+                piece.classList.add('confetti-piece');
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.setProperty('--fall-duration', (Math.random() * 2 + 2.5) + 's');
+                piece.style.setProperty('--fall-delay', Math.random() * 1.5 + 's');
+                piece.style.width = (Math.random() * 10 + 8) + 'px';
+                piece.style.height = (Math.random() * 10 + 8) + 'px';
+                container.appendChild(piece);
+
+                // Удалить после анимации
+                setTimeout(() => piece.remove(), 4000);
+            }
+        }
+
+        // ============ РЕНДЕР ШАГОВ ============
+        function renderStepIndicator() {
+            let html = '<div class="step-indicator">';
+            for (let i = 1; i <= TOTAL_STEPS; i++) {
+                let cls = 'dot';
+                if (i < currentStep) cls += ' done';
+                if (i === currentStep) cls += ' active';
+                html += `<div class="${cls}"></div>`;
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function renderStep1() {
+            return `
+                ${renderStepIndicator()}
+                <div class="hearts-float">💭</div>
+                <h2>Шаг 1: Шифр любви</h2>
+                <p class="subtitle">Разгадай, что я хочу тебе сказать...</p>
+                <div class="emoji-riddle">${CONFIG.riddleEmoji}</div>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.8em; margin-bottom: 8px;">${CONFIG.riddleHint}</p>
+                <input type="text" id="riddleInput" placeholder="Твой ответ..." autocomplete="off">
+                <div class="error-msg" id="step1Error"></div>
+                <button id="step1Btn">💫 Проверить</button>
+            `;
+        }
+
+        function renderStep2() {
+            let heartsHtml = '<div class="hearts-row" id="heartsPalette">';
+            CONFIG.colorOptions.forEach((color, idx) => {
+                const isPlaced = placedColors.includes(color);
+                heartsHtml +=
+                    `<div class="heart-drag${isPlaced ? ' placed' : ''}" data-color="${color}" style="color: ${getHeartColorCSS(color)};">${color}</div>`;
+            });
+            heartsHtml += '</div>';
+
+            let slotsHtml = '<div class="slots" id="slotsRow">';
+            for (let i = 0; i < 4; i++) {
+                slotsHtml +=
+                    `<div class="slot${placedColors[i] ? ' filled' : ''}" data-slot="${i}">${placedColors[i] || '◌'}</div>`;
+            }
+            slotsHtml += '</div>';
+
+            return `
+                ${renderStepIndicator()}
+                <div class="hearts-float">🎨</div>
+                <h2>Шаг 2: Палитра чувств</h2>
+                <p class="subtitle">Расположи сердечки в правильном порядке</p>
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.8em; margin-bottom: 4px;">Нажимай на сердечко, затем на кружок</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.75em; margin-bottom: 8px;">${CONFIG.colorHint}</p>
+                ${heartsHtml}
+                ${slotsHtml}
+                <div class="error-msg" id="step2Error"></div>
+                <button id="step2ClearBtn" style="background: rgba(255,255,255,0.1); margin-right: 8px;">🔄 Заново</button>
+                <button id="step2Btn">💫 Проверить</button>
+            `;
+        }
+
+        function renderStep3() {
+            return `
+                ${renderStepIndicator()}
+                <div class="hearts-float">🧮</div>
+                <h2>Шаг 3: Математика любви</h2>
+                <p class="subtitle">${CONFIG.calcQuestion}</p>
+                <div class="calc-display">📅 Дней вместе: <strong>??</strong></div>
+                <p class="calc-hint">Посчитай и введи число</p>
+                <input type="number" id="calcInput" placeholder="Введи число..." autocomplete="off">
+                <div class="error-msg" id="step3Error"></div>
+                <button id="step3Btn">💫 Проверить</button>
+            `;
+        }
+
+        function renderFinal() {
+            launchConfetti();
+            return `
+                ${renderStepIndicator()}
+                <div class="final-prize">
+                    <div class="prize-icon">🎁</div>
+                    <h2 style="color: #ffd700; margin-top: 8px;">Ты справилась!</h2>
+                    <p class="prize-text">${CONFIG.prizeMessage}</p>
+                    <a class="hidden-link" href="${CONFIG.prizeLinkUrl}" target="_blank">${CONFIG.prizeLinkText}</a>
+                    <p style="color: rgba(255,255,255,0.4); font-size: 0.75em; margin-top: 16px;">Я люблю тебя бесконечно ♾️</p>
+                </div>
+            `;
+        }
+
+        function getHeartColorCSS(emoji) {
+            const map = {
+                '❤️': '#ff4757',
+                '🧡': '#ff9f43',
+                '💛': '#ffd700',
+                '💚': '#4effb4',
+                '💙': '#54a0ff',
+                '💜': '#a29bfe',
+            };
+            return map[emoji] || '#fff';
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            switch (currentStep) {
+                case 1:
+                    app.innerHTML = renderStep1();
+                    bindStep1();
+                    break;
+                case 2:
+                    app.innerHTML = renderStep2();
+                    bindStep2();
+                    break;
+                case 3:
+                    app.innerHTML = renderStep3();
+                    bindStep3();
+                    break;
+                case 4:
+                    app.innerHTML = renderFinal();
+                    // Обновляем точки (все done)
+                    document.querySelectorAll('.dot').forEach(d => d.classList.add('done'));
+                    document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+                    break;
+            }
+        }
+
+        // ============ ЛОГИКА ШАГА 1 ============
+        function bindStep1() {
+            const input = document.getElementById('riddleInput');
+            const btn = document.getElementById('step1Btn');
+            const error = document.getElementById('step1Error');
+
+            input?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') btn?.click();
+            });
+
+            btn?.addEventListener('click', () => {
+                const val = input.value.trim().toLowerCase();
+                if (val === CONFIG.riddleAnswer.toLowerCase()) {
+                    input.classList.add('correct');
+                    input.classList.remove('wrong');
+                    error.textContent = '';
+                    btn.disabled = true;
+                    btn.textContent = '✅ Верно!';
+                    setTimeout(() => {
+                        currentStep = 2;
+                        render();
+                    }, 800);
+                } else {
+                    input.classList.add('wrong');
+                    input.classList.remove('correct');
+                    error.textContent = 'Не совсем так... попробуй еще раз 💕';
+                    setTimeout(() => input.classList.remove('wrong'), 500);
+                }
+            });
+
+            input?.focus();
+        }
+
+        // ============ ЛОГИКА ШАГА 2 ============
+        let selectedHeart = null;
+
+        function bindStep2() {
+            const palette = document.getElementById('heartsPalette');
+            const slotsRow = document.getElementById('slotsRow');
+            const clearBtn = document.getElementById('step2ClearBtn');
+            const checkBtn = document.getElementById('step2Btn');
+            const error = document.getElementById('step2Error');
+            selectedHeart = null;
+
+            // Выбор сердечка
+            palette?.addEventListener('click', (e) => {
+                const heart = e.target.closest('.heart-drag');
+                if (!heart || heart.classList.contains('placed')) return;
+
+                // Снять выделение со всех
+                document.querySelectorAll('.heart-drag').forEach(h => h.classList.remove(
+                'selected'));
+                heart.classList.add('selected');
+                selectedHeart = heart.dataset.color;
+            });
+
+            // Размещение в слот
+            slotsRow?.addEventListener('click', (e) => {
+                const slot = e.target.closest('.slot');
+                if (!slot || !selectedHeart || slot.classList.contains('filled')) return;
+
+                const slotIdx = parseInt(slot.dataset.slot);
+                placedColors[slotIdx] = selectedHeart;
+                selectedHeart = null;
+                document.querySelectorAll('.heart-drag').forEach(h => h.classList.remove('selected'));
+                render();
+            });
+
+            // Очистка слота (двойной тап)
+            slotsRow?.addEventListener('dblclick', (e) => {
+                const slot = e.target.closest('.slot');
+                if (!slot || !slot.classList.contains('filled')) return;
+                const slotIdx = parseInt(slot.dataset.slot);
+                placedColors[slotIdx] = null;
+                render();
+            });
+            // Для мобильных — долгое нажатие
+            let longPressTimer;
+            slotsRow?.addEventListener('touchstart', (e) => {
+                const slot = e.target.closest('.slot');
+                if (!slot || !slot.classList.contains('filled')) return;
+                longPressTimer = setTimeout(() => {
+                    const slotIdx = parseInt(slot.dataset.slot);
+                    placedColors[slotIdx] = null;
+                    render();
+                }, 600);
+            });
+            slotsRow?.addEventListener('touchend', () => clearTimeout(longPressTimer));
+            slotsRow?.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+
+            // Кнопка "Заново"
+            clearBtn?.addEventListener('click', () => {
+                for (let i = 0; i < 4; i++) placedColors[i] = null;
+                selectedHeart = null;
+                render();
+            });
+
+            // Проверка
+            checkBtn?.addEventListener('click', () => {
+                const correct = CONFIG.colorSequence;
+                const allFilled = placedColors.every(c => c !== null);
+                if (!allFilled) {
+                    error.textContent = 'Заполни все кружочки! 🎨';
+                    return;
+                }
+                const isCorrect = placedColors.every((c, i) => c === correct[i]);
+                if (isCorrect) {
+                    error.textContent = '';
+                    checkBtn.disabled = true;
+                    checkBtn.textContent = '✅ Идеально!';
+                    document.querySelectorAll('.slot').forEach(s => s.style.borderColor =
+                        '#4effb4');
+                    setTimeout(() => {
+                        currentStep = 3;
+                        render();
+                    }, 800);
+                } else {
+                    error.textContent = 'Почти! Подсказка: от теплого к холодному 🌡️';
+                }
+            });
+        }
+
+        // ============ ЛОГИКА ШАГА 3 ============
+        function bindStep3() {
+            const input = document.getElementById('calcInput');
+            const btn = document.getElementById('step3Btn');
+            const error = document.getElementById('step3Error');
+
+            input?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') btn?.click();
+            });
+
+            btn?.addEventListener('click', () => {
+                const val = parseInt(input.value);
+                if (val === CONFIG.calcAnswer) {
+                    input.classList.add('correct');
+                    error.textContent = '';
+                    btn.disabled = true;
+                    btn.textContent = '✅ Именно столько!';
+                    setTimeout(() => {
+                        currentStep = 4;
+                        render();
+                    }, 800);
+                } else if (isNaN(val)) {
+                    error.textContent = 'Введи число 😊';
+                } else if (val < CONFIG.calcAnswer) {
+                    error.textContent = 'Чуть больше... наша любовь длится дольше 💕';
+                } else {
+                    error.textContent = 'Немного меньше... но я ценю оптимизм! 😄';
+                }
+            });
+
+            input?.focus();
+        }
+
+        // ============ ЗАПУСК ============
+        createStars();
+        render();
+    </script>
+</body>
+</html>
