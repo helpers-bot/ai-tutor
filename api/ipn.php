@@ -1,8 +1,6 @@
 <?php
-// api/ipn.php
 require_once 'config.php';
-
-file_put_contents('ipn_log.txt', date('Y-m-d H:i:s') . " - IPN received\n" . file_get_contents('php://input') . "\n\n", FILE_APPEND);
+file_put_contents('ipn_log.txt', date('Y-m-d H:i:s') . " IPN\n" . file_get_contents('php://input') . "\n\n", FILE_APPEND);
 
 $receivedHmac = $_SERVER['HTTP_X_NOWPAYMENTS_SIG'] ?? '';
 $body = file_get_contents('php://input');
@@ -16,28 +14,19 @@ if (!hash_equals($receivedHmac, $calculatedHmac)) {
 $data = json_decode($body, true);
 
 if (($data['payment_status'] ?? '') === 'finished') {
-    $orderId = $data['order_id'] ?? '';
-    preg_match('/vip_(\d+)_/', $orderId, $matches);
+    preg_match('/vip_(\d+)_/', $data['order_id'] ?? '', $matches);
     $userId = $matches[1] ?? null;
     
     if ($userId) {
-        // Активируем VIP через специальную функцию (без проверки баланса)
         $ch = curl_init(SUPABASE_URL . '/rest/v1/rpc/purchase_vip_crypto');
         curl_setopt_array($ch, [
             CURLOPT_POST => true,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => [
-                'apikey: ' . SUPABASE_KEY,
-                'Content-Type: application/json'
-            ],
+            CURLOPT_HTTPHEADER => ['apikey: ' . SUPABASE_KEY, 'Content-Type: application/json'],
             CURLOPT_POSTFIELDS => json_encode(['p_user_id' => (int)$userId])
         ]);
-        $result = curl_exec($ch);
+        curl_exec($ch);
         curl_close($ch);
-        
-        file_put_contents('ipn_log.txt', date('Y-m-d H:i:s') . " - VIP activated via crypto for user $userId: $result\n\n", FILE_APPEND);
     }
 }
-
 http_response_code(200);
-echo 'OK';
