@@ -1348,7 +1348,7 @@
     const supabaseUrl = 'https://zvneiyhsoivaozzhzeoy.supabase.co';
     const supabaseKey = 'sb_publishable_CFPn1BIheE6L8wS89l0LtA_G9GofNzt';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-    const NOWPAYMENTS_API_KEY = '2cf60623-8bb3-41bb-8a4b-07d205c38bfa';
+    const NOWPAYMENTS_API_KEY = 'G8EWBX7-S334S29-HCA8VZF-VV45W4B';
 
     const stageRegister = document.getElementById('stageRegister');
     const stageHome = document.getElementById('stageHome');
@@ -1375,7 +1375,6 @@
 
     function formatNumber(n) { return n >= 1000 ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.') : n.toString(); }
 
-    // Поддержка
     function initSupport() {
         const sb = document.getElementById('supportBtn'), sc = document.getElementById('supportChat'), scb = document.getElementById('supportCloseBtn'), sm = document.getElementById('supportMessages'), si = document.getElementById('supportInput'), ssb = document.getElementById('supportSendBtn');
         function am(text, type) { const d = document.createElement('div'); d.className = `support-message ${type}`; d.innerHTML = `${text}<div class="support-message-time">${new Date().toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}</div>`; sm.appendChild(d); sm.scrollTop = sm.scrollHeight; }
@@ -1388,7 +1387,6 @@
         setInterval(chk, 5000);
     }
 
-    // NOWPayments
     async function createCryptoPayment() {
         const cryptoType = document.getElementById('paymentCrypto').value;
         try {
