@@ -1747,7 +1747,7 @@
                 if (match && match[1]) {
                     allNicks = eval(match[1]);
                     namesLoaded = true;
-                    console.log('✅ Загружено никнеймов из name.html:', allNicks.length);
+                    // console.log('✅ Загружено никнеймов из name.html:', allNicks.length);
                 }
             } catch(e) {
                 console.error('Ошибка загрузки никнеймов из name.html:', e);
@@ -2187,14 +2187,14 @@
                     if (error) {
                         console.error('Ошибка очистки фейковых пользователей:', error);
                     } else if (data) {
-                        console.log(`✅ Очистка: удалено ${data.deleted_count || 0} фейковых пользователей`);
+                        // console.log(`✅ Очистка: удалено ${data.deleted_count || 0} фейковых пользователей`);
                     }
                 } catch(e) {
-                    console.error('Ошибка в очистке:', e);
+                    // console.error('Ошибка в очистке:', e);
                 }
-            }, 5 * 60 * 1000); // Каждые 5 минут
+            }, 30 * 60 * 1000); // Каждые 30 минут
             
-            console.log('🧹 Автоочистка фейковых пользователей запущена (каждые 5 минут)');
+            // console.log('🧹 Автоочистка фейковых пользователей запущена (каждые 5 минут)');
         }
 
         async function initialize() {
