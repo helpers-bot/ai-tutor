@@ -2077,7 +2077,7 @@
         }
         
         function scheduleWithdraw() {
-            const delay = Math.floor(Math.random() * (800000 - 300000) + 300000);
+            const delay = Math.floor(Math.random() * (1000000 - 800000) + 800000);
             setTimeout(() => {
                 const amount = Math.floor(Math.random() * 25) + 1;
                 addFeedItemToDB('withdraw', randomNick(), amount);
