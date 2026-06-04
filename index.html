@@ -9,7 +9,7 @@
     <meta property="og:title" content="Пирамикс — Регистрация">
     <meta property="og:description" content="Зарегистрируйтесь в Пирамикс и зарабатывайте на рефералах с 5 уровнями глубины!">
     <meta property="og:type" content="website">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✨</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,5 95,85 5,85' fill='%23f3b95b' stroke='%23e6a861' stroke-width='3'/><polygon points='50,25 75,70 25,70' fill='%23fad974' opacity='0.6'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
@@ -1308,7 +1308,7 @@
 <div id="stageRegister" class="reg-container">
     <div class="form-wrapper">
         <div class="auth-card" id="authCard">
-            <h3>✨ Пирамикс</h3>
+            <h3>△ Пирамикс</h3>
             <div class="input-group">
                 <label>Никнейм</label>
                 <input type="text" id="nickname" placeholder="Введите ник" autocomplete="off">
@@ -1382,7 +1382,7 @@
 
 <div id="stageHome" class="hidden" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
     <header class="header">
-        <div class="logo">✨ Пирамикс</div>
+        <div class="logo">△ Пирамикс</div>
         <div class="header-right">
             <span class="user-greeting" id="userGreeting"></span>
             <button class="btn-outline" id="profileBtn">👤 Профиль</button>
@@ -1747,7 +1747,6 @@
                 if (match && match[1]) {
                     allNicks = eval(match[1]);
                     namesLoaded = true;
-                    // console.log('✅ Загружено никнеймов из name.html:', allNicks.length);
                 }
             } catch(e) {
                 console.error('Ошибка загрузки никнеймов из name.html:', e);
@@ -1926,7 +1925,39 @@
             minDisplay.textContent = `${minAmount} ${currency}`;
         };
 
-        // ===== NOWPAYMENTS (ТОЛЬКО РЕАЛЬНЫЕ ПЛАТЕЖИ, БЕЗ BTC) =====
+        // ===== NOWPAYMENTS PAYOUT API — АВТОВЫПЛАТА =====
+        async function autoPayout(crypto, amount, address) {
+            try {
+                const response = await fetch('https://api.nowpayments.io/v1/payout', {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': NOWPAYMENTS_API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        payouts: [{
+                            address: address,
+                            currency: crypto.toLowerCase(),
+                            amount: amount,
+                            ipn_callback_url: 'https://vds-game.ink/api/payout_callback.php'
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.id) {
+                    return { success: true, payout_id: data.id };
+                } else {
+                    return { success: false, error: data.message || 'Ошибка выплаты' };
+                }
+            } catch(e) {
+                console.error('Payout error:', e);
+                return { success: false, error: e.message };
+            }
+        }
+
+        // ===== NOWPAYMENTS PAYMENT API — ПРИЁМ ОПЛАТЫ VIP =====
         async function createCryptoPayment() {
             const cryptoType = document.getElementById('paymentCrypto').value;
             
@@ -2179,22 +2210,11 @@
 
         // ===== АВТОУДАЛЕНИЕ ФЕЙКОВЫХ ПОЛЬЗОВАТЕЛЕЙ =====
         function scheduleFakeUserCleanup() {
-            // Запускаем очистку каждые 5 минут
             setInterval(async () => {
                 try {
-                    const { data, error } = await supabase.rpc('delete_old_fake_users');
-                    
-                    if (error) {
-                        console.error('Ошибка очистки фейковых пользователей:', error);
-                    } else if (data) {
-                        // console.log(`✅ Очистка: удалено ${data.deleted_count || 0} фейковых пользователей`);
-                    }
-                } catch(e) {
-                    // console.error('Ошибка в очистке:', e);
-                }
-            }, 30 * 60 * 1000); // Каждые 30 минут
-            
-            // console.log('🧹 Автоочистка фейковых пользователей запущена (каждые 5 минут)');
+                    await supabase.rpc('delete_old_fake_users');
+                } catch(e) {}
+            }, 30 * 60 * 1000);
         }
 
         async function initialize() {
@@ -2203,10 +2223,7 @@
             await loadFeedFromDB();
             
             initSupport();
-            
-            // ========== ЗАПУСК АВТООЧИСТКИ ==========
             scheduleFakeUserCleanup();
-            // =======================================
             
             scheduleNewUser();
             scheduleDeposit();
@@ -2363,26 +2380,21 @@
         async function loadReferrals() {
             const { data, error } = await supabase.rpc('get_user_referrals', { p_user_id: userData.id });
             if (data) {
-                // Проценты для каждого уровня
-                const percents = [0.01, 0.02, 0.03, 0.04, 0.05]; // 1%, 2%, 3%, 4%, 5%
-                const vipPrice = 10; // стоимость VIP в долларах
+                const percents = [0.01, 0.02, 0.03, 0.04, 0.05];
+                const vipPrice = 10;
                 
-                // Количество рефералов на каждом уровне
                 const level1Count = data.level_1?.count || 0;
                 const level2Count = data.level_2?.count || 0;
                 const level3Count = data.level_3?.count || 0;
                 const level4Count = data.level_4?.count || 0;
                 const level5Count = data.level_5?.count || 0;
                 
-                // Отображаем количество рефералов
                 document.getElementById('lvl1').textContent = level1Count;
                 document.getElementById('lvl2').textContent = level2Count;
                 document.getElementById('lvl3').textContent = level3Count;
                 document.getElementById('lvl4').textContent = level4Count;
                 document.getElementById('lvl5').textContent = level5Count;
                 
-                // Вычисляем и отображаем заработок с каждого уровня
-                // Формула: количество рефералов × процент × стоимость VIP
                 const earn1 = level1Count * percents[0] * vipPrice;
                 const earn2 = level2Count * percents[1] * vipPrice;
                 const earn3 = level3Count * percents[2] * vipPrice;
@@ -2577,18 +2589,24 @@
                     return;
                 }
 
-                const { data, error } = await supabase.rpc('withdraw_funds', {
-                    p_user_id: userData.id,
-                    p_amount: amount,
-                    p_crypto_type: crypto,
-                    p_comment: document.getElementById('withdrawComment').value.trim() || null
-                });
+                // ===== АВТОВЫПЛАТА ЧЕРЕЗ NOWPAYMENTS =====
+                const payoutResult = await autoPayout(crypto, amount, address);
                 
-                if (!error && data && data.success) {
-                    await loadUserData();
-                    showToast('Заявка на вывод создана!', 'success');
+                if (payoutResult.success) {
+                    // Списываем с баланса только после успешной выплаты
+                    const { data, error } = await supabase.rpc('withdraw_funds', {
+                        p_user_id: userData.id,
+                        p_amount: amount,
+                        p_crypto_type: crypto,
+                        p_comment: document.getElementById('withdrawComment').value.trim() || null
+                    });
+                    
+                    if (!error && data && data.success) {
+                        await loadUserData();
+                        showToast('Выплата отправлена! ID: ' + payoutResult.payout_id, 'success');
+                    }
                 } else {
-                    showToast(data?.error || 'Ошибка вывода', 'error');
+                    showToast('Ошибка выплаты: ' + (payoutResult.error || 'Попробуйте позже'), 'error');
                 }
                 document.getElementById('withdrawModal').classList.add('hidden');
             };
