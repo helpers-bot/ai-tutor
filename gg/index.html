@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cave Ball</title>
+    <title>Flick Shot</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
@@ -25,7 +25,6 @@
             overflow: hidden;
         }
         
-        /* ===== PARALLAX BACKGROUND ===== */
         .layer {
             position: absolute;
             width: 220%;
@@ -86,130 +85,169 @@
             z-index: 5;
         }
         
-        .ball {
-            position: absolute;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            left: 90px;
-            bottom: 95px;
-            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #bfc7d1 10%, #6d7682 30%, #2b313a 60%, #0b0f14 100%);
-            box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2),
-                        inset -4px -4px 10px rgba(0,0,0,0.6),
-                        0 0 18px rgba(180,200,255,0.15);
-            z-index: 10;
-        }
-        
-        .ball.exploding {
-            animation: explode 2.5s forwards;
-        }
-        
-        @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(2.5); opacity: 0.6; background: radial-gradient(circle at 30% 30%, #ff4444, #880000); }
-            100% { transform: scale(4); opacity: 0; }
-        }
-        
-        .shadow {
-            position: absolute;
-            width: 40px;
-            height: 12px;
-            background: rgba(0,0,0,0.55);
-            border-radius: 50%;
-            left: 90px;
-            bottom: 85px;
-            filter: blur(3px);
-            z-index: 9;
-        }
-        
-        /* ===== OBSTACLES ===== */
-        .obstacle {
-            position: absolute;
-            z-index: 8;
-        }
-        
-        .crystal-spike {
-            width: 28px;
-            height: 35px;
-            position: relative;
-        }
-        
-        .crystal-spike .spike-base {
-            width: 8px;
-            height: 18px;
-            background: linear-gradient(180deg, #3a3a4a, #1a1a2a);
-            position: absolute;
-            bottom: 0;
-            left: 10px;
-            border-radius: 2px;
-        }
-        
-        .crystal-spike .spike-top {
-            width: 0;
-            height: 0;
-            border-left: 14px solid transparent;
-            border-right: 14px solid transparent;
-            border-bottom: 20px solid #4a4a6a;
-            position: absolute;
-            top: 0;
-            left: 0;
-            filter: drop-shadow(0 0 4px rgba(100,100,200,0.4));
-        }
-        
-        .floating-arrow {
-            width: 40px;
-            height: 5px;
-            background: linear-gradient(90deg, #3a3a4a, #5a5a7a);
-            position: relative;
-            border-radius: 2px;
-            box-shadow: 0 0 6px rgba(100,100,200,0.3);
-        }
-        
-        .floating-arrow::after {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: -4px;
-            width: 0;
-            height: 0;
-            border-top: 7px solid transparent;
-            border-bottom: 7px solid transparent;
-            border-right: 10px solid #5a5a7a;
-        }
-        
         .score-display {
             position: absolute;
-            top: 10px;
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 20;
             color: #b7c0cc;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-shadow: 0 0 10px rgba(180,200,255,0.4);
+            text-align: center;
         }
         
-        .jump-btn {
+        .combo-display {
             position: absolute;
-            left: 12px;
-            bottom: 95px;
-            width: 58px;
-            height: 58px;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            color: #ffd700;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(255,215,0,0.6);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        /* Зона попадания */
+        .target-zone {
+            position: absolute;
+            z-index: 15;
+            pointer-events: none;
+        }
+        
+        .zone-rect {
+            width: 80px;
+            height: 200px;
+            border: 2px solid rgba(180,200,255,0.2);
+            border-radius: 8px;
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(100,140,255,0.05);
+            box-shadow: 0 0 20px rgba(100,140,255,0.1);
+        }
+        
+        .zone-marker {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border: 2px dashed rgba(255,255,255,0.3);
             border-radius: 50%;
-            background: #1c232d;
-            color: #b7c0cc;
-            border: 1px solid #2a3442;
+            z-index: 16;
+            pointer-events: none;
+        }
+        
+        .zone-marker::after {
+            content: '🎯';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20px;
+            opacity: 0.5;
+        }
+        
+        /* Цель */
+        .target {
+            position: absolute;
+            z-index: 12;
+            pointer-events: none;
+            transition: none;
+        }
+        
+        .target-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,80,80,0.8), rgba(200,30,30,0.6));
+            border: 2px solid rgba(255,100,100,0.9);
+            box-shadow: 0 0 25px rgba(255,0,0,0.5);
+            animation: targetGlow 0.5s infinite;
+        }
+        
+        @keyframes targetGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255,0,0,0.5); }
+            50% { box-shadow: 0 0 40px rgba(255,0,0,0.8), 0 0 60px rgba(255,50,50,0.4); }
+        }
+        
+        .crosshair {
+            position: absolute;
+            width: 4px;
+            height: 20px;
+            background: rgba(255,255,255,0.4);
+            top: 15px;
+            left: 23px;
+        }
+        
+        .crosshair::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            top: 8px;
+            left: -8px;
+        }
+        
+        /* Трассер */
+        .tracer {
+            position: absolute;
+            z-index: 11;
+            pointer-events: none;
+            animation: tracerFly 0.6s forwards;
+        }
+        
+        @keyframes tracerFly {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* Вспышка при попадании */
+        .hit-flash {
+            position: absolute;
+            z-index: 14;
+            pointer-events: none;
+            animation: flash 0.3s forwards;
+        }
+        
+        @keyframes flash {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        /* Кнопка выстрела */
+        .shoot-btn {
+            position: absolute;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #2a1a1a, #1a0a0a);
+            border: 2px solid #442222;
+            color: #ff4444;
+            font-size: 32px;
             z-index: 20;
             touch-action: manipulation;
-            font-size: 22px;
             cursor: pointer;
+            box-shadow: 0 0 20px rgba(255,0,0,0.3);
         }
         
-        .jump-btn:active {
-            background: #2a3442;
+        .shoot-btn:active {
+            background: radial-gradient(circle, #3a1a1a, #2a0a0a);
+            box-shadow: 0 0 40px rgba(255,0,0,0.6);
         }
         
-        /* ===== START SCREEN ===== */
+        /* Стартовый экран */
         .start-screen {
             position: absolute;
             top: 0;
@@ -226,20 +264,23 @@
         
         .start-screen h1 {
             color: #b7c0cc;
-            font-size: 28px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(180,200,255,0.3);
+            font-size: 26px;
+            margin-bottom: 8px;
+            text-shadow: 0 0 15px rgba(255,100,100,0.3);
         }
         
         .start-screen p {
             color: #6d7682;
             margin-bottom: 20px;
+            font-size: 13px;
+            text-align: center;
+            padding: 0 20px;
         }
         
         .start-btn {
             background: #1c232d;
-            color: #b7c0cc;
-            border: 2px solid #2a3442;
+            color: #ff6666;
+            border: 2px solid #442222;
             padding: 15px 40px;
             border-radius: 25px;
             font-size: 18px;
@@ -248,10 +289,10 @@
         }
         
         .start-btn:active {
-            background: #2a3442;
+            background: #2a1a1a;
         }
         
-        /* ===== GAME OVER ===== */
+        /* Конец игры */
         .gameover-screen {
             position: absolute;
             top: 0;
@@ -268,14 +309,14 @@
         
         .gameover-screen h2 {
             color: #ff6666;
-            font-size: 26px;
+            font-size: 24px;
             margin-bottom: 10px;
         }
         
         .gameover-screen p {
             color: #b7c0cc;
-            margin-bottom: 20px;
-            font-size: 16px;
+            margin: 5px 0;
+            font-size: 14px;
         }
         
         .restart-btn {
@@ -287,9 +328,10 @@
             font-size: 16px;
             cursor: pointer;
             font-family: monospace;
+            margin-top: 15px;
         }
         
-        /* ===== BOTTOM NAV ===== */
+        /* Нижнее меню */
         .bottom-nav {
             position: absolute;
             bottom: 10px;
@@ -307,10 +349,10 @@
         .nav-btn {
             background: #1c232d;
             border: none;
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             color: #6d7682;
             transition: all 0.3s;
@@ -321,19 +363,19 @@
             color: #b7c0cc;
         }
         
+        .hidden {
+            display: none !important;
+        }
+        
         .shake {
-            animation: shake 0.5s infinite;
+            animation: shake 0.3s infinite;
         }
         
         @keyframes shake {
             0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-10px, 5px); }
-            50% { transform: translate(10px, -5px); }
-            75% { transform: translate(-5px, -5px); }
-        }
-        
-        .hidden {
-            display: none !important;
+            25% { transform: translate(-5px, 3px); }
+            50% { transform: translate(5px, -3px); }
+            75% { transform: translate(-3px, -3px); }
         }
     </style>
 </head>
@@ -346,28 +388,33 @@
         <div class="light"></div>
         <div class="floor" id="floor"></div>
         
-        <div class="shadow" id="shadow"></div>
-        <div class="ball" id="ball"></div>
+        <div class="zone-rect"></div>
+        <div class="zone-marker"></div>
         
-        <div class="score-display" id="scoreDisplay">💎 0</div>
+        <div class="target" id="target">
+            <div class="target-circle">
+                <div class="crosshair"></div>
+            </div>
+        </div>
         
-        <button class="jump-btn" id="jumpBtn">▲</button>
+        <div class="score-display" id="scoreDisplay">🎯 0 очков</div>
+        <div class="combo-display" id="comboDisplay"></div>
         
-        <!-- Стартовый экран -->
+        <button class="shoot-btn" id="shootBtn">💥</button>
+        
         <div class="start-screen" id="startScreen">
-            <h1>🕳️ CAVE BALL</h1>
-            <p>Прыгай и уклоняйся!</p>
+            <h1>🎯 FLICK SHOT</h1>
+            <p>Цель летит слева направо.<br>Нажми 💥 когда она в зоне!</p>
             <button class="start-btn" id="startGameBtn">▶ НАЧАТЬ</button>
         </div>
         
-        <!-- Экран проигрыша -->
         <div class="gameover-screen" id="gameoverScreen">
-            <h2>💀 Потрачено</h2>
-            <p>Счёт: <strong id="finalScore">0</strong> 💎</p>
+            <h2>💀 Игра окончена</h2>
+            <p>Счёт: <strong id="finalScore">0</strong></p>
+            <p>Лучший: <strong id="bestScore">0</strong></p>
             <button class="restart-btn" id="restartBtn">🔄 ЗАНОВО</button>
         </div>
         
-        <!-- Нижнее меню -->
         <div class="bottom-nav" id="bottomNav">
             <button class="nav-btn active" data-screen="game">🎮</button>
             <button class="nav-btn" data-screen="shop">🛒</button>
@@ -383,223 +430,194 @@
             tg.expand();
         } catch(e) {}
         
-        // ===== СОСТОЯНИЕ =====
-        let y = 95;
-        let v = 0;
-        let jumps = 2;
-        let worldX = 0;
+        // Состояние
         let score = 0;
-        let speed = 2;
+        let bestScore = parseInt(localStorage.getItem('flickBest')) || 0;
+        let combo = 0;
         let isPlaying = false;
         let isGameOver = false;
-        let canJump = true;
+        let targetX = -60;
+        let targetSpeed = 3;
+        let targetDirection = 1;
+        let misses = 0;
+        const MAX_MISSES = 3;
         
-        const GRAVITY = -0.75;
-        const JUMP_POWER = 12;
-        const GROUND = 95;
-        
-        let obstacles = [];
-        let gameLoop;
-        let spawnTimeout;
-        
-        // ===== ЭЛЕМЕНТЫ =====
-        const ball = document.getElementById('ball');
-        const shadow = document.getElementById('shadow');
+        const gameContainer = document.getElementById('gameContainer');
+        const target = document.getElementById('target');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const comboDisplay = document.getElementById('comboDisplay');
+        const startScreen = document.getElementById('startScreen');
+        const gameoverScreen = document.getElementById('gameoverScreen');
+        const bottomNav = document.getElementById('bottomNav');
         const bg = document.getElementById('bg');
         const stones = document.getElementById('stones');
         const roots = document.getElementById('roots');
         const floor = document.getElementById('floor');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const startScreen = document.getElementById('startScreen');
-        const gameoverScreen = document.getElementById('gameoverScreen');
-        const gameContainer = document.getElementById('gameContainer');
-        const bottomNav = document.getElementById('bottomNav');
         
-        // ===== ПРЫЖОК =====
-        function jump() {
+        let worldX = 0;
+        let gameLoop;
+        let targetAnimLoop;
+        
+        // Зона попадания (правая часть экрана)
+        const zoneLeft = window.innerWidth - 150;
+        const zoneRight = window.innerWidth - 30;
+        
+        function shoot() {
             if (!isPlaying || isGameOver) return;
-            if (jumps <= 0) return;
             
-            v = JUMP_POWER;
-            jumps--;
-            canJump = false;
-        }
-        
-        function resetJump() {
-            if (y <= GROUND) {
-                jumps = 2;
-                canJump = true;
+            // Проверяем в зоне ли цель
+            if (targetX >= zoneLeft && targetX <= zoneRight) {
+                // Попадание!
+                const distanceFromCenter = Math.abs(targetX - (zoneLeft + zoneRight) / 2);
+                const zoneWidth = (zoneRight - zoneLeft) / 2;
+                const accuracy = 1 - (distanceFromCenter / zoneWidth);
+                
+                combo++;
+                const points = Math.floor(10 + accuracy * 90);
+                score += points;
+                
+                scoreDisplay.textContent = '🎯 ' + score + ' очков';
+                
+                // Комбо
+                if (combo > 1) {
+                    comboDisplay.textContent = 'COMBO x' + combo + '!';
+                    comboDisplay.style.opacity = '1';
+                    setTimeout(() => { comboDisplay.style.opacity = '0'; }, 1500);
+                }
+                
+                // Эффект попадания
+                createHitEffect();
+                createTracer();
+                
+                // Сброс цели
+                resetTarget();
+                targetSpeed += 0.3;
+            } else {
+                // Промах
+                misses++;
+                combo = 0;
+                comboDisplay.style.opacity = '0';
+                
+                // Тряска при промахе
+                gameContainer.classList.add('shake');
+                setTimeout(() => gameContainer.classList.remove('shake'), 300);
+                
+                if (misses >= MAX_MISSES) {
+                    endGame();
+                }
             }
         }
         
-        // ===== ПРЕПЯТСТВИЯ =====
-        function createObstacle() {
+        function resetTarget() {
+            targetX = -60;
+            targetDirection = 1;
+            target.style.left = targetX + 'px';
+            target.style.top = (80 + Math.random() * (window.innerHeight - 250)) + 'px';
+        }
+        
+        function createHitEffect() {
+            const flash = document.createElement('div');
+            flash.className = 'hit-flash';
+            flash.style.width = '60px';
+            flash.style.height = '60px';
+            flash.style.borderRadius = '50%';
+            flash.style.background = 'rgba(255,255,255,0.8)';
+            flash.style.left = targetX + 'px';
+            flash.style.top = target.style.top;
+            gameContainer.appendChild(flash);
+            setTimeout(() => flash.remove(), 300);
+        }
+        
+        function createTracer() {
+            const tracer = document.createElement('div');
+            tracer.className = 'tracer';
+            tracer.style.width = '3px';
+            tracer.style.height = '40px';
+            tracer.style.background = 'rgba(255,200,100,0.8)';
+            tracer.style.left = targetX + 'px';
+            tracer.style.top = (parseFloat(target.style.top) + 10) + 'px';
+            tracer.style.boxShadow = '0 0 10px rgba(255,200,100,0.6)';
+            gameContainer.appendChild(tracer);
+            setTimeout(() => tracer.remove(), 600);
+        }
+        
+        function updateTarget() {
             if (!isPlaying) return;
             
-            const obstacle = document.createElement('div');
-            obstacle.className = 'obstacle';
+            targetX += targetSpeed * targetDirection;
             
-            if (Math.random() < 0.6) {
-                // Кристальные шипы
-                obstacle.innerHTML = `
-                    <div class="crystal-spike">
-                        <div class="spike-top"></div>
-                        <div class="spike-base"></div>
-                    </div>
-                `;
-                obstacle.style.bottom = '95px';
-            } else {
-                // Летящие стрелы
-                obstacle.innerHTML = '<div class="floating-arrow"></div>';
-                obstacle.style.bottom = (110 + Math.random() * 120) + 'px';
-            }
-            
-            obstacle.style.right = '-60px';
-            gameContainer.appendChild(obstacle);
-            obstacles.push(obstacle);
-        }
-        
-        function moveObstacles() {
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obs = obstacles[i];
-                const currentRight = parseFloat(obs.style.right) || -60;
-                const newRight = currentRight + speed;
-                obs.style.right = newRight + 'px';
+            // Если цель ушла за правый край
+            if (targetX > window.innerWidth + 60) {
+                misses++;
+                combo = 0;
+                comboDisplay.style.opacity = '0';
                 
-                if (checkCollision(obs)) {
+                if (misses >= MAX_MISSES) {
                     endGame();
                     return;
                 }
                 
-                if (newRight > window.innerWidth + 100) {
-                    obs.remove();
-                    obstacles.splice(i, 1);
-                    score++;
-                    scoreDisplay.textContent = '💎 ' + score;
-                }
+                resetTarget();
             }
-        }
-        
-        function checkCollision(obstacle) {
-            const ballRect = ball.getBoundingClientRect();
-            const obsRect = obstacle.getBoundingClientRect();
             
-            return ballRect.left + 8 < obsRect.right &&
-                   ballRect.right - 8 > obsRect.left &&
-                   ballRect.top + 8 < obsRect.bottom &&
-                   ballRect.bottom - 8 > obsRect.top;
+            target.style.left = targetX + 'px';
+            
+            // Параллакс
+            worldX -= 1;
+            bg.style.transform = `translateX(${worldX * 0.1}px)`;
+            stones.style.transform = `translateX(${worldX * 0.2}px)`;
+            roots.style.transform = `translateX(${worldX * 0.3}px)`;
+            floor.style.transform = `translateX(${worldX * 0.6}px)`;
         }
         
-        // ===== КОНЕЦ ИГРЫ =====
         function endGame() {
             isPlaying = false;
             isGameOver = true;
             
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('flickBest', bestScore);
+            }
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('bestScore').textContent = bestScore;
+            
+            gameoverScreen.style.display = 'flex';
+            bottomNav.classList.remove('hidden');
+            
             gameContainer.classList.add('shake');
-            ball.classList.add('exploding');
-            
-            clearTimeout(spawnTimeout);
-            
-            setTimeout(() => {
-                gameContainer.classList.remove('shake');
-                ball.classList.remove('exploding');
-                
-                document.getElementById('finalScore').textContent = score;
-                gameoverScreen.style.display = 'flex';
-                bottomNav.classList.remove('hidden');
-            }, 2500);
+            setTimeout(() => gameContainer.classList.remove('shake'), 500);
         }
         
         function restartGame() {
-            obstacles.forEach(o => o.remove());
-            obstacles = [];
             score = 0;
-            speed = 2;
-            y = GROUND;
-            v = 0;
-            jumps = 2;
-            canJump = true;
+            combo = 0;
+            misses = 0;
+            targetSpeed = 3;
+            targetX = -60;
+            targetDirection = 1;
             isPlaying = true;
             isGameOver = false;
             
-            ball.style.bottom = GROUND + 'px';
-            shadow.style.bottom = (GROUND - 10) + 'px';
-            ball.classList.remove('exploding');
-            scoreDisplay.textContent = '💎 0';
+            scoreDisplay.textContent = '🎯 0 очков';
+            comboDisplay.style.opacity = '0';
+            resetTarget();
             
-            gameContainer.classList.remove('shake');
             gameoverScreen.style.display = 'none';
             bottomNav.classList.add('hidden');
-            
-            startSpawning();
         }
         
-        function startSpawning() {
-            clearTimeout(spawnTimeout);
-            
-            function spawn() {
-                if (!isPlaying) return;
-                createObstacle();
-                const delay = Math.max(1800 / speed, 1000);
-                spawnTimeout = setTimeout(spawn, delay);
-            }
-            
-            spawnTimeout = setTimeout(spawn, 2000);
-        }
-        
-        // ===== ИГРОВОЙ ЦИКЛ =====
-        function update() {
-            if (!isPlaying) {
-                requestAnimationFrame(update);
-                return;
-            }
-            
-            v += GRAVITY;
-            y += v;
-            
-            if (y < GROUND) {
-                y = GROUND;
-                v = 0;
-                resetJump();
-            }
-            
-            if (y > window.innerHeight - 50) {
-                y = window.innerHeight - 50;
-                v = 0;
-            }
-            
-            ball.style.bottom = y + 'px';
-            shadow.style.bottom = (y - 10) + 'px';
-            ball.style.transform = 'rotate(' + y * 1.8 + 'deg)';
-            
-            worldX -= speed;
-            
-            bg.style.transform = `translateX(${worldX * 0.15}px)`;
-            stones.style.transform = `translateX(${worldX * 0.3}px)`;
-            roots.style.transform = `translateX(${worldX * 0.45}px)`;
-            floor.style.transform = `translateX(${worldX * 0.8}px)`;
-            
-            moveObstacles();
-            
-            // Увеличение скорости
-            if (score > 0 && score % 5 === 0 && speed < 8) {
-                speed += 0.1;
-            }
-            
-            requestAnimationFrame(update);
-        }
-        
-        // ===== ОБРАБОТЧИКИ =====
-        document.getElementById('jumpBtn').addEventListener('touchstart', (e) => {
+        // Обработчики
+        document.getElementById('shootBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
-            jump();
+            shoot();
         });
-        document.getElementById('jumpBtn').addEventListener('click', jump);
+        document.getElementById('shootBtn').addEventListener('click', shoot);
         
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
+            if (e.code === 'Space' || e.code === 'KeyF') {
                 e.preventDefault();
-                jump();
+                shoot();
             }
         });
         
@@ -607,7 +625,7 @@
             startScreen.style.display = 'none';
             bottomNav.classList.add('hidden');
             isPlaying = true;
-            startSpawning();
+            resetTarget();
         });
         
         document.getElementById('restartBtn').addEventListener('click', restartGame);
@@ -623,8 +641,15 @@
             });
         });
         
+        // Игровой цикл
+        function gameTick() {
+            updateTarget();
+            requestAnimationFrame(gameTick);
+        }
+        
         // Запуск
-        update();
+        target.style.top = '200px';
+        gameTick();
     </script>
 </body>
 </html>
