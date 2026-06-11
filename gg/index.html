@@ -86,6 +86,16 @@
             );
         }
         
+        /* Второй этаж */
+        .platform {
+            position: absolute;
+            height: 20px;
+            background: linear-gradient(0deg, #1a1a1a, #2a2a2a);
+            border-top: 2px solid #444;
+            border-bottom: 2px solid #333;
+            z-index: 3;
+        }
+        
         .ball {
             position: absolute;
             width: 30px;
@@ -392,6 +402,7 @@
         const menuOverlay = document.getElementById('menuOverlay');
         const gameContainer = document.getElementById('gameContainer');
         
+        let ballX = 40;
         let ballY = 80;
         let ballVelocity = 0;
         const GRAVITY = 0.8;
@@ -399,6 +410,7 @@
         const GROUND_LEVEL = 80;
         
         let obstacles = [];
+        let platforms = [];
         let gameLoop;
         let spawnTimeout;
         let speedInterval;
@@ -413,14 +425,50 @@
             canJump = false;
         }
         
+        function checkPlatformCollision() {
+            for (let platform of platforms) {
+                const platformRect = platform.getBoundingClientRect();
+                const ballRect = ball.getBoundingClientRect();
+                const platformBottom = parseFloat(platform.style.bottom);
+                
+                // Проверка что шар над платформой и падает
+                if (ballVelocity > 0 &&
+                    ballRect.right > platformRect.left + 10 &&
+                    ballRect.left < platformRect.right - 10 &&
+                    ballRect.bottom >= platformRect.top &&
+                    ballRect.bottom <= platformRect.top + 15 &&
+                    ballY > platformBottom) {
+                    
+                    ballY = platformBottom + 20;
+                    ballVelocity = 0;
+                    canJump = true;
+                    ball.style.bottom = ballY + 'px';
+                    return true;
+                }
+            }
+            return false;
+        }
+        
         function updateBall() {
             ballVelocity += GRAVITY;
             ballY += ballVelocity;
             
+            // Проверка столкновения с платформами
+            if (ballVelocity > 0) {
+                checkPlatformCollision();
+            }
+            
+            // Пол
             if (ballY >= GROUND_LEVEL) {
                 ballY = GROUND_LEVEL;
                 ballVelocity = 0;
                 canJump = true;
+            }
+            
+            // Потолок
+            if (ballY > gameArea.offsetHeight - 30) {
+                ballY = gameArea.offsetHeight - 30;
+                ballVelocity = 0;
             }
             
             if (ballY < 20) {
@@ -431,6 +479,23 @@
             ball.style.bottom = ballY + 'px';
         }
         
+        function createPlatform() {
+            if (!isPlaying) return;
+            
+            const platform = document.createElement('div');
+            platform.className = 'platform';
+            
+            const width = 80 + Math.random() * 60;
+            const bottomPos = 200 + Math.random() * 150;
+            
+            platform.style.width = width + 'px';
+            platform.style.bottom = bottomPos + 'px';
+            platform.style.right = '-100px';
+            
+            gameArea.appendChild(platform);
+            platforms.push(platform);
+        }
+        
         function createObstacle() {
             if (!isPlaying) return;
             
@@ -438,9 +503,12 @@
             const obstacle = document.createElement('div');
             obstacle.className = 'obstacle';
             
+            // Размещаем на земле или на платформе
+            const onGround = Math.random() > 0.3;
+            
             if (type < 0.35) {
                 obstacle.innerHTML = '<div class="hole"></div>';
-                obstacle.style.bottom = '65px';
+                obstacle.style.bottom = onGround ? '65px' : '250px';
                 obstacle.dataset.type = 'hole';
             } else if (type < 0.7) {
                 obstacle.innerHTML = `
@@ -449,11 +517,11 @@
                         <div class="spike-body"></div>
                     </div>
                 `;
-                obstacle.style.bottom = '80px';
+                obstacle.style.bottom = onGround ? '80px' : '270px';
                 obstacle.dataset.type = 'spike';
             } else {
                 obstacle.innerHTML = '<div class="arrow"></div>';
-                obstacle.style.bottom = (80 + Math.random() * 30) + 'px';
+                obstacle.style.bottom = onGround ? (80 + Math.random() * 30) + 'px' : (250 + Math.random() * 30) + 'px';
                 obstacle.dataset.type = 'arrow';
             }
             
@@ -480,6 +548,20 @@
                     score++;
                     scoreDisplay.textContent = score;
                     showDiamondAnimation();
+                }
+            }
+        }
+        
+        function movePlatforms() {
+            for (let i = platforms.length - 1; i >= 0; i--) {
+                const platform = platforms[i];
+                const currentRight = parseFloat(platform.style.right) || -100;
+                const newRight = currentRight + speed;
+                platform.style.right = newRight + 'px';
+                
+                if (newRight > gameArea.offsetWidth + 150) {
+                    platform.remove();
+                    platforms.splice(i, 1);
                 }
             }
         }
@@ -526,7 +608,9 @@
         
         function restartGame() {
             obstacles.forEach(o => o.remove());
+            platforms.forEach(p => p.remove());
             obstacles = [];
+            platforms = [];
             score = 0;
             speed = 2;
             ballY = GROUND_LEVEL;
@@ -568,20 +652,28 @@
         function startSpawning() {
             clearTimeout(spawnTimeout);
             
-            function spawn() {
+            function spawnObstacles() {
                 if (!isPlaying) return;
                 createObstacle();
                 const delay = Math.max(1500 / speed, 1000);
-                spawnTimeout = setTimeout(spawn, delay);
+                spawnTimeout = setTimeout(spawnObstacles, delay);
             }
             
-            spawnTimeout = setTimeout(spawn, 1500);
+            function spawnPlatforms() {
+                if (!isPlaying) return;
+                createPlatform();
+                setTimeout(spawnPlatforms, 3000 / speed);
+            }
+            
+            spawnTimeout = setTimeout(spawnObstacles, 1500);
+            setTimeout(spawnPlatforms, 2000);
         }
         
         function gameTick() {
             if (!isPlaying) return;
             updateBall();
             moveObstacles();
+            movePlatforms();
         }
         
         // Обработчики
@@ -604,7 +696,6 @@
             }
         });
         
-        // Предотвращаем скролл на мобильных
         document.addEventListener('touchmove', (e) => {
             if (e.target === jumpBtn) {
                 e.preventDefault();
