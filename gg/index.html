@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Gg Mining</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: #0a0c0f;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            color: #f0e6c5;
+        }
+        
+        .game-container {
+            max-width: 100%;
+            width: 100%;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1a1f2b 0%, #0b0e12 100%);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(20, 25, 30, 0.95);
+            border-radius: 50px;
+            padding: 10px 15px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .balance-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .lang-btn {
+            background: #2a2f36;
+            border: none;
+            color: #e0c88c;
+            font-weight: bold;
+            border-radius: 20px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            border: 1px solid #4d4530;
+        }
+        
+        .mining-display {
+            background: #12171d;
+            border-radius: 20px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #3a3322;
+        }
+        
+        .miners-animation {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+            font-size: 0.8rem;
+            color: #cfb87c;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .tab {
+            flex: 1;
+            background: #20262e;
+            border: none;
+            padding: 10px;
+            border-radius: 15px;
+            color: #b9b09b;
+            font-weight: bold;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        
+        .tab.active {
+            background: #c9a73c;
+            color: #000;
+        }
+        
+        .content-panel {
+            background: #141a20;
+            border-radius: 15px;
+            padding: 10px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 60vh;
+        }
+        
+        .card {
+            background: #1e232a;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #d4af37;
+        }
+        
+        .card.locked {
+            opacity: 0.5;
+            border-left-color: #555;
+        }
+        
+        .card-info h3 {
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+        
+        .card-info p {
+            font-size: 0.7rem;
+            color: #aaa;
+        }
+        
+        .btn {
+            background: #e5b93c;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn:disabled {
+            background: #555;
+            color: #999;
+        }
+        
+        .floating-text {
+            position: fixed;
+            animation: floatUp 1.5s ease-out forwards;
+            font-weight: bold;
+            color: #ffd700;
+            pointer-events: none;
+            z-index: 1000;
+            font-size: 1.2rem;
+        }
+        
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(1.5); }
+        }
+
+        .debug-info {
+            background: #000;
+            color: #0f0;
+            padding: 5px;
+            font-size: 0.6rem;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="top-bar">
+            <div class="balance-item">
+                <span>🪙</span>
+                <span id="coinsDisplay">0</span>
+            </div>
+            <div class="balance-item">
+                <span>💎</span>
+                <span id="crystalsDisplay">0</span>
+            </div>
+            <button class="lang-btn" id="langToggle">🌐 RU</button>
+        </div>
+        
+        <div class="mining-display">
+            <div class="miners-animation">⛏️👷⚒️</div>
+            <div class="stats-row">
+                <span>Добыто: <strong id="totalMined">0</strong></span>
+                <span>Доход: <strong id="incomeRate">+0.0/с</strong></span>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="mines">⛰️ Шахты</button>
+            <button class="tab" data-tab="miners">👷 Шахтёры</button>
+        </div>
+        
+        <div class="content-panel" id="contentPanel"></div>
+        
+        <div class="debug-info" id="debugInfo"></div>
+    </div>
+
+    <script>
+        // Проверка окружения
+        const debugInfo = document.getElementById('debugInfo');
+        
+        function logDebug(msg) {
+            debugInfo.style.display = 'block';
+            debugInfo.innerHTML += msg + '<br>';
+            console.log(msg);
+        }
+        
+        logDebug('Starting app...');
+        logDebug('URL: ' + window.location.href);
+        logDebug('UserAgent: ' + navigator.userAgent);
+        
+        // Инициализация Telegram WebApp
+        let tg = null;
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                logDebug('Telegram WebApp found');
+                tg.ready();
+                tg.expand();
+                logDebug('Telegram WebApp initialized');
+            } else {
+                logDebug('Telegram WebApp NOT found - running in browser mode');
+            }
+        } catch (e) {
+            logDebug('Telegram error: ' + e.message);
+        }
+        
+        // Переводы
+        const lang = {
+            ru: {
+                coalMine: 'Угольная шахта',
+                ironMine: 'Железная шахта',
+                goldMine: 'Золотая шахта',
+                crystalMine: 'Кристальная шахта',
+                diamondMine: 'Алмазная шахта',
+                miner: 'Шахтёр',
+                level: 'Уровень',
+                income: 'Доход',
+                upgrade: 'Улучшить',
+                buyMiner: 'Нанять шахтёра',
+                locked: 'Заблокировано',
+                unlockAt: 'Откроется на уровне'
+            },
+            en: {
+                coalMine: 'Coal Mine',
+                ironMine: 'Iron Mine',
+                goldMine: 'Gold Mine',
+                crystalMine: 'Crystal Mine',
+                diamondMine: 'Diamond Mine',
+                miner: 'Miner',
+                level: 'Level',
+                income: 'Income',
+                upgrade: 'Upgrade',
+                buyMiner: 'Hire Miner',
+                locked: 'Locked',
+                unlockAt: 'Unlocks at level'
+            }
+        };
+        
+        let currentLang = 'ru';
+        
+        function t(key) {
+            return lang[currentLang]?.[key] || key;
+        }
+        
+        // Игра
+        const game = JSON.parse(localStorage.getItem('ggMiningGame')) || {
+            coins: 100,
+            crystals: 10,
+            totalMined: 0,
+            mines: [
+                { id: 0, type: 'coalMine', level: 1, baseIncome: 1, upgradeCost: 50, unlockLevel: 0 },
+                { id: 1, type: 'ironMine', level: 0, baseIncome: 3, upgradeCost: 150, unlockLevel: 10 },
+                { id: 2, type: 'goldMine', level: 0, baseIncome: 8, upgradeCost: 500, unlockLevel: 20 },
+                { id: 3, type: 'crystalMine', level: 0, baseIncome: 20, upgradeCost: 1500, unlockLevel: 30 },
+                { id: 4, type: 'diamondMine', level: 0, baseIncome: 50, upgradeCost: 5000, unlockLevel: 40 }
+            ],
+            miners: [
+                { id: 0, level: 1, income: 0.5, upgradeCost: 30 }
+            ]
+        };
+        
+        function saveGame() {
+            localStorage.setItem('ggMiningGame', JSON.stringify(game));
+        }
+        
+        function getIncome() {
+            let total = 0;
+            game.mines.forEach(m => { if (m.level > 0) total += m.baseIncome * m.level; });
+            game.miners.forEach(m => total += m.income * m.level);
+            return total;
+        }
+        
+        function updateDisplay() {
+            document.getElementById('coinsDisplay').textContent = Math.floor(game.coins);
+            document.getElementById('crystalsDisplay').textContent = Math.floor(game.crystals);
+            document.getElementById('totalMined').textContent = Math.floor(game.totalMined);
+            document.getElementById('incomeRate').textContent = '+' + getIncome().toFixed(1) + '/с';
+        }
+        
+        function floatText(text) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.textContent = text;
+            el.style.left = '50%';
+            el.style.top = '50%';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1500);
+        }
+        
+        function isUnlocked(mineIndex) {
+            if (mineIndex === 0) return true;
+            return game.mines[mineIndex - 1].level >= game.mines[mineIndex].unlockLevel;
+        }
+        
+        function upgradeMine(index) {
+            if (!isUnlocked(index)) return;
+            const mine = game.mines[index];
+            const cost = Math.floor(mine.upgradeCost * Math.pow(1.5, mine.level));
+            if (game.coins < cost) return;
+            
+            game.coins -= cost;
+            mine.level++;
+            if (mine.level === 1 && index > 0) game.crystals += 2;
+            game.totalMined += 10;
+            floatText('+1 ⬆️');
+            saveGame();
+            renderContent();
+            updateDisplay();
+        }
+        
+        function hireMiner() {
+            const count = game.miners.length;
+            const cost = Math.floor(50 * Math.pow(1.6, count));
+            if (game.coins < cost) return;
+            
+            game.coins -= cost;
+            game.miners.push({
+                id: count,
+                level: 1,
+                income: 0.5 + (count * 0.3),
+                upgradeCost: 30 + (count * 20)
+            });
+            floatText('👷 +1');
+            saveGame();
+            renderContent();
+            updateDisplay();
+        }
+        
+        function upgradeMiner(id) {
+            const miner = game.miners.find(m => m.id === id);
+            if (!miner) return;
+            const cost = Math.floor(miner.upgradeCost * Math.pow(1.4, miner.level));
+            if (game.coins < cost) return;
+            
+            game.coins -= cost;
+            miner.level++;
+            floatText('⚡ +1');
+            saveGame();
+            renderContent();
+            updateDisplay();
+        }
+        
+        function renderContent(tab = 'mines') {
+            const panel = document.getElementById('contentPanel');
+            panel.innerHTML = '';
+            
+            if (tab === 'mines') {
+                game.mines.forEach((mine, i) => {
+                    const unlocked = isUnlocked(i);
+                    const cost = Math.floor(mine.upgradeCost * Math.pow(1.5, mine.level));
+                    const card = document.createElement('div');
+                    card.className = `card ${unlocked ? '' : 'locked'}`;
+                    card.innerHTML = `
+                        <div class="card-info">
+                            <h3>${t(mine.type)}</h3>
+                            <p>${t('level')}: ${mine.level} | ${t('income')}: ${mine.baseIncome * mine.level}/с</p>
+                            ${!unlocked ? `<p>🔒 ${t('unlockAt')} ${mine.unlockLevel}</p>` : ''}
+                        </div>
+                        <button class="btn" ${!unlocked ? 'disabled' : ''}>
+                            ${unlocked ? `⬆️ ${cost} 🪙` : t('locked')}
+                        </button>
+                    `;
+                    if (unlocked) {
+                        card.querySelector('.btn').onclick = () => upgradeMine(i);
+                    }
+                    panel.appendChild(card);
+                });
+            } else if (tab === 'miners') {
+                game.miners.forEach(miner => {
+                    const cost = Math.floor(miner.upgradeCost * Math.pow(1.4, miner.level));
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `
+                        <div class="card-info">
+                            <h3>${t('miner')} #${miner.id + 1}</h3>
+                            <p>${t('level')}: ${miner.level} | ${t('income')}: ${(miner.income * miner.level).toFixed(1)}/с</p>
+                        </div>
+                        <button class="btn">⬆️ ${cost} 🪙</button>
+                    `;
+                    card.querySelector('.btn').onclick = () => upgradeMiner(miner.id);
+                    panel.appendChild(card);
+                });
+                
+                const hireCost = Math.floor(50 * Math.pow(1.6, game.miners.length));
+                const hireBtn = document.createElement('button');
+                hireBtn.className = 'btn';
+                hireBtn.textContent = `${t('buyMiner')} 🪙 ${hireCost}`;
+                hireBtn.style.width = '100%';
+                hireBtn.onclick = hireMiner;
+                panel.appendChild(hireBtn);
+            }
+        }
+        
+        function switchLang() {
+            currentLang = currentLang === 'ru' ? 'en' : 'ru';
+            document.getElementById('langToggle').textContent = currentLang === 'ru' ? '🌐 RU' : '🌐 EN';
+            const activeTab = document.querySelector('.tab.active').dataset.tab;
+            renderContent(activeTab);
+        }
+        
+        // Инициализация
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                renderContent(this.dataset.tab);
+            });
+        });
+        
+        document.getElementById('langToggle').addEventListener('click', switchLang);
+        
+        // Игровой цикл
+        setInterval(() => {
+            const income = getIncome();
+            if (income > 0) {
+                game.coins += income * 0.1;
+                game.totalMined += income * 0.1;
+                updateDisplay();
+            }
+        }, 100);
+        
+        // Автосохранение
+        setInterval(saveGame, 5000);
+        
+        // Старт
+        updateDisplay();
+        renderContent('mines');
+        logDebug('Game initialized successfully');
+    </script>
+</body>
+</html>
