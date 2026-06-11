@@ -3,369 +3,375 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brutal Ball</title>
+    <title>Cave Ball</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            background: #0a0a0a;
-            height: 100vh;
-            font-family: 'Courier New', monospace;
-            display: flex;
-            justify-content: center;
+            margin: 0;
             overflow: hidden;
+            background: #05070a;
+            font-family: monospace;
             touch-action: manipulation;
             user-select: none;
+            height: 100vh;
         }
         
-        .game-container {
+        .game {
+            position: relative;
             width: 100%;
             max-width: 420px;
             height: 100vh;
-            background: #0d0d0d;
-            display: flex;
-            flex-direction: column;
-            position: relative;
+            margin: auto;
             overflow: hidden;
         }
         
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 8px 15px;
-            margin: 8px;
-            border: 1px solid #333;
-            z-index: 10;
-        }
-        
-        .score-display {
-            font-weight: bold;
-            font-size: 16px;
-            color: #c0c0c0;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .game-area {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            margin: 0 8px;
-            border-radius: 10px;
-            border: 1px solid #222;
-            background: #111;
-        }
-        
-        .ground {
+        /* ===== PARALLAX BACKGROUND ===== */
+        .layer {
             position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 80px;
-            background: linear-gradient(0deg, #1a1a1a, #222);
-            border-top: 2px solid #333;
+            width: 220%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            will-change: transform;
         }
         
-        .ground-texture {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            height: 80px;
-            background: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 20px,
-                #1f1f1f 20px,
-                #1f1f1f 22px
-            );
+        .bg {
+            background: radial-gradient(circle at 70% 20%, rgba(255,255,255,0.08), transparent 40%),
+                        radial-gradient(circle at 30% 70%, rgba(80,80,80,0.12), transparent 50%),
+                        linear-gradient(#0b0f14, #05070a);
+            z-index: 0;
         }
         
-        .platform {
+        .stones {
+            background: radial-gradient(circle at 20% 60%, rgba(90,90,90,0.25), transparent 45%),
+                        radial-gradient(circle at 60% 40%, rgba(60,60,60,0.2), transparent 50%),
+                        radial-gradient(circle at 90% 80%, rgba(100,100,100,0.15), transparent 40%);
+            z-index: 1;
+            opacity: 0.9;
+        }
+        
+        .roots {
+            background: repeating-linear-gradient(45deg, transparent, transparent 90px,
+                        rgba(60,40,20,0.15) 90px, rgba(60,40,20,0.15) 92px);
+            z-index: 2;
+            opacity: 0.6;
+        }
+        
+        .light {
             position: absolute;
-            height: 20px;
-            background: linear-gradient(0deg, #1a1a1a, #2a2a2a);
-            border-top: 2px solid #444;
-            border-bottom: 2px solid #333;
+            top: -60px;
+            right: -60px;
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255,255,255,0.22), rgba(120,140,255,0.08), transparent 60%);
+            filter: blur(2px);
             z-index: 3;
+            animation: pulse 3s infinite ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .floor {
+            position: absolute;
+            bottom: 0;
+            width: 220%;
+            height: 95px;
+            background: repeating-linear-gradient(90deg, #0a0c10, #0a0c10 22px, #07090c 22px, #07090c 44px),
+                        repeating-linear-gradient(0deg, transparent, transparent 18px,
+                        rgba(255,255,255,0.02) 18px, rgba(255,255,255,0.02) 20px);
+            border-top: 1px solid #1a1f28;
+            z-index: 5;
         }
         
         .ball {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            background: radial-gradient(circle at 35% 35%, #808080, #3a3a3a);
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            left: 40px;
-            bottom: 80px;
-            z-index: 5;
-            border: 2px solid #555;
-            box-shadow: 0 0 10px rgba(100,100,100,0.5), inset 0 2px 5px rgba(255,255,255,0.2);
-            transition: none;
+            left: 90px;
+            bottom: 95px;
+            background: radial-gradient(circle at 30% 30%, #ffffff 0%, #bfc7d1 10%, #6d7682 30%, #2b313a 60%, #0b0f14 100%);
+            box-shadow: inset 3px 3px 6px rgba(255,255,255,0.2),
+                        inset -4px -4px 10px rgba(0,0,0,0.6),
+                        0 0 18px rgba(180,200,255,0.15);
+            z-index: 10;
         }
         
         .ball.exploding {
-            animation: brutalExplode 3s forwards;
+            animation: explode 2.5s forwards;
         }
         
-        @keyframes brutalExplode {
-            0% { 
-                transform: scale(1); 
-                opacity: 1;
-            }
-            30% { 
-                transform: scale(1.5); 
-                opacity: 0.8;
-                background: radial-gradient(circle at 35% 35%, #ff4444, #880000);
-            }
-            70% { 
-                transform: scale(2.5); 
-                opacity: 0.5;
-                background: radial-gradient(circle at 35% 35%, #ff8800, #cc4400);
-            }
-            100% { 
-                transform: scale(3.5); 
-                opacity: 0;
-            }
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(2.5); opacity: 0.6; background: radial-gradient(circle at 30% 30%, #ff4444, #880000); }
+            100% { transform: scale(4); opacity: 0; }
         }
         
+        .shadow {
+            position: absolute;
+            width: 40px;
+            height: 12px;
+            background: rgba(0,0,0,0.55);
+            border-radius: 50%;
+            left: 90px;
+            bottom: 85px;
+            filter: blur(3px);
+            z-index: 9;
+        }
+        
+        /* ===== OBSTACLES ===== */
         .obstacle {
             position: absolute;
-            z-index: 4;
+            z-index: 8;
         }
         
-        .spike {
-            width: 30px;
-            height: 30px;
+        .crystal-spike {
+            width: 28px;
+            height: 35px;
             position: relative;
         }
         
-        .spike-body {
-            width: 4px;
-            height: 20px;
-            background: #555;
+        .crystal-spike .spike-base {
+            width: 8px;
+            height: 18px;
+            background: linear-gradient(180deg, #3a3a4a, #1a1a2a);
             position: absolute;
             bottom: 0;
-            left: 13px;
+            left: 10px;
+            border-radius: 2px;
         }
         
-        .spike-tip {
+        .crystal-spike .spike-top {
             width: 0;
             height: 0;
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-bottom: 20px solid #666;
+            border-left: 14px solid transparent;
+            border-right: 14px solid transparent;
+            border-bottom: 20px solid #4a4a6a;
             position: absolute;
             top: 0;
             left: 0;
-            filter: drop-shadow(0 0 3px rgba(100,0,0,0.8));
+            filter: drop-shadow(0 0 4px rgba(100,100,200,0.4));
         }
         
-        .arrow {
-            position: absolute;
-            z-index: 4;
-        }
-        
-        .arrow-body {
-            width: 35px;
-            height: 4px;
-            background: #555;
+        .floating-arrow {
+            width: 40px;
+            height: 5px;
+            background: linear-gradient(90deg, #3a3a4a, #5a5a7a);
             position: relative;
+            border-radius: 2px;
+            box-shadow: 0 0 6px rgba(100,100,200,0.3);
         }
         
-        .arrow-head {
+        .floating-arrow::after {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: -4px;
             width: 0;
             height: 0;
-            border-top: 6px solid transparent;
-            border-bottom: 6px solid transparent;
-            border-left: 10px solid #666;
-            position: absolute;
-            left: 35px;
-            top: -4px;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            border-right: 10px solid #5a5a7a;
         }
         
-        .diamond-collect {
+        .score-display {
             position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            color: #b7c0cc;
             font-size: 20px;
-            z-index: 3;
-            pointer-events: none;
-            animation: diamondFloat 0.8s forwards;
-        }
-        
-        @keyframes diamondFloat {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
-        }
-        
-        .controls {
-            position: absolute;
-            bottom: 100px;
-            left: 15px;
-            z-index: 10;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(180,200,255,0.4);
         }
         
         .jump-btn {
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle at 40% 40%, #555, #222);
-            border: 3px solid #444;
+            position: absolute;
+            left: 12px;
+            bottom: 95px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
-            font-size: 32px;
+            background: #1c232d;
+            color: #b7c0cc;
+            border: 1px solid #2a3442;
+            z-index: 20;
+            touch-action: manipulation;
+            font-size: 22px;
             cursor: pointer;
-            color: #999;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.1);
-            transition: all 0.1s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         .jump-btn:active {
-            transform: scale(0.9);
-            background: radial-gradient(circle at 40% 40%, #666, #333);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.9);
+            background: #2a3442;
         }
         
-        .bottom-nav {
-            display: flex;
-            gap: 5px;
-            background: #1a1a1a;
-            border-radius: 20px;
-            padding: 6px;
-            margin: 8px;
-            border: 1px solid #333;
-            z-index: 10;
-        }
-        
-        .nav-btn {
-            flex: 1;
-            background: #222;
-            border: none;
-            padding: 10px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 20px;
-            transition: all 0.3s;
-            color: #666;
-        }
-        
-        .nav-btn.active {
-            background: #333;
-            color: #999;
-            box-shadow: 0 0 10px rgba(100,100,100,0.3);
-        }
-        
-        .menu-overlay {
-            position: fixed;
+        /* ===== START SCREEN ===== */
+        .start-screen {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-        }
-        
-        .menu-overlay.show {
+            background: rgba(5,7,10,0.9);
+            z-index: 30;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
         
-        .menu-panel {
-            background: #1a1a1a;
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            border: 2px solid #333;
-            max-width: 280px;
-            width: 90%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        .start-screen h1 {
+            color: #b7c0cc;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px rgba(180,200,255,0.3);
         }
         
-        .menu-panel h2 {
-            color: #999;
-            margin-bottom: 15px;
-            font-size: 22px;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
+        .start-screen p {
+            color: #6d7682;
+            margin-bottom: 20px;
         }
         
-        .menu-panel p {
-            color: #777;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-        
-        .menu-btn {
-            background: #333;
-            border: 2px solid #555;
-            padding: 10px 25px;
-            border-radius: 20px;
-            font-weight: bold;
+        .start-btn {
+            background: #1c232d;
+            color: #b7c0cc;
+            border: 2px solid #2a3442;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 18px;
             cursor: pointer;
-            margin: 5px;
-            font-size: 14px;
-            color: #999;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-            transition: all 0.2s;
+            font-family: monospace;
         }
         
-        .menu-btn:active {
-            background: #444;
-            transform: scale(0.95);
+        .start-btn:active {
+            background: #2a3442;
+        }
+        
+        /* ===== GAME OVER ===== */
+        .gameover-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5,7,10,0.85);
+            z-index: 25;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gameover-screen h2 {
+            color: #ff6666;
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+        
+        .gameover-screen p {
+            color: #b7c0cc;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .restart-btn {
+            background: #1c232d;
+            color: #ff6666;
+            border: 2px solid #ff4444;
+            padding: 12px 35px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        /* ===== BOTTOM NAV ===== */
+        .bottom-nav {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 20;
+            background: rgba(10,12,16,0.9);
+            border-radius: 20px;
+            padding: 6px;
+            border: 1px solid #1a1f28;
+        }
+        
+        .nav-btn {
+            background: #1c232d;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 22px;
+            cursor: pointer;
+            color: #6d7682;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn.active {
+            background: #2a3442;
+            color: #b7c0cc;
         }
         
         .shake {
-            animation: brutalShake 0.3s infinite;
+            animation: shake 0.5s infinite;
         }
         
-        @keyframes brutalShake {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(-8px, 8px) rotate(-2deg); }
-            50% { transform: translate(8px, -8px) rotate(2deg); }
-            75% { transform: translate(-8px, -8px) rotate(-2deg); }
+        @keyframes shake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-10px, 5px); }
+            50% { transform: translate(10px, -5px); }
+            75% { transform: translate(-5px, -5px); }
+        }
+        
+        .hidden {
+            display: none !important;
         }
     </style>
 </head>
 <body>
-    <div class="game-container" id="gameContainer">
-        <div class="top-bar">
-            <div class="score-display">💎 <span id="scoreDisplay">0</span></div>
-            <div class="score-display">🏆 <span id="bestDisplay">0</span></div>
+    <div class="game" id="gameContainer">
+        <div class="layer bg" id="bg"></div>
+        <div class="layer stones" id="stones"></div>
+        <div class="layer roots" id="roots"></div>
+        
+        <div class="light"></div>
+        <div class="floor" id="floor"></div>
+        
+        <div class="shadow" id="shadow"></div>
+        <div class="ball" id="ball"></div>
+        
+        <div class="score-display" id="scoreDisplay">💎 0</div>
+        
+        <button class="jump-btn" id="jumpBtn">▲</button>
+        
+        <!-- Стартовый экран -->
+        <div class="start-screen" id="startScreen">
+            <h1>🕳️ CAVE BALL</h1>
+            <p>Прыгай и уклоняйся!</p>
+            <button class="start-btn" id="startGameBtn">▶ НАЧАТЬ</button>
         </div>
         
-        <div class="game-area" id="gameArea">
-            <div class="ground">
-                <div class="ground-texture"></div>
-            </div>
-            <div class="ball" id="ball"></div>
+        <!-- Экран проигрыша -->
+        <div class="gameover-screen" id="gameoverScreen">
+            <h2>💀 Потрачено</h2>
+            <p>Счёт: <strong id="finalScore">0</strong> 💎</p>
+            <button class="restart-btn" id="restartBtn">🔄 ЗАНОВО</button>
         </div>
         
-        <div class="controls">
-            <button class="jump-btn" id="jumpBtn">▲</button>
-        </div>
-        
-        <div class="bottom-nav">
+        <!-- Нижнее меню -->
+        <div class="bottom-nav" id="bottomNav">
             <button class="nav-btn active" data-screen="game">🎮</button>
             <button class="nav-btn" data-screen="shop">🛒</button>
             <button class="nav-btn" data-screen="profile">👤</button>
-        </div>
-    </div>
-    
-    <div class="menu-overlay" id="menuOverlay">
-        <div class="menu-panel">
-            <h2>💀 Потрачено</h2>
-            <p>Счёт: <strong id="finalScore">0</strong> 💎</p>
-            <p>Рекорд: <strong id="menuBest">0</strong> 🏆</p>
-            <button class="menu-btn" id="restartBtn">🔄 Заново</button>
-            <button class="menu-btn" id="menuBtn">📋 В меню</button>
         </div>
     </div>
 
@@ -377,188 +383,99 @@
             tg.expand();
         } catch(e) {}
         
+        // ===== СОСТОЯНИЕ =====
+        let y = 95;
+        let v = 0;
+        let jumps = 2;
+        let worldX = 0;
         let score = 0;
-        let bestScore = parseInt(localStorage.getItem('brutalBallBest')) || 0;
         let speed = 2;
         let isPlaying = false;
         let isGameOver = false;
         let canJump = true;
         
-        const ball = document.getElementById('ball');
-        const gameArea = document.getElementById('gameArea');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const bestDisplay = document.getElementById('bestDisplay');
-        const menuOverlay = document.getElementById('menuOverlay');
-        const gameContainer = document.getElementById('gameContainer');
-        
-        // В CSS bottom - это расстояние от НИЗА экрана
-        // Чем БОЛЬШЕ bottom, тем ВЫШЕ объект
-        let ballBottom = 80; // Начальная позиция на земле
-        let ballVelocity = 0;
-        const GRAVITY = 0.8;
-        const JUMP_FORCE = -14; // Отрицательное = вверх (увеличивает bottom)
-        const GROUND_LEVEL = 80;
+        const GRAVITY = -0.75;
+        const JUMP_POWER = 12;
+        const GROUND = 95;
         
         let obstacles = [];
-        let platforms = [];
         let gameLoop;
         let spawnTimeout;
-        let platformTimeout;
-        let speedInterval;
         
-        bestDisplay.textContent = bestScore;
+        // ===== ЭЛЕМЕНТЫ =====
+        const ball = document.getElementById('ball');
+        const shadow = document.getElementById('shadow');
+        const bg = document.getElementById('bg');
+        const stones = document.getElementById('stones');
+        const roots = document.getElementById('roots');
+        const floor = document.getElementById('floor');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const startScreen = document.getElementById('startScreen');
+        const gameoverScreen = document.getElementById('gameoverScreen');
+        const gameContainer = document.getElementById('gameContainer');
+        const bottomNav = document.getElementById('bottomNav');
         
+        // ===== ПРЫЖОК =====
         function jump() {
             if (!isPlaying || isGameOver) return;
-            if (!canJump) return;
+            if (jumps <= 0) return;
             
-            ballVelocity = JUMP_FORCE;
+            v = JUMP_POWER;
+            jumps--;
             canJump = false;
         }
         
-        function updateBall() {
-            // Гравитация уменьшает скорость (тянет вниз)
-            ballVelocity += GRAVITY;
-            // Изменяем позицию
-            ballBottom += ballVelocity;
-            
-            // Проверка платформ
-            if (ballVelocity < 0) {
-                // Движется вверх - проверяем столкновение с платформами снизу
-                for (let platform of platforms) {
-                    const platBottom = parseFloat(platform.style.bottom);
-                    const platRight = parseFloat(platform.style.right) || 0;
-                    const platWidth = parseFloat(platform.style.width);
-                    const platLeft = gameArea.offsetWidth - platRight - platWidth;
-                    
-                    if (ballBottom + 30 >= platBottom && 
-                        ballBottom <= platBottom + 20 &&
-                        ballBottom + ballVelocity <= platBottom &&
-                        40 >= platLeft - 10 && 
-                        40 <= platLeft + platWidth + 10) {
-                        ballBottom = platBottom - 30;
-                        ballVelocity = 0;
-                        break;
-                    }
-                }
-            } else if (ballVelocity > 0) {
-                // Движется вниз - проверяем приземление на платформы
-                for (let platform of platforms) {
-                    const platBottom = parseFloat(platform.style.bottom);
-                    const platRight = parseFloat(platform.style.right) || 0;
-                    const platWidth = parseFloat(platform.style.width);
-                    const platLeft = gameArea.offsetWidth - platRight - platWidth;
-                    
-                    if (ballBottom <= platBottom + 20 && 
-                        ballBottom + ballVelocity >= platBottom &&
-                        40 >= platLeft - 10 && 
-                        40 <= platLeft + platWidth + 10) {
-                        ballBottom = platBottom + 20;
-                        ballVelocity = 0;
-                        canJump = true;
-                        break;
-                    }
-                }
-            }
-            
-            // Пол
-            if (ballBottom <= GROUND_LEVEL) {
-                ballBottom = GROUND_LEVEL;
-                ballVelocity = 0;
+        function resetJump() {
+            if (y <= GROUND) {
+                jumps = 2;
                 canJump = true;
             }
-            
-            // Потолок
-            if (ballBottom > gameArea.offsetHeight - 50) {
-                ballBottom = gameArea.offsetHeight - 50;
-                ballVelocity = 0;
-            }
-            
-            ball.style.bottom = ballBottom + 'px';
         }
         
-        function createPlatform() {
-            if (!isPlaying) return;
-            
-            const platform = document.createElement('div');
-            platform.className = 'platform';
-            
-            const width = 80 + Math.random() * 60;
-            const bottomPos = 180 + Math.random() * 200;
-            
-            platform.style.width = width + 'px';
-            platform.style.bottom = bottomPos + 'px';
-            platform.style.right = '-100px';
-            
-            gameArea.appendChild(platform);
-            platforms.push(platform);
-        }
-        
+        // ===== ПРЕПЯТСТВИЯ =====
         function createObstacle() {
             if (!isPlaying) return;
             
-            const type = Math.random();
             const obstacle = document.createElement('div');
             obstacle.className = 'obstacle';
             
-            if (type < 0.5) {
-                // Шипы на земле
+            if (Math.random() < 0.6) {
+                // Кристальные шипы
                 obstacle.innerHTML = `
-                    <div class="spike">
-                        <div class="spike-tip"></div>
-                        <div class="spike-body"></div>
+                    <div class="crystal-spike">
+                        <div class="spike-top"></div>
+                        <div class="spike-base"></div>
                     </div>
                 `;
-                obstacle.style.bottom = '80px';
+                obstacle.style.bottom = '95px';
             } else {
-                // Летящая стрела
-                obstacle.innerHTML = `
-                    <div class="arrow">
-                        <div class="arrow-body"></div>
-                        <div class="arrow-head"></div>
-                    </div>
-                `;
-                obstacle.style.bottom = (100 + Math.random() * 150) + 'px';
+                // Летящие стрелы
+                obstacle.innerHTML = '<div class="floating-arrow"></div>';
+                obstacle.style.bottom = (110 + Math.random() * 120) + 'px';
             }
             
             obstacle.style.right = '-60px';
-            obstacle.style.left = 'auto';
-            gameArea.appendChild(obstacle);
+            gameContainer.appendChild(obstacle);
             obstacles.push(obstacle);
         }
         
         function moveObstacles() {
             for (let i = obstacles.length - 1; i >= 0; i--) {
-                const obstacle = obstacles[i];
-                const currentRight = parseFloat(obstacle.style.right) || -60;
+                const obs = obstacles[i];
+                const currentRight = parseFloat(obs.style.right) || -60;
                 const newRight = currentRight + speed;
-                obstacle.style.right = newRight + 'px';
+                obs.style.right = newRight + 'px';
                 
-                if (checkCollision(obstacle)) {
-                    gameOver();
+                if (checkCollision(obs)) {
+                    endGame();
                     return;
                 }
                 
-                if (newRight > gameArea.offsetWidth + 100) {
-                    obstacle.remove();
+                if (newRight > window.innerWidth + 100) {
+                    obs.remove();
                     obstacles.splice(i, 1);
                     score++;
-                    scoreDisplay.textContent = score;
-                    showDiamondAnimation();
-                }
-            }
-        }
-        
-        function movePlatforms() {
-            for (let i = platforms.length - 1; i >= 0; i--) {
-                const platform = platforms[i];
-                const currentRight = parseFloat(platform.style.right) || -100;
-                const newRight = currentRight + speed;
-                platform.style.right = newRight + 'px';
-                
-                if (newRight > gameArea.offsetWidth + 150) {
-                    platform.remove();
-                    platforms.splice(i, 1);
+                    scoreDisplay.textContent = '💎 ' + score;
                 }
             }
         }
@@ -567,164 +484,147 @@
             const ballRect = ball.getBoundingClientRect();
             const obsRect = obstacle.getBoundingClientRect();
             
-            const margin = 8;
-            
-            return ballRect.left + margin < obsRect.right &&
-                   ballRect.right - margin > obsRect.left &&
-                   ballRect.top + margin < obsRect.bottom &&
-                   ballRect.bottom - margin > obsRect.top;
+            return ballRect.left + 8 < obsRect.right &&
+                   ballRect.right - 8 > obsRect.left &&
+                   ballRect.top + 8 < obsRect.bottom &&
+                   ballRect.bottom - 8 > obsRect.top;
         }
         
-        function gameOver() {
-            if (!isPlaying) return;
-            
+        // ===== КОНЕЦ ИГРЫ =====
+        function endGame() {
             isPlaying = false;
             isGameOver = true;
-            
-            if (score > bestScore) {
-                bestScore = score;
-                localStorage.setItem('brutalBallBest', bestScore);
-                bestDisplay.textContent = bestScore;
-            }
             
             gameContainer.classList.add('shake');
             ball.classList.add('exploding');
             
-            clearInterval(speedInterval);
             clearTimeout(spawnTimeout);
-            clearTimeout(platformTimeout);
             
             setTimeout(() => {
                 gameContainer.classList.remove('shake');
                 ball.classList.remove('exploding');
                 
                 document.getElementById('finalScore').textContent = score;
-                document.getElementById('menuBest').textContent = bestScore;
-                menuOverlay.classList.add('show');
-            }, 3000);
+                gameoverScreen.style.display = 'flex';
+                bottomNav.classList.remove('hidden');
+            }, 2500);
         }
         
         function restartGame() {
             obstacles.forEach(o => o.remove());
-            platforms.forEach(p => p.remove());
             obstacles = [];
-            platforms = [];
             score = 0;
             speed = 2;
-            ballBottom = GROUND_LEVEL;
-            ballVelocity = 0;
+            y = GROUND;
+            v = 0;
+            jumps = 2;
             canJump = true;
             isPlaying = true;
             isGameOver = false;
             
-            ball.style.bottom = GROUND_LEVEL + 'px';
+            ball.style.bottom = GROUND + 'px';
+            shadow.style.bottom = (GROUND - 10) + 'px';
             ball.classList.remove('exploding');
-            scoreDisplay.textContent = '0';
+            scoreDisplay.textContent = '💎 0';
             
             gameContainer.classList.remove('shake');
-            menuOverlay.classList.remove('show');
+            gameoverScreen.style.display = 'none';
+            bottomNav.classList.add('hidden');
             
             startSpawning();
-            startSpeedIncrease();
-        }
-        
-        function showDiamondAnimation() {
-            const diamond = document.createElement('div');
-            diamond.className = 'diamond-collect';
-            diamond.textContent = '💎';
-            diamond.style.left = '50%';
-            diamond.style.top = '40%';
-            document.body.appendChild(diamond);
-            setTimeout(() => diamond.remove(), 800);
-        }
-        
-        function startSpeedIncrease() {
-            clearInterval(speedInterval);
-            speedInterval = setInterval(() => {
-                if (isPlaying && speed < 8) {
-                    speed += 0.3;
-                }
-            }, 3000);
         }
         
         function startSpawning() {
             clearTimeout(spawnTimeout);
-            clearTimeout(platformTimeout);
             
-            function spawnObstacle() {
+            function spawn() {
                 if (!isPlaying) return;
                 createObstacle();
-                const delay = Math.max(1800 / speed, 900);
-                spawnTimeout = setTimeout(spawnObstacle, delay);
+                const delay = Math.max(1800 / speed, 1000);
+                spawnTimeout = setTimeout(spawn, delay);
             }
             
-            function spawnPlatform() {
-                if (!isPlaying) return;
-                createPlatform();
-                platformTimeout = setTimeout(spawnPlatform, 3500 / speed);
-            }
-            
-            // Задержка перед первым появлением
-            spawnTimeout = setTimeout(spawnObstacle, 2000);
-            platformTimeout = setTimeout(spawnPlatform, 3000);
+            spawnTimeout = setTimeout(spawn, 2000);
         }
         
-        function gameTick() {
-            if (!isPlaying) return;
-            updateBall();
+        // ===== ИГРОВОЙ ЦИКЛ =====
+        function update() {
+            if (!isPlaying) {
+                requestAnimationFrame(update);
+                return;
+            }
+            
+            v += GRAVITY;
+            y += v;
+            
+            if (y < GROUND) {
+                y = GROUND;
+                v = 0;
+                resetJump();
+            }
+            
+            if (y > window.innerHeight - 50) {
+                y = window.innerHeight - 50;
+                v = 0;
+            }
+            
+            ball.style.bottom = y + 'px';
+            shadow.style.bottom = (y - 10) + 'px';
+            ball.style.transform = 'rotate(' + y * 1.8 + 'deg)';
+            
+            worldX -= speed;
+            
+            bg.style.transform = `translateX(${worldX * 0.15}px)`;
+            stones.style.transform = `translateX(${worldX * 0.3}px)`;
+            roots.style.transform = `translateX(${worldX * 0.45}px)`;
+            floor.style.transform = `translateX(${worldX * 0.8}px)`;
+            
             moveObstacles();
-            movePlatforms();
+            
+            // Увеличение скорости
+            if (score > 0 && score % 5 === 0 && speed < 8) {
+                speed += 0.1;
+            }
+            
+            requestAnimationFrame(update);
         }
         
-        // Обработчики
-        const jumpBtn = document.getElementById('jumpBtn');
-        
-        jumpBtn.addEventListener('click', (e) => {
+        // ===== ОБРАБОТЧИКИ =====
+        document.getElementById('jumpBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
             jump();
         });
-        
-        jumpBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            jump();
-        });
+        document.getElementById('jumpBtn').addEventListener('click', jump);
         
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
                 e.preventDefault();
                 jump();
             }
         });
         
-        document.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-        }, { passive: false });
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            bottomNav.classList.add('hidden');
+            isPlaying = true;
+            startSpawning();
+        });
         
         document.getElementById('restartBtn').addEventListener('click', restartGame);
-        document.getElementById('menuBtn').addEventListener('click', () => {
-            menuOverlay.classList.remove('show');
-            restartGame();
-        });
         
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
+                
+                if (this.dataset.screen === 'game' && isGameOver) {
+                    restartGame();
+                }
             });
         });
         
-        function init() {
-            isPlaying = true;
-            canJump = true;
-            ballBottom = GROUND_LEVEL;
-            ballVelocity = 0;
-            ball.style.bottom = GROUND_LEVEL + 'px';
-            startSpawning();
-            startSpeedIncrease();
-            gameLoop = setInterval(gameTick, 16);
-        }
-        
-        init();
+        // Запуск
+        update();
     </script>
 </body>
 </html>
