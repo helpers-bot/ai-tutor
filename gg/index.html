@@ -67,7 +67,7 @@
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 50px;
+            height: 80px;
             background: linear-gradient(0deg, #1a1a1a, #222);
             border-top: 2px solid #333;
         }
@@ -76,7 +76,7 @@
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 50px;
+            height: 80px;
             background: repeating-linear-gradient(
                 90deg,
                 transparent,
@@ -93,10 +93,11 @@
             background: radial-gradient(circle at 35% 35%, #808080, #3a3a3a);
             border-radius: 50%;
             left: 40px;
-            bottom: 50px;
+            bottom: 80px;
             z-index: 5;
             border: 2px solid #555;
             box-shadow: 0 0 10px rgba(100,100,100,0.5), inset 0 2px 5px rgba(255,255,255,0.2);
+            transition: none;
         }
         
         .ball.exploding {
@@ -129,6 +130,7 @@
         .obstacle {
             position: absolute;
             z-index: 4;
+            will-change: right;
         }
         
         .hole {
@@ -204,7 +206,7 @@
             padding: 8px;
             z-index: 10;
             position: absolute;
-            bottom: 70px;
+            bottom: 160px;
             left: 10px;
         }
         
@@ -381,8 +383,7 @@
         let speed = 2;
         let isPlaying = false;
         let isGameOver = false;
-        let jumpCount = 0;
-        const maxJumps = 2;
+        let canJump = true;
         
         const ball = document.getElementById('ball');
         const gameArea = document.getElementById('gameArea');
@@ -391,26 +392,25 @@
         const menuOverlay = document.getElementById('menuOverlay');
         const gameContainer = document.getElementById('gameContainer');
         
-        let ballY = 50;
+        let ballY = 80;
         let ballVelocity = 0;
-        const GRAVITY = 0.6;
-        const JUMP_FORCE = -10;
-        const GROUND_LEVEL = 50;
+        const GRAVITY = 0.8;
+        const JUMP_FORCE = -14;
+        const GROUND_LEVEL = 80;
         
         let obstacles = [];
         let gameLoop;
-        let spawnLoop;
+        let spawnTimeout;
         let speedInterval;
         
         bestDisplay.textContent = bestScore;
         
         function jump() {
             if (!isPlaying || isGameOver) return;
+            if (!canJump) return;
             
-            if (jumpCount < maxJumps) {
-                ballVelocity = JUMP_FORCE;
-                jumpCount++;
-            }
+            ballVelocity = JUMP_FORCE;
+            canJump = false;
         }
         
         function updateBall() {
@@ -420,11 +420,11 @@
             if (ballY >= GROUND_LEVEL) {
                 ballY = GROUND_LEVEL;
                 ballVelocity = 0;
-                jumpCount = 0;
+                canJump = true;
             }
             
-            if (ballY < 15) {
-                ballY = 15;
+            if (ballY < 20) {
+                ballY = 20;
                 ballVelocity = 0;
             }
             
@@ -440,7 +440,7 @@
             
             if (type < 0.35) {
                 obstacle.innerHTML = '<div class="hole"></div>';
-                obstacle.style.bottom = '35px';
+                obstacle.style.bottom = '65px';
                 obstacle.dataset.type = 'hole';
             } else if (type < 0.7) {
                 obstacle.innerHTML = `
@@ -449,15 +449,15 @@
                         <div class="spike-body"></div>
                     </div>
                 `;
-                obstacle.style.bottom = '50px';
+                obstacle.style.bottom = '80px';
                 obstacle.dataset.type = 'spike';
             } else {
                 obstacle.innerHTML = '<div class="arrow"></div>';
-                obstacle.style.bottom = (50 + Math.random() * 35) + 'px';
+                obstacle.style.bottom = (80 + Math.random() * 30) + 'px';
                 obstacle.dataset.type = 'arrow';
             }
             
-            obstacle.style.right = '-50px';
+            obstacle.style.right = '-60px';
             gameArea.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -465,15 +465,16 @@
         function moveObstacles() {
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obstacle = obstacles[i];
-                const currentRight = parseFloat(obstacle.style.right) || -50;
-                obstacle.style.right = (currentRight + speed) + 'px';
+                const currentRight = parseFloat(obstacle.style.right) || -60;
+                const newRight = currentRight + speed;
+                obstacle.style.right = newRight + 'px';
                 
                 if (checkCollision(obstacle)) {
                     gameOver();
                     return;
                 }
                 
-                if (currentRight > gameArea.offsetWidth + 80) {
+                if (newRight > gameArea.offsetWidth + 80) {
                     obstacle.remove();
                     obstacles.splice(i, 1);
                     score++;
@@ -487,7 +488,7 @@
             const ballRect = ball.getBoundingClientRect();
             const obsRect = obstacle.getBoundingClientRect();
             
-            const margin = 8;
+            const margin = 10;
             
             return ballRect.left + margin < obsRect.right &&
                    ballRect.right - margin > obsRect.left &&
@@ -511,7 +512,7 @@
             ball.classList.add('exploding');
             
             clearInterval(speedInterval);
-            clearTimeout(spawnLoop);
+            clearTimeout(spawnTimeout);
             
             setTimeout(() => {
                 gameContainer.classList.remove('shake');
@@ -528,9 +529,9 @@
             obstacles = [];
             score = 0;
             speed = 2;
-            jumpCount = 0;
             ballY = GROUND_LEVEL;
             ballVelocity = 0;
+            canJump = true;
             isPlaying = true;
             isGameOver = false;
             
@@ -558,22 +559,23 @@
         function startSpeedIncrease() {
             clearInterval(speedInterval);
             speedInterval = setInterval(() => {
-                if (isPlaying && speed < 10) {
-                    speed += 0.5;
+                if (isPlaying && speed < 8) {
+                    speed += 0.3;
                 }
             }, 3000);
         }
         
         function startSpawning() {
+            clearTimeout(spawnTimeout);
+            
             function spawn() {
                 if (!isPlaying) return;
                 createObstacle();
-                const delay = 2000 / speed;
-                spawnLoop = setTimeout(spawn, Math.max(delay, 800));
+                const delay = Math.max(1500 / speed, 1000);
+                spawnTimeout = setTimeout(spawn, delay);
             }
             
-            clearTimeout(spawnLoop);
-            spawnLoop = setTimeout(spawn, 1000);
+            spawnTimeout = setTimeout(spawn, 1500);
         }
         
         function gameTick() {
@@ -583,12 +585,14 @@
         }
         
         // Обработчики
-        document.getElementById('jumpBtn').addEventListener('click', (e) => {
+        const jumpBtn = document.getElementById('jumpBtn');
+        
+        jumpBtn.addEventListener('click', (e) => {
             e.preventDefault();
             jump();
         });
         
-        document.getElementById('jumpBtn').addEventListener('touchstart', (e) => {
+        jumpBtn.addEventListener('touchstart', (e) => {
             e.preventDefault();
             jump();
         });
@@ -599,6 +603,13 @@
                 jump();
             }
         });
+        
+        // Предотвращаем скролл на мобильных
+        document.addEventListener('touchmove', (e) => {
+            if (e.target === jumpBtn) {
+                e.preventDefault();
+            }
+        }, { passive: false });
         
         document.getElementById('restartBtn').addEventListener('click', restartGame);
         document.getElementById('menuBtn').addEventListener('click', () => {
@@ -615,6 +626,10 @@
         
         function init() {
             isPlaying = true;
+            canJump = true;
+            ballY = GROUND_LEVEL;
+            ballVelocity = 0;
+            ball.style.bottom = GROUND_LEVEL + 'px';
             startSpawning();
             startSpeedIncrease();
             gameLoop = setInterval(gameTick, 16);
