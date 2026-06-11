@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>GG Clicker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: linear-gradient(145deg, #1a2a3a 0%, #0f1a24 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(4px);
+            border-radius: 64px;
+            padding: 24px 20px 32px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,215,0,0.3);
+            text-align: center;
+        }
+        .coin-display {
+            background: #000000aa;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            border: 1px solid gold;
+        }
+        .coin-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 2px 5px gold);
+        }
+        .coin-count {
+            font-size: 42px;
+            font-weight: 800;
+            color: #FFD966;
+            text-shadow: 0 2px 5px #000;
+            letter-spacing: 2px;
+        }
+        .click-area {
+            background: radial-gradient(circle at 30% 20%, #ffd966, #b8860b);
+            width: 220px;
+            height: 220px;
+            margin: 20px auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 20px 35px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,200,0.8);
+            transition: transform 0.08s linear;
+            border: 3px solid #ffec80;
+        }
+        .click-area:active {
+            transform: scale(0.94);
+        }
+        .click-emoji {
+            font-size: 98px;
+            filter: drop-shadow(2px 8px 12px rgba(0,0,0,0.5));
+        }
+        .bonus-btn {
+            background: #2c2c3a;
+            border: none;
+            width: 90%;
+            margin: 20px auto 10px;
+            padding: 14px 10px;
+            border-radius: 60px;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            background: linear-gradient(95deg, #3a2c1f, #5e3a1f);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #ffc857;
+        }
+        .bonus-btn:active {
+            transform: scale(0.97);
+            background: #2f2418;
+        }
+        .ref-link {
+            background: #1f3b4c;
+            color: #9fd3ff;
+            font-size: 13px;
+            word-break: break-all;
+            padding: 12px;
+            border-radius: 44px;
+            margin-top: 18px;
+            font-weight: 500;
+            border: 1px dashed #ffaa33;
+        }
+        .footer {
+            font-size: 11px;
+            color: #ccc5aa;
+            margin-top: 20px;
+            opacity: 0.7;
+        }
+        button {
+            background: none;
+            border: none;
+        }
+    </style>
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="coin-display">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-count" id="coinCounter">0</span>
+    </div>
+    
+    <div class="click-area" id="clicker">
+        <span class="click-emoji">💎</span>
+    </div>
+    
+    <button class="bonus-btn" id="claimReferralBtn">
+        <span>🎁</span> ЗАБРАТЬ БОНУС <span>🔥</span>
+    </button>
+    
+    <div class="ref-link" id="refLinkBox">
+        👥 Твоя реферальная ссылка:
+        <span id="refLinkText">Загрузка...</span>
+    </div>
+    <div class="footer">
+        ⚡ кликай по кристаллу | приглашай друзей
+    </div>
+</div>
+
+<script>
+    // ---------- ИНИЦИАЛИЗАЦИЯ Telegram Mini App ----------
+    let tg = window.Telegram.WebApp;
+    tg.expand();   // на весь экран
+    tg.ready();
+    
+    // ---------- получаем данные пользователя из Telegram ----------
+    let initData = tg.initDataUnsafe;
+    let user = initData.user;
+    let userId = user ? user.id : Math.floor(Math.random() * 1000000);
+    let username = user ? (user.username || user.first_name || "player") : "guest";
+    
+    // ---------- ПАРТНЁРСКАЯ ССЫЛКА (куда ведёт бонус-кнопка) ----------
+    // заменяем на твой реальный оффер (vds-game.ink)
+    const OFFER_URL = "https://vds-game.ink/gg";
+    
+    // ---------- раБота с localStorage (виртуальное хранилище, вместо БД) ----------
+    let STORAGE_KEY = `gg_coins_${userId}`;
+    let REFERRAL_KEY = `gg_referred_${userId}`;
+    
+    let coins = 0;
+    
+    function loadCoins() {
+        let saved = localStorage.getItem(STORAGE_KEY);
+        if(saved !== null) {
+            coins = parseInt(saved) || 0;
+        } else {
+            // стартовый бонус 250 монет
+            coins = 250;
+            saveCoins();
+        }
+        updateUI();
+    }
+    
+    function saveCoins() {
+        localStorage.setItem(STORAGE_KEY, coins);
+    }
+    
+    function addCoins(amount) {
+        coins += amount;
+        saveCoins();
+        updateUI();
+        // вибрация (если доступно)
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred("light");
+    }
+    
+    function updateUI() {
+        document.getElementById('coinCounter').innerText = Math.floor(coins);
+    }
+    
+    // ---------- РЕФЕРАЛЬНАЯ СИСТЕМА (простая генерация ссылки с твоим ID) ----------
+    // Реальная рефералка: ты можешь сделать mini app с параметром startapp=ref_userId
+    // но для твоего варианта: копируем ссылку на бота с твоим ID, а при открытии бот передаст параметр.
+    // Но чтобы работало на 100% — используем кастомную ссылку.
+    function getReferralLink() {
+        // Твой бот: @gg_your_bot - замени на реальное имя бота (который ты создал в BotFather)
+        // твой бот выше по токену 8227457744:AAHa... но username бота надо указать.
+        // Если бот ещё не создан публично — укажи его юзернейм. Пример: @GGclickerBot
+        // Ссылка с параметром startapp=ref_{userId}
+        let botUsername = "gg_clicker_demo_bot";   // !!! ЗДЕСЬ УКАЖИ РЕАЛЬНЫЙ ЮЗЕРНЕЙМ ТВОЕГО БОТА (из @BotFather)
+        return `https://t.me/${botUsername}?startapp=ref_${userId}`;
+    }
+    
+    function displayReferralLink() {
+        let link = getReferralLink();
+        let refSpan = document.getElementById('refLinkText');
+        if(refSpan) {
+            refSpan.innerText = link;
+            refSpan.style.cursor = "pointer";
+            refSpan.style.textDecoration = "underline";
+            refSpan.onclick = () => {
+                // копируем в буфер
+                navigator.clipboard.writeText(link);
+                tg.showPopup({
+                    title: "Ссылка скопирована",
+                    message: "Поделись с друзьями! За каждого друга получишь +150 монет (после его первого клика).",
+                    buttons: [{type: "ok"}]
+                });
+            };
+        }
+    }
+    
+    // Простая симуляция реферального бонуса (друг перешёл) — проверяем параметр startapp
+    function checkReferralBonus() {
+        // если в URL есть параметр startapp=ref_XXXXX
+        let urlParams = new URLSearchParams(window.location.search);
+        let startParam = urlParams.get('startapp');
+        if(startParam && startParam.startsWith('ref_')) {
+            let referrerId = startParam.replace('ref_', '');
+            let hasClaimed = localStorage.getItem(REFERRAL_KEY);
+            if(!hasClaimed && referrerId != userId) {
+                // начисляем бонус приведённому пользователю (тому кто кликнул по ссылке)
+                addCoins(200);
+                localStorage.setItem(REFERRAL_KEY, "claimed");
+                tg.showPopup({
+                    title: "🎉 +200 монет",
+                    message: "Ты перешёл по реферальной ссылке! Бонус зачислен.",
+                    buttons: [{type: "ok"}]
+                });
+            }
+        }
+    }
+    
+    // ---------- КНОПКА "ЗАБРАТЬ БОНУС" (переход на твой оффер) ----------
+    function setupBonusButton() {
+        let btn = document.getElementById('claimReferralBtn');
+        if(btn) {
+            btn.addEventListener('click', () => {
+                // Открываем сайт vds-game.ink/gg в WebView (Telegram Browser)
+                tg.openLink(OFFER_URL);
+                // Дополнительно можно начислить бонус 100 монет за то, что нажал кнопку
+                addCoins(100);
+                tg.showPopup({
+                    title: "Переход на сайт",
+                    message: "Бонус +100 монет!",
+                    buttons: [{type: "ok"}]
+                });
+            });
+        }
+    }
+    
+    // ---------- КЛИКЕР ----------
+    function initClicker() {
+        const clickDiv = document.getElementById('clicker');
+        let clickCount = 0;
+        clickDiv.addEventListener('click', (e) => {
+            // Базовая награда за клик
+            let gain = 1;
+            // Эффект "летящей монетки" + анимация (не обязателен)
+            addCoins(gain);
+            // вспышка при клике
+            clickDiv.style.transform = "scale(0.94)";
+            setTimeout(() => { clickDiv.style.transform = ""; }, 90);
+            
+            // вибрация
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred("rigid");
+        });
+    }
+    
+    // ========== ЗАПУСК ==========
+    function init() {
+        loadCoins();
+        displayReferralLink();
+        setupBonusButton();
+        initClicker();
+        checkReferralBonus();
+        // показываем интерфейс
+        tg.MainButton.hide();
+        tg.BackButton.hide();
+    }
+    
+    init();
+</script>
+</body>
+</html>
