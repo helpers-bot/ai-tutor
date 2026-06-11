@@ -20,6 +20,7 @@
             padding: 0;
             margin: 0;
             color: #f0e6c5;
+            user-select: none;
         }
         
         .game-container {
@@ -66,7 +67,7 @@
         .mines-container {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 8px;
             max-height: 350px;
             overflow-y: auto;
         }
@@ -79,124 +80,150 @@
             position: relative;
             height: 100px;
             background: linear-gradient(0deg, #2a1f0a 0%, #1a1510 60%, #1a1f2b 100%);
+            min-height: 100px;
         }
         
         .mine-ground {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 30%;
+            height: 35%;
             background: linear-gradient(0deg, #3d2b0f 0%, #5a3d1a 50%, #2a1f0a 100%);
             border-top: 2px solid #6b4c25;
         }
         
         .mine-entrance {
             position: absolute;
-            left: 15px;
-            bottom: 28%;
-            font-size: 2rem;
+            left: 10px;
+            bottom: 32%;
+            font-size: 2.2rem;
             z-index: 2;
         }
         
         .mine-storage {
             position: absolute;
-            right: 15px;
-            bottom: 28%;
-            font-size: 1.8rem;
+            right: 10px;
+            bottom: 32%;
+            font-size: 2rem;
             z-index: 2;
         }
         
         .miner-wrapper {
             position: absolute;
-            bottom: 30%;
-            transition: left 2s linear;
+            bottom: 34%;
+            transition: left 1.5s linear;
             z-index: 3;
         }
         
         .miner-figure {
             position: relative;
-            width: 30px;
-            height: 40px;
+            width: 35px;
+            height: 45px;
         }
         
         .miner-head {
             position: absolute;
             top: 0;
-            left: 5px;
-            font-size: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            z-index: 2;
         }
         
-        .miner-body {
-            position: absolute;
-            top: 14px;
-            left: 8px;
-            width: 14px;
-            height: 14px;
-            background: #d4a574;
-            border-radius: 3px;
-        }
-        
-        .miner-arms {
+        .miner-body-part {
             position: absolute;
             top: 16px;
-            left: 2px;
-            width: 26px;
-            height: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 14px;
             background: #d4a574;
+            border-radius: 4px;
+            z-index: 1;
+        }
+        
+        .miner-arm-left {
+            position: absolute;
+            top: 18px;
+            left: 2px;
+            width: 6px;
+            height: 14px;
+            background: #c9966b;
             border-radius: 3px;
-            animation: swingArms 0.5s infinite;
+            transform-origin: top center;
+            animation: swingLeft 0.6s infinite;
+        }
+        
+        .miner-arm-right {
+            position: absolute;
+            top: 18px;
+            right: 2px;
+            width: 6px;
+            height: 14px;
+            background: #c9966b;
+            border-radius: 3px;
+            transform-origin: top center;
+            animation: swingRight 0.6s infinite;
         }
         
         .miner-pickaxe {
             position: absolute;
-            top: 8px;
-            right: -8px;
-            font-size: 0.8rem;
-            animation: swingPick 0.5s infinite;
+            top: 12px;
+            right: -10px;
+            font-size: 0.9rem;
+            animation: swingPick 0.6s infinite;
         }
         
-        .miner-legs {
+        .miner-leg-left {
             position: absolute;
             bottom: 0;
-            left: 6px;
-            display: flex;
-            gap: 4px;
-        }
-        
-        .leg {
-            width: 6px;
+            left: 8px;
+            width: 7px;
             height: 12px;
             background: #3d2b0f;
-            border-radius: 2px;
-            animation: walk 0.5s infinite;
+            border-radius: 3px;
+            animation: walkLeg 0.4s infinite;
         }
         
-        .leg:nth-child(2) {
-            animation-delay: 0.25s;
+        .miner-leg-right {
+            position: absolute;
+            bottom: 0;
+            right: 8px;
+            width: 7px;
+            height: 12px;
+            background: #3d2b0f;
+            border-radius: 3px;
+            animation: walkLeg 0.4s infinite 0.2s;
         }
         
         .carried-resource {
             position: absolute;
-            top: -5px;
-            left: 12px;
-            font-size: 0.7rem;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
             opacity: 0;
             transition: opacity 0.3s;
         }
         
-        @keyframes swingArms {
-            0%, 100% { transform: rotate(-15deg); }
-            50% { transform: rotate(15deg); }
+        @keyframes swingLeft {
+            0%, 100% { transform: rotate(-20deg); }
+            50% { transform: rotate(20deg); }
+        }
+        
+        @keyframes swingRight {
+            0%, 100% { transform: rotate(20deg); }
+            50% { transform: rotate(-20deg); }
         }
         
         @keyframes swingPick {
-            0%, 100% { transform: rotate(-30deg); }
-            50% { transform: rotate(30deg); }
+            0%, 100% { transform: rotate(-25deg); }
+            50% { transform: rotate(25deg); }
         }
         
-        @keyframes walk {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-4px); }
+        @keyframes walkLeg {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-5px) rotate(10deg); }
         }
         
         .stats-row {
@@ -313,7 +340,7 @@
                 <span>💠</span>
                 <span id="crystalsDisplay">0</span>
             </div>
-            <button class="lang-btn" id="langToggle">🌐 RU</button>
+            <button class="lang-btn" id="langToggle">🌐 РУС</button>
         </div>
         
         <div class="mines-container" id="minesContainer"></div>
@@ -341,22 +368,21 @@
             }
         } catch (e) {}
         
-        // Переводы
-        const lang = {
+        const translations = {
             ru: {
                 coalMine: 'Угольная шахта',
                 ironMine: 'Железная шахта',
                 goldMine: 'Золотая шахта',
                 crystalMine: 'Кристальная шахта',
                 diamondMine: 'Алмазная шахта',
-                miner: 'Шахтёр',
                 level: 'Уровень',
                 income: 'Доход',
                 upgrade: 'Улучшить',
                 buyMiner: 'Нанять шахтёра',
-                locked: 'Заблокировано',
-                unlockAt: 'Откроется на уровне',
-                minersCount: 'Шахтёров'
+                locked: 'Закрыто',
+                unlockAt: 'Нужен уровень',
+                minersCount: 'Шахтёров',
+                max: 'Макс'
             },
             en: {
                 coalMine: 'Coal Mine',
@@ -364,21 +390,21 @@
                 goldMine: 'Gold Mine',
                 crystalMine: 'Crystal Mine',
                 diamondMine: 'Diamond Mine',
-                miner: 'Miner',
                 level: 'Level',
                 income: 'Income',
                 upgrade: 'Upgrade',
                 buyMiner: 'Hire Miner',
                 locked: 'Locked',
-                unlockAt: 'Unlocks at level',
-                minersCount: 'Miners'
+                unlockAt: 'Need level',
+                minersCount: 'Miners',
+                max: 'Max'
             }
         };
         
         let currentLang = 'ru';
         
         function t(key) {
-            return lang[currentLang]?.[key] || key;
+            return translations[currentLang]?.[key] || key;
         }
         
         // Игра
@@ -395,12 +421,11 @@
             ]
         };
         
-        // Анимация шахтёров
         const minerAnimations = {};
         
         function createMinerElement(mineId, minerIndex) {
             const scene = document.querySelector(`.mine-scene[data-mine="${mineId}"]`);
-            if (!scene) return;
+            if (!scene) return null;
             
             const wrapper = document.createElement('div');
             wrapper.className = 'miner-wrapper';
@@ -410,13 +435,12 @@
             wrapper.innerHTML = `
                 <div class="miner-figure">
                     <div class="miner-head">👷</div>
-                    <div class="miner-body"></div>
-                    <div class="miner-arms"></div>
+                    <div class="miner-body-part"></div>
+                    <div class="miner-arm-left"></div>
+                    <div class="miner-arm-right"></div>
                     <div class="miner-pickaxe">⛏️</div>
-                    <div class="miner-legs">
-                        <div class="leg"></div>
-                        <div class="leg"></div>
-                    </div>
+                    <div class="miner-leg-left"></div>
+                    <div class="miner-leg-right"></div>
                     <div class="carried-resource">💎</div>
                 </div>
             `;
@@ -429,10 +453,11 @@
             const minerEl = document.getElementById(`miner-${mineId}-${minerIndex}`);
             if (!minerEl) return;
             
-            const sceneWidth = minerEl.parentElement.offsetWidth;
-            const leftLimit = 80;
-            const rightLimit = sceneWidth - 60;
-            let position = leftLimit;
+            const scene = minerEl.parentElement;
+            const sceneWidth = scene.offsetWidth;
+            const leftLimit = 70;
+            const rightLimit = sceneWidth - 70;
+            let position = leftLimit + (minerIndex * 15);
             let goingRight = true;
             let hasResource = false;
             
@@ -444,16 +469,17 @@
             
             minerAnimations[animId] = setInterval(() => {
                 if (goingRight) {
-                    position += 1.5;
+                    position += 2;
                     if (position >= rightLimit) {
                         goingRight = false;
-                        // Дошёл до склада - начисляем ресурсы
                         if (hasResource) {
                             const mine = game.mines.find(m => m.id === mineId);
                             if (mine && mine.level > 0) {
-                                game.coins += mine.baseIncome * mine.level;
-                                game.totalMined += mine.baseIncome * mine.level;
+                                const earned = mine.baseIncome * mine.level;
+                                game.coins += earned;
+                                game.totalMined += earned;
                                 updateDisplay();
+                                floatText('+' + earned.toFixed(1));
                             }
                             hasResource = false;
                             const resource = minerEl.querySelector('.carried-resource');
@@ -461,10 +487,9 @@
                         }
                     }
                 } else {
-                    position -= 1.5;
+                    position -= 2;
                     if (position <= leftLimit) {
                         goingRight = true;
-                        // Дошёл до шахты - забирает ресурс
                         hasResource = true;
                         const resource = minerEl.querySelector('.carried-resource');
                         if (resource) resource.style.opacity = '1';
@@ -476,20 +501,17 @@
         }
         
         function updateAllMiners() {
-            // Очищаем все сцены
             document.querySelectorAll('.mine-scene').forEach(scene => {
                 scene.querySelectorAll('.miner-wrapper').forEach(w => w.remove());
             });
             
-            // Останавливаем все анимации
             Object.keys(minerAnimations).forEach(key => {
                 clearInterval(minerAnimations[key]);
                 delete minerAnimations[key];
             });
             
-            // Создаём новых шахтёров
             game.mines.forEach(mine => {
-                if (mine.level > 0) {
+                if (mine.level > 0 && mine.miners > 0) {
                     for (let i = 0; i < mine.miners; i++) {
                         const minerEl = createMinerElement(mine.id, i);
                         if (minerEl) {
@@ -509,16 +531,22 @@
                     const scene = document.createElement('div');
                     scene.className = 'mine-scene';
                     scene.dataset.mine = mine.id;
+                    
+                    const icons = ['⛏️', '⚒️', '💎', '🔮', '👑'];
+                    
                     scene.innerHTML = `
                         <div class="mine-ground"></div>
-                        <div class="mine-entrance">${index === 0 ? '⛏️' : index === 1 ? '⚒️' : index === 2 ? '💎' : index === 3 ? '🔮' : '👑'}</div>
+                        <div class="mine-entrance">${icons[index] || '⛏️'}</div>
                         <div class="mine-storage">📦</div>
                     `;
                     container.appendChild(scene);
                 }
             });
             
-            updateAllMiners();
+            // Небольшая задержка чтобы DOM обновился
+            setTimeout(() => {
+                updateAllMiners();
+            }, 100);
         }
         
         function saveGame() {
@@ -562,16 +590,19 @@
             if (game.coins < cost) return;
             
             game.coins -= cost;
+            const wasZero = mine.level === 0;
             mine.level++;
-            if (mine.level === 1 && index > 0) {
+            
+            if (wasZero && index > 0) {
                 game.crystals += 2;
-                mine.miners = 1; // Даём первого шахтёра бесплатно
+                mine.miners = 1;
             }
+            
             game.totalMined += 10;
             floatText('+1 ⬆️');
             saveGame();
             renderMineScenes();
-            renderContent();
+            renderContent(document.querySelector('.tab.active').dataset.tab);
             updateDisplay();
         }
         
@@ -588,11 +619,11 @@
             floatText('👷 +1');
             saveGame();
             renderMineScenes();
-            renderContent();
+            renderContent('miners');
             updateDisplay();
         }
         
-        function renderContent(tab = 'mines') {
+        function renderContent(tab) {
             const panel = document.getElementById('contentPanel');
             panel.innerHTML = '';
             
@@ -625,11 +656,11 @@
                         card.className = 'card';
                         card.innerHTML = `
                             <div class="card-info">
-                                <h3>${t(mine.type)} - ${t('minersCount')}: ${mine.miners}/${mine.maxMiners}</h3>
-                                <p>${t('income')}: ${(mine.baseIncome * mine.level * mine.miners).toFixed(1)}/с</p>
+                                <h3>${t(mine.type)}</h3>
+                                <p>${t('minersCount')}: ${mine.miners}/${mine.maxMiners} | ${t('income')}: ${(mine.baseIncome * mine.level * mine.miners).toFixed(1)}/с</p>
                             </div>
                             <button class="btn" ${mine.miners >= mine.maxMiners ? 'disabled' : ''}>
-                                ${mine.miners >= mine.maxMiners ? 'MAX' : `${t('buyMiner')} 💰 ${hireCost}`}
+                                ${mine.miners >= mine.maxMiners ? t('max') : `${t('buyMiner')} 💰 ${hireCost}`}
                             </button>
                         `;
                         if (mine.miners < mine.maxMiners) {
@@ -643,8 +674,12 @@
         
         function switchLang() {
             currentLang = currentLang === 'ru' ? 'en' : 'ru';
-            document.getElementById('langToggle').textContent = currentLang === 'ru' ? '🌐 RU' : '🌐 EN';
+            document.getElementById('langToggle').textContent = currentLang === 'ru' ? '🌐 РУС' : '🌐 ENG';
             const activeTab = document.querySelector('.tab.active').dataset.tab;
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.dataset.tab === 'mines') t.innerHTML = '⛰️ ' + (currentLang === 'ru' ? 'Шахты' : 'Mines');
+                if (t.dataset.tab === 'miners') t.innerHTML = '👷 ' + (currentLang === 'ru' ? 'Шахтёры' : 'Miners');
+            });
             renderContent(activeTab);
         }
         
@@ -663,8 +698,8 @@
         setInterval(() => {
             const income = getIncome();
             if (income > 0) {
-                game.coins += income * 0.1;
-                game.totalMined += income * 0.1;
+                game.coins += income * 0.05;
+                game.totalMined += income * 0.05;
                 updateDisplay();
             }
         }, 100);
