@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Ball Jump</title>
+    <title>Brutal Ball</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -13,20 +13,21 @@
         }
         
         body {
-            background: #0a0c0f;
+            background: #0a0a0a;
             height: 100vh;
-            font-family: Arial, sans-serif;
+            font-family: 'Courier New', monospace;
             display: flex;
             justify-content: center;
             overflow: hidden;
             touch-action: manipulation;
+            user-select: none;
         }
         
         .game-container {
             width: 100%;
             max-width: 420px;
             height: 100vh;
-            background: linear-gradient(180deg, #1a1f2b, #0b0e12);
+            background: #0d0d0d;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -37,189 +38,234 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(26, 31, 43, 0.9);
-            border-radius: 30px;
-            padding: 10px 15px;
-            margin: 10px;
-            border: 1px solid #d4af37;
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 8px 15px;
+            margin: 8px;
+            border: 1px solid #333;
             z-index: 10;
         }
         
         .score-display {
             font-weight: bold;
-            font-size: 18px;
-            color: #ffd700;
+            font-size: 16px;
+            color: #c0c0c0;
+            font-family: 'Courier New', monospace;
         }
         
         .game-area {
             flex: 1;
             position: relative;
             overflow: hidden;
-            margin: 0 10px;
-            border-radius: 15px;
-            border: 1px solid #3a3322;
-            background: linear-gradient(180deg, #87CEEB, #E0F7FA);
+            margin: 0 8px;
+            border-radius: 10px;
+            border: 1px solid #222;
+            background: #111;
         }
         
         .ground {
             position: absolute;
             bottom: 0;
             width: 100%;
-            height: 60px;
-            background: linear-gradient(0deg, #4a7c3f, #6b9e4a);
-            border-top: 3px solid #3d6b35;
+            height: 50px;
+            background: linear-gradient(0deg, #1a1a1a, #222);
+            border-top: 2px solid #333;
+        }
+        
+        .ground-texture {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 20px,
+                #1f1f1f 20px,
+                #1f1f1f 22px
+            );
         }
         
         .ball {
             position: absolute;
-            width: 40px;
-            height: 40px;
-            background: radial-gradient(circle at 30% 30%, #ff4444, #cc0000);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle at 35% 35%, #808080, #3a3a3a);
             border-radius: 50%;
-            left: 50px;
-            bottom: 60px;
+            left: 40px;
+            bottom: 50px;
             z-index: 5;
-            box-shadow: 0 5px 15px rgba(255,0,0,0.5);
-            transition: none;
+            border: 2px solid #555;
+            box-shadow: 0 0 10px rgba(100,100,100,0.5), inset 0 2px 5px rgba(255,255,255,0.2);
         }
         
         .ball.exploding {
-            animation: explode 3s forwards;
+            animation: brutalExplode 3s forwards;
         }
         
-        @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(2); opacity: 0.7; }
-            100% { transform: scale(3); opacity: 0; }
+        @keyframes brutalExplode {
+            0% { 
+                transform: scale(1); 
+                opacity: 1;
+                background: radial-gradient(circle at 35% 35%, #808080, #3a3a3a);
+            }
+            30% { 
+                transform: scale(1.5); 
+                opacity: 0.8;
+                background: radial-gradient(circle at 35% 35%, #ff4444, #880000);
+            }
+            70% { 
+                transform: scale(2.5); 
+                opacity: 0.5;
+                background: radial-gradient(circle at 35% 35%, #ff8800, #cc4400);
+            }
+            100% { 
+                transform: scale(3.5); 
+                opacity: 0;
+                background: radial-gradient(circle at 35% 35%, #ffcc00, #ff6600);
+            }
         }
         
         .obstacle {
             position: absolute;
-            bottom: 60px;
             z-index: 4;
         }
         
         .hole {
-            width: 50px;
-            height: 20px;
-            background: #1a1510;
+            width: 40px;
+            height: 15px;
+            background: #000;
             border-radius: 50%;
-            box-shadow: inset 0 5px 15px rgba(0,0,0,0.8);
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.9);
+            border: 1px solid #1a1a1a;
         }
         
         .spike {
+            width: 30px;
+            height: 20px;
+            position: relative;
+        }
+        
+        .spike-body {
+            width: 4px;
+            height: 20px;
+            background: #555;
+            position: absolute;
+            left: 13px;
+        }
+        
+        .spike-tip {
             width: 0;
             height: 0;
             border-left: 15px solid transparent;
             border-right: 15px solid transparent;
-            border-bottom: 25px solid #888;
-            position: relative;
-        }
-        
-        .spike::after {
-            content: '';
+            border-bottom: 20px solid #666;
             position: absolute;
-            top: 25px;
-            left: -10px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 15px solid #ff0000;
+            top: -15px;
+            left: 0;
+            filter: drop-shadow(0 0 3px rgba(100,0,0,0.8));
         }
         
         .arrow {
-            width: 40px;
-            height: 6px;
-            background: #8B4513;
+            width: 30px;
+            height: 4px;
+            background: #444;
             position: relative;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
         
-        .arrow::after {
+        .arrow::before {
             content: '';
             position: absolute;
-            right: -8px;
-            top: -5px;
+            right: -6px;
+            top: -3px;
             width: 0;
             height: 0;
-            border-top: 8px solid transparent;
-            border-bottom: 8px solid transparent;
-            border-left: 12px solid #8B4513;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #444;
         }
         
         .diamond-collect {
             position: absolute;
-            font-size: 24px;
+            font-size: 20px;
             z-index: 3;
-            animation: diamondFloat 1s forwards;
+            pointer-events: none;
+            animation: diamondFloat 0.8s forwards;
         }
         
         @keyframes diamondFloat {
-            0% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-50px); }
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-40px) scale(0.5); }
         }
         
         .controls {
             display: flex;
-            padding: 10px;
+            padding: 8px;
             z-index: 10;
+            position: absolute;
+            bottom: 70px;
+            left: 10px;
         }
         
         .jump-btn {
-            flex: 1;
-            background: linear-gradient(180deg, #ffd700, #ffaa00);
-            border: none;
-            padding: 25px;
-            border-radius: 20px;
-            font-size: 30px;
+            width: 70px;
+            height: 70px;
+            background: radial-gradient(circle at 40% 40%, #555, #222);
+            border: 3px solid #444;
+            border-radius: 50%;
+            font-size: 28px;
             cursor: pointer;
-            font-weight: bold;
-            color: #000;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+            color: #999;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.1);
             transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .jump-btn:active {
-            transform: scale(0.95);
-            box-shadow: 0 2px 5px rgba(255, 215, 0, 0.3);
+            transform: scale(0.9);
+            background: radial-gradient(circle at 40% 40%, #666, #333);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.9);
         }
         
         .bottom-nav {
             display: flex;
             gap: 5px;
-            background: rgba(26, 31, 43, 0.95);
-            border-radius: 25px;
-            padding: 8px;
-            margin: 10px;
-            border: 1px solid #d4af37;
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 6px;
+            margin: 8px;
+            border: 1px solid #333;
             z-index: 10;
         }
         
         .nav-btn {
             flex: 1;
-            background: #20262e;
+            background: #222;
             border: none;
-            padding: 12px;
-            border-radius: 20px;
+            padding: 10px;
+            border-radius: 15px;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 20px;
             transition: all 0.3s;
-            color: #b9b09b;
+            color: #666;
         }
         
         .nav-btn.active {
-            background: #c9a73c;
-            box-shadow: 0 0 20px rgba(201, 167, 60, 0.5);
+            background: #333;
+            color: #999;
+            box-shadow: 0 0 10px rgba(100,100,100,0.3);
         }
         
-        /* Меню Game Over */
         .menu-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             display: none;
             justify-content: center;
             align-items: center;
@@ -231,47 +277,59 @@
         }
         
         .menu-panel {
-            background: linear-gradient(180deg, #1a1f2b, #0b0e12);
-            border-radius: 20px;
-            padding: 30px;
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 25px;
             text-align: center;
-            border: 2px solid #d4af37;
-            max-width: 300px;
+            border: 2px solid #333;
+            max-width: 280px;
             width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         
         .menu-panel h2 {
-            color: #ffd700;
+            color: #999;
             margin-bottom: 15px;
-            font-size: 24px;
+            font-size: 22px;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
         }
         
         .menu-panel p {
-            color: #cfb87c;
-            margin-bottom: 10px;
-            font-size: 16px;
+            color: #777;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
         
         .menu-btn {
-            background: #ffd700;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
+            background: #333;
+            border: 2px solid #555;
+            padding: 10px 25px;
+            border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
             margin: 5px;
-            font-size: 16px;
+            font-size: 14px;
+            color: #999;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        
+        .menu-btn:active {
+            background: #444;
+            transform: scale(0.95);
         }
         
         .shake {
-            animation: shake 0.5s infinite;
+            animation: brutalShake 0.3s infinite;
         }
         
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(-10px, 10px); }
-            50% { transform: translate(10px, -10px); }
-            75% { transform: translate(-10px, -10px); }
+        @keyframes brutalShake {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-8px, 8px) rotate(-2deg); }
+            50% { transform: translate(8px, -8px) rotate(2deg); }
+            75% { transform: translate(-8px, -8px) rotate(-2deg); }
         }
     </style>
 </head>
@@ -283,12 +341,14 @@
         </div>
         
         <div class="game-area" id="gameArea">
-            <div class="ground"></div>
+            <div class="ground">
+                <div class="ground-texture"></div>
+            </div>
             <div class="ball" id="ball"></div>
         </div>
         
         <div class="controls">
-            <button class="jump-btn" id="jumpBtn">⬆️</button>
+            <button class="jump-btn" id="jumpBtn">⬆</button>
         </div>
         
         <div class="bottom-nav">
@@ -300,7 +360,7 @@
     
     <div class="menu-overlay" id="menuOverlay">
         <div class="menu-panel">
-            <h2>💥 Взрыв!</h2>
+            <h2>💀 Потрачено</h2>
             <p>Счёт: <strong id="finalScore">0</strong> 💎</p>
             <p>Рекорд: <strong id="menuBest">0</strong> 🏆</p>
             <button class="menu-btn" id="restartBtn">🔄 Заново</button>
@@ -316,14 +376,13 @@
             tg.expand();
         } catch(e) {}
         
-        // Состояние игры
         let score = 0;
-        let bestScore = parseInt(localStorage.getItem('ballJumpBest')) || 0;
-        let speed = 5;
+        let bestScore = parseInt(localStorage.getItem('brutalBallBest')) || 0;
+        let speed = 2;
         let isPlaying = false;
         let isGameOver = false;
         let jumpCount = 0;
-        let maxJumps = 2;
+        const maxJumps = 2;
         
         const ball = document.getElementById('ball');
         const gameArea = document.getElementById('gameArea');
@@ -332,25 +391,24 @@
         const menuOverlay = document.getElementById('menuOverlay');
         const gameContainer = document.getElementById('gameContainer');
         
-        let ballY = 60;
+        let ballY = 50;
         let ballVelocity = 0;
-        let isJumping = false;
+        const GRAVITY = 0.6;
+        const JUMP_FORCE = -10;
+        const GROUND_LEVEL = 50;
+        
         let obstacles = [];
         let gameLoop;
-        let speedTimer;
+        let spawnLoop;
+        let speedInterval;
         
         bestDisplay.textContent = bestScore;
-        
-        // Физика прыжка
-        const GRAVITY = 0.8;
-        const JUMP_FORCE = -12;
         
         function jump() {
             if (!isPlaying || isGameOver) return;
             
             if (jumpCount < maxJumps) {
                 ballVelocity = JUMP_FORCE;
-                isJumping = true;
                 jumpCount++;
             }
         }
@@ -359,17 +417,14 @@
             ballVelocity += GRAVITY;
             ballY += ballVelocity;
             
-            const groundLevel = 60;
-            
-            if (ballY >= groundLevel) {
-                ballY = groundLevel;
+            if (ballY >= GROUND_LEVEL) {
+                ballY = GROUND_LEVEL;
                 ballVelocity = 0;
-                isJumping = false;
                 jumpCount = 0;
             }
             
-            if (ballY < 20) {
-                ballY = 20;
+            if (ballY < 15) {
+                ballY = 15;
                 ballVelocity = 0;
             }
             
@@ -377,28 +432,32 @@
         }
         
         function createObstacle() {
+            if (!isPlaying) return;
+            
             const type = Math.random();
             const obstacle = document.createElement('div');
             obstacle.className = 'obstacle';
             
-            if (type < 0.4) {
-                // Яма
+            if (type < 0.35) {
                 obstacle.innerHTML = '<div class="hole"></div>';
-                obstacle.style.bottom = '40px';
+                obstacle.style.bottom = '35px';
                 obstacle.dataset.type = 'hole';
             } else if (type < 0.7) {
-                // Шипы
-                obstacle.innerHTML = '<div class="spike"></div>';
-                obstacle.style.bottom = '60px';
+                obstacle.innerHTML = `
+                    <div class="spike">
+                        <div class="spike-tip"></div>
+                        <div class="spike-body"></div>
+                    </div>
+                `;
+                obstacle.style.bottom = '50px';
                 obstacle.dataset.type = 'spike';
             } else {
-                // Стрела
                 obstacle.innerHTML = '<div class="arrow"></div>';
-                obstacle.style.bottom = (60 + Math.random() * 40) + 'px';
+                obstacle.style.bottom = (50 + Math.random() * 35) + 'px';
                 obstacle.dataset.type = 'arrow';
             }
             
-            obstacle.style.right = '-60px';
+            obstacle.style.right = '-50px';
             gameArea.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -406,23 +465,19 @@
         function moveObstacles() {
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 const obstacle = obstacles[i];
-                const currentRight = parseInt(obstacle.style.right) || -60;
+                const currentRight = parseFloat(obstacle.style.right) || -50;
                 obstacle.style.right = (currentRight + speed) + 'px';
                 
-                // Проверка столкновения
                 if (checkCollision(obstacle)) {
                     gameOver();
                     return;
                 }
                 
-                // Удаление ушедших препятствий
-                if (currentRight > gameArea.offsetWidth + 100) {
+                if (currentRight > gameArea.offsetWidth + 80) {
                     obstacle.remove();
                     obstacles.splice(i, 1);
                     score++;
                     scoreDisplay.textContent = score;
-                    
-                    // Анимация алмаза
                     showDiamondAnimation();
                 }
             }
@@ -432,8 +487,7 @@
             const ballRect = ball.getBoundingClientRect();
             const obsRect = obstacle.getBoundingClientRect();
             
-            // Небольшой отступ для честной игры
-            const margin = 10;
+            const margin = 8;
             
             return ballRect.left + margin < obsRect.right &&
                    ballRect.right - margin > obsRect.left &&
@@ -442,29 +496,27 @@
         }
         
         function gameOver() {
+            if (!isPlaying) return;
+            
             isPlaying = false;
             isGameOver = true;
             
-            // Сохраняем рекорд
             if (score > bestScore) {
                 bestScore = score;
-                localStorage.setItem('ballJumpBest', bestScore);
+                localStorage.setItem('brutalBallBest', bestScore);
                 bestDisplay.textContent = bestScore;
             }
             
-            // Тряска экрана
             gameContainer.classList.add('shake');
-            
-            // Шар увеличивается и взрывается
             ball.classList.add('exploding');
+            
+            clearInterval(speedInterval);
+            clearTimeout(spawnLoop);
             
             setTimeout(() => {
                 gameContainer.classList.remove('shake');
                 ball.classList.remove('exploding');
-                ball.style.transform = 'scale(1)';
-                ball.style.opacity = '1';
                 
-                // Показываем меню
                 document.getElementById('finalScore').textContent = score;
                 document.getElementById('menuBest').textContent = bestScore;
                 menuOverlay.classList.add('show');
@@ -472,27 +524,25 @@
         }
         
         function restartGame() {
-            // Очистка
             obstacles.forEach(o => o.remove());
             obstacles = [];
             score = 0;
-            speed = 5;
+            speed = 2;
             jumpCount = 0;
-            ballY = 60;
+            ballY = GROUND_LEVEL;
             ballVelocity = 0;
             isPlaying = true;
             isGameOver = false;
             
-            ball.style.bottom = '60px';
-            ball.style.transform = 'scale(1)';
-            ball.style.opacity = '1';
+            ball.style.bottom = GROUND_LEVEL + 'px';
+            ball.classList.remove('exploding');
             scoreDisplay.textContent = '0';
             
             gameContainer.classList.remove('shake');
             menuOverlay.classList.remove('show');
             
-            // Перезапуск спавна препятствий
-            startObstacleSpawning();
+            startSpawning();
+            startSpeedIncrease();
         }
         
         function showDiamondAnimation() {
@@ -500,48 +550,51 @@
             diamond.className = 'diamond-collect';
             diamond.textContent = '💎';
             diamond.style.left = '50%';
-            diamond.style.top = '50%';
-            gameArea.appendChild(diamond);
-            setTimeout(() => diamond.remove(), 1000);
+            diamond.style.top = '40%';
+            document.body.appendChild(diamond);
+            setTimeout(() => diamond.remove(), 800);
         }
         
-        function startObstacleSpawning() {
-            if (speedTimer) clearInterval(speedTimer);
-            
-            // Увеличиваем скорость каждые 3 секунды
-            speedTimer = setInterval(() => {
-                if (isPlaying) {
-                    speed += 1;
+        function startSpeedIncrease() {
+            clearInterval(speedInterval);
+            speedInterval = setInterval(() => {
+                if (isPlaying && speed < 10) {
+                    speed += 0.5;
                 }
             }, 3000);
-            
-            // Спавн препятствий
-            function spawnLoop() {
+        }
+        
+        function startSpawning() {
+            function spawn() {
                 if (!isPlaying) return;
-                
                 createObstacle();
-                setTimeout(spawnLoop, 1500 / (speed / 3));
+                const delay = 2000 / speed;
+                spawnLoop = setTimeout(spawn, Math.max(delay, 800));
             }
             
-            setTimeout(spawnLoop, 1000);
+            clearTimeout(spawnLoop);
+            spawnLoop = setTimeout(spawn, 1000);
         }
         
         function gameTick() {
             if (!isPlaying) return;
-            
             updateBall();
             moveObstacles();
         }
         
         // Обработчики
-        document.getElementById('jumpBtn').addEventListener('click', jump);
+        document.getElementById('jumpBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            jump();
+        });
+        
         document.getElementById('jumpBtn').addEventListener('touchstart', (e) => {
             e.preventDefault();
             jump();
         });
         
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') {
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
                 e.preventDefault();
                 jump();
             }
@@ -553,26 +606,18 @@
             restartGame();
         });
         
-        // Нижнее меню
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
-                
-                if (this.dataset.screen === 'game') {
-                    if (!isPlaying && !isGameOver) {
-                        restartGame();
-                    }
-                }
             });
         });
         
-        // Запуск игры
         function init() {
             isPlaying = true;
-            startObstacleSpawning();
-            
-            gameLoop = setInterval(gameTick, 16); // ~60 FPS
+            startSpawning();
+            startSpeedIncrease();
+            gameLoop = setInterval(gameTick, 16);
         }
         
         init();
