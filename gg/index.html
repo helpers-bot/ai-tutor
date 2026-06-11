@@ -86,7 +86,6 @@
             );
         }
         
-        /* Второй этаж */
         .platform {
             position: absolute;
             height: 20px;
@@ -118,7 +117,6 @@
             0% { 
                 transform: scale(1); 
                 opacity: 1;
-                background: radial-gradient(circle at 35% 35%, #808080, #3a3a3a);
             }
             30% { 
                 transform: scale(1.5); 
@@ -133,28 +131,17 @@
             100% { 
                 transform: scale(3.5); 
                 opacity: 0;
-                background: radial-gradient(circle at 35% 35%, #ffcc00, #ff6600);
             }
         }
         
         .obstacle {
             position: absolute;
             z-index: 4;
-            will-change: right;
-        }
-        
-        .hole {
-            width: 40px;
-            height: 15px;
-            background: #000;
-            border-radius: 50%;
-            box-shadow: inset 0 5px 10px rgba(0,0,0,0.9);
-            border: 1px solid #1a1a1a;
         }
         
         .spike {
             width: 30px;
-            height: 20px;
+            height: 30px;
             position: relative;
         }
         
@@ -163,6 +150,7 @@
             height: 20px;
             background: #555;
             position: absolute;
+            bottom: 0;
             left: 13px;
         }
         
@@ -173,29 +161,32 @@
             border-right: 15px solid transparent;
             border-bottom: 20px solid #666;
             position: absolute;
-            top: -15px;
+            top: 0;
             left: 0;
             filter: drop-shadow(0 0 3px rgba(100,0,0,0.8));
         }
         
         .arrow {
-            width: 30px;
-            height: 4px;
-            background: #444;
-            position: relative;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            position: absolute;
+            z-index: 4;
         }
         
-        .arrow::before {
-            content: '';
-            position: absolute;
-            right: -6px;
-            top: -3px;
+        .arrow-body {
+            width: 35px;
+            height: 4px;
+            background: #555;
+            position: relative;
+        }
+        
+        .arrow-head {
             width: 0;
             height: 0;
-            border-top: 5px solid transparent;
-            border-bottom: 5px solid transparent;
-            border-left: 8px solid #444;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+            border-left: 10px solid #666;
+            position: absolute;
+            left: 35px;
+            top: -4px;
         }
         
         .diamond-collect {
@@ -212,21 +203,19 @@
         }
         
         .controls {
-            display: flex;
-            padding: 8px;
-            z-index: 10;
             position: absolute;
-            bottom: 160px;
-            left: 10px;
+            bottom: 100px;
+            left: 15px;
+            z-index: 10;
         }
         
         .jump-btn {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             background: radial-gradient(circle at 40% 40%, #555, #222);
             border: 3px solid #444;
             border-radius: 50%;
-            font-size: 28px;
+            font-size: 32px;
             cursor: pointer;
             color: #999;
             box-shadow: 0 5px 15px rgba(0,0,0,0.8), inset 0 2px 5px rgba(255,255,255,0.1);
@@ -360,7 +349,7 @@
         </div>
         
         <div class="controls">
-            <button class="jump-btn" id="jumpBtn">⬆</button>
+            <button class="jump-btn" id="jumpBtn">▲</button>
         </div>
         
         <div class="bottom-nav">
@@ -402,17 +391,19 @@
         const menuOverlay = document.getElementById('menuOverlay');
         const gameContainer = document.getElementById('gameContainer');
         
-        let ballX = 40;
-        let ballY = 80;
+        // В CSS bottom - это расстояние от НИЗА экрана
+        // Чем БОЛЬШЕ bottom, тем ВЫШЕ объект
+        let ballBottom = 80; // Начальная позиция на земле
         let ballVelocity = 0;
         const GRAVITY = 0.8;
-        const JUMP_FORCE = -14;
+        const JUMP_FORCE = -14; // Отрицательное = вверх (увеличивает bottom)
         const GROUND_LEVEL = 80;
         
         let obstacles = [];
         let platforms = [];
         let gameLoop;
         let spawnTimeout;
+        let platformTimeout;
         let speedInterval;
         
         bestDisplay.textContent = bestScore;
@@ -425,58 +416,65 @@
             canJump = false;
         }
         
-        function checkPlatformCollision() {
-            for (let platform of platforms) {
-                const platformRect = platform.getBoundingClientRect();
-                const ballRect = ball.getBoundingClientRect();
-                const platformBottom = parseFloat(platform.style.bottom);
-                
-                // Проверка что шар над платформой и падает
-                if (ballVelocity > 0 &&
-                    ballRect.right > platformRect.left + 10 &&
-                    ballRect.left < platformRect.right - 10 &&
-                    ballRect.bottom >= platformRect.top &&
-                    ballRect.bottom <= platformRect.top + 15 &&
-                    ballY > platformBottom) {
-                    
-                    ballY = platformBottom + 20;
-                    ballVelocity = 0;
-                    canJump = true;
-                    ball.style.bottom = ballY + 'px';
-                    return true;
-                }
-            }
-            return false;
-        }
-        
         function updateBall() {
+            // Гравитация уменьшает скорость (тянет вниз)
             ballVelocity += GRAVITY;
-            ballY += ballVelocity;
+            // Изменяем позицию
+            ballBottom += ballVelocity;
             
-            // Проверка столкновения с платформами
-            if (ballVelocity > 0) {
-                checkPlatformCollision();
+            // Проверка платформ
+            if (ballVelocity < 0) {
+                // Движется вверх - проверяем столкновение с платформами снизу
+                for (let platform of platforms) {
+                    const platBottom = parseFloat(platform.style.bottom);
+                    const platRight = parseFloat(platform.style.right) || 0;
+                    const platWidth = parseFloat(platform.style.width);
+                    const platLeft = gameArea.offsetWidth - platRight - platWidth;
+                    
+                    if (ballBottom + 30 >= platBottom && 
+                        ballBottom <= platBottom + 20 &&
+                        ballBottom + ballVelocity <= platBottom &&
+                        40 >= platLeft - 10 && 
+                        40 <= platLeft + platWidth + 10) {
+                        ballBottom = platBottom - 30;
+                        ballVelocity = 0;
+                        break;
+                    }
+                }
+            } else if (ballVelocity > 0) {
+                // Движется вниз - проверяем приземление на платформы
+                for (let platform of platforms) {
+                    const platBottom = parseFloat(platform.style.bottom);
+                    const platRight = parseFloat(platform.style.right) || 0;
+                    const platWidth = parseFloat(platform.style.width);
+                    const platLeft = gameArea.offsetWidth - platRight - platWidth;
+                    
+                    if (ballBottom <= platBottom + 20 && 
+                        ballBottom + ballVelocity >= platBottom &&
+                        40 >= platLeft - 10 && 
+                        40 <= platLeft + platWidth + 10) {
+                        ballBottom = platBottom + 20;
+                        ballVelocity = 0;
+                        canJump = true;
+                        break;
+                    }
+                }
             }
             
             // Пол
-            if (ballY >= GROUND_LEVEL) {
-                ballY = GROUND_LEVEL;
+            if (ballBottom <= GROUND_LEVEL) {
+                ballBottom = GROUND_LEVEL;
                 ballVelocity = 0;
                 canJump = true;
             }
             
             // Потолок
-            if (ballY > gameArea.offsetHeight - 30) {
-                ballY = gameArea.offsetHeight - 30;
+            if (ballBottom > gameArea.offsetHeight - 50) {
+                ballBottom = gameArea.offsetHeight - 50;
                 ballVelocity = 0;
             }
             
-            if (ballY < 20) {
-                ballY = 20;
-                ballVelocity = 0;
-            }
-            
-            ball.style.bottom = ballY + 'px';
+            ball.style.bottom = ballBottom + 'px';
         }
         
         function createPlatform() {
@@ -486,7 +484,7 @@
             platform.className = 'platform';
             
             const width = 80 + Math.random() * 60;
-            const bottomPos = 200 + Math.random() * 150;
+            const bottomPos = 180 + Math.random() * 200;
             
             platform.style.width = width + 'px';
             platform.style.bottom = bottomPos + 'px';
@@ -503,29 +501,28 @@
             const obstacle = document.createElement('div');
             obstacle.className = 'obstacle';
             
-            // Размещаем на земле или на платформе
-            const onGround = Math.random() > 0.3;
-            
-            if (type < 0.35) {
-                obstacle.innerHTML = '<div class="hole"></div>';
-                obstacle.style.bottom = onGround ? '65px' : '250px';
-                obstacle.dataset.type = 'hole';
-            } else if (type < 0.7) {
+            if (type < 0.5) {
+                // Шипы на земле
                 obstacle.innerHTML = `
                     <div class="spike">
                         <div class="spike-tip"></div>
                         <div class="spike-body"></div>
                     </div>
                 `;
-                obstacle.style.bottom = onGround ? '80px' : '270px';
-                obstacle.dataset.type = 'spike';
+                obstacle.style.bottom = '80px';
             } else {
-                obstacle.innerHTML = '<div class="arrow"></div>';
-                obstacle.style.bottom = onGround ? (80 + Math.random() * 30) + 'px' : (250 + Math.random() * 30) + 'px';
-                obstacle.dataset.type = 'arrow';
+                // Летящая стрела
+                obstacle.innerHTML = `
+                    <div class="arrow">
+                        <div class="arrow-body"></div>
+                        <div class="arrow-head"></div>
+                    </div>
+                `;
+                obstacle.style.bottom = (100 + Math.random() * 150) + 'px';
             }
             
             obstacle.style.right = '-60px';
+            obstacle.style.left = 'auto';
             gameArea.appendChild(obstacle);
             obstacles.push(obstacle);
         }
@@ -542,7 +539,7 @@
                     return;
                 }
                 
-                if (newRight > gameArea.offsetWidth + 80) {
+                if (newRight > gameArea.offsetWidth + 100) {
                     obstacle.remove();
                     obstacles.splice(i, 1);
                     score++;
@@ -570,7 +567,7 @@
             const ballRect = ball.getBoundingClientRect();
             const obsRect = obstacle.getBoundingClientRect();
             
-            const margin = 10;
+            const margin = 8;
             
             return ballRect.left + margin < obsRect.right &&
                    ballRect.right - margin > obsRect.left &&
@@ -595,6 +592,7 @@
             
             clearInterval(speedInterval);
             clearTimeout(spawnTimeout);
+            clearTimeout(platformTimeout);
             
             setTimeout(() => {
                 gameContainer.classList.remove('shake');
@@ -613,7 +611,7 @@
             platforms = [];
             score = 0;
             speed = 2;
-            ballY = GROUND_LEVEL;
+            ballBottom = GROUND_LEVEL;
             ballVelocity = 0;
             canJump = true;
             isPlaying = true;
@@ -651,22 +649,24 @@
         
         function startSpawning() {
             clearTimeout(spawnTimeout);
+            clearTimeout(platformTimeout);
             
-            function spawnObstacles() {
+            function spawnObstacle() {
                 if (!isPlaying) return;
                 createObstacle();
-                const delay = Math.max(1500 / speed, 1000);
-                spawnTimeout = setTimeout(spawnObstacles, delay);
+                const delay = Math.max(1800 / speed, 900);
+                spawnTimeout = setTimeout(spawnObstacle, delay);
             }
             
-            function spawnPlatforms() {
+            function spawnPlatform() {
                 if (!isPlaying) return;
                 createPlatform();
-                setTimeout(spawnPlatforms, 3000 / speed);
+                platformTimeout = setTimeout(spawnPlatform, 3500 / speed);
             }
             
-            spawnTimeout = setTimeout(spawnObstacles, 1500);
-            setTimeout(spawnPlatforms, 2000);
+            // Задержка перед первым появлением
+            spawnTimeout = setTimeout(spawnObstacle, 2000);
+            platformTimeout = setTimeout(spawnPlatform, 3000);
         }
         
         function gameTick() {
@@ -697,9 +697,7 @@
         });
         
         document.addEventListener('touchmove', (e) => {
-            if (e.target === jumpBtn) {
-                e.preventDefault();
-            }
+            e.preventDefault();
         }, { passive: false });
         
         document.getElementById('restartBtn').addEventListener('click', restartGame);
@@ -718,7 +716,7 @@
         function init() {
             isPlaying = true;
             canJump = true;
-            ballY = GROUND_LEVEL;
+            ballBottom = GROUND_LEVEL;
             ballVelocity = 0;
             ball.style.bottom = GROUND_LEVEL + 'px';
             startSpawning();
