@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shape Racers - Гонки фигур</title>
+    <title>Shape Racers 3D - Гонки фигур</title>
     <style>
         * {
             margin: 0;
@@ -12,7 +12,7 @@
         }
 
         body {
-            background: #0a0a2e;
+            background: #000;
             font-family: 'Arial', sans-serif;
             overflow: hidden;
             user-select: none;
@@ -21,10 +21,6 @@
 
         canvas {
             display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
         }
 
         .screen {
@@ -38,6 +34,7 @@
             justify-content: center;
             z-index: 10;
             transition: opacity 0.5s;
+            pointer-events: all;
         }
 
         .hidden {
@@ -53,17 +50,25 @@
         }
 
         .game-title {
-            font-size: 64px;
+            font-size: 56px;
             font-weight: 900;
             background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #FFE66D, #A8E6CF);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: titleGlow 2s infinite;
+            text-align: center;
         }
 
         @keyframes titleGlow {
             0%, 100% { filter: brightness(1); }
             50% { filter: brightness(1.3); }
+        }
+
+        .subtitle {
+            color: white;
+            font-size: 18px;
+            opacity: 0.7;
+            text-align: center;
         }
 
         .menu-btn {
@@ -76,21 +81,13 @@
             transition: all 0.3s;
             text-transform: uppercase;
             letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
             color: white;
-        }
-
-        .menu-btn:hover {
-            transform: translateY(-3px);
-        }
-
-        .play-btn {
             background: linear-gradient(135deg, #FF6B6B, #ee5a24);
             box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
         }
 
-        .play-btn:hover {
+        .menu-btn:hover {
+            transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(255, 107, 107, 0.6);
         }
 
@@ -103,13 +100,13 @@
         #characterSelect {
             background: rgba(0, 0, 0, 0.95);
             flex-direction: column;
-            gap: 30px;
+            gap: 20px;
             color: white;
         }
 
         .char-grid {
             display: flex;
-            gap: 30px;
+            gap: 25px;
             flex-wrap: wrap;
             justify-content: center;
         }
@@ -118,8 +115,8 @@
             background: rgba(255, 255, 255, 0.1);
             border: 3px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 30px;
-            width: 250px;
+            padding: 25px;
+            width: 220px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -134,41 +131,33 @@
         .char-card.selected {
             border-color: #FFD700;
             box-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
-            background: rgba(255, 215, 0, 0.1);
+            background: rgba(255, 215, 0, 0.15);
         }
 
         .char-icon {
-            font-size: 80px;
-            margin-bottom: 15px;
+            font-size: 60px;
+            margin-bottom: 10px;
         }
 
         .char-name {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .char-stats {
-            font-size: 14px;
+            font-size: 13px;
             text-align: left;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
-            margin: 8px 0;
+            margin: 5px 0;
             padding: 5px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 5px;
-        }
-
-        .stat-label {
-            color: #aaa;
-        }
-
-        .stat-value {
-            font-weight: bold;
         }
 
         .stat-value.good { color: #4ECDC4; }
@@ -179,15 +168,15 @@
             background: linear-gradient(135deg, #667eea, #764ba2);
             padding: 10px;
             border-radius: 10px;
-            margin-top: 15px;
-            font-size: 14px;
+            margin-top: 10px;
+            font-size: 12px;
         }
 
         /* Выбор сложности */
         #difficultySelect {
             background: rgba(0, 0, 0, 0.95);
             flex-direction: column;
-            gap: 30px;
+            gap: 25px;
             color: white;
         }
 
@@ -231,17 +220,17 @@
         #raceInfo {
             position: absolute;
             top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 20px;
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 10px;
             z-index: 5;
         }
 
         .info-box {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
-            padding: 12px 20px;
+            padding: 10px 20px;
             border-radius: 50px;
             color: white;
             font-weight: bold;
@@ -249,19 +238,25 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 16px;
         }
 
-        #superPowerBar {
+        #superPowerContainer {
             position: absolute;
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
+            z-index: 5;
+            text-align: center;
+        }
+
+        #superPowerBar {
             width: 300px;
             height: 20px;
             background: rgba(255, 255, 255, 0.2);
             border-radius: 10px;
             overflow: hidden;
-            z-index: 5;
+            border: 2px solid rgba(255, 255, 255, 0.3);
         }
 
         #superPowerFill {
@@ -272,21 +267,23 @@
             box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
         }
 
+        #superPowerLabel {
+            color: white;
+            margin-top: 5px;
+            font-size: 14px;
+        }
+
         #superPowerReady {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
             color: #FFD700;
             font-weight: bold;
-            font-size: 18px;
-            z-index: 5;
+            font-size: 20px;
+            margin-top: 5px;
             animation: pulse 1s infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.1); }
         }
 
         #stunOverlay {
@@ -295,7 +292,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 0, 0, 0.2);
+            background: rgba(255, 0, 0, 0.3);
             z-index: 4;
             display: none;
             pointer-events: none;
@@ -307,10 +304,40 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 48px;
+            font-size: 72px;
             font-weight: bold;
             z-index: 5;
             display: none;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+        }
+
+        #minimap {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            z-index: 5;
+            overflow: hidden;
+        }
+
+        #minimapCanvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        #speedometer {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            z-index: 5;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
         }
 
         /* Финиш */
@@ -334,13 +361,16 @@
             border-radius: 15px;
             padding: 20px;
             min-width: 400px;
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .result-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px;
+            padding: 12px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            align-items: center;
         }
 
         .result-row:last-child {
@@ -350,21 +380,30 @@
         .result-position {
             font-weight: bold;
             color: #FFD700;
+            font-size: 20px;
+        }
+
+        .result-name {
+            font-size: 16px;
+        }
+
+        .result-time {
+            opacity: 0.7;
         }
     </style>
 </head>
 <body>
     <!-- Главное меню -->
     <div id="mainMenu" class="screen">
-        <h1 class="game-title">🏁 SHAPE RACERS</h1>
-        <p style="color: white; font-size: 18px; opacity: 0.7;">Выберите фигуру и победите в гонке!</p>
-        <button class="menu-btn play-btn" onclick="showCharacterSelect()">🎮 Играть</button>
-        <button class="menu-btn secondary" onclick="showTutorial()">📚 Как играть</button>
+        <h1 class="game-title">🏁 SHAPE RACERS 3D</h1>
+        <p class="subtitle">Выберите фигуру и побеждайте в 3D гонках!</p>
+        <button class="menu-btn" onclick="showCharacterSelect()">🎮 Играть</button>
+        <button class="menu-btn secondary" onclick="showTutorial()">📚 Обучение</button>
     </div>
 
     <!-- Выбор персонажа -->
     <div id="characterSelect" class="screen hidden">
-        <h2 style="font-size: 36px; color: #FFD700;">ВЫБЕРИТЕ ФИГУРУ</h2>
+        <h2 style="font-size: 32px; color: #FFD700;">ВЫБЕРИТЕ ФИГУРУ</h2>
         <div class="char-grid">
             <!-- Шар -->
             <div class="char-card" onclick="selectCharacter('ball')" id="cardBall">
@@ -372,21 +411,21 @@
                 <div class="char-name">ШАР</div>
                 <div class="char-stats">
                     <div class="stat-row">
-                        <span class="stat-label">Скорость</span>
+                        <span>Скорость</span>
                         <span class="stat-value good">★★★★★</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Управление</span>
-                        <span class="stat-value avg">★★★</span>
+                        <span>Ускорение</span>
+                        <span class="stat-value good">★★★★★</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Вес</span>
+                        <span>Вес</span>
                         <span class="stat-value bad">★★</span>
                     </div>
                 </div>
                 <div class="super-power">
-                    ⚡ Супер: УСКОРЕНИЕ<br>
-                    Резкий рывок вперёд на 3 секунды
+                    ⚡ Супер: ТУРБО-УСКОРЕНИЕ<br>
+                    Мгновенный рывок вперёд!
                 </div>
             </div>
 
@@ -396,21 +435,21 @@
                 <div class="char-name">КВАДРАТ</div>
                 <div class="char-stats">
                     <div class="stat-row">
-                        <span class="stat-label">Скорость</span>
+                        <span>Скорость</span>
                         <span class="stat-value bad">★★</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Управление</span>
-                        <span class="stat-value good">★★★★★</span>
+                        <span>Ускорение</span>
+                        <span class="stat-value avg">★★★</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Вес</span>
+                        <span>Вес</span>
                         <span class="stat-value good">★★★★★</span>
                     </div>
                 </div>
                 <div class="super-power">
-                    ⚡ Супер: ЗЕМЛЕТРЯСЕНИЕ<br>
-                    Подбрасывает всех соперников рядом
+                    ⚡ Супер: УДАРНАЯ ВОЛНА<br>
+                    Отбрасывает всех соперников!
                 </div>
             </div>
 
@@ -420,38 +459,43 @@
                 <div class="char-name">КОНУС</div>
                 <div class="char-stats">
                     <div class="stat-row">
-                        <span class="stat-label">Скорость</span>
+                        <span>Скорость</span>
                         <span class="stat-value avg">★★★</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Управление</span>
+                        <span>Ускорение</span>
                         <span class="stat-value good">★★★★</span>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-label">Вес</span>
+                        <span>Вес</span>
                         <span class="stat-value avg">★★★</span>
                     </div>
                 </div>
                 <div class="super-power">
-                    ⚡ Супер: ТОРНАДО<br>
-                    Создаёт вихрь, отбрасывая всех назад
+                    ⚡ Супер: СМЕРЧ<br>
+                    Засасывает и замедляет врагов!
                 </div>
             </div>
         </div>
-        <button class="menu-btn play-btn" onclick="showDifficultySelect()" id="nextBtn" disabled>
+        <button class="menu-btn" onclick="showDifficultySelect()" id="nextBtn" disabled>
             Далее →
         </button>
     </div>
 
     <!-- Выбор сложности -->
     <div id="difficultySelect" class="screen hidden">
-        <h2 style="font-size: 36px; color: #FFD700;">СЛОЖНОСТЬ БОТОВ</h2>
+        <h2 style="font-size: 32px; color: #FFD700;">СЛОЖНОСТЬ БОТОВ</h2>
         <div class="difficulty-grid">
             <button class="diff-btn easy" onclick="selectDifficulty('easy')">🟢 Лёгкая</button>
             <button class="diff-btn medium" onclick="selectDifficulty('medium')">🟡 Средняя</button>
             <button class="diff-btn hard" onclick="selectDifficulty('hard')">🔴 Профи</button>
         </div>
-        <button class="menu-btn play-btn" onclick="startRace()" id="startRaceBtn" disabled>
+        <p style="color: white; opacity: 0.7; max-width: 500px; text-align: center;">
+            Лёгкая: боты медленные и часто ошибаются<br>
+            Средняя: боты едут хорошо, иногда агрессивны<br>
+            Профи: боты идеально проходят трассу и атакуют
+        </p>
+        <button class="menu-btn" onclick="startRace()" id="startRaceBtn" disabled>
             🏁 НА СТАРТ!
         </button>
     </div>
@@ -468,14 +512,29 @@
                 <span id="scoreDisplay">0</span>
             </div>
             <div class="info-box">
-                <span>🕐</span>
-                <span id="lapTime">0:00</span>
+                <span>🔄</span>
+                <span id="lapDisplay">Круг 1/3</span>
+            </div>
+            <div class="info-box">
+                <span>⏱️</span>
+                <span id="timeDisplay">0:00</span>
             </div>
         </div>
-        <div id="superPowerBar">
-            <div id="superPowerFill" style="width: 0%"></div>
+
+        <div id="superPowerContainer">
+            <div id="superPowerBar">
+                <div id="superPowerFill" style="width: 0%"></div>
+            </div>
+            <div id="superPowerLabel">Супер-способность</div>
+            <div id="superPowerReady" style="display: none;">⚡ ГОТОВ! (ПРОБЕЛ) ⚡</div>
         </div>
-        <div id="superPowerReady" style="display: none;">⚡ СУПЕР ГОТОВ! (ПРОБЕЛ)</div>
+
+        <div id="speedometer">0 км/ч</div>
+
+        <div id="minimap">
+            <canvas id="minimapCanvas"></canvas>
+        </div>
+
         <div id="stunOverlay"></div>
         <div id="stunText"></div>
     </div>
@@ -484,38 +543,43 @@
     <div id="finishScreen" class="screen hidden">
         <h2 class="finish-title" id="finishTitle"></h2>
         <div class="results-table" id="resultsTable"></div>
-        <button class="menu-btn play-btn" onclick="restartGame()">🔄 Заново</button>
+        <button class="menu-btn" onclick="restartGame()">🔄 Заново</button>
         <button class="menu-btn secondary" onclick="goToMainMenu()">🏠 В меню</button>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // ============================================
-        // SHAPE RACERS - Гонки фигур
+        // SHAPE RACERS 3D
         // ============================================
 
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        // Three.js сцена
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
+        scene.fog = new THREE.Fog(0x87CEEB, 100, 500);
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 15, -20);
+        camera.lookAt(0, 0, 20);
 
-        const { Engine, World, Bodies, Body, Events, Vector } = Matter;
-        let engine, world;
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
 
         // Игровые переменные
         let player = null;
         let playerType = 'ball';
+        let playerMesh = null;
+        let playerSpeed = 0;
+        let playerRotation = 0;
         let bots = [];
+        let botMeshes = [];
         let allRacers = [];
-        let raceTrack = [];
         let trackPoints = [];
+        let trackSegments = [];
+        let trackWidth = 12;
         let raceStarted = false;
         let raceFinished = false;
         let finishOrder = [];
@@ -525,243 +589,368 @@
         let superPowerTimer = 0;
         let stunTimer = 0;
         let score = 0;
-        let lapStartTime = 0;
+        let startTime = 0;
         let difficulty = 'medium';
-        let cameraOffset = { x: 0, y: 0 };
-        let finishLine = null;
+        let currentLap = 0;
+        let maxLaps = 3;
+        let playerProgress = 0;
+        let trees = [];
+        let buildings = [];
 
-        // Генерация трассы
+        // Освещение
+        const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        sunLight.position.set(100, 100, 50);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.left = -200;
+        sunLight.shadow.camera.right = 200;
+        sunLight.shadow.camera.top = 200;
+        sunLight.shadow.camera.bottom = -200;
+        scene.add(sunLight);
+
+        // Создание ландшафта
+        function createTerrain() {
+            const terrainGeometry = new THREE.PlaneGeometry(600, 600, 50, 50);
+            const terrainMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x4a8c3f,
+                side: THREE.DoubleSide
+            });
+            const terrain = new THREE.Mesh(terrainGeometry, terrainMaterial);
+            terrain.rotation.x = -Math.PI / 2;
+            terrain.position.y = -1;
+            terrain.receiveShadow = true;
+            scene.add(terrain);
+            
+            // Добавляем холмы
+            const vertices = terrainGeometry.attributes.position.array;
+            for (let i = 2; i < vertices.length; i += 3) {
+                const x = vertices[i - 2];
+                const z = vertices[i];
+                const distance = Math.sqrt(x * x + z * z);
+                vertices[i] = Math.sin(distance * 0.05) * 2 + Math.random() * 1;
+            }
+            terrainGeometry.attributes.position.needsUpdate = true;
+            terrainGeometry.computeVertexNormals();
+        }
+
+        // Генерация сложной трассы
         function generateTrack() {
             trackPoints = [];
-            const cx = canvas.width / 2;
-            const cy = canvas.height / 2;
-            const rx = canvas.width * 0.4;
-            const ry = canvas.height * 0.35;
             
-            // Создаём овальную трассу
-            for (let i = 0; i < 100; i++) {
-                const angle = (i / 100) * Math.PI * 2;
-                const x = cx + Math.cos(angle) * rx;
-                const y = cy + Math.sin(angle) * ry;
-                trackPoints.push({ x, y });
+            // Создаём интересную трассу с поворотами
+            const segments = [
+                { x: 0, z: 0 },
+                { x: 60, z: -20 },
+                { x: 100, z: -60 },
+                { x: 80, z: -120 },
+                { x: 20, z: -140 },
+                { x: -40, z: -110 },
+                { x: -90, z: -50 },
+                { x: -100, z: 10 },
+                { x: -60, z: 60 },
+                { x: 0, z: 80 },
+                { x: 60, z: 50 },
+                { x: 100, z: 0 }
+            ];
+            
+            // Интерполяция для плавной трассы
+            for (let i = 0; i < segments.length; i++) {
+                const next = segments[(i + 1) % segments.length];
+                const curr = segments[i];
+                
+                for (let t = 0; t < 20; t++) {
+                    const alpha = t / 20;
+                    const x = curr.x + (next.x - curr.x) * alpha;
+                    const z = curr.z + (next.z - curr.z) * alpha;
+                    trackPoints.push({ x, z, y: 0 });
+                }
             }
             
-            // Создаём физические стены трассы
-            raceTrack = [];
-            const trackWidth = 80;
+            // Создаём визуальную трассу
+            createTrackVisuals();
+            
+            // Создаём ограждения
+            createTrackBarriers();
+            
+            // Добавляем окружение
+            createEnvironment();
+        }
+
+        function createTrackVisuals() {
+            // Полотно трассы
+            const trackShape = new THREE.Shape();
+            trackPoints.forEach((point, i) => {
+                const x = point.x;
+                const z = point.z;
+                if (i === 0) trackShape.moveTo(x, z);
+                else trackShape.lineTo(x, z);
+            });
+            
+            const trackGeometry = new THREE.BufferGeometry();
+            const vertices = [];
+            const indices = [];
             
             for (let i = 0; i < trackPoints.length; i++) {
                 const p1 = trackPoints[i];
                 const p2 = trackPoints[(i + 1) % trackPoints.length];
                 
-                // Внутренняя стена
-                const inner = Vector.sub(p2, p1);
-                const innerNormal = Vector.normalise({ x: -inner.y, y: inner.x });
+                const dx = p2.x - p1.x;
+                const dz = p2.z - p1.z;
+                const len = Math.sqrt(dx * dx + dz * dz);
+                const nx = -dz / len * trackWidth;
+                const nz = dx / len * trackWidth;
                 
-                // Внешняя стена
-                const outer = Vector.sub(p2, p1);
-                const outerNormal = Vector.normalise({ x: outer.y, y: -outer.x });
-                
-                const midX = (p1.x + p2.x) / 2;
-                const midY = (p1.y + p2.y) / 2;
-                const length = Vector.magnitude(inner);
-                
-                // Внутренний барьер
-                const innerBarrier = Bodies.rectangle(
-                    midX + innerNormal.x * trackWidth/2,
-                    midY + innerNormal.y * trackWidth/2,
-                    length,
-                    10,
-                    {
-                        isStatic: true,
-                        angle: Math.atan2(inner.y, inner.x),
-                        render: { fillStyle: '#FF4444' }
-                    }
+                vertices.push(
+                    p1.x + nx, 0.01, p1.z + nz,
+                    p1.x - nx, 0.01, p1.z - nz
                 );
-                
-                // Внешний барьер
-                const outerBarrier = Bodies.rectangle(
-                    midX + outerNormal.x * trackWidth/2,
-                    midY + outerNormal.y * trackWidth/2,
-                    length,
-                    10,
-                    {
-                        isStatic: true,
-                        angle: Math.atan2(inner.y, inner.x),
-                        render: { fillStyle: '#FF4444' }
-                    }
-                );
-                
-                World.add(world, [innerBarrier, outerBarrier]);
-                raceTrack.push(innerBarrier, outerBarrier);
             }
             
-            // Финишная линия
-            const finishPoint = trackPoints[0];
-            finishLine = {
-                x1: finishPoint.x - 40,
-                y1: finishPoint.y - 15,
-                x2: finishPoint.x + 40,
-                y2: finishPoint.y - 15
-            };
+            for (let i = 0; i < trackPoints.length; i++) {
+                const j = (i + 1) % trackPoints.length;
+                const base = i * 2;
+                indices.push(base, base + 1, base + 2);
+                indices.push(base + 1, base + 3, base + 2);
+            }
+            
+            trackGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            trackGeometry.setIndex(indices);
+            trackGeometry.computeVertexNormals();
+            
+            const trackMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x444444,
+                side: THREE.DoubleSide
+            });
+            const trackMesh = new THREE.Mesh(trackGeometry, trackMaterial);
+            trackMesh.receiveShadow = true;
+            scene.add(trackMesh);
+            
+            // Разметка трассы
+            const lineMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFF00 });
+            trackPoints.forEach((point, i) => {
+                if (i % 3 === 0) {
+                    const lineGeometry = new THREE.BoxGeometry(2, 0.02, 2);
+                    const line = new THREE.Mesh(lineGeometry, lineMaterial);
+                    line.position.set(point.x, 0.02, point.z);
+                    line.receiveShadow = true;
+                    scene.add(line);
+                }
+            });
+        }
+
+        function createTrackBarriers() {
+            const barrierMaterial = new THREE.MeshPhongMaterial({ color: 0xFF4444 });
+            
+            for (let i = 0; i < trackPoints.length; i += 2) {
+                const p1 = trackPoints[i];
+                const p2 = trackPoints[(i + 1) % trackPoints.length];
+                
+                const dx = p2.x - p1.x;
+                const dz = p2.z - p1.z;
+                const len = Math.sqrt(dx * dx + dz * dz);
+                const nx = -dz / len * trackWidth;
+                const nz = dx / len * trackWidth;
+                
+                // Внутренний барьер
+                const innerBarrier = new THREE.Mesh(
+                    new THREE.BoxGeometry(len, 2, 0.5),
+                    barrierMaterial
+                );
+                innerBarrier.position.set(
+                    (p1.x + p2.x) / 2 + nx,
+                    1,
+                    (p1.z + p2.z) / 2 + nz
+                );
+                innerBarrier.rotation.y = Math.atan2(dx, dz);
+                innerBarrier.castShadow = true;
+                innerBarrier.receiveShadow = true;
+                scene.add(innerBarrier);
+                
+                // Внешний барьер
+                const outerBarrier = new THREE.Mesh(
+                    new THREE.BoxGeometry(len, 2, 0.5),
+                    barrierMaterial
+                );
+                outerBarrier.position.set(
+                    (p1.x + p2.x) / 2 - nx,
+                    1,
+                    (p1.z + p2.z) / 2 - nz
+                );
+                outerBarrier.rotation.y = Math.atan2(dx, dz);
+                outerBarrier.castShadow = true;
+                outerBarrier.receiveShadow = true;
+                scene.add(outerBarrier);
+            }
+        }
+
+        function createEnvironment() {
+            // Деревья вокруг трассы
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 30 + Math.random() * 50;
+                const x = Math.cos(angle) * distance;
+                const z = Math.sin(angle) * distance;
+                
+                if (isOffTrack(x, z)) {
+                    createTree(x, z);
+                }
+            }
+            
+            // Здания
+            const buildingPositions = [
+                { x: -150, z: -150 },
+                { x: 150, z: 100 },
+                { x: -100, z: 150 },
+                { x: 120, z: -120 }
+            ];
+            
+            buildingPositions.forEach(pos => {
+                createBuilding(pos.x, pos.z);
+            });
+        }
+
+        function isOffTrack(x, z) {
+            let minDist = Infinity;
+            trackPoints.forEach(point => {
+                const dx = x - point.x;
+                const dz = z - point.z;
+                const dist = Math.sqrt(dx * dx + dz * dz);
+                minDist = Math.min(minDist, dist);
+            });
+            return minDist > trackWidth + 10;
+        }
+
+        function createTree(x, z) {
+            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.7, 4);
+            const trunkMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.set(x, 2, z);
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            scene.add(trunk);
+            
+            const leavesGeometry = new THREE.ConeGeometry(3, 6, 8);
+            const leavesMaterial = new THREE.MeshPhongMaterial({ color: 0x228B22 });
+            const leaves = new THREE.Mesh(leavesGeometry, leavesMaterial);
+            leaves.position.set(x, 7, z);
+            leaves.castShadow = true;
+            leaves.receiveShadow = true;
+            scene.add(leaves);
+            
+            trees.push(trunk, leaves);
+        }
+
+        function createBuilding(x, z) {
+            const height = 5 + Math.random() * 15;
+            const width = 5 + Math.random() * 10;
+            const depth = 5 + Math.random() * 10;
+            
+            const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
+            const buildingMaterial = new THREE.MeshPhongMaterial({ 
+                color: new THREE.Color(Math.random() * 0.5, Math.random() * 0.5, Math.random() * 0.5 + 0.5)
+            });
+            const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+            building.position.set(x, height / 2, z);
+            building.castShadow = true;
+            building.receiveShadow = true;
+            scene.add(building);
+            
+            buildings.push(building);
         }
 
         // Создание игрока
-        function createPlayer(type, startPos) {
-            let body;
-            const startX = startPos.x;
-            const startY = startPos.y;
+        function createPlayerMesh(type) {
+            let geometry, material;
             
             switch(type) {
                 case 'ball':
-                    body = Bodies.circle(startX, startY, 20, {
-                        restitution: 0.6,
-                        friction: 0.05,
-                        frictionAir: 0.01,
-                        density: 0.002,
-                        render: { fillStyle: '#4ECDC4' }
+                    geometry = new THREE.SphereGeometry(1.5, 32, 32);
+                    material = new THREE.MeshPhongMaterial({ 
+                        color: 0x4ECDC4,
+                        specular: 0xffffff,
+                        shininess: 100
                     });
                     break;
                     
                 case 'square':
-                    body = Bodies.rectangle(startX, startY, 40, 40, {
-                        restitution: 0.3,
-                        friction: 0.15,
-                        frictionAir: 0.02,
-                        density: 0.005,
-                        render: { fillStyle: '#FFE66D' }
+                    geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+                    material = new THREE.MeshPhongMaterial({ 
+                        color: 0xFFE66D,
+                        specular: 0xffffff,
+                        shininess: 50
                     });
                     break;
                     
                 case 'cone':
-                    // Конус из трёх частей
-                    body = Bodies.circle(startX, startY, 22, {
-                        restitution: 0.5,
-                        friction: 0.08,
-                        frictionAir: 0.015,
-                        density: 0.003,
-                        render: { fillStyle: '#FF8B94' }
+                    geometry = new THREE.ConeGeometry(1.8, 4, 8);
+                    material = new THREE.MeshPhongMaterial({ 
+                        color: 0xFF8B94,
+                        specular: 0xffffff,
+                        shininess: 75
                     });
                     break;
             }
             
-            body.racerType = type;
-            body.isPlayer = true;
-            body.stunned = false;
-            body.laps = 0;
-            body.checkpoints = new Set();
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
             
-            World.add(world, body);
-            return body;
+            // Добавляем свечение для игрока
+            const glowGeometry = new THREE.SphereGeometry(2, 16, 16);
+            const glowMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xFFD700,
+                transparent: true,
+                opacity: 0.2
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            mesh.add(glow);
+            
+            return mesh;
         }
 
-        // Создание бота
-        function createBot(type, startPos, difficulty) {
-            let body;
-            const startX = startPos.x + (Math.random() - 0.5) * 100;
-            const startY = startPos.y + (Math.random() - 0.5) * 50;
+        function createBotMesh(type, color) {
+            let geometry, material;
             
             switch(type) {
                 case 'ball':
-                    body = Bodies.circle(startX, startY, 20, {
-                        restitution: 0.6,
-                        friction: 0.05,
-                        frictionAir: 0.01,
-                        density: 0.002,
-                        render: { fillStyle: '#FF6B6B' }
-                    });
+                    geometry = new THREE.SphereGeometry(1.5, 16, 16);
+                    material = new THREE.MeshPhongMaterial({ color });
                     break;
-                    
                 case 'square':
-                    body = Bodies.rectangle(startX, startY, 40, 40, {
-                        restitution: 0.3,
-                        friction: 0.15,
-                        frictionAir: 0.02,
-                        density: 0.005,
-                        render: { fillStyle: '#FFA500' }
-                    });
+                    geometry = new THREE.BoxGeometry(2.5, 2.5, 2.5);
+                    material = new THREE.MeshPhongMaterial({ color });
                     break;
-                    
                 case 'cone':
-                    body = Bodies.circle(startX, startY, 22, {
-                        restitution: 0.5,
-                        friction: 0.08,
-                        frictionAir: 0.015,
-                        density: 0.003,
-                        render: { fillStyle: '#FF69B4' }
-                    });
+                    geometry = new THREE.ConeGeometry(1.8, 4, 6);
+                    material = new THREE.MeshPhongMaterial({ color });
                     break;
             }
             
-            body.racerType = type;
-            body.isPlayer = false;
-            body.botDifficulty = difficulty;
-            body.stunned = false;
-            body.laps = 0;
-            body.checkpoints = new Set();
-            body.botTarget = 0;
-            body.botTimer = 0;
-            
-            World.add(world, body);
-            return body;
+            const mesh = new THREE.Mesh(geometry, material);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            scene.add(mesh);
+            return mesh;
         }
 
         // Инициализация гонки
         function initRace() {
-            engine = Engine.create({
-                gravity: { x: 0, y: 0 }
-            });
-            world = engine.world;
-            
-            generateTrack();
-            
-            const startPos = trackPoints[0];
-            
-            // Создаём игрока
-            player = createPlayer(playerType, startPos);
-            
-            // Создаём ботов
-            bots = [];
-            const botTypes = ['ball', 'square', 'cone'];
-            const botDifficulties = {
-                easy: { speed: 0.003, accuracy: 0.6, aggression: 0.2 },
-                medium: { speed: 0.005, accuracy: 0.8, aggression: 0.5 },
-                hard: { speed: 0.008, accuracy: 0.95, aggression: 0.9 }
-            };
-            
-            // Распределяем типы ботов
-            const botDistribution = [
-                'ball', 'ball', 'ball',
-                'square', 'square',
-                'cone', 'cone'
-            ];
-            
-            for (let i = 0; i < 7; i++) {
-                const type = botDistribution[i];
-                const bot = createBot(type, startPos, difficulty);
-                bot.botSpeed = botDifficulties[difficulty].speed;
-                bot.botAccuracy = botDifficulties[difficulty].accuracy;
-                bot.botAggression = botDifficulties[difficulty].aggression;
-                bots.push(bot);
+            // Очистка старых объектов
+            while(scene.children.length > 0) {
+                scene.remove(scene.children[0]);
             }
             
-            allRacers = [player, ...bots];
+            // Добавляем освещение заново
+            scene.add(ambientLight);
+            scene.add(sunLight);
             
-            // Обработка столкновений
-            Events.on(engine, 'collisionStart', (event) => {
-                event.pairs.forEach(pair => {
-                    const bodyA = pair.bodyA;
-                    const bodyB = pair.bodyB;
-                    
-                    // Сталкивание соперников
-                    if (allRacers.includes(bodyA) && allRacers.includes(bodyB)) {
-                        handleRacerCollision(bodyA, bodyB);
-                    }
-                });
-            });
-            
-            lapStartTime = Date.now();
-            raceStarted = true;
+            playerProgress = 0;
+            currentLap = 0;
             raceFinished = false;
             finishOrder = [];
             superPowerCharge = 0;
@@ -769,177 +958,247 @@
             superPowerActive = false;
             stunTimer = 0;
             score = 0;
+            playerSpeed = 0;
+            playerRotation = 0;
             
+            createTerrain();
+            generateTrack();
+            
+            // Создаём игрока
+            playerMesh = createPlayerMesh(playerType);
+            const startPoint = trackPoints[0];
+            playerMesh.position.set(startPoint.x, 2, startPoint.z);
+            
+            player = {
+                mesh: playerMesh,
+                x: startPoint.x,
+                z: startPoint.z,
+                speed: 0,
+                rotation: 0,
+                stunned: false,
+                laps: 0,
+                progress: 0,
+                trackIndex: 0
+            };
+            
+            // Создаём ботов
+            botMeshes = [];
+            bots = [];
+            const botColors = [0xFF6B6B, 0xFFA500, 0xFF69B4, 0x98FB98, 0xDDA0DD, 0xF0E68C, 0x87CEEB];
+            const botTypes = ['ball', 'ball', 'ball', 'square', 'square', 'cone', 'cone'];
+            
+            const botConfigs = {
+                easy: { speed: 0.15, accuracy: 0.6, aggression: 0.1 },
+                medium: { speed: 0.22, accuracy: 0.8, aggression: 0.3 },
+                hard: { speed: 0.3, accuracy: 0.95, aggression: 0.7 }
+            };
+            
+            for (let i = 0; i < 7; i++) {
+                const type = botTypes[i];
+                const mesh = createBotMesh(type, botColors[i]);
+                const startOffset = (i + 1) * 3;
+                mesh.position.set(startPoint.x, 2, startPoint.z + startOffset);
+                
+                const bot = {
+                    mesh: mesh,
+                    x: startPoint.x,
+                    z: startPoint.z + startOffset,
+                    speed: 0,
+                    rotation: 0,
+                    stunned: false,
+                    laps: 0,
+                    progress: 0,
+                    trackIndex: 0,
+                    targetIndex: 10,
+                    botSpeed: botConfigs[difficulty].speed,
+                    botAccuracy: botConfigs[difficulty].accuracy,
+                    botAggression: botConfigs[difficulty].aggression,
+                    type: type
+                };
+                
+                botMeshes.push(mesh);
+                bots.push(bot);
+            }
+            
+            allRacers = [player, ...bots];
+            startTime = Date.now();
+            raceStarted = true;
+            
+            document.getElementById('gameUI').classList.remove('hidden');
             document.getElementById('stunOverlay').style.display = 'none';
             document.getElementById('stunText').style.display = 'none';
             document.getElementById('superPowerReady').style.display = 'none';
+            document.getElementById('superPowerFill').style.width = '0%';
         }
 
-        function handleRacerCollision(racer1, racer2) {
-            const speed1 = Vector.magnitude(racer1.velocity);
-            const speed2 = Vector.magnitude(racer2.velocity);
-            const impactSpeed = Math.abs(speed1 - speed2);
+        function updatePlayer(deltaTime) {
+            if (!player || player.stunned || raceFinished) return;
             
-            // Сильное столкновение может скинуть с трассы
-            if (impactSpeed > 8) {
-                const lighter = speed1 > speed2 ? racer2 : racer1;
-                const heavier = speed1 > speed2 ? racer1 : racer2;
-                
-                // Проверяем, вылетел ли за трассу
-                const dist = distanceToTrack(lighter.position);
-                if (dist > 80) {
-                    stunRacer(lighter);
-                    if (heavier.isPlayer) {
-                        score += 50;
-                        updateUI();
-                    }
-                }
-            }
-        }
-
-        function distanceToTrack(pos) {
-            let minDist = Infinity;
-            for (const point of trackPoints) {
-                const dx = pos.x - point.x;
-                const dy = pos.y - point.y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                minDist = Math.min(minDist, dist);
-            }
-            return minDist - 40; // 40 - радиус трассы
-        }
-
-        function stunRacer(racer) {
-            racer.stunned = true;
-            setTimeout(() => {
-                racer.stunned = false;
-            }, 3000);
+            // Управление
+            let acceleration = 0;
+            let turn = 0;
             
-            // Возвращаем на трассу
-            const nearest = findNearestTrackPoint(racer.position);
-            Body.setPosition(racer, nearest);
-            Body.setVelocity(racer, { x: 0, y: 0 });
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) acceleration = 1;
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) acceleration = -0.5;
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) turn = 1;
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) turn = -1;
             
-            if (racer.isPlayer) {
-                document.getElementById('stunOverlay').style.display = 'block';
-                document.getElementById('stunText').style.display = 'block';
-                document.getElementById('stunText').textContent = '3';
-                
-                let count = 3;
-                const countdown = setInterval(() => {
-                    count--;
-                    if (count > 0) {
-                        document.getElementById('stunText').textContent = count;
-                    } else {
-                        clearInterval(countdown);
-                        document.getElementById('stunOverlay').style.display = 'none';
-                        document.getElementById('stunText').style.display = 'none';
-                    }
-                }, 1000);
-            }
-        }
-
-        function findNearestTrackPoint(pos) {
-            let minDist = Infinity;
-            let nearest = trackPoints[0];
-            
-            for (const point of trackPoints) {
-                const dx = pos.x - point.x;
-                const dy = pos.y - point.y;
-                const dist = dx * dx + dy * dy;
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearest = point;
-                }
+            // Супер-способность
+            if (keys[' '] && superPowerReady && !superPowerActive) {
+                activateSuperPower();
             }
             
-            return nearest;
-        }
-
-        function activateSuperPower() {
-            if (!superPowerReady || superPowerActive || player.stunned) return;
-            
-            superPowerActive = true;
-            superPowerTimer = 180; // 3 секунды при 60 FPS
-            superPowerReady = false;
-            superPowerCharge = 0;
-            document.getElementById('superPowerReady').style.display = 'none';
-            
-            switch(playerType) {
-                case 'ball':
-                    // Ускорение
-                    const angle = Math.atan2(player.velocity.y, player.velocity.x);
-                    const boost = 25;
-                    Body.setVelocity(player, {
-                        x: Math.cos(angle) * boost,
-                        y: Math.sin(angle) * boost
-                    });
-                    break;
-                    
-                case 'square':
-                    // Землетрясение
-                    bots.forEach(bot => {
-                        const dx = bot.position.x - player.position.x;
-                        const dy = bot.position.y - player.position.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        
-                        if (dist < 200) {
-                            Body.setVelocity(bot, {
-                                x: (dx / dist) * 15 + (Math.random() - 0.5) * 10,
-                                y: (dy / dist) * 15 - 10
-                            });
-                        }
-                    });
-                    break;
-                    
-                case 'cone':
-                    // Торнадо
-                    bots.forEach(bot => {
-                        const dx = bot.position.x - player.position.x;
-                        const dy = bot.position.y - player.position.y;
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        
-                        if (dist < 250) {
-                            const force = 20 - dist * 0.08;
-                            Body.setVelocity(bot, {
-                                x: -dx * force * 0.1,
-                                y: -dy * force * 0.1 - 5
-                            });
-                        }
-                    });
-                    break;
-            }
-        }
-
-        function updateBotAI(bot) {
-            if (bot.stunned || raceFinished) return;
-            
-            // Находим следующую точку трассы
-            const target = trackPoints[bot.botTarget];
-            const dx = target.x - bot.position.x;
-            const dy = target.y - bot.position.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            
-            // Двигаемся к цели
-            const force = {
-                x: (dx / dist) * bot.botSpeed * (0.8 + Math.random() * 0.4),
-                y: (dy / dist) * bot.botSpeed * (0.8 + Math.random() * 0.4)
+            // Физика в зависимости от типа
+            const physics = {
+                ball: { maxSpeed: 0.4, acceleration: 0.015, friction: 0.98, turnSpeed: 0.04 },
+                square: { maxSpeed: 0.25, acceleration: 0.01, friction: 0.96, turnSpeed: 0.06 },
+                cone: { maxSpeed: 0.32, acceleration: 0.013, friction: 0.97, turnSpeed: 0.05 }
             };
             
-            // Добавляем неточность
-            const inaccuracy = (1 - bot.botAccuracy) * 0.005;
-            force.x += (Math.random() - 0.5) * inaccuracy;
-            force.y += (Math.random() - 0.5) * inaccuracy;
+            const phys = physics[playerType];
             
-            Body.applyForce(bot, bot.position, force);
+            if (superPowerActive && playerType === 'ball') {
+                player.speed = Math.min(player.speed + 0.1, 0.8);
+            } else {
+                player.speed += acceleration * phys.acceleration;
+                player.speed = Math.max(-0.1, Math.min(player.speed, phys.maxSpeed));
+            }
             
-            // Переходим к следующей точке
-            if (dist < 50) {
-                bot.botTarget = (bot.botTarget + 1) % trackPoints.length;
+            if (acceleration === 0) {
+                player.speed *= phys.friction;
+            }
+            
+            player.rotation += turn * phys.turnSpeed * (player.speed / phys.maxSpeed);
+            
+            // Движение
+            player.x += Math.sin(player.rotation) * player.speed * deltaTime * 60;
+            player.z += Math.cos(player.rotation) * player.speed * deltaTime * 60;
+            
+            // Обновление позиции меша
+            player.mesh.position.x = player.x;
+            player.mesh.position.z = player.z;
+            player.mesh.position.y = 2 + Math.abs(player.speed) * 2;
+            
+            // Вращение меша
+            if (playerType === 'ball') {
+                player.mesh.rotation.x += player.speed * 0.5;
+            } else if (playerType === 'square') {
+                player.mesh.rotation.y = player.rotation;
+                player.mesh.rotation.z += player.speed * 0.3;
+            } else {
+                player.mesh.rotation.y = player.rotation;
+            }
+            
+            // Проверка на трассе
+            const trackDist = getTrackDistance(player.x, player.z);
+            if (trackDist > trackWidth + 5) {
+                // Вылетел с трассы
+                stunPlayer();
+                score -= 25;
+            }
+            
+            // Проверка прогресса
+            updatePlayerProgress();
+            
+            // Обновление скорости для UI
+            playerSpeed = Math.abs(player.speed) * 100;
+        }
+
+        function getTrackDistance(x, z) {
+            let minDist = Infinity;
+            let nearestIndex = 0;
+            
+            trackPoints.forEach((point, i) => {
+                const dx = x - point.x;
+                const dz = z - point.z;
+                const dist = Math.sqrt(dx * dx + dz * dz);
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearestIndex = i;
+                }
+            });
+            
+            player.trackIndex = nearestIndex;
+            return minDist;
+        }
+
+        function updatePlayerProgress() {
+            const prevProgress = player.progress;
+            player.progress = player.trackIndex;
+            
+            // Проверка завершения круга
+            if (prevProgress > trackPoints.length * 0.8 && player.progress < trackPoints.length * 0.2) {
+                player.laps++;
+                if (player.laps >= maxLaps && !finishOrder.includes(player)) {
+                    finishOrder.push(player);
+                    score += 500;
+                    if (finishOrder.length >= allRacers.length) {
+                        finishRace();
+                    }
+                }
+            }
+        }
+
+        function updateBot(bot, deltaTime) {
+            if (bot.stunned || raceFinished) return;
+            
+            // Находим целевую точку
+            const target = trackPoints[bot.targetIndex];
+            const dx = target.x - bot.x;
+            const dz = target.z - bot.z;
+            const dist = Math.sqrt(dx * dx + dz * dz);
+            const targetAngle = Math.atan2(dx, dz);
+            
+            // Поворачиваем к цели
+            let angleDiff = targetAngle - bot.rotation;
+            while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+            while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+            
+            bot.rotation += angleDiff * 0.1 * bot.botAccuracy;
+            
+            // Ускорение
+            bot.speed += (0.01 * bot.botSpeed * 60) * deltaTime;
+            bot.speed = Math.min(bot.speed, 0.25 * bot.botSpeed * 60);
+            
+            // Случайные ошибки
+            if (Math.random() < (1 - bot.botAccuracy) * 0.1) {
+                bot.rotation += (Math.random() - 0.5) * 0.2;
+                bot.speed *= 0.8;
+            }
+            
+            // Агрессия к ближайшему сопернику
+            if (Math.random() < bot.botAggression * 0.05) {
+                allRacers.forEach(racer => {
+                    if (racer !== bot) {
+                        const rdx = racer.x - bot.x;
+                        const rdz = racer.z - bot.z;
+                        const rdist = Math.sqrt(rdx * rdx + rdz * rdz);
+                        
+                        if (rdist < 8) {
+                            bot.rotation = Math.atan2(rdx, rdz);
+                            bot.speed += 0.1;
+                        }
+                    }
+                });
+            }
+            
+            // Движение
+            bot.x += Math.sin(bot.rotation) * bot.speed * deltaTime;
+            bot.z += Math.cos(bot.rotation) * bot.speed * deltaTime;
+            
+            bot.mesh.position.x = bot.x;
+            bot.mesh.position.z = bot.z;
+            bot.mesh.position.y = 2;
+            bot.mesh.rotation.y = bot.rotation;
+            
+            // Следующая точка
+            if (dist < 5) {
+                bot.targetIndex = (bot.targetIndex + 1) % trackPoints.length;
                 
-                // Проверка финиша
-                if (bot.botTarget === 0 && bot.laps < 3) {
+                // Проверка круга
+                if (bot.targetIndex === 0) {
                     bot.laps++;
-                    if (bot.laps >= 3 && !finishOrder.includes(bot)) {
+                    if (bot.laps >= maxLaps && !finishOrder.includes(bot)) {
                         finishOrder.push(bot);
                         if (finishOrder.length >= allRacers.length) {
                             finishRace();
@@ -948,138 +1207,252 @@
                 }
             }
             
-            // Агрессивное поведение - толкаем игрока
-            if (Math.random() < bot.botAggression * 0.01) {
-                const px = player.position.x - bot.position.x;
-                const py = player.position.y - bot.position.y;
-                const pdist = Math.sqrt(px * px + py * py);
-                
-                if (pdist < 100) {
-                    Body.applyForce(bot, bot.position, {
-                        x: (px / pdist) * bot.botSpeed * 3,
-                        y: (py / pdist) * bot.botSpeed * 3
-                    });
-                }
+            // Вылетел с трассы
+            if (getTrackDistance(bot.x, bot.z) > trackWidth + 8) {
+                stunBot(bot);
             }
         }
 
-        function checkPlayerProgress() {
-            if (!player || raceFinished) return;
+        function stunPlayer() {
+            player.stunned = true;
+            player.speed = 0;
             
-            const playerTrackIndex = findNearestTrackIndex(player.position);
+            document.getElementById('stunOverlay').style.display = 'block';
+            document.getElementById('stunText').style.display = 'block';
             
-            // Проверяем, прошёл ли игрок круг
-            if (playerTrackIndex < 10 && player.laps < 3) {
-                // Возможно финишировал круг
-                const lastCheckpoint = Array.from(player.checkpoints).pop() || 0;
-                if (lastCheckpoint > 90) {
-                    player.laps++;
-                    player.checkpoints.clear();
+            let count = 3;
+            document.getElementById('stunText').textContent = count;
+            
+            const countdown = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    document.getElementById('stunText').textContent = count;
+                } else {
+                    clearInterval(countdown);
+                    document.getElementById('stunOverlay').style.display = 'none';
+                    document.getElementById('stunText').style.display = 'none';
+                    player.stunned = false;
                     
-                    if (player.laps >= 3 && !finishOrder.includes(player)) {
-                        finishOrder.push(player);
-                        if (finishOrder.length >= allRacers.length) {
-                            finishRace();
+                    // Возврат на трассу
+                    const nearest = trackPoints[player.trackIndex];
+                    player.x = nearest.x;
+                    player.z = nearest.z;
+                    player.mesh.position.set(nearest.x, 2, nearest.z);
+                }
+            }, 1000);
+        }
+
+        function stunBot(bot) {
+            bot.stunned = true;
+            bot.speed = 0;
+            
+            setTimeout(() => {
+                bot.stunned = false;
+                const nearest = trackPoints[bot.targetIndex];
+                bot.x = nearest.x;
+                bot.z = nearest.z;
+                bot.mesh.position.set(nearest.x, 2, nearest.z);
+            }, 3000);
+        }
+
+        function activateSuperPower() {
+            superPowerActive = true;
+            superPowerTimer = 180;
+            superPowerReady = false;
+            superPowerCharge = 0;
+            document.getElementById('superPowerReady').style.display = 'none';
+            
+            switch(playerType) {
+                case 'ball':
+                    // Турбо-ускорение уже в updatePlayer
+                    break;
+                case 'square':
+                    // Ударная волна
+                    bots.forEach(bot => {
+                        const dx = bot.x - player.x;
+                        const dz = bot.z - player.z;
+                        const dist = Math.sqrt(dx * dx + dz * dz);
+                        if (dist < 20) {
+                            bot.speed = -0.3;
+                            bot.stunned = true;
+                            setTimeout(() => bot.stunned = false, 1500);
                         }
-                    }
-                }
+                    });
+                    break;
+                case 'cone':
+                    // Смерч - притягиваем и замедляем
+                    bots.forEach(bot => {
+                        const dx = bot.x - player.x;
+                        const dz = bot.z - player.z;
+                        const dist = Math.sqrt(dx * dx + dz * dz);
+                        if (dist < 30 && dist > 5) {
+                            bot.x -= dx * 0.05;
+                            bot.z -= dz * 0.05;
+                            bot.speed *= 0.5;
+                        }
+                    });
+                    break;
             }
-            
-            player.checkpoints.add(playerTrackIndex);
-        }
-
-        function findNearestTrackIndex(pos) {
-            let minDist = Infinity;
-            let index = 0;
-            
-            trackPoints.forEach((point, i) => {
-                const dx = pos.x - point.x;
-                const dy = pos.y - point.y;
-                const dist = dx * dx + dy * dy;
-                if (dist < minDist) {
-                    minDist = dist;
-                    index = i;
-                }
-            });
-            
-            return index;
-        }
-
-        function finishRace() {
-            raceFinished = true;
-            
-            // Начисляем очки за позицию
-            const position = finishOrder.indexOf(player) + 1;
-            const positionPoints = { 1: 500, 2: 300, 3: 200, 4: 100, 5: 50, 6: 25, 7: 10, 8: 5 };
-            score += positionPoints[position] || 0;
-            
-            showFinishScreen(position);
         }
 
         function updateUI() {
             if (!player || raceFinished) return;
             
             // Позиция
-            const sorted = [...allRacers].sort((a, b) => b.laps - a.laps || 
-                findNearestTrackIndex(b.position) - findNearestTrackIndex(a.position));
+            const sorted = [...allRacers].sort((a, b) => {
+                if (b.laps !== a.laps) return b.laps - a.laps;
+                return b.trackIndex - a.trackIndex;
+            });
             const position = sorted.indexOf(player) + 1;
             document.getElementById('position').textContent = `${position}/8`;
             
             // Счёт
             document.getElementById('scoreDisplay').textContent = score;
             
+            // Круг
+            document.getElementById('lapDisplay').textContent = `Круг ${player.laps + 1}/${maxLaps}`;
+            
             // Время
-            const elapsed = Math.floor((Date.now() - lapStartTime) / 1000);
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
             const mins = Math.floor(elapsed / 60);
             const secs = elapsed % 60;
-            document.getElementById('lapTime').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timeDisplay').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            
+            // Спидометр
+            document.getElementById('speedometer').textContent = Math.floor(playerSpeed) + ' км/ч';
             
             // Супер-способность
             if (!superPowerActive && superPowerCharge < 100) {
-                superPowerCharge += 0.055; // ~30 секунд до полной зарядки
+                superPowerCharge += 0.055;
                 document.getElementById('superPowerFill').style.width = superPowerCharge + '%';
-                
                 if (superPowerCharge >= 100) {
                     superPowerReady = true;
                     superPowerCharge = 100;
                     document.getElementById('superPowerReady').style.display = 'block';
                 }
             }
+            
+            // Миникарта
+            updateMinimap();
+        }
+
+        function updateMinimap() {
+            const minimapCanvas = document.getElementById('minimapCanvas');
+            minimapCanvas.width = 200;
+            minimapCanvas.height = 200;
+            const mctx = minimapCanvas.getContext('2d');
+            
+            // Очистка
+            mctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+            mctx.fillRect(0, 0, 200, 200);
+            
+            // Трасса
+            mctx.strokeStyle = '#444';
+            mctx.lineWidth = 15;
+            mctx.beginPath();
+            trackPoints.forEach((point, i) => {
+                const mx = 100 + point.x * 0.5;
+                const my = 100 + point.z * 0.5;
+                if (i === 0) mctx.moveTo(mx, my);
+                else mctx.lineTo(mx, my);
+            });
+            mctx.closePath();
+            mctx.stroke();
+            
+            // Игрок
+            const px = 100 + player.x * 0.5;
+            const pz = 100 + player.z * 0.5;
+            mctx.fillStyle = '#FFD700';
+            mctx.beginPath();
+            mctx.arc(px, pz, 5, 0, Math.PI * 2);
+            mctx.fill();
+            
+            // Боты
+            bots.forEach(bot => {
+                const bx = 100 + bot.x * 0.5;
+                const bz = 100 + bot.z * 0.5;
+                mctx.fillStyle = '#FF4444';
+                mctx.beginPath();
+                mctx.arc(bx, bz, 3, 0, Math.PI * 2);
+                mctx.fill();
+            });
+        }
+
+        function updateCamera() {
+            if (!player) return;
+            
+            // Камера от третьего лица
+            const cameraDistance = 15;
+            const cameraHeight = 8;
+            
+            const targetX = player.x - Math.sin(player.rotation) * cameraDistance;
+            const targetZ = player.z - Math.cos(player.rotation) * cameraDistance;
+            const targetY = 8;
+            
+            camera.position.x += (targetX - camera.position.x) * 0.1;
+            camera.position.y += (targetY - camera.position.y) * 0.1;
+            camera.position.z += (targetZ - camera.position.z) * 0.1;
+            
+            camera.lookAt(
+                player.x,
+                3,
+                player.z
+            );
+        }
+
+        function finishRace() {
+            raceFinished = true;
+            
+            const position = finishOrder.indexOf(player) + 1;
+            const positionPoints = { 1: 500, 2: 300, 3: 200, 4: 100, 5: 50, 6: 25, 7: 10, 8: 5 };
+            score += positionPoints[position] || 0;
+            
+            document.getElementById('gameUI').classList.add('hidden');
+            document.getElementById('finishScreen').classList.remove('hidden');
+            
+            const title = document.getElementById('finishTitle');
+            if (position === 1) {
+                title.textContent = '🏆 ПОБЕДА!';
+                title.className = 'finish-title winner';
+            } else {
+                title.textContent = `Вы заняли ${position} место`;
+                title.className = 'finish-title loser';
+            }
+            
+            const table = document.getElementById('resultsTable');
+            table.innerHTML = '<h3 style="margin-bottom:15px;">Результаты гонки:</h3>';
+            
+            finishOrder.forEach((racer, i) => {
+                const pos = i + 1;
+                const name = racer === player ? '🚀 ВЫ' : `🤖 Бот ${i}`;
+                const icon = racer === player ? 
+                    (playerType === 'ball' ? '⚽' : playerType === 'square' ? '🟫' : '🔺') :
+                    (racer.type === 'ball' ? '⚽' : racer.type === 'square' ? '🟫' : '🔺');
+                
+                const row = document.createElement('div');
+                row.className = 'result-row';
+                row.innerHTML = `
+                    <span class="result-position">#${pos}</span>
+                    <span class="result-name">${icon} ${name}</span>
+                    <span class="result-time">Круги: ${racer.laps}</span>
+                `;
+                table.appendChild(row);
+            });
         }
 
         // Игровой цикл
+        let lastTime = Date.now();
+
         function gameLoop() {
+            const currentTime = Date.now();
+            const deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            
             if (raceStarted && !raceFinished) {
-                Engine.update(engine, 1000 / 60);
-                
-                // Управление игроком
-                if (player && !player.stunned) {
-                    const force = 0.008;
-                    
-                    if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
-                        Body.applyForce(player, player.position, { x: -force, y: 0 });
-                    }
-                    if (keys['ArrowRight'] || keys['d'] || keys['D']) {
-                        Body.applyForce(player, player.position, { x: force, y: 0 });
-                    }
-                    if (keys['ArrowUp'] || keys['w'] || keys['W']) {
-                        Body.applyForce(player, player.position, { x: 0, y: -force });
-                    }
-                    if (keys['ArrowDown'] || keys['s'] || keys['S']) {
-                        Body.applyForce(player, player.position, { x: 0, y: force });
-                    }
-                    
-                    // Супер-способность
-                    if (keys[' '] && superPowerReady) {
-                        activateSuperPower();
-                    }
-                }
-                
-                // Обновление ботов
-                bots.forEach(bot => updateBotAI(bot));
-                
-                // Проверка прогресса
-                checkPlayerProgress();
+                updatePlayer(deltaTime);
+                bots.forEach(bot => updateBot(bot, deltaTime));
+                updateCamera();
+                updateUI();
                 
                 // Таймер супер-способности
                 if (superPowerActive) {
@@ -1088,132 +1461,9 @@
                         superPowerActive = false;
                     }
                 }
-                
-                updateUI();
             }
             
-            // Отрисовка
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Фон
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#0a0a2e');
-            gradient.addColorStop(1, '#1a1a4e');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Звезды
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            for (let i = 0; i < 100; i++) {
-                const x = (i * 137.5) % canvas.width;
-                const y = (i * 97.3) % canvas.height;
-                ctx.fillRect(x, y, 1.5, 1.5);
-            }
-            
-            // Трасса
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.lineWidth = 80;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            ctx.beginPath();
-            trackPoints.forEach((point, i) => {
-                if (i === 0) ctx.moveTo(point.x, point.y);
-                else ctx.lineTo(point.x, point.y);
-            });
-            ctx.closePath();
-            ctx.stroke();
-            
-            // Финишная линия
-            if (finishLine) {
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.lineWidth = 4;
-                ctx.setLineDash([10, 10]);
-                ctx.beginPath();
-                ctx.moveTo(finishLine.x1, finishLine.y1);
-                ctx.lineTo(finishLine.x2, finishLine.y2);
-                ctx.stroke();
-                ctx.setLineDash([]);
-            }
-            
-            // Отрисовка рацеров (сортировка по позиции)
-            const sortedRacers = [...allRacers].sort((a, b) => {
-                const aProgress = a.laps * 1000 + findNearestTrackIndex(a.position);
-                const bProgress = b.laps * 1000 + findNearestTrackIndex(b.position);
-                return bProgress - aProgress;
-            });
-            
-            sortedRacers.forEach(racer => {
-                ctx.save();
-                ctx.translate(racer.position.x, racer.position.y);
-                
-                // Свечение для игрока
-                if (racer.isPlayer) {
-                    ctx.shadowColor = '#FFD700';
-                    ctx.shadowBlur = 25;
-                }
-                
-                // Эффект стана
-                if (racer.stunned) {
-                    ctx.globalAlpha = 0.5;
-                    ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 30, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-                
-                // Отрисовка в зависимости от типа
-                switch(racer.racerType) {
-                    case 'ball':
-                        ctx.fillStyle = racer.render.fillStyle;
-                        ctx.beginPath();
-                        ctx.arc(0, 0, 20, 0, Math.PI * 2);
-                        ctx.fill();
-                        
-                        // Блик
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-                        ctx.beginPath();
-                        ctx.arc(-5, -5, 6, 0, Math.PI * 2);
-                        ctx.fill();
-                        break;
-                        
-                    case 'square':
-                        ctx.fillStyle = racer.render.fillStyle;
-                        ctx.fillRect(-20, -20, 40, 40);
-                        
-                        // Грани
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(-20, -20, 40, 40);
-                        break;
-                        
-                    case 'cone':
-                        ctx.fillStyle = racer.render.fillStyle;
-                        ctx.beginPath();
-                        ctx.moveTo(0, -25);
-                        ctx.lineTo(20, 20);
-                        ctx.lineTo(-20, 20);
-                        ctx.closePath();
-                        ctx.fill();
-                        
-                        // Грани
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                        ctx.lineWidth = 2;
-                        ctx.stroke();
-                        break;
-                }
-                
-                // Супер-эффект
-                if (racer.isPlayer && superPowerActive) {
-                    ctx.strokeStyle = 'rgba(102, 126, 234, 0.8)';
-                    ctx.lineWidth = 4;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, 30, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-                
-                ctx.restore();
-            });
-            
+            renderer.render(scene, camera);
             requestAnimationFrame(gameLoop);
         }
 
@@ -1221,8 +1471,13 @@
         const keys = {};
         document.addEventListener('keydown', e => keys[e.key] = true);
         document.addEventListener('keyup', e => keys[e.key] = false);
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
-        // Функции интерфейса
+        // Функции меню
         function showCharacterSelect() {
             document.getElementById('mainMenu').classList.add('hidden');
             document.getElementById('characterSelect').classList.remove('hidden');
@@ -1250,77 +1505,44 @@
         function startRace() {
             document.getElementById('difficultySelect').classList.add('hidden');
             document.getElementById('gameUI').classList.remove('hidden');
-            
             initRace();
-        }
-
-        function showFinishScreen(position) {
-            document.getElementById('gameUI').classList.add('hidden');
-            document.getElementById('finishScreen').classList.remove('hidden');
-            
-            const title = document.getElementById('finishTitle');
-            if (position === 1) {
-                title.textContent = '🏆 ПОБЕДА!';
-                title.className = 'finish-title winner';
-            } else {
-                title.textContent = `Вы заняли ${position} место`;
-                title.className = 'finish-title loser';
-            }
-            
-            // Таблица результатов
-            const table = document.getElementById('resultsTable');
-            table.innerHTML = '<h3 style="margin-bottom:15px;">Результаты:</h3>';
-            
-            finishOrder.forEach((racer, i) => {
-                const pos = i + 1;
-                const name = racer.isPlayer ? 'ВЫ' : `Бот ${i + 1}`;
-                const icon = racer.racerType === 'ball' ? '⚽' : 
-                            racer.racerType === 'square' ? '🟫' : '🔺';
-                
-                const row = document.createElement('div');
-                row.className = 'result-row';
-                row.innerHTML = `
-                    <span class="result-position">#${pos}</span>
-                    <span>${icon} ${name}</span>
-                    <span>${racer.laps} кругов</span>
-                `;
-                table.appendChild(row);
-            });
         }
 
         function restartGame() {
             document.getElementById('finishScreen').classList.add('hidden');
-            
-            // Очистка
-            World.clear(world);
-            Engine.clear(engine);
-            
-            startRace();
+            initRace();
         }
 
         function goToMainMenu() {
             document.getElementById('finishScreen').classList.add('hidden');
             document.getElementById('mainMenu').classList.remove('hidden');
-            
-            World.clear(world);
-            Engine.clear(engine);
+            raceStarted = false;
+            raceFinished = false;
         }
 
         function showTutorial() {
-            alert(`🎮 КАК ИГРАТЬ:\n\n` +
+            alert(`🎮 КАК ИГРАТЬ В SHAPE RACERS 3D:\n\n` +
                   `🏁 Цель: Проехать 3 круга первым!\n\n` +
                   `🕹️ Управление:\n` +
-                  `• Стрелки/WASD - движение\n` +
+                  `• W/↑ - газ вперёд\n` +
+                  `• S/↓ - тормоз/назад\n` +
+                  `• A/← - поворот влево\n` +
+                  `• D/→ - поворот вправо\n` +
                   `• ПРОБЕЛ - супер-способность (заряжается 30 сек)\n\n` +
                   `⚡ Супер-способности:\n` +
-                  `• Шар: Ускорение вперёд\n` +
-                  `• Квадрат: Подбрасывает соперников\n` +
-                  `• Конус: Вихрь отбрасывает всех\n\n` +
-                  `💥 Скидывайте соперников с трассы!\n` +
-                  `За это даются дополнительные очки.`);
+                  `• ШАР: Турбо-ускорение на 3 секунды\n` +
+                  `• КВАДРАТ: Ударная волна оглушает врагов\n` +
+                  `• КОНУС: Смерч притягивает и замедляет всех\n\n` +
+                  `💡 СОВЕТЫ:\n` +
+                  `• Не вылетайте с трассы!\n` +
+                  `• Толкайте соперников на поворотах\n` +
+                  `• Квадрат медленнее, но его трудно сдвинуть\n` +
+                  `• Шар быстрый, но легко вылетает`);
         }
 
         // Запуск
+        createTerrain();
+        generateTrack();
         gameLoop();
     </script>
 </body>
