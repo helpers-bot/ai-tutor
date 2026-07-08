@@ -32,7 +32,6 @@
       display: block;
     }
 
-    /* Авторизация */
     .auth-container {
       background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
       border-radius: 28px;
@@ -66,9 +65,7 @@
       border-color: #7873f5;
       box-shadow: 0 0 15px rgba(120, 115, 245, 0.4);
     }
-    .auth-container input::placeholder {
-      color: #6666aa;
-    }
+    .auth-container input::placeholder { color: #6666aa; }
     .auth-container button {
       width: 100%;
       padding: 14px;
@@ -94,13 +91,8 @@
       font-size: 0.9rem;
       box-shadow: none;
     }
-    .error-msg {
-      color: #ff4444;
-      font-size: 0.85rem;
-      min-height: 20px;
-    }
+    .error-msg { color: #ff4444; font-size: 0.85rem; min-height: 20px; }
 
-    /* Игровой контейнер */
     .game-container {
       background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
       border-radius: 32px;
@@ -124,10 +116,7 @@
       border: 1px solid #3a3a8a;
       box-shadow: 0 0 20px rgba(120, 115, 245, 0.2);
     }
-    .user-info {
-      display: flex;
-      flex-direction: column;
-    }
+    .user-info { display: flex; flex-direction: column; }
     .username {
       font-weight: 600;
       font-size: 1.2rem;
@@ -161,6 +150,24 @@
       gap: 4px;
       font-size: 1rem;
       box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+      position: relative;
+    }
+    .bonus-timer {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff4444;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      display: none;
+      animation: pulse 1s infinite;
+    }
+    .bonus-timer.active { display: block; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
     .ref-count {
       background: rgba(120, 115, 245, 0.2);
@@ -172,6 +179,11 @@
       border: 1px solid #3a3a8a;
     }
 
+    .canvas-wrapper {
+      position: relative;
+      width: 100%;
+      height: 300px;
+    }
     canvas {
       width: 100%;
       height: 300px;
@@ -181,6 +193,20 @@
       box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(120, 115, 245, 0.2);
       touch-action: none;
       border: 1px solid #2a2a5a;
+    }
+    .floating-text {
+      position: absolute;
+      pointer-events: none;
+      font-weight: bold;
+      font-size: 1rem;
+      color: #ffd700;
+      text-shadow: 0 0 10px #ffd700;
+      animation: floatUp 1s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
     }
 
     .balls-slots {
@@ -198,7 +224,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       position: relative;
     }
     .slot-circle {
@@ -214,15 +240,21 @@
       font-size: 0.8rem;
     }
     .slot-circle.empty-slot {
-      background: #2a2a3a;
+      background: #2a2a3a !important;
       color: #555;
       border-color: #444;
-      box-shadow: none;
+      box-shadow: none !important;
     }
     .slot-circle.active-slot {
       border-color: #fff;
       color: #fff;
       text-shadow: 0 0 10px currentColor;
+    }
+    .slot-circle.launched-slot {
+      background: #2a2a3a !important;
+      color: #555;
+      border-color: #555;
+      box-shadow: none !important;
     }
     .slot-label {
       font-size: 0.65rem;
@@ -232,28 +264,23 @@
       max-width: 55px;
     }
     .launch-btn {
-      font-size: 0.6rem;
+      font-size: 0.65rem;
       background: linear-gradient(90deg, #ff6ec7, #7873f5);
       color: white;
       border: none;
       border-radius: 12px;
-      padding: 3px 8px;
+      padding: 4px 10px;
       font-weight: bold;
       cursor: pointer;
       display: none;
       box-shadow: 0 0 10px rgba(120, 115, 245, 0.5);
-      animation: pulse 2s infinite;
+      animation: btnGlow 2s infinite;
+      white-space: nowrap;
     }
-    .launch-btn.visible {
-      display: block;
-    }
-    @keyframes pulse {
+    .launch-btn.visible { display: block; }
+    @keyframes btnGlow {
       0%, 100% { box-shadow: 0 0 10px rgba(120, 115, 245, 0.5); }
       50% { box-shadow: 0 0 20px rgba(255, 110, 199, 0.8); }
-    }
-    @keyframes btnGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(120, 115, 245, 0.4); }
-      50% { box-shadow: 0 0 25px rgba(255, 110, 199, 0.7); }
     }
 
     .buttons-grid {
@@ -282,10 +309,7 @@
       animation: btnGlow 3s infinite;
       backdrop-filter: blur(5px);
     }
-    .btn:active {
-      transform: scale(0.95);
-      background: rgba(60, 60, 100, 0.9);
-    }
+    .btn:active { transform: scale(0.95); background: rgba(60, 60, 100, 0.9); }
     .btn.primary {
       background: linear-gradient(90deg, #ff6ec7, #7873f5);
       border: none;
@@ -299,7 +323,6 @@
       font-weight: bold;
     }
 
-    /* Модалки */
     .modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -313,10 +336,7 @@
       opacity: 0;
       transition: 0.3s ease;
     }
-    .modal.active {
-      visibility: visible;
-      opacity: 1;
-    }
+    .modal.active { visibility: visible; opacity: 1; }
     .modal-content {
       background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
       padding: 24px;
@@ -337,11 +357,7 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .modal-content p {
-      margin: 8px 0;
-      font-size: 0.9rem;
-      color: #ccc;
-    }
+    .modal-content p { margin: 8px 0; font-size: 0.9rem; color: #ccc; }
     .close-btn {
       background: rgba(60, 60, 100, 0.8);
       border: 1px solid #3a3a8a;
@@ -354,9 +370,7 @@
       display: inline-block;
       transition: 0.3s;
     }
-    .close-btn:hover {
-      background: rgba(80, 80, 140, 0.9);
-    }
+    .close-btn:hover { background: rgba(80, 80, 140, 0.9); }
     .copy-text {
       background: #0a0a1a;
       padding: 8px;
@@ -374,9 +388,7 @@
       text-align: left;
       border: 1px solid #3a3a8a;
     }
-    .vip-option button {
-      margin-top: 6px;
-    }
+    .vip-option button { margin-top: 6px; }
     .admin-panel {
       background: rgba(255, 110, 199, 0.1);
       border: 1px solid #ff6ec7;
@@ -406,7 +418,6 @@
 </head>
 <body>
 
-<!-- Авторизация -->
 <div id="authScreen" class="screen active">
   <div class="auth-container" id="loginForm">
     <h2>🔐 Вход</h2>
@@ -427,7 +438,6 @@
   </div>
 </div>
 
-<!-- Игра -->
 <div id="gameScreen" class="screen">
   <div class="game-container">
     <div class="top-panel">
@@ -436,10 +446,15 @@
         <span id="vipStatus" class="no-vip">VIP неактивен</span>
         <span class="ref-count" id="refCountDisplay">👥 0 реф. (0 VIP)</span>
       </div>
-      <div class="balance" id="balanceDisplay">⭐ 0</div>
+      <div class="balance" id="balanceDisplay">
+        ⭐ 0
+        <span class="bonus-timer" id="bonusTimer">60s</span>
+      </div>
     </div>
     <div class="balls-slots" id="ballsSlotsContainer"></div>
-    <canvas id="gameCanvas" width="400" height="300"></canvas>
+    <div class="canvas-wrapper" id="canvasWrapper">
+      <canvas id="gameCanvas" width="400" height="300"></canvas>
+    </div>
     <div class="buttons-grid">
       <button class="btn primary" id="buyVipBtn">💎 VIP</button>
       <button class="btn" id="bonusBtn">⚡ x5</button>
@@ -451,7 +466,6 @@
   </div>
 </div>
 
-<!-- VIP -->
 <div class="modal" id="vipModal">
   <div class="modal-content">
     <h3>💎 VIP статус</h3>
@@ -471,7 +485,6 @@
   </div>
 </div>
 
-<!-- Бонус -->
 <div class="modal" id="bonusModal">
   <div class="modal-content">
     <h3>⚡ x5 Бонус</h3>
@@ -481,7 +494,6 @@
   </div>
 </div>
 
-<!-- Друзья -->
 <div class="modal" id="inviteModal">
   <div class="modal-content">
     <h3>👥 Пригласить друга</h3>
@@ -495,7 +507,6 @@
   </div>
 </div>
 
-<!-- Профиль -->
 <div class="modal" id="profileModal">
   <div class="modal-content">
     <h3>👤 Профиль</h3>
@@ -509,9 +520,9 @@
     <button class="close-btn" id="copyProfileRefBtn">📋 Копировать ссылку</button>
     <div class="admin-panel" id="adminPanel" style="display:none;">
       <strong>👑 Админ-панель (Casper)</strong>
-      <p style="font-size:0.75rem;">Изменить VIP-рефералов:</p>
+      <p style="font-size:0.75rem;">VIP-рефералов:</p>
       <input type="number" id="adminVipRefs" value="0" min="0">
-      <button id="adminSetRefsBtn">Установить</button>
+      <button id="adminSetRefsBtn">Уст.</button>
       <button id="adminAddRefBtn">+1</button>
       <button id="adminRemoveRefBtn">-1</button>
     </div>
@@ -519,7 +530,6 @@
   </div>
 </div>
 
-<!-- Вывод -->
 <div class="modal" id="withdrawModal">
   <div class="modal-content">
     <h3>💸 Вывод средств</h3>
@@ -535,23 +545,23 @@
 
 <script>
   (function() {
-    const USERS_KEY = 'neon_game_users';
-    const SESSION_KEY = 'neon_game_session';
-    const SAVED_LOGIN_KEY = 'neon_saved_login';
+    const USERS_KEY = 'neon_game_users_v3';
+    const SESSION_KEY = 'neon_game_session_v3';
+    const SAVED_LOGIN_KEY = 'neon_saved_login_v3';
+    const OFFLINE_EARNINGS_KEY = 'neon_offline_earnings';
 
     function getUsers() {
       const data = localStorage.getItem(USERS_KEY);
       return data ? JSON.parse(data) : {};
     }
-    function saveUsers(users) {
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
+    function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
 
     let currentUser = null;
     let userState = {
       id: null, name: '', balance: 0, isVip: false, vipExpiry: null,
       ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
       bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1,
+      lastSeen: Date.now(),
     };
 
     const ballColors = [
@@ -582,6 +592,22 @@
           }
           if (!userState.totalReferrals) userState.totalReferrals = 0;
           if (!userState.vipReferrals) userState.vipReferrals = 0;
+          if (!userState.lastSeen) userState.lastSeen = Date.now();
+
+          // Оффлайн-заработок
+          const now = Date.now();
+          const elapsed = now - userState.lastSeen;
+          if (elapsed > 10000) {
+            const offlineSeconds = Math.floor(elapsed / 1000);
+            const ballsInGame = Math.min(userState.activeBallsInGame, userState.ballsCount);
+            const hitsPerSecond = ballsInGame * 2;
+            const starsPerHit = userState.isVip ? 2 : 1;
+            const earned = Math.floor(offlineSeconds * hitsPerSecond * starsPerHit * 0.5);
+            if (earned > 0) {
+              userState.balance += earned;
+            }
+          }
+          userState.lastSeen = now;
           return true;
         }
       }
@@ -590,22 +616,15 @@
 
     function saveUserState() {
       if (!currentUser) return;
+      userState.lastSeen = Date.now();
       const users = getUsers();
       users[currentUser] = { ...userState };
       saveUsers(users);
     }
 
-    function generateId() {
-      return Math.floor(10000000 + Math.random() * 90000000).toString();
-    }
-
-    // Сохранение логина
-    function saveLoginCredentials(username) {
-      localStorage.setItem(SAVED_LOGIN_KEY, username);
-    }
-    function getSavedLogin() {
-      return localStorage.getItem(SAVED_LOGIN_KEY);
-    }
+    function generateId() { return Math.floor(10000000 + Math.random() * 90000000).toString(); }
+    function saveLoginCredentials(username) { localStorage.setItem(SAVED_LOGIN_KEY, username); }
+    function getSavedLogin() { return localStorage.getItem(SAVED_LOGIN_KEY); }
 
     const authScreen = document.getElementById('authScreen');
     const gameScreen = document.getElementById('gameScreen');
@@ -618,9 +637,7 @@
       loginForm.style.display = 'block';
       registerForm.style.display = 'none';
       const savedLogin = getSavedLogin();
-      if (savedLogin) {
-        document.getElementById('loginUsername').value = savedLogin;
-      }
+      if (savedLogin) document.getElementById('loginUsername').value = savedLogin;
     }
 
     function showGame() {
@@ -636,12 +653,10 @@
     }
 
     document.getElementById('showRegisterBtn').addEventListener('click', ()=>{
-      loginForm.style.display = 'none';
-      registerForm.style.display = 'block';
+      loginForm.style.display = 'none'; registerForm.style.display = 'block';
     });
     document.getElementById('showLoginBtn').addEventListener('click', ()=>{
-      registerForm.style.display = 'none';
-      loginForm.style.display = 'block';
+      registerForm.style.display = 'none'; loginForm.style.display = 'block';
     });
 
     document.getElementById('registerBtn').addEventListener('click', ()=>{
@@ -655,9 +670,10 @@
       const users = getUsers();
       if (users[name]) { errEl.textContent = 'Такой никнейм уже занят'; return; }
       users[name] = {
-        id: generateId(), name: name, balance: 0, isVip: false, vipExpiry: null,
+        id: generateId(), name, balance: 0, isVip: false, vipExpiry: null,
         ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
         bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1,
+        lastSeen: Date.now(),
       };
       saveUsers(users);
       localStorage.setItem(SESSION_KEY, name);
@@ -684,6 +700,7 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      saveUserState();
       localStorage.removeItem(SESSION_KEY);
       currentUser = null;
       userState = {};
@@ -691,61 +708,53 @@
       showAuth();
     });
 
+    window.addEventListener('beforeunload', () => {
+      if (currentUser) saveUserState();
+    });
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const canvasWrapper = document.getElementById('canvasWrapper');
+    const FIXED_WIDTH = 400;
+    const FIXED_HEIGHT = 300;
+    canvas.width = FIXED_WIDTH;
+    canvas.height = FIXED_HEIGHT;
 
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) {
-        canvas.width = rect.width;
-        canvas.height = 300;
-      }
-    }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
+    const BALL_RADIUS = 15;
 
     class Ball {
-      constructor(x, y, vx, vy, radius = 16, colorIndex = 0) {
+      constructor(x, y, vx, vy, colorIndex) {
         this.x = x; this.y = y; this.vx = vx; this.vy = vy;
-        this.radius = radius; this.colorIndex = colorIndex;
+        this.radius = BALL_RADIUS; this.colorIndex = colorIndex;
+        this.mass = 1;
       }
     }
 
     let balls = [];
+    const floatingTexts = [];
 
     function createBalls(count) {
       balls = [];
-      const w = canvas.width || 400;
-      const h = canvas.height || 300;
       for (let i = 0; i < count; i++) {
-        let r = 15 + Math.floor(Math.random()*5);
-        let x = Math.random() * (w - 2*r) + r;
-        let y = Math.random() * (h - 2*r) + r;
-        let speed = 1.8 + Math.random()*1.5;
-        let angle = Math.random()*2*Math.PI;
-        balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, r, i % ballColors.length));
-      }
-      resolveOverlap();
-    }
-
-    function resolveOverlap() {
-      const w = canvas.width, h = canvas.height;
-      for (let i=0;i<balls.length;i++) {
-        for (let j=i+1;j<balls.length;j++) {
-          let b1=balls[i], b2=balls[j];
-          let dx=b2.x-b1.x, dy=b2.y-b1.y, dist=Math.sqrt(dx*dx+dy*dy);
-          let min=b1.radius+b2.radius;
-          if(dist<min && dist>0.001) {
-            let ang=Math.atan2(dy,dx);
-            let move=(min-dist)/2;
-            b1.x-=Math.cos(ang)*move; b1.y-=Math.sin(ang)*move;
-            b2.x+=Math.cos(ang)*move; b2.y+=Math.sin(ang)*move;
-            b1.x=Math.min(Math.max(b1.x,b1.radius),w-b1.radius);
-            b1.y=Math.min(Math.max(b1.y,b1.radius),h-b1.radius);
-            b2.x=Math.min(Math.max(b2.x,b2.radius),w-b2.radius);
-            b2.y=Math.min(Math.max(b2.y,b2.radius),h-b2.radius);
+        let x, y, overlapping;
+        let attempts = 0;
+        do {
+          overlapping = false;
+          x = BALL_RADIUS + Math.random() * (FIXED_WIDTH - 2 * BALL_RADIUS);
+          y = BALL_RADIUS + Math.random() * (FIXED_HEIGHT - 2 * BALL_RADIUS);
+          for (const b of balls) {
+            const dx = b.x - x, dy = b.y - y;
+            if (Math.sqrt(dx*dx + dy*dy) < BALL_RADIUS * 2 + 2) {
+              overlapping = true;
+              break;
+            }
           }
-        }
+          attempts++;
+        } while (overlapping && attempts < 100);
+
+        const speed = 1.8 + Math.random() * 1.5;
+        const angle = Math.random() * 2 * Math.PI;
+        balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, i % ballColors.length));
       }
     }
 
@@ -756,62 +765,105 @@
       }
     }
 
+    function spawnFloatingText(x, y, text) {
+      const el = document.createElement('div');
+      el.className = 'floating-text';
+      el.textContent = text;
+      const rect = canvas.getBoundingClientRect();
+      const wrapperRect = canvasWrapper.getBoundingClientRect();
+      const scaleX = FIXED_WIDTH / rect.width;
+      const scaleY = FIXED_HEIGHT / rect.height;
+      const left = (x / scaleX) + (rect.left - wrapperRect.left);
+      const top = (y / scaleY) + (rect.top - wrapperRect.top);
+      el.style.left = left + 'px';
+      el.style.top = top + 'px';
+      canvasWrapper.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }
+
     function applyBonusSpeed() {
       if (userState.bonusEndTime && Date.now() < userState.bonusEndTime) return 5;
       return 1;
     }
 
-    function gameLoop(ts) {
+    function resolveCollisions() {
+      for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+          const a = balls[i], b = balls[j];
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          const minDist = a.radius + b.radius;
+          if (dist < minDist) {
+            // Нормаль
+            const nx = dist > 0.001 ? dx / dist : 1;
+            const ny = dist > 0.001 ? dy / dist : 0;
+
+            // Относительная скорость
+            const dvx = a.vx - b.vx;
+            const dvy = a.vy - b.vy;
+            const vn = dvx * nx + dvy * ny;
+
+            // Отталкиваем только если сближаются
+            if (vn > 0) {
+              const impulse = 2 * vn / (a.mass + b.mass);
+              a.vx -= impulse * b.mass * nx;
+              a.vy -= impulse * b.mass * ny;
+              b.vx += impulse * a.mass * nx;
+              b.vy += impulse * a.mass * ny;
+            }
+
+            // Раздвигаем
+            const overlap = minDist - dist;
+            const moveX = overlap * nx / 2;
+            const moveY = overlap * ny / 2;
+            a.x -= moveX;
+            a.y -= moveY;
+            b.x += moveX;
+            b.y += moveY;
+          }
+        }
+      }
+    }
+
+    function gameLoop() {
       if (!gameScreen.classList.contains('active')) {
         requestAnimationFrame(gameLoop);
         return;
       }
-      const w = canvas.width, h = canvas.height;
       const sp = applyBonusSpeed();
-      for (let b of balls) {
-        b.x += b.vx * sp * 0.85;
-        b.y += b.vy * sp * 0.85;
+      const dt = 1;
+
+      for (const b of balls) {
+        b.x += b.vx * sp * dt;
+        b.y += b.vy * sp * dt;
+
         let hit = false;
-        if(b.x-b.radius<0){b.x=b.radius; b.vx=Math.abs(b.vx); hit=true;}
-        if(b.x+b.radius>w){b.x=w-b.radius; b.vx=-Math.abs(b.vx); hit=true;}
-        if(b.y-b.radius<0){b.y=b.radius; b.vy=Math.abs(b.vy); hit=true;}
-        if(b.y+b.radius>h){b.y=h-b.radius; b.vy=-Math.abs(b.vy); hit=true;}
-        if(hit){
-          userState.balance += userState.isVip ? 2 : 1;
+        if (b.x - b.radius < 0) { b.x = b.radius; b.vx = Math.abs(b.vx); hit = true; }
+        if (b.x + b.radius > FIXED_WIDTH) { b.x = FIXED_WIDTH - b.radius; b.vx = -Math.abs(b.vx); hit = true; }
+        if (b.y - b.radius < 0) { b.y = b.radius; b.vy = Math.abs(b.vy); hit = true; }
+        if (b.y + b.radius > FIXED_HEIGHT) { b.y = FIXED_HEIGHT - b.radius; b.vy = -Math.abs(b.vy); hit = true; }
+
+        if (hit) {
+          const stars = userState.isVip ? 2 : 1;
+          userState.balance += stars;
+          spawnFloatingText(b.x, b.y - b.radius, `+${stars}`);
           saveUserState();
           updateUI();
         }
       }
-      for(let i=0;i<balls.length;i++){
-        for(let j=i+1;j<balls.length;j++){
-          let a=balls[i], b2=balls[j];
-          let dx=b2.x-a.x, dy=b2.y-a.y, dist=Math.sqrt(dx*dx+dy*dy);
-          let min=a.radius+b2.radius;
-          if(dist<min && dist>0.001){
-            let nx=dx/dist, ny=dy/dist;
-            let dvx=a.vx-b2.vx, dvy=a.vy-b2.vy;
-            let vn=dvx*nx+dvy*ny;
-            if(vn<0){
-              let imp=2*vn/2;
-              a.vx-=imp*nx; a.vy-=imp*ny;
-              b2.vx+=imp*nx; b2.vy+=imp*ny;
-            }
-            let ov=min-dist;
-            a.x-=ov*nx/2; a.y-=ov*ny/2;
-            b2.x+=ov*nx/2; b2.y+=ov*ny/2;
-          }
-        }
-      }
-      ctx.clearRect(0,0,w,h);
-      for(let b of balls){
+
+      resolveCollisions();
+
+      ctx.clearRect(0, 0, FIXED_WIDTH, FIXED_HEIGHT);
+      for (const b of balls) {
         const color = ballColors[b.colorIndex];
         const glow = ballGlowColors[b.colorIndex];
         ctx.save();
         ctx.shadowColor = glow;
         ctx.shadowBlur = 20;
         ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI*2);
-        const g = ctx.createRadialGradient(b.x-4, b.y-4, 2, b.x, b.y, b.radius);
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        const g = ctx.createRadialGradient(b.x - 4, b.y - 4, 2, b.x, b.y, b.radius);
         g.addColorStop(0, '#ffffff');
         g.addColorStop(0.3, color);
         g.addColorStop(1, '#00000060');
@@ -821,7 +873,7 @@
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.beginPath();
-        ctx.arc(b.x-5, b.y-5, 4, 0, 2*Math.PI);
+        ctx.arc(b.x - 5, b.y - 5, 4, 0, 2 * Math.PI);
         ctx.fillStyle = '#ffffffcc';
         ctx.fill();
         ctx.restore();
@@ -834,8 +886,7 @@
 
     function renderSlots(container = slotsContainer) {
       container.innerHTML = '';
-      const maxSlots = slotsRequirements.length;
-      for (let i = 0; i < maxSlots; i++) {
+      for (let i = 0; i < slotsRequirements.length; i++) {
         const req = slotsRequirements[i];
         const slot = document.createElement('div');
         slot.className = 'slot';
@@ -843,8 +894,12 @@
         const circle = document.createElement('div');
         circle.className = 'slot-circle';
         const isUnlocked = i < userState.ballsCount;
+        const isLaunched = i < userState.activeBallsInGame;
 
-        if (isUnlocked) {
+        if (isLaunched) {
+          circle.classList.add('launched-slot');
+          circle.textContent = '';
+        } else if (isUnlocked) {
           circle.classList.add('active-slot');
           circle.style.backgroundColor = ballColors[i % ballColors.length];
           circle.style.boxShadow = `0 0 15px ${ballGlowColors[i % ballColors.length]}`;
@@ -857,23 +912,21 @@
         const label = document.createElement('div');
         label.className = 'slot-label';
         if (i === 0) {
-          label.textContent = 'Старт';
+          label.textContent = isLaunched ? 'Запущен' : 'Старт';
         } else {
-          const currentVip = userState.vipReferrals;
-          label.textContent = `${Math.min(currentVip, req)}/${req} VIP`;
+          label.textContent = `${Math.min(userState.vipReferrals, req)}/${req} VIP`;
         }
 
         const launchBtn = document.createElement('button');
         launchBtn.className = 'launch-btn';
-        launchBtn.textContent = '🚀';
-        const isInGame = i < userState.activeBallsInGame;
-        if (isUnlocked && !isInGame) {
+        launchBtn.textContent = 'Запустить';
+        if (isUnlocked && !isLaunched) {
           launchBtn.classList.add('visible');
         }
 
         launchBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (currentUser === 'Casper' || (isUnlocked && !isInGame)) {
+          if (currentUser === 'Casper' || (isUnlocked && !isLaunched)) {
             if (userState.activeBallsInGame < userState.ballsCount) {
               userState.activeBallsInGame++;
               saveUserState();
@@ -902,9 +955,18 @@
         vipEl.className = 'no-vip';
         vipEl.textContent = 'VIP неактивен';
       }
-      document.getElementById('balanceDisplay').textContent = `⭐ ${userState.balance.toLocaleString()}`;
+      document.getElementById('balanceDisplay').childNodes[0].textContent = `⭐ ${userState.balance.toLocaleString()} `;
       document.getElementById('refCountDisplay').textContent =
         `👥 ${userState.totalReferrals} реф. (${userState.vipReferrals} VIP)`;
+
+      const timerEl = document.getElementById('bonusTimer');
+      if (userState.bonusEndTime && Date.now() < userState.bonusEndTime) {
+        const remaining = Math.ceil((userState.bonusEndTime - Date.now()) / 1000);
+        timerEl.textContent = `${remaining}s`;
+        timerEl.classList.add('active');
+      } else {
+        timerEl.classList.remove('active');
+      }
     }
 
     function recalcBalls() {
@@ -937,14 +999,12 @@
         userState.vipExpiry + 30*24*60*60*1000 : now + 30*24*60*60*1000;
       saveUserState(); updateUI();
       document.getElementById('vipModal').classList.remove('active');
-      alert('VIP на месяц активирован!');
     });
     document.getElementById('buyVipForeverBtn').addEventListener('click', ()=>{
       userState.isVip = true;
       userState.vipExpiry = null;
       saveUserState(); updateUI();
       document.getElementById('vipModal').classList.remove('active');
-      alert('VIP навсегда активирован!');
     });
 
     // Бонус
@@ -954,8 +1014,8 @@
       userState.bonusMultiplier = 5;
       userState.bonusEndTime = Date.now() + 60000;
       saveUserState();
+      updateUI();
       document.getElementById('bonusModal').classList.remove('active');
-      alert('x5 бонус активирован на 1 минуту!');
     });
 
     // Друзья
@@ -968,7 +1028,7 @@
     });
     document.getElementById('closeInviteModal').addEventListener('click', ()=> document.getElementById('inviteModal').classList.remove('active'));
     document.getElementById('copyRefBtn').addEventListener('click', ()=>{
-      navigator.clipboard?.writeText(document.getElementById('refLinkDisplay').textContent).then(()=>alert('Ссылка скопирована!'));
+      navigator.clipboard?.writeText(document.getElementById('refLinkDisplay').textContent).then(()=>alert('Скопировано!'));
     });
 
     // Профиль
@@ -981,8 +1041,6 @@
       document.getElementById('profileVipStatus').textContent = userState.isVip ?
         (userState.vipExpiry ? `до ${new Date(userState.vipExpiry).toLocaleDateString()}` : 'навсегда') : 'нет';
       document.getElementById('profileRef').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
-
-      // Админ-панель для Casper
       const adminPanel = document.getElementById('adminPanel');
       if (currentUser === 'Casper') {
         adminPanel.style.display = 'block';
@@ -990,12 +1048,11 @@
       } else {
         adminPanel.style.display = 'none';
       }
-
       document.getElementById('profileModal').classList.add('active');
     });
     document.getElementById('closeProfileModal').addEventListener('click', ()=> document.getElementById('profileModal').classList.remove('active'));
     document.getElementById('copyProfileRefBtn').addEventListener('click', ()=>{
-      navigator.clipboard?.writeText(document.getElementById('profileRef').textContent).then(()=>alert('Ссылка скопирована!'));
+      navigator.clipboard?.writeText(document.getElementById('profileRef').textContent).then(()=>alert('Скопировано!'));
     });
     document.getElementById('editNameBtn').addEventListener('click', ()=>{
       const newName = prompt('Новое имя:', userState.name);
@@ -1013,16 +1070,12 @@
       }
     });
 
-    // Админ-кнопки
+    // Админ
     document.getElementById('adminSetRefsBtn').addEventListener('click', ()=>{
       if (currentUser !== 'Casper') return;
-      const val = parseInt(document.getElementById('adminVipRefs').value) || 0;
-      userState.vipReferrals = Math.max(0, val);
+      userState.vipReferrals = Math.max(0, parseInt(document.getElementById('adminVipRefs').value) || 0);
       userState.totalReferrals = Math.max(userState.totalReferrals, userState.vipReferrals);
-      recalcBalls();
-      saveUserState();
-      updateUI();
-      renderSlots();
+      recalcBalls(); saveUserState(); updateUI(); renderSlots();
       document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
       document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
     });
@@ -1030,10 +1083,7 @@
       if (currentUser !== 'Casper') return;
       userState.vipReferrals++;
       userState.totalReferrals = Math.max(userState.totalReferrals, userState.vipReferrals);
-      recalcBalls();
-      saveUserState();
-      updateUI();
-      renderSlots();
+      recalcBalls(); saveUserState(); updateUI(); renderSlots();
       document.getElementById('adminVipRefs').value = userState.vipReferrals;
       document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
       document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
@@ -1041,10 +1091,7 @@
     document.getElementById('adminRemoveRefBtn').addEventListener('click', ()=>{
       if (currentUser !== 'Casper') return;
       userState.vipReferrals = Math.max(0, userState.vipReferrals - 1);
-      recalcBalls();
-      saveUserState();
-      updateUI();
-      renderSlots();
+      recalcBalls(); saveUserState(); updateUI(); renderSlots();
       document.getElementById('adminVipRefs').value = userState.vipReferrals;
       document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
     });
@@ -1068,41 +1115,37 @@
       if (userState.balance >= 10000000 && userState.totalReferrals >= 10) {
         alert('Заявка на вывод 10$ отправлена! (эмуляция)');
         userState.balance -= 10000000;
-        saveUserState();
-        updateUI();
+        saveUserState(); updateUI();
         document.getElementById('withdrawModal').classList.remove('active');
       } else {
-        alert('Не выполнены условия для вывода!');
+        alert('Не выполнены условия!');
       }
     });
 
     document.querySelectorAll('.modal').forEach(m=> m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('active'); }));
 
-    // Обработка реферальной ссылки
     const params = new URLSearchParams(location.search);
     if(params.get('ref') && loadUserState()){
-      if(!sessionStorage.getItem('invited_done')){
-        sessionStorage.setItem('invited_done','1');
+      if(!sessionStorage.getItem('invited_done_v3')){
+        sessionStorage.setItem('invited_done_v3','1');
         userState.totalReferrals++;
         userState.vipReferrals++;
-        recalcBalls();
-        saveUserState();
-        renderSlots();
-        alert('Друг с VIP присоединился! +1 шар.');
+        recalcBalls(); saveUserState(); renderSlots();
       }
     }
 
     setInterval(()=>{
       if(userState.vipExpiry && Date.now() > userState.vipExpiry){
-        userState.isVip = false;
-        userState.vipExpiry = null;
-        saveUserState();
-        updateUI();
+        userState.isVip = false; userState.vipExpiry = null; saveUserState(); updateUI();
       }
-      if(userState.bonusEndTime && Date.now()>userState.bonusEndTime){
-        userState.bonusMultiplier=1; userState.bonusEndTime=0; saveUserState();
+      if(userState.bonusEndTime && Date.now() > userState.bonusEndTime){
+        userState.bonusMultiplier = 1; userState.bonusEndTime = 0; saveUserState(); updateUI();
       }
-    },1000);
+      if (currentUser && userState.bonusEndTime && Date.now() < userState.bonusEndTime) {
+        const remaining = Math.ceil((userState.bonusEndTime - Date.now()) / 1000);
+        document.getElementById('bonusTimer').textContent = `${remaining}s`;
+      }
+    }, 1000);
 
     if(loadUserState()){
       recalcBalls();
