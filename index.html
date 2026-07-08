@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Неоновые шарики • Звёзды</title>
+  <title>VDS — Неоновые шарики и звёзды</title>
+  <meta name="description" content="VDS — браузерная игра с неоновыми шарами. Зарабатывай звёзды, приглашай друзей, покупай VIP и выводи средства. Играй на ПК и телефоне.">
+  <meta name="keywords" content="VDS, игра шарики, неоновые шары, заработать звёзды, браузерная игра, VIP, рефералы, вывод средств">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="VDS — Неоновые шарики и звёзды">
+  <meta property="og:description" content="Зарабатывай звёзды, отскакивая от стен! Приглашай друзей, получай новые шары и выводи заработанное.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="VDS — Неоновые шарики">
+  <meta name="twitter:description" content="Играй в VDS, собирай звёзды и приглашай друзей!">
   <style>
     * {
       margin: 0;
@@ -30,6 +39,22 @@
     }
     .screen.active { display: block; }
 
+    .game-title {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #ff6ec7, #7873f5, #00ff88);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+      letter-spacing: 2px;
+    }
+    .game-subtitle {
+      color: #aaaacc;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+
     .auth-container {
       background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
       border-radius: 28px;
@@ -41,7 +66,7 @@
     }
     .auth-container h2 {
       margin-bottom: 20px;
-      font-size: 1.8rem;
+      font-size: 1.5rem;
       background: linear-gradient(90deg, #ff6ec7, #7873f5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -108,34 +133,54 @@
       background: rgba(20, 20, 50, 0.8);
       backdrop-filter: blur(10px);
       border-radius: 24px;
-      padding: 10px 18px;
+      padding: 12px 18px;
       color: white;
       flex-wrap: wrap;
+      gap: 8px;
       border: 1px solid #3a3a8a;
       box-shadow: 0 0 20px rgba(120, 115, 245, 0.2);
     }
-    .user-info { display: flex; flex-direction: column; gap: 2px; }
-    .username {
-      font-weight: 600;
-      font-size: 1.2rem;
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .user-row {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .username {
+      font-weight: 700;
+      font-size: 1.1rem;
     }
     .vip-badge {
       background: linear-gradient(90deg, #ffd700, #ffaa00);
       color: #000;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: bold;
       padding: 3px 10px;
       border-radius: 20px;
-      box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+      white-space: nowrap;
     }
     .no-vip {
       color: #ff4444;
       text-decoration: line-through;
       font-weight: 500;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
+      white-space: nowrap;
+    }
+    .ref-badge {
+      background: rgba(120, 115, 245, 0.25);
+      color: #c0c0e0;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      border: 1px solid #3a3a8a;
+      white-space: nowrap;
     }
     .balance {
       background: linear-gradient(90deg, #ffd700, #ffaa00);
@@ -149,6 +194,7 @@
       font-size: 1rem;
       box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
       position: relative;
+      white-space: nowrap;
     }
     .bonus-timer {
       position: absolute;
@@ -156,8 +202,8 @@
       right: -8px;
       background: #ff4444;
       color: white;
-      font-size: 0.65rem;
-      padding: 2px 8px;
+      font-size: 0.6rem;
+      padding: 2px 7px;
       border-radius: 10px;
       display: none;
       animation: pulse 1s infinite;
@@ -166,14 +212,6 @@
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.15); }
-    }
-    .ref-count {
-      background: rgba(120, 115, 245, 0.2);
-      color: #aaaacc;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.7rem;
-      border: 1px solid #3a3a8a;
     }
 
     .canvas-wrapper {
@@ -250,7 +288,7 @@
     }
     .slot-circle.active-slot {
       border-color: #ffffff;
-      box-shadow: 0 0 12px currentColor;
+      box-shadow: 0 0 14px currentColor;
     }
     .slot-circle.launched-slot {
       background: #2a2a3a !important;
@@ -392,7 +430,6 @@
     }
     .vip-option button { margin-top: 6px; }
 
-    /* Профиль */
     .profile-row {
       display: flex;
       justify-content: space-between;
@@ -407,18 +444,27 @@
     .profile-row .label {
       color: #aaaacc;
       font-size: 0.85rem;
+      flex-shrink: 0;
     }
     .profile-row .value {
       color: white;
       font-weight: 600;
       font-size: 0.9rem;
       text-align: right;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .profile-row .value.gold {
-      color: #ffd700;
-    }
-    .profile-row .value.vip {
-      color: #00ff88;
+    .profile-row .value.gold { color: #ffd700; }
+    .profile-row .value.vip { color: #00ff88; }
+    .copy-icon-btn {
+      background: #3a3a8a;
+      border: none;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.7rem;
     }
     .admin-panel {
       background: rgba(255, 110, 199, 0.1);
@@ -454,6 +500,8 @@
 
 <div id="authScreen" class="screen active">
   <div class="auth-container" id="loginForm">
+    <div class="game-title">VDS</div>
+    <div class="game-subtitle">Неоновые шарики • Зарабатывай звёзды</div>
     <h2>🔐 Вход</h2>
     <input type="text" id="loginUsername" placeholder="Логин" autocomplete="off">
     <input type="password" id="loginPassword" placeholder="Пароль">
@@ -462,6 +510,8 @@
     <button class="link-btn" id="showRegisterBtn">Нет аккаунта? Зарегистрироваться</button>
   </div>
   <div class="auth-container" id="registerForm" style="display:none;">
+    <div class="game-title">VDS</div>
+    <div class="game-subtitle">Неоновые шарики • Зарабатывай звёзды</div>
     <h2>📝 Регистрация</h2>
     <input type="text" id="regUsername" placeholder="Никнейм" autocomplete="off">
     <input type="password" id="regPassword1" placeholder="Пароль">
@@ -476,9 +526,11 @@
   <div class="game-container">
     <div class="top-panel">
       <div class="user-info">
-        <span class="username" id="displayName">Игрок</span>
-        <span id="vipStatus" class="no-vip">VIP неактивен</span>
-        <span class="ref-count" id="refCountDisplay">👥 0 реф. (0 VIP)</span>
+        <div class="user-row">
+          <span class="username" id="displayName">Игрок</span>
+          <span id="vipStatus" class="no-vip">VIP неактивен</span>
+        </div>
+        <span class="ref-badge" id="refCountDisplay">👥 0 реф. (0 VIP)</span>
       </div>
       <div class="balance" id="balanceDisplay">
         ⭐ 0
@@ -550,7 +602,10 @@
     </div>
     <div class="profile-row">
       <span class="label">🆔 ID</span>
-      <span class="value" id="profileId">—</span>
+      <span class="value">
+        <span id="profileId">—</span>
+        <button class="copy-icon-btn" id="copyIdBtn">📋</button>
+      </span>
     </div>
     <div class="profile-row">
       <span class="label">⭐ Баланс</span>
@@ -598,82 +653,46 @@
 
 <script>
   (function() {
-    const USERS_KEY = 'neon_game_users_v4';
-    const SESSION_KEY = 'neon_game_session_v4';
-    const SAVED_CREDS_KEY = 'neon_saved_creds_v4';
+    const USERS_KEY = 'vds_game_users';
+    const SESSION_KEY = 'vds_game_session';
+    const SAVED_CREDS_KEY = 'vds_saved_creds';
 
-    function getUsers() {
-      const data = localStorage.getItem(USERS_KEY);
-      return data ? JSON.parse(data) : {};
-    }
-    function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
-
-    // Сохранение логина и пароля
-    function saveCredentials(username, password) {
-      localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify({ username, password }));
-    }
-    function getSavedCredentials() {
-      const data = localStorage.getItem(SAVED_CREDS_KEY);
-      return data ? JSON.parse(data) : null;
-    }
-    function clearCredentials() {
-      localStorage.removeItem(SAVED_CREDS_KEY);
-    }
+    function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
+    function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+    function saveCreds(u,p) { localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify({u,p})); }
+    function getCreds() { try { return JSON.parse(localStorage.getItem(SAVED_CREDS_KEY)); } catch(e) { return null; } }
 
     let currentUser = null;
     let userState = {
       id: null, name: '', password: '', balance: 0, isVip: false, vipExpiry: null,
       ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
-      bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1,
-      lastSeen: Date.now(),
+      bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1, lastSeen: Date.now(),
     };
 
-    const ballColors = [
-      '#ff6ec7', '#7873f5', '#00ff88', '#ffaa00', '#00ccff',
-      '#ff3366', '#cc00ff'
-    ];
-    const ballGlowColors = [
-      'rgba(255,110,199,0.8)', 'rgba(120,115,245,0.8)', 'rgba(0,255,136,0.8)',
-      'rgba(255,170,0,0.8)', 'rgba(0,204,255,0.8)', 'rgba(255,51,102,0.8)',
-      'rgba(204,0,255,0.8)'
-    ];
+    const ballColors = ['#ff6ec7','#7873f5','#00ff88','#ffaa00','#00ccff','#ff3366','#cc00ff'];
+    const ballGlows = ['rgba(255,110,199,0.8)','rgba(120,115,245,0.8)','rgba(0,255,136,0.8)','rgba(255,170,0,0.8)','rgba(0,204,255,0.8)','rgba(255,51,102,0.8)','rgba(204,0,255,0.8)'];
 
     function loadUserState() {
-      const session = localStorage.getItem(SESSION_KEY);
-      if (session) {
-        currentUser = session;
-        const users = getUsers();
-        if (users[currentUser]) {
-          userState = { ...userState, ...users[currentUser] };
-          if (!userState.id) userState.id = generateId();
-          if (userState.vipExpiry && Date.now() > userState.vipExpiry) {
-            userState.isVip = false;
-            userState.vipExpiry = null;
-          }
-          if (userState.bonusEndTime && Date.now() > userState.bonusEndTime) {
-            userState.bonusMultiplier = 1;
-            userState.bonusEndTime = 0;
-          }
-          if (!userState.totalReferrals) userState.totalReferrals = 0;
-          if (!userState.vipReferrals) userState.vipReferrals = 0;
-          if (!userState.lastSeen) userState.lastSeen = Date.now();
-
-          // Оффлайн-заработок
-          const now = Date.now();
-          const elapsed = now - userState.lastSeen;
-          if (elapsed > 10000) {
-            const offlineSeconds = Math.floor(elapsed / 1000);
-            const ballsInGame = Math.min(userState.activeBallsInGame, userState.ballsCount);
-            const hitsPerSecond = ballsInGame * 2;
-            const starsPerHit = userState.isVip ? 2 : 1;
-            const earned = Math.floor(offlineSeconds * hitsPerSecond * starsPerHit * 0.3);
-            if (earned > 0) userState.balance += earned;
-          }
-          userState.lastSeen = now;
-          return true;
-        }
+      const s = localStorage.getItem(SESSION_KEY);
+      if (!s) return false;
+      currentUser = s;
+      const users = getUsers();
+      if (!users[currentUser]) return false;
+      userState = { ...userState, ...users[currentUser] };
+      if (!userState.id) userState.id = Math.floor(10000000+Math.random()*90000000).toString();
+      if (userState.vipExpiry && Date.now() > userState.vipExpiry) { userState.isVip = false; userState.vipExpiry = null; }
+      if (userState.bonusEndTime && Date.now() > userState.bonusEndTime) { userState.bonusMultiplier = 1; userState.bonusEndTime = 0; }
+      userState.totalReferrals = userState.totalReferrals || 0;
+      userState.vipReferrals = userState.vipReferrals || 0;
+      if (!userState.lastSeen) userState.lastSeen = Date.now();
+      const elapsed = Date.now() - userState.lastSeen;
+      if (elapsed > 10000) {
+        const ballsInGame = Math.min(userState.activeBallsInGame, userState.ballsCount);
+        const earned = Math.floor((elapsed/1000) * ballsInGame * 2 * (userState.isVip?2:1) * 0.3);
+        if (earned > 0) userState.balance += earned;
       }
-      return false;
+      userState.lastSeen = Date.now();
+      return true;
     }
 
     function saveUserState() {
@@ -683,8 +702,6 @@
       users[currentUser] = { ...userState };
       saveUsers(users);
     }
-
-    function generateId() { return Math.floor(10000000 + Math.random() * 90000000).toString(); }
 
     const authScreen = document.getElementById('authScreen');
     const gameScreen = document.getElementById('gameScreen');
@@ -696,10 +713,10 @@
       gameScreen.classList.remove('active');
       loginForm.style.display = 'block';
       registerForm.style.display = 'none';
-      const creds = getSavedCredentials();
+      const creds = getCreds();
       if (creds) {
-        document.getElementById('loginUsername').value = creds.username;
-        document.getElementById('loginPassword').value = creds.password;
+        document.getElementById('loginUsername').value = creds.u;
+        document.getElementById('loginPassword').value = creds.p;
       }
     }
 
@@ -709,55 +726,47 @@
       updateUI();
       renderSlots();
       syncBalls();
-      if (!window._loopStarted) {
-        window._loopStarted = true;
-        requestAnimationFrame(gameLoop);
-      }
+      if (!window._loopStarted) { window._loopStarted = true; requestAnimationFrame(gameLoop); }
     }
 
-    document.getElementById('showRegisterBtn').addEventListener('click', ()=>{
-      loginForm.style.display = 'none'; registerForm.style.display = 'block';
-    });
-    document.getElementById('showLoginBtn').addEventListener('click', ()=>{
-      registerForm.style.display = 'none'; loginForm.style.display = 'block';
-    });
+    document.getElementById('showRegisterBtn').addEventListener('click', ()=>{ loginForm.style.display='none'; registerForm.style.display='block'; });
+    document.getElementById('showLoginBtn').addEventListener('click', ()=>{ registerForm.style.display='none'; loginForm.style.display='block'; });
 
     document.getElementById('registerBtn').addEventListener('click', ()=>{
       const name = document.getElementById('regUsername').value.trim();
       const p1 = document.getElementById('regPassword1').value;
       const p2 = document.getElementById('regPassword2').value;
-      const errEl = document.getElementById('regError');
-      if (!name || name.length < 2) { errEl.textContent = 'Никнейм минимум 2 символа'; return; }
-      if (p1.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
-      if (p1 !== p2) { errEl.textContent = 'Пароли не совпадают'; return; }
+      const err = document.getElementById('regError');
+      if (!name || name.length<2) { err.textContent='Никнейм минимум 2 символа'; return; }
+      if (p1.length<4) { err.textContent='Пароль минимум 4 символа'; return; }
+      if (p1!==p2) { err.textContent='Пароли не совпадают'; return; }
       const users = getUsers();
-      if (users[name]) { errEl.textContent = 'Такой никнейм уже занят'; return; }
+      if (users[name]) { err.textContent='Никнейм занят'; return; }
       users[name] = {
-        id: generateId(), name, password: p1, balance: 0, isVip: false, vipExpiry: null,
-        ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
-        bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1, lastSeen: Date.now(),
+        id: Math.floor(10000000+Math.random()*90000000).toString(), name, password:p1, balance:0, isVip:false, vipExpiry:null,
+        ballsCount:1, totalReferrals:0, vipReferrals:0, bonusMultiplier:1, bonusEndTime:0, activeBallsInGame:1, lastSeen:Date.now()
       };
       saveUsers(users);
       localStorage.setItem(SESSION_KEY, name);
-      saveCredentials(name, p1);
+      saveCreds(name, p1);
       currentUser = name;
       userState = { ...users[name] };
-      errEl.textContent = '';
+      err.textContent = '';
       showGame();
     });
 
     document.getElementById('loginBtn').addEventListener('click', ()=>{
       const name = document.getElementById('loginUsername').value.trim();
       const pass = document.getElementById('loginPassword').value;
-      const errEl = document.getElementById('loginError');
+      const err = document.getElementById('loginError');
       const users = getUsers();
-      if (!users[name]) { errEl.textContent = 'Пользователь не найден'; return; }
-      if (users[name].password !== pass) { errEl.textContent = 'Неверный пароль'; return; }
+      if (!users[name]) { err.textContent='Пользователь не найден'; return; }
+      if (users[name].password !== pass) { err.textContent='Неверный пароль'; return; }
       localStorage.setItem(SESSION_KEY, name);
-      saveCredentials(name, pass);
+      saveCreds(name, pass);
       currentUser = name;
       userState = { ...users[name] };
-      errEl.textContent = '';
+      err.textContent = '';
       showGame();
     });
 
@@ -765,268 +774,155 @@
       saveUserState();
       localStorage.removeItem(SESSION_KEY);
       currentUser = null;
-      userState = {};
       balls = [];
       showAuth();
     });
-
-    window.addEventListener('beforeunload', () => {
-      if (currentUser) saveUserState();
-    });
+    window.addEventListener('beforeunload', ()=>{ if(currentUser) saveUserState(); });
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const canvasWrapper = document.getElementById('canvasWrapper');
-    const FIXED_WIDTH = 400;
-    const FIXED_HEIGHT = 300;
-    canvas.width = FIXED_WIDTH;
-    canvas.height = FIXED_HEIGHT;
-
-    const BALL_RADIUS = 15;
+    const FW = 400, FH = 300, BR = 15;
+    canvas.width = FW; canvas.height = FH;
 
     class Ball {
-      constructor(x, y, vx, vy, colorIndex) {
-        this.x = x; this.y = y; this.vx = vx; this.vy = vy;
-        this.radius = BALL_RADIUS; this.colorIndex = colorIndex;
-        this.mass = 1;
-      }
+      constructor(x,y,vx,vy,ci) { this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.radius=BR; this.colorIndex=ci; this.mass=1; }
     }
-
     let balls = [];
 
-    function createBalls(count) {
+    function createBalls(n) {
       balls = [];
-      for (let i = 0; i < count; i++) {
-        let x, y, overlapping;
-        let attempts = 0;
-        do {
-          overlapping = false;
-          x = BALL_RADIUS + Math.random() * (FIXED_WIDTH - 2 * BALL_RADIUS);
-          y = BALL_RADIUS + Math.random() * (FIXED_HEIGHT - 2 * BALL_RADIUS);
-          for (const b of balls) {
-            const dx = b.x - x, dy = b.y - y;
-            if (Math.sqrt(dx*dx + dy*dy) < BALL_RADIUS * 2 + 4) {
-              overlapping = true;
-              break;
-            }
-          }
-          attempts++;
-        } while (overlapping && attempts < 100);
-
-        const speed = 2 + Math.random() * 1.5;
-        const angle = Math.random() * 2 * Math.PI;
-        balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, i % ballColors.length));
+      for (let i=0; i<n; i++) {
+        let x,y,ov; let at=0;
+        do { ov=false; x=BR+Math.random()*(FW-2*BR); y=BR+Math.random()*(FH-2*BR);
+          for (const b of balls) if (Math.hypot(b.x-x,b.y-y) < BR*2+4) { ov=true; break; } at++;
+        } while(ov && at<100);
+        const sp=2+Math.random()*1.5, ang=Math.random()*2*Math.PI;
+        balls.push(new Ball(x,y,Math.cos(ang)*sp,Math.sin(ang)*sp, i%ballColors.length));
       }
     }
 
     function syncBalls() {
-      const desired = Math.min(userState.activeBallsInGame, userState.ballsCount);
-      if (balls.length !== desired) {
-        createBalls(desired);
-      }
+      const d = Math.min(userState.activeBallsInGame, userState.ballsCount);
+      if (balls.length !== d) createBalls(d);
     }
 
-    function spawnFloatingText(x, y, text) {
-      const el = document.createElement('div');
-      el.className = 'floating-text';
-      el.textContent = text;
-      const canvasRect = canvas.getBoundingClientRect();
-      const wrapperRect = canvasWrapper.getBoundingClientRect();
-      const scaleX = canvasRect.width / FIXED_WIDTH;
-      const scaleY = canvasRect.height / FIXED_HEIGHT;
-      const left = (x * scaleX) + (canvasRect.left - wrapperRect.left);
-      const top = (y * scaleY) + (canvasRect.top - wrapperRect.top);
-      el.style.left = left + 'px';
-      el.style.top = top + 'px';
+    function spawnFloatingText(x,y,txt) {
+      const el = document.createElement('div'); el.className='floating-text'; el.textContent=txt;
+      const cr = canvas.getBoundingClientRect(), wr = canvasWrapper.getBoundingClientRect();
+      el.style.left = (x * cr.width/FW + cr.left - wr.left) + 'px';
+      el.style.top = (y * cr.height/FH + cr.top - wr.top) + 'px';
       canvasWrapper.appendChild(el);
-      el.addEventListener('animationend', () => el.remove());
+      el.addEventListener('animationend', ()=>el.remove());
     }
 
-    function animateBallDrop(slotElement, colorIndex) {
-      const slotRect = slotElement.getBoundingClientRect();
-      const canvasRect = canvas.getBoundingClientRect();
-      const wrapperRect = canvasWrapper.getBoundingClientRect();
-
-      const dropBall = document.createElement('div');
-      dropBall.className = 'ball-drop';
-      dropBall.style.width = BALL_RADIUS * 2 + 'px';
-      dropBall.style.height = BALL_RADIUS * 2 + 'px';
-      dropBall.style.borderRadius = '50%';
-      dropBall.style.background = `radial-gradient(circle at 30% 30%, #fff, ${ballColors[colorIndex]})`;
-      dropBall.style.boxShadow = `0 0 20px ${ballGlowColors[colorIndex]}`;
-      dropBall.style.left = (slotRect.left - wrapperRect.left + slotRect.width/2 - BALL_RADIUS) + 'px';
-      dropBall.style.top = (slotRect.top - wrapperRect.top + slotRect.height/2 - BALL_RADIUS) + 'px';
-
-      canvasWrapper.appendChild(dropBall);
-
-      requestAnimationFrame(() => {
-        const targetX = (canvasRect.left - wrapperRect.left) + Math.random() * (canvasRect.width - BALL_RADIUS*2) + BALL_RADIUS;
-        const targetY = (canvasRect.top - wrapperRect.top) + Math.random() * (canvasRect.height - BALL_RADIUS*2) + BALL_RADIUS;
-        dropBall.style.left = targetX + 'px';
-        dropBall.style.top = targetY + 'px';
-        dropBall.style.opacity = '0.8';
+    function animateBallDrop(slotEl, ci) {
+      const sr = slotEl.getBoundingClientRect(), wr = canvasWrapper.getBoundingClientRect();
+      const cr = canvas.getBoundingClientRect();
+      const d = document.createElement('div'); d.className='ball-drop';
+      d.style.width=BR*2+'px'; d.style.height=BR*2+'px'; d.style.borderRadius='50%';
+      d.style.background=`radial-gradient(circle at 30% 30%, #fff, ${ballColors[ci]})`;
+      d.style.boxShadow=`0 0 20px ${ballGlows[ci]}`;
+      d.style.left = (sr.left - wr.left + sr.width/2 - BR) + 'px';
+      d.style.top = (sr.top - wr.top + sr.height/2 - BR) + 'px';
+      canvasWrapper.appendChild(d);
+      requestAnimationFrame(()=>{
+        d.style.left = (cr.left - wr.left + Math.random()*(cr.width-BR*2) + BR) + 'px';
+        d.style.top = (cr.top - wr.top + Math.random()*(cr.height-BR*2) + BR) + 'px';
       });
-
-      dropBall.addEventListener('transitionend', () => dropBall.remove());
+      d.addEventListener('transitionend', ()=>d.remove());
     }
 
-    function applyBonusSpeed() {
+    function applyBonus() {
       if (userState.bonusEndTime && Date.now() < userState.bonusEndTime) return 5;
       return 1;
     }
 
     function resolveCollisions() {
-      for (let i = 0; i < balls.length; i++) {
-        for (let j = i + 1; j < balls.length; j++) {
-          const a = balls[i], b = balls[j];
-          const dx = b.x - a.x, dy = b.y - a.y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          const minDist = a.radius + b.radius;
-          if (dist < minDist) {
-            const nx = dist > 0.001 ? dx / dist : 1;
-            const ny = dist > 0.001 ? dy / dist : 0;
-            const dvx = a.vx - b.vx;
-            const dvy = a.vy - b.vy;
-            const vn = dvx * nx + dvy * ny;
-            if (vn > 0) {
-              const impulse = 2 * vn / (a.mass + b.mass);
-              a.vx -= impulse * b.mass * nx;
-              a.vy -= impulse * b.mass * ny;
-              b.vx += impulse * a.mass * nx;
-              b.vy += impulse * a.mass * ny;
-            }
-            const overlap = minDist - dist;
-            const moveX = overlap * nx / 2;
-            const moveY = overlap * ny / 2;
-            a.x -= moveX; a.y -= moveY;
-            b.x += moveX; b.y += moveY;
+      for (let i=0;i<balls.length;i++) {
+        for (let j=i+1;j<balls.length;j++) {
+          const a=balls[i], b=balls[j], dx=b.x-a.x, dy=b.y-a.y, dist=Math.hypot(dx,dy), min=BR*2;
+          if (dist < min) {
+            const nx=dist>0.001?dx/dist:1, ny=dist>0.001?dy/dist:0;
+            const dvx=a.vx-b.vx, dvy=a.vy-b.vy, vn=dvx*nx+dvy*ny;
+            if (vn>0) { const imp=2*vn/2; a.vx-=imp*nx; a.vy-=imp*ny; b.vx+=imp*nx; b.vy+=imp*ny; }
+            const ov=min-dist; a.x-=ov*nx/2; a.y-=ov*ny/2; b.x+=ov*nx/2; b.y+=ov*ny/2;
           }
         }
       }
     }
 
     function gameLoop() {
-      if (!gameScreen.classList.contains('active')) {
-        requestAnimationFrame(gameLoop);
-        return;
-      }
-      const sp = applyBonusSpeed();
-
+      if (!gameScreen.classList.contains('active')) { requestAnimationFrame(gameLoop); return; }
+      const sp = applyBonus();
       for (const b of balls) {
-        b.x += b.vx * sp;
-        b.y += b.vy * sp;
-
-        let hit = false;
-        if (b.x - b.radius < 0) { b.x = b.radius; b.vx = Math.abs(b.vx); hit = true; }
-        if (b.x + b.radius > FIXED_WIDTH) { b.x = FIXED_WIDTH - b.radius; b.vx = -Math.abs(b.vx); hit = true; }
-        if (b.y - b.radius < 0) { b.y = b.radius; b.vy = Math.abs(b.vy); hit = true; }
-        if (b.y + b.radius > FIXED_HEIGHT) { b.y = FIXED_HEIGHT - b.radius; b.vy = -Math.abs(b.vy); hit = true; }
-
-        if (hit) {
-          const stars = userState.isVip ? 2 : 1;
-          userState.balance += stars;
-          spawnFloatingText(b.x, b.y - b.radius, `+${stars}`);
-          saveUserState();
-          updateUI();
-        }
+        b.x += b.vx*sp; b.y += b.vy*sp;
+        let hit=false;
+        if (b.x-BR<0) { b.x=BR; b.vx=Math.abs(b.vx); hit=true; }
+        if (b.x+BR>FW) { b.x=FW-BR; b.vx=-Math.abs(b.vx); hit=true; }
+        if (b.y-BR<0) { b.y=BR; b.vy=Math.abs(b.vy); hit=true; }
+        if (b.y+BR>FH) { b.y=FH-BR; b.vy=-Math.abs(b.vy); hit=true; }
+        if (hit) { const s=userState.isVip?2:1; userState.balance+=s; spawnFloatingText(b.x,b.y-BR,`+${s}`); saveUserState(); updateUI(); }
       }
-
       resolveCollisions();
-
-      ctx.clearRect(0, 0, FIXED_WIDTH, FIXED_HEIGHT);
+      ctx.clearRect(0,0,FW,FH);
       for (const b of balls) {
-        const color = ballColors[b.colorIndex];
-        const glow = ballGlowColors[b.colorIndex];
-        ctx.save();
-        ctx.shadowColor = glow;
-        ctx.shadowBlur = 18;
-        ctx.beginPath();
-        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-        const g = ctx.createRadialGradient(b.x - 3, b.y - 3, 2, b.x, b.y, b.radius);
-        g.addColorStop(0, '#ffffff');
-        g.addColorStop(0.3, color);
-        g.addColorStop(1, '#00000040');
-        ctx.fillStyle = g;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffffdd';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(b.x - 4, b.y - 4, 4, 0, 2 * Math.PI);
-        ctx.fillStyle = '#ffffffcc';
-        ctx.fill();
+        const col=ballColors[b.colorIndex], glow=ballGlows[b.colorIndex];
+        ctx.save(); ctx.shadowColor=glow; ctx.shadowBlur=18;
+        ctx.beginPath(); ctx.arc(b.x,b.y,BR,0,Math.PI*2);
+        const g=ctx.createRadialGradient(b.x-3,b.y-3,2,b.x,b.y,BR);
+        g.addColorStop(0,'#fff'); g.addColorStop(0.3,col); g.addColorStop(1,'#00000040');
+        ctx.fillStyle=g; ctx.fill(); ctx.strokeStyle='#ffffffdd'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(b.x-4,b.y-4,4,0,2*Math.PI); ctx.fillStyle='#ffffffcc'; ctx.fill();
         ctx.restore();
       }
       requestAnimationFrame(gameLoop);
     }
 
     const slotsContainer = document.getElementById('ballsSlotsContainer');
-    const slotsRequirements = [0, 1, 3, 10, 20, 50, 100];
+    const reqs = [0,1,3,10,20,50,100];
 
     function renderSlots(container = slotsContainer) {
       container.innerHTML = '';
-      for (let i = 0; i < slotsRequirements.length; i++) {
-        const req = slotsRequirements[i];
-        const slot = document.createElement('div');
-        slot.className = 'slot';
+      for (let i=0; i<reqs.length; i++) {
+        const req = reqs[i];
+        const slot = document.createElement('div'); slot.className='slot';
+        const circle = document.createElement('div'); circle.className='slot-circle';
+        const unlocked = i < userState.ballsCount;
+        const launched = i < userState.activeBallsInGame;
 
-        const circle = document.createElement('div');
-        circle.className = 'slot-circle';
-        const isUnlocked = i < userState.ballsCount;
-        const isLaunched = i < userState.activeBallsInGame;
-
-        if (isLaunched) {
-          // Запущенный шар — серый
+        if (launched) {
           circle.classList.add('launched-slot');
-          circle.style.backgroundColor = '#2a2a3a';
-          circle.style.boxShadow = 'none';
-        } else if (isUnlocked) {
-          // Доступен, но не запущен — цветной шар
+          circle.style.backgroundColor = '#2a2a3a'; circle.style.boxShadow = 'none';
+        } else if (unlocked) {
           circle.classList.add('active-slot');
-          circle.style.backgroundColor = ballColors[i % ballColors.length];
-          circle.style.boxShadow = `0 0 14px ${ballGlowColors[i % ballColors.length]}`;
+          circle.style.backgroundColor = ballColors[i%ballColors.length];
+          circle.style.boxShadow = `0 0 14px ${ballGlows[i%ballColors.length]}`;
         } else {
-          // Не открыт — серый
           circle.classList.add('empty-slot');
-          circle.style.backgroundColor = '#2a2a3a';
-          circle.style.boxShadow = 'none';
+          circle.style.backgroundColor = '#2a2a3a'; circle.style.boxShadow = 'none';
         }
 
-        const label = document.createElement('div');
-        label.className = 'slot-label';
-        if (i === 0) {
-          label.textContent = isLaunched ? 'В игре' : 'Старт';
-        } else {
-          label.textContent = `${Math.min(userState.vipReferrals, req)}/${req} VIP`;
-        }
+        const label = document.createElement('div'); label.className='slot-label';
+        label.textContent = i===0 ? (launched?'В игре':'Старт') : `${Math.min(userState.vipReferrals,req)}/${req} VIP`;
 
-        const launchBtn = document.createElement('button');
-        launchBtn.className = 'launch-btn';
-        launchBtn.textContent = 'Запустить';
-        if (isUnlocked && !isLaunched) {
-          launchBtn.classList.add('visible');
-        }
-
-        launchBtn.addEventListener('click', (e) => {
+        const btn = document.createElement('button'); btn.className='launch-btn'; btn.textContent='Запустить';
+        if (unlocked && !launched) btn.classList.add('visible');
+        btn.addEventListener('click', (e)=>{
           e.stopPropagation();
-          if ((currentUser === 'Casper') || (isUnlocked && !isLaunched)) {
+          if ((currentUser==='Casper') || (unlocked && !launched)) {
             if (userState.activeBallsInGame < userState.ballsCount) {
-              const colorIndex = userState.activeBallsInGame % ballColors.length;
-              animateBallDrop(circle, colorIndex);
-              setTimeout(() => {
+              const ci = userState.activeBallsInGame % ballColors.length;
+              animateBallDrop(circle, ci);
+              setTimeout(()=>{
                 userState.activeBallsInGame++;
-                saveUserState();
-                syncBalls();
-                renderSlots();
-                renderSlots(document.getElementById('inviteSlotsContainer'));
+                saveUserState(); syncBalls(); renderSlots(); renderSlots(document.getElementById('inviteSlotsContainer'));
               }, 400);
             }
           }
         });
 
-        slot.appendChild(circle);
-        slot.appendChild(label);
-        slot.appendChild(launchBtn);
+        slot.appendChild(circle); slot.appendChild(label); slot.appendChild(btn);
         container.appendChild(slot);
       }
     }
@@ -1036,205 +932,112 @@
       const vipEl = document.getElementById('vipStatus');
       if (userState.isVip) {
         vipEl.className = 'vip-badge';
-        const expiry = userState.vipExpiry ? new Date(userState.vipExpiry).toLocaleDateString() : 'навсегда';
-        vipEl.textContent = `VIP ⭐x2 (${expiry})`;
+        vipEl.textContent = `VIP ⭐x2 (${userState.vipExpiry?new Date(userState.vipExpiry).toLocaleDateString():'навсегда'})`;
       } else {
-        vipEl.className = 'no-vip';
-        vipEl.textContent = 'VIP неактивен';
+        vipEl.className = 'no-vip'; vipEl.textContent = 'VIP неактивен';
       }
       document.getElementById('balanceDisplay').childNodes[0].textContent = `⭐ ${userState.balance.toLocaleString()} `;
-      document.getElementById('refCountDisplay').textContent =
-        `👥 ${userState.totalReferrals} реф. (${userState.vipReferrals} VIP)`;
-
-      const timerEl = document.getElementById('bonusTimer');
+      document.getElementById('refCountDisplay').textContent = `👥 ${userState.totalReferrals} реф. (${userState.vipReferrals} VIP)`;
+      const t = document.getElementById('bonusTimer');
       if (userState.bonusEndTime && Date.now() < userState.bonusEndTime) {
-        const remaining = Math.ceil((userState.bonusEndTime - Date.now()) / 1000);
-        timerEl.textContent = `${remaining}s`;
-        timerEl.classList.add('active');
-      } else {
-        timerEl.classList.remove('active');
-      }
+        t.textContent = Math.ceil((userState.bonusEndTime-Date.now())/1000)+'s'; t.classList.add('active');
+      } else t.classList.remove('active');
     }
 
     function recalcBalls() {
-      const f = userState.vipReferrals;
-      let extra = 0;
-      if (f >= 100) extra = 6;
-      else if (f >= 50) extra = 5;
-      else if (f >= 20) extra = 4;
-      else if (f >= 10) extra = 3;
-      else if (f >= 3) extra = 2;
-      else if (f >= 1) extra = 1;
-      userState.ballsCount = 1 + extra;
-      if (userState.activeBallsInGame > userState.ballsCount) {
-        userState.activeBallsInGame = userState.ballsCount;
-      }
+      const f = userState.vipReferrals; let e=0;
+      if(f>=100)e=6; else if(f>=50)e=5; else if(f>=20)e=4; else if(f>=10)e=3; else if(f>=3)e=2; else if(f>=1)e=1;
+      userState.ballsCount = 1+e;
+      if (userState.activeBallsInGame > userState.ballsCount) userState.activeBallsInGame = userState.ballsCount;
     }
 
-    // VIP
-    document.getElementById('buyVipBtn').addEventListener('click', ()=>{
-      document.getElementById('vipMonthInfo').textContent = userState.isVip ?
-        `Текущий VIP до: ${new Date(userState.vipExpiry).toLocaleDateString()}. Можно продлить.` :
-        'VIP неактивен.';
+    // Кнопки
+    document.getElementById('buyVipBtn').addEventListener('click',()=>{
+      document.getElementById('vipMonthInfo').textContent = userState.isVip ? `Текущий VIP до: ${new Date(userState.vipExpiry).toLocaleDateString()}` : 'VIP неактивен.';
       document.getElementById('vipModal').classList.add('active');
     });
-    document.getElementById('closeVipModal').addEventListener('click', ()=> document.getElementById('vipModal').classList.remove('active'));
-    document.getElementById('buyVipMonthBtn').addEventListener('click', ()=>{
-      userState.isVip = true;
-      const now = Date.now();
-      userState.vipExpiry = userState.vipExpiry && userState.vipExpiry > now ?
-        userState.vipExpiry + 30*24*60*60*1000 : now + 30*24*60*60*1000;
-      saveUserState(); updateUI();
-      document.getElementById('vipModal').classList.remove('active');
+    document.getElementById('closeVipModal').addEventListener('click',()=>document.getElementById('vipModal').classList.remove('active'));
+    document.getElementById('buyVipMonthBtn').addEventListener('click',()=>{
+      userState.isVip=true; const n=Date.now(); userState.vipExpiry=(userState.vipExpiry&&userState.vipExpiry>n?userState.vipExpiry:n)+30*86400000;
+      saveUserState(); updateUI(); document.getElementById('vipModal').classList.remove('active');
     });
-    document.getElementById('buyVipForeverBtn').addEventListener('click', ()=>{
-      userState.isVip = true;
-      userState.vipExpiry = null;
-      saveUserState(); updateUI();
-      document.getElementById('vipModal').classList.remove('active');
+    document.getElementById('buyVipForeverBtn').addEventListener('click',()=>{
+      userState.isVip=true; userState.vipExpiry=null; saveUserState(); updateUI(); document.getElementById('vipModal').classList.remove('active');
     });
 
-    // Бонус
-    document.getElementById('bonusBtn').addEventListener('click', ()=> document.getElementById('bonusModal').classList.add('active'));
-    document.getElementById('closeBonusModal').addEventListener('click', ()=> document.getElementById('bonusModal').classList.remove('active'));
-    document.getElementById('watchAdBtn').addEventListener('click', ()=>{
-      userState.bonusMultiplier = 5;
-      userState.bonusEndTime = Date.now() + 60000;
-      saveUserState(); updateUI();
-      document.getElementById('bonusModal').classList.remove('active');
+    document.getElementById('bonusBtn').addEventListener('click',()=>document.getElementById('bonusModal').classList.add('active'));
+    document.getElementById('closeBonusModal').addEventListener('click',()=>document.getElementById('bonusModal').classList.remove('active'));
+    document.getElementById('watchAdBtn').addEventListener('click',()=>{
+      userState.bonusMultiplier=5; userState.bonusEndTime=Date.now()+60000; saveUserState(); updateUI(); document.getElementById('bonusModal').classList.remove('active');
     });
 
-    // Друзья
-    document.getElementById('inviteBtn').addEventListener('click', ()=>{
+    document.getElementById('inviteBtn').addEventListener('click',()=>{
       document.getElementById('refLinkDisplay').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
       document.getElementById('invTotalRefs').textContent = userState.totalReferrals;
       document.getElementById('invVipRefs').textContent = userState.vipReferrals;
       renderSlots(document.getElementById('inviteSlotsContainer'));
       document.getElementById('inviteModal').classList.add('active');
     });
-    document.getElementById('closeInviteModal').addEventListener('click', ()=> document.getElementById('inviteModal').classList.remove('active'));
-    document.getElementById('copyRefBtn').addEventListener('click', ()=>{
-      navigator.clipboard?.writeText(document.getElementById('refLinkDisplay').textContent).then(()=>alert('Скопировано!'));
-    });
+    document.getElementById('closeInviteModal').addEventListener('click',()=>document.getElementById('inviteModal').classList.remove('active'));
+    document.getElementById('copyRefBtn').addEventListener('click',()=>navigator.clipboard?.writeText(document.getElementById('refLinkDisplay').textContent).then(()=>alert('Скопировано!')));
 
-    // Профиль
-    document.getElementById('profileBtn').addEventListener('click', ()=>{
-      document.getElementById('profileName').textContent = userState.name;
-      document.getElementById('profileId').textContent = userState.id;
-      document.getElementById('profileBalance').textContent = userState.balance.toLocaleString();
-      document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
-      document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
-      document.getElementById('profileVipStatus').textContent = userState.isVip ?
-        (userState.vipExpiry ? `до ${new Date(userState.vipExpiry).toLocaleDateString()}` : '♾️ навсегда') : '❌ нет';
-      document.getElementById('profileVipStatus').className = userState.isVip ? 'value vip' : 'value';
-      document.getElementById('profileRef').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
-      const adminPanel = document.getElementById('adminPanel');
-      if (currentUser === 'Casper') {
-        adminPanel.style.display = 'block';
-        document.getElementById('adminVipRefs').value = userState.vipReferrals;
-      } else {
-        adminPanel.style.display = 'none';
-      }
+    document.getElementById('profileBtn').addEventListener('click',()=>{
+      document.getElementById('profileName').textContent=userState.name;
+      document.getElementById('profileId').textContent=userState.id;
+      document.getElementById('profileBalance').textContent=userState.balance.toLocaleString();
+      document.getElementById('profileTotalRefs').textContent=userState.totalReferrals;
+      document.getElementById('profileVipRefs').textContent=userState.vipReferrals;
+      document.getElementById('profileVipStatus').textContent=userState.isVip?(userState.vipExpiry?`до ${new Date(userState.vipExpiry).toLocaleDateString()}`:'♾️ навсегда'):'❌ нет';
+      document.getElementById('profileRef').textContent=`${location.origin}${location.pathname}?ref=${userState.id}`;
+      document.getElementById('adminPanel').style.display = currentUser==='Casper'?'block':'none';
+      if (currentUser==='Casper') document.getElementById('adminVipRefs').value=userState.vipReferrals;
       document.getElementById('profileModal').classList.add('active');
     });
-    document.getElementById('closeProfileModal').addEventListener('click', ()=> document.getElementById('profileModal').classList.remove('active'));
-    document.getElementById('copyProfileRefBtn').addEventListener('click', ()=>{
-      navigator.clipboard?.writeText(document.getElementById('profileRef').textContent).then(()=>alert('Скопировано!'));
-    });
-    document.getElementById('editNameBtn').addEventListener('click', ()=>{
-      const newName = prompt('Новое имя:', userState.name);
-      if(newName && newName.trim().length>1){
-        const users = getUsers();
-        if(users[newName] && newName !== currentUser) { alert('Имя занято'); return; }
-        delete users[currentUser];
-        userState.name = newName.trim();
-        users[newName] = {...userState};
-        saveUsers(users);
-        localStorage.setItem(SESSION_KEY, newName);
-        saveCredentials(newName, userState.password);
-        currentUser = newName;
-        updateUI();
-        document.getElementById('profileName').textContent = userState.name;
+    document.getElementById('closeProfileModal').addEventListener('click',()=>document.getElementById('profileModal').classList.remove('active'));
+    document.getElementById('copyProfileRefBtn').addEventListener('click',()=>navigator.clipboard?.writeText(document.getElementById('profileRef').textContent).then(()=>alert('Скопировано!')));
+    document.getElementById('copyIdBtn').addEventListener('click',()=>navigator.clipboard?.writeText(userState.id).then(()=>alert('ID скопирован!')));
+    document.getElementById('editNameBtn').addEventListener('click',()=>{
+      const nn=prompt('Новое имя:',userState.name);
+      if(nn&&nn.trim().length>1){
+        const users=getUsers(); if(users[nn]&&nn!==currentUser){alert('Имя занято');return;}
+        delete users[currentUser]; userState.name=nn.trim(); users[nn]={...userState};
+        saveUsers(users); localStorage.setItem(SESSION_KEY,nn); saveCreds(nn,userState.password);
+        currentUser=nn; updateUI(); document.getElementById('profileName').textContent=userState.name;
       }
     });
 
-    // Админ
-    document.getElementById('adminSetRefsBtn').addEventListener('click', ()=>{
-      if (currentUser !== 'Casper') return;
-      userState.vipReferrals = Math.max(0, parseInt(document.getElementById('adminVipRefs').value) || 0);
-      userState.totalReferrals = Math.max(userState.totalReferrals, userState.vipReferrals);
-      recalcBalls(); saveUserState(); updateUI(); renderSlots();
-    });
-    document.getElementById('adminAddRefBtn').addEventListener('click', ()=>{
-      if (currentUser !== 'Casper') return;
-      userState.vipReferrals++;
-      userState.totalReferrals = Math.max(userState.totalReferrals, userState.vipReferrals);
-      recalcBalls(); saveUserState(); updateUI(); renderSlots();
-      document.getElementById('adminVipRefs').value = userState.vipReferrals;
-    });
-    document.getElementById('adminRemoveRefBtn').addEventListener('click', ()=>{
-      if (currentUser !== 'Casper') return;
-      userState.vipReferrals = Math.max(0, userState.vipReferrals - 1);
-      recalcBalls(); saveUserState(); updateUI(); renderSlots();
-      document.getElementById('adminVipRefs').value = userState.vipReferrals;
-    });
+    document.getElementById('adminSetRefsBtn').addEventListener('click',()=>{if(currentUser!=='Casper')return;userState.vipReferrals=Math.max(0,+document.getElementById('adminVipRefs').value||0);userState.totalReferrals=Math.max(userState.totalReferrals,userState.vipReferrals);recalcBalls();saveUserState();updateUI();renderSlots();});
+    document.getElementById('adminAddRefBtn').addEventListener('click',()=>{if(currentUser!=='Casper')return;userState.vipReferrals++;userState.totalReferrals=Math.max(userState.totalReferrals,userState.vipReferrals);recalcBalls();saveUserState();updateUI();renderSlots();document.getElementById('adminVipRefs').value=userState.vipReferrals;});
+    document.getElementById('adminRemoveRefBtn').addEventListener('click',()=>{if(currentUser!=='Casper')return;userState.vipReferrals=Math.max(0,userState.vipReferrals-1);recalcBalls();saveUserState();updateUI();renderSlots();document.getElementById('adminVipRefs').value=userState.vipReferrals;});
 
-    // Вывод
-    document.getElementById('withdrawBtn').addEventListener('click', ()=>{
-      document.getElementById('withdrawBalance').textContent = userState.balance.toLocaleString();
-      document.getElementById('withdrawRefs').textContent = userState.totalReferrals;
-      const statusEl = document.getElementById('withdrawStatus');
-      if (userState.balance >= 10000000 && userState.totalReferrals >= 10) {
-        statusEl.textContent = '✅ Доступен вывод 10$';
-        statusEl.style.color = '#00ff88';
-      } else {
-        statusEl.textContent = '❌ Не выполнены условия';
-        statusEl.style.color = '#ff4444';
-      }
+    document.getElementById('withdrawBtn').addEventListener('click',()=>{
+      document.getElementById('withdrawBalance').textContent=userState.balance.toLocaleString();
+      document.getElementById('withdrawRefs').textContent=userState.totalReferrals;
+      const s=document.getElementById('withdrawStatus');
+      if(userState.balance>=10000000&&userState.totalReferrals>=10){s.textContent='✅ Доступен вывод 10$';s.style.color='#00ff88';}
+      else{s.textContent='❌ Не выполнены условия';s.style.color='#ff4444';}
       document.getElementById('withdrawModal').classList.add('active');
     });
-    document.getElementById('closeWithdrawModal').addEventListener('click', ()=> document.getElementById('withdrawModal').classList.remove('active'));
-    document.getElementById('requestWithdrawBtn').addEventListener('click', ()=>{
-      if (userState.balance >= 10000000 && userState.totalReferrals >= 10) {
-        alert('Заявка на вывод 10$ отправлена! (эмуляция)');
-        userState.balance -= 10000000;
-        saveUserState(); updateUI();
-        document.getElementById('withdrawModal').classList.remove('active');
-      } else {
-        alert('Не выполнены условия!');
-      }
+    document.getElementById('closeWithdrawModal').addEventListener('click',()=>document.getElementById('withdrawModal').classList.remove('active'));
+    document.getElementById('requestWithdrawBtn').addEventListener('click',()=>{
+      if(userState.balance>=10000000&&userState.totalReferrals>=10){alert('Заявка отправлена!');userState.balance-=10000000;saveUserState();updateUI();document.getElementById('withdrawModal').classList.remove('active');}
+      else alert('Не выполнены условия!');
     });
 
-    document.querySelectorAll('.modal').forEach(m=> m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('active'); }));
+    document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('active');}));
 
-    const params = new URLSearchParams(location.search);
-    if(params.get('ref') && loadUserState()){
-      if(!sessionStorage.getItem('invited_done_v4')){
-        sessionStorage.setItem('invited_done_v4','1');
-        userState.totalReferrals++;
-        userState.vipReferrals++;
-        recalcBalls(); saveUserState(); renderSlots();
-      }
+    const params=new URLSearchParams(location.search);
+    if(params.get('ref')&&loadUserState()&&!sessionStorage.getItem('vds_inv')){
+      sessionStorage.setItem('vds_inv','1'); userState.totalReferrals++; userState.vipReferrals++; recalcBalls(); saveUserState(); renderSlots();
     }
 
     setInterval(()=>{
-      if(userState.vipExpiry && Date.now() > userState.vipExpiry){
-        userState.isVip = false; userState.vipExpiry = null; saveUserState(); updateUI();
-      }
-      if(userState.bonusEndTime && Date.now() > userState.bonusEndTime){
-        userState.bonusMultiplier = 1; userState.bonusEndTime = 0; saveUserState(); updateUI();
-      }
-      if (currentUser && userState.bonusEndTime && Date.now() < userState.bonusEndTime) {
-        document.getElementById('bonusTimer').textContent = Math.ceil((userState.bonusEndTime - Date.now())/1000) + 's';
-      }
-    }, 1000);
+      if(userState.vipExpiry&&Date.now()>userState.vipExpiry){userState.isVip=false;userState.vipExpiry=null;saveUserState();updateUI();}
+      if(userState.bonusEndTime&&Date.now()>userState.bonusEndTime){userState.bonusMultiplier=1;userState.bonusEndTime=0;saveUserState();updateUI();}
+      if(currentUser&&userState.bonusEndTime&&Date.now()<userState.bonusEndTime)document.getElementById('bonusTimer').textContent=Math.ceil((userState.bonusEndTime-Date.now())/1000)+'s';
+    },1000);
 
-    if(loadUserState()){
-      recalcBalls();
-      showGame();
-    } else {
-      showAuth();
-    }
+    if(loadUserState()){recalcBalls();showGame();}else showAuth();
   })();
 </script>
 </body>
