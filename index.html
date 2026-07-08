@@ -28,9 +28,7 @@
       width: 100%;
       max-width: 480px;
     }
-    .screen.active {
-      display: block;
-    }
+    .screen.active { display: block; }
 
     .auth-container {
       background: linear-gradient(135deg, #1a1a3e, #0f0f2a);
@@ -116,7 +114,7 @@
       border: 1px solid #3a3a8a;
       box-shadow: 0 0 20px rgba(120, 115, 245, 0.2);
     }
-    .user-info { display: flex; flex-direction: column; }
+    .user-info { display: flex; flex-direction: column; gap: 2px; }
     .username {
       font-weight: 600;
       font-size: 1.2rem;
@@ -127,7 +125,7 @@
     .vip-badge {
       background: linear-gradient(90deg, #ffd700, #ffaa00);
       color: #000;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: bold;
       padding: 3px 10px;
       border-radius: 20px;
@@ -142,7 +140,7 @@
     .balance {
       background: linear-gradient(90deg, #ffd700, #ffaa00);
       color: #000;
-      padding: 6px 14px;
+      padding: 8px 16px;
       border-radius: 30px;
       font-weight: bold;
       display: flex;
@@ -159,7 +157,7 @@
       background: #ff4444;
       color: white;
       font-size: 0.65rem;
-      padding: 2px 6px;
+      padding: 2px 8px;
       border-radius: 10px;
       display: none;
       animation: pulse 1s infinite;
@@ -167,15 +165,14 @@
     .bonus-timer.active { display: block; }
     @keyframes pulse {
       0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.15); }
     }
     .ref-count {
       background: rgba(120, 115, 245, 0.2);
       color: #aaaacc;
       padding: 4px 10px;
       border-radius: 20px;
-      font-size: 0.75rem;
-      margin-top: 4px;
+      font-size: 0.7rem;
       border: 1px solid #3a3a8a;
     }
 
@@ -198,15 +195,21 @@
       position: absolute;
       pointer-events: none;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 1.1rem;
       color: #ffd700;
-      text-shadow: 0 0 10px #ffd700;
+      text-shadow: 0 0 10px #ffd700, 0 0 20px #ffaa00;
       animation: floatUp 1s ease-out forwards;
       z-index: 10;
     }
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
-      100% { opacity: 0; transform: translateY(-40px) scale(1.5); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.6); }
+    }
+    .ball-drop {
+      position: absolute;
+      pointer-events: none;
+      z-index: 20;
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     }
 
     .balls-slots {
@@ -216,8 +219,7 @@
       flex-wrap: wrap;
       background: rgba(20, 20, 50, 0.6);
       border-radius: 20px;
-      padding: 12px;
-      margin-bottom: 4px;
+      padding: 12px 8px;
       border: 1px solid #2a2a5a;
     }
     .slot {
@@ -226,10 +228,11 @@
       align-items: center;
       gap: 6px;
       position: relative;
+      width: 55px;
     }
     .slot-circle {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -237,45 +240,45 @@
       font-weight: bold;
       transition: 0.3s;
       border: 2px solid #444;
-      font-size: 0.8rem;
+      position: relative;
+      overflow: hidden;
     }
     .slot-circle.empty-slot {
       background: #2a2a3a !important;
-      color: #555;
       border-color: #444;
       box-shadow: none !important;
     }
     .slot-circle.active-slot {
-      border-color: #fff;
-      color: #fff;
-      text-shadow: 0 0 10px currentColor;
+      border-color: #ffffff;
+      box-shadow: 0 0 12px currentColor;
     }
     .slot-circle.launched-slot {
       background: #2a2a3a !important;
-      color: #555;
       border-color: #555;
       box-shadow: none !important;
     }
     .slot-label {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       color: #aaaacc;
       text-align: center;
       line-height: 1.2;
-      max-width: 55px;
+      white-space: nowrap;
     }
     .launch-btn {
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       background: linear-gradient(90deg, #ff6ec7, #7873f5);
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 4px 10px;
+      border-radius: 10px;
+      padding: 3px 8px;
       font-weight: bold;
       cursor: pointer;
       display: none;
       box-shadow: 0 0 10px rgba(120, 115, 245, 0.5);
       animation: btnGlow 2s infinite;
       white-space: nowrap;
+      position: absolute;
+      bottom: -18px;
     }
     .launch-btn.visible { display: block; }
     @keyframes btnGlow {
@@ -294,19 +297,18 @@
       background: rgba(30, 30, 60, 0.8);
       border: 1px solid #3a3a8a;
       color: white;
-      padding: 12px 16px;
+      padding: 12px 14px;
       border-radius: 40px;
       font-weight: 600;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       flex: 1 1 auto;
-      min-width: 65px;
+      min-width: 60px;
       cursor: pointer;
       transition: 0.3s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      animation: btnGlow 3s infinite;
       backdrop-filter: blur(5px);
     }
     .btn:active { transform: scale(0.95); background: rgba(60, 60, 100, 0.9); }
@@ -347,17 +349,17 @@
       text-align: center;
       box-shadow: 0 0 60px rgba(120, 115, 245, 0.4), 0 20px 40px black;
       border: 1px solid #3a3a8a;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
     }
     .modal-content h3 {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
       background: linear-gradient(90deg, #ff6ec7, #7873f5);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
-    .modal-content p { margin: 8px 0; font-size: 0.9rem; color: #ccc; }
+    .modal-content p { margin: 6px 0; font-size: 0.9rem; color: #ccc; }
     .close-btn {
       background: rgba(60, 60, 100, 0.8);
       border: 1px solid #3a3a8a;
@@ -373,7 +375,7 @@
     .close-btn:hover { background: rgba(80, 80, 140, 0.9); }
     .copy-text {
       background: #0a0a1a;
-      padding: 8px;
+      padding: 10px;
       border-radius: 12px;
       word-break: break-all;
       margin: 10px 0;
@@ -383,25 +385,56 @@
     .vip-option {
       background: rgba(20, 20, 50, 0.8);
       border-radius: 16px;
-      padding: 12px;
+      padding: 14px;
       margin: 10px 0;
       text-align: left;
       border: 1px solid #3a3a8a;
     }
     .vip-option button { margin-top: 6px; }
+
+    /* Профиль */
+    .profile-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      margin: 6px 0;
+      background: rgba(20, 20, 50, 0.6);
+      border-radius: 16px;
+      border: 1px solid #3a3a8a;
+      text-align: left;
+    }
+    .profile-row .label {
+      color: #aaaacc;
+      font-size: 0.85rem;
+    }
+    .profile-row .value {
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    .profile-row .value.gold {
+      color: #ffd700;
+    }
+    .profile-row .value.vip {
+      color: #00ff88;
+    }
     .admin-panel {
       background: rgba(255, 110, 199, 0.1);
       border: 1px solid #ff6ec7;
-      border-radius: 12px;
-      padding: 10px;
+      border-radius: 16px;
+      padding: 12px;
       margin: 10px 0;
+      text-align: left;
     }
+    .admin-panel strong { color: #ff6ec7; }
     .admin-panel input {
       width: 60px;
       background: #0a0a1a;
       border: 1px solid #ff6ec7;
       color: white;
-      padding: 4px;
+      padding: 6px;
       border-radius: 8px;
       text-align: center;
     }
@@ -409,10 +442,11 @@
       background: #ff6ec7;
       border: none;
       color: white;
-      padding: 4px 10px;
-      border-radius: 12px;
+      padding: 5px 10px;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 0.75rem;
+      margin: 2px;
     }
   </style>
 </head>
@@ -510,17 +544,36 @@
 <div class="modal" id="profileModal">
   <div class="modal-content">
     <h3>👤 Профиль</h3>
-    <p>Имя: <span id="profileName"></span> <button id="editNameBtn" style="background:#7873f5; border:none; padding:2px 10px; border-radius:20px; cursor:pointer;">✏️</button></p>
-    <p>ID: <strong id="profileId"></strong></p>
-    <p>Баланс: ⭐ <span id="profileBalance"></span></p>
-    <p>Всего рефералов: <strong id="profileTotalRefs">0</strong></p>
-    <p>Рефералов с VIP: <strong id="profileVipRefs">0</strong></p>
-    <p>VIP: <span id="profileVipStatus"></span></p>
+    <div class="profile-row">
+      <span class="label">👤 Имя</span>
+      <span class="value" id="profileName">—</span>
+    </div>
+    <div class="profile-row">
+      <span class="label">🆔 ID</span>
+      <span class="value" id="profileId">—</span>
+    </div>
+    <div class="profile-row">
+      <span class="label">⭐ Баланс</span>
+      <span class="value gold" id="profileBalance">0</span>
+    </div>
+    <div class="profile-row">
+      <span class="label">👥 Всего рефералов</span>
+      <span class="value" id="profileTotalRefs">0</span>
+    </div>
+    <div class="profile-row">
+      <span class="label">💎 Рефералов с VIP</span>
+      <span class="value vip" id="profileVipRefs">0</span>
+    </div>
+    <div class="profile-row">
+      <span class="label">👑 VIP статус</span>
+      <span class="value" id="profileVipStatus">—</span>
+    </div>
+    <button id="editNameBtn" class="close-btn" style="width:100%;">✏️ Изменить имя</button>
     <div class="copy-text" id="profileRef"></div>
-    <button class="close-btn" id="copyProfileRefBtn">📋 Копировать ссылку</button>
+    <button class="close-btn" id="copyProfileRefBtn" style="width:100%;">📋 Копировать ссылку</button>
     <div class="admin-panel" id="adminPanel" style="display:none;">
       <strong>👑 Админ-панель (Casper)</strong>
-      <p style="font-size:0.75rem;">VIP-рефералов:</p>
+      <p style="font-size:0.75rem; margin:6px 0;">VIP-рефералов:</p>
       <input type="number" id="adminVipRefs" value="0" min="0">
       <button id="adminSetRefsBtn">Уст.</button>
       <button id="adminAddRefBtn">+1</button>
@@ -545,10 +598,9 @@
 
 <script>
   (function() {
-    const USERS_KEY = 'neon_game_users_v3';
-    const SESSION_KEY = 'neon_game_session_v3';
-    const SAVED_LOGIN_KEY = 'neon_saved_login_v3';
-    const OFFLINE_EARNINGS_KEY = 'neon_offline_earnings';
+    const USERS_KEY = 'neon_game_users_v4';
+    const SESSION_KEY = 'neon_game_session_v4';
+    const SAVED_CREDS_KEY = 'neon_saved_creds_v4';
 
     function getUsers() {
       const data = localStorage.getItem(USERS_KEY);
@@ -556,9 +608,21 @@
     }
     function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
 
+    // Сохранение логина и пароля
+    function saveCredentials(username, password) {
+      localStorage.setItem(SAVED_CREDS_KEY, JSON.stringify({ username, password }));
+    }
+    function getSavedCredentials() {
+      const data = localStorage.getItem(SAVED_CREDS_KEY);
+      return data ? JSON.parse(data) : null;
+    }
+    function clearCredentials() {
+      localStorage.removeItem(SAVED_CREDS_KEY);
+    }
+
     let currentUser = null;
     let userState = {
-      id: null, name: '', balance: 0, isVip: false, vipExpiry: null,
+      id: null, name: '', password: '', balance: 0, isVip: false, vipExpiry: null,
       ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
       bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1,
       lastSeen: Date.now(),
@@ -602,10 +666,8 @@
             const ballsInGame = Math.min(userState.activeBallsInGame, userState.ballsCount);
             const hitsPerSecond = ballsInGame * 2;
             const starsPerHit = userState.isVip ? 2 : 1;
-            const earned = Math.floor(offlineSeconds * hitsPerSecond * starsPerHit * 0.5);
-            if (earned > 0) {
-              userState.balance += earned;
-            }
+            const earned = Math.floor(offlineSeconds * hitsPerSecond * starsPerHit * 0.3);
+            if (earned > 0) userState.balance += earned;
           }
           userState.lastSeen = now;
           return true;
@@ -623,8 +685,6 @@
     }
 
     function generateId() { return Math.floor(10000000 + Math.random() * 90000000).toString(); }
-    function saveLoginCredentials(username) { localStorage.setItem(SAVED_LOGIN_KEY, username); }
-    function getSavedLogin() { return localStorage.getItem(SAVED_LOGIN_KEY); }
 
     const authScreen = document.getElementById('authScreen');
     const gameScreen = document.getElementById('gameScreen');
@@ -636,8 +696,11 @@
       gameScreen.classList.remove('active');
       loginForm.style.display = 'block';
       registerForm.style.display = 'none';
-      const savedLogin = getSavedLogin();
-      if (savedLogin) document.getElementById('loginUsername').value = savedLogin;
+      const creds = getSavedCredentials();
+      if (creds) {
+        document.getElementById('loginUsername').value = creds.username;
+        document.getElementById('loginPassword').value = creds.password;
+      }
     }
 
     function showGame() {
@@ -670,14 +733,13 @@
       const users = getUsers();
       if (users[name]) { errEl.textContent = 'Такой никнейм уже занят'; return; }
       users[name] = {
-        id: generateId(), name, balance: 0, isVip: false, vipExpiry: null,
+        id: generateId(), name, password: p1, balance: 0, isVip: false, vipExpiry: null,
         ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
-        bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1,
-        lastSeen: Date.now(),
+        bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1, lastSeen: Date.now(),
       };
       saveUsers(users);
       localStorage.setItem(SESSION_KEY, name);
-      saveLoginCredentials(name);
+      saveCredentials(name, p1);
       currentUser = name;
       userState = { ...users[name] };
       errEl.textContent = '';
@@ -690,9 +752,9 @@
       const errEl = document.getElementById('loginError');
       const users = getUsers();
       if (!users[name]) { errEl.textContent = 'Пользователь не найден'; return; }
-      if (pass !== name + '_pass') { errEl.textContent = 'Неверный пароль'; return; }
+      if (users[name].password !== pass) { errEl.textContent = 'Неверный пароль'; return; }
       localStorage.setItem(SESSION_KEY, name);
-      saveLoginCredentials(name);
+      saveCredentials(name, pass);
       currentUser = name;
       userState = { ...users[name] };
       errEl.textContent = '';
@@ -731,7 +793,6 @@
     }
 
     let balls = [];
-    const floatingTexts = [];
 
     function createBalls(count) {
       balls = [];
@@ -744,7 +805,7 @@
           y = BALL_RADIUS + Math.random() * (FIXED_HEIGHT - 2 * BALL_RADIUS);
           for (const b of balls) {
             const dx = b.x - x, dy = b.y - y;
-            if (Math.sqrt(dx*dx + dy*dy) < BALL_RADIUS * 2 + 2) {
+            if (Math.sqrt(dx*dx + dy*dy) < BALL_RADIUS * 2 + 4) {
               overlapping = true;
               break;
             }
@@ -752,7 +813,7 @@
           attempts++;
         } while (overlapping && attempts < 100);
 
-        const speed = 1.8 + Math.random() * 1.5;
+        const speed = 2 + Math.random() * 1.5;
         const angle = Math.random() * 2 * Math.PI;
         balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, i % ballColors.length));
       }
@@ -769,16 +830,44 @@
       const el = document.createElement('div');
       el.className = 'floating-text';
       el.textContent = text;
-      const rect = canvas.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
       const wrapperRect = canvasWrapper.getBoundingClientRect();
-      const scaleX = FIXED_WIDTH / rect.width;
-      const scaleY = FIXED_HEIGHT / rect.height;
-      const left = (x / scaleX) + (rect.left - wrapperRect.left);
-      const top = (y / scaleY) + (rect.top - wrapperRect.top);
+      const scaleX = canvasRect.width / FIXED_WIDTH;
+      const scaleY = canvasRect.height / FIXED_HEIGHT;
+      const left = (x * scaleX) + (canvasRect.left - wrapperRect.left);
+      const top = (y * scaleY) + (canvasRect.top - wrapperRect.top);
       el.style.left = left + 'px';
       el.style.top = top + 'px';
       canvasWrapper.appendChild(el);
       el.addEventListener('animationend', () => el.remove());
+    }
+
+    function animateBallDrop(slotElement, colorIndex) {
+      const slotRect = slotElement.getBoundingClientRect();
+      const canvasRect = canvas.getBoundingClientRect();
+      const wrapperRect = canvasWrapper.getBoundingClientRect();
+
+      const dropBall = document.createElement('div');
+      dropBall.className = 'ball-drop';
+      dropBall.style.width = BALL_RADIUS * 2 + 'px';
+      dropBall.style.height = BALL_RADIUS * 2 + 'px';
+      dropBall.style.borderRadius = '50%';
+      dropBall.style.background = `radial-gradient(circle at 30% 30%, #fff, ${ballColors[colorIndex]})`;
+      dropBall.style.boxShadow = `0 0 20px ${ballGlowColors[colorIndex]}`;
+      dropBall.style.left = (slotRect.left - wrapperRect.left + slotRect.width/2 - BALL_RADIUS) + 'px';
+      dropBall.style.top = (slotRect.top - wrapperRect.top + slotRect.height/2 - BALL_RADIUS) + 'px';
+
+      canvasWrapper.appendChild(dropBall);
+
+      requestAnimationFrame(() => {
+        const targetX = (canvasRect.left - wrapperRect.left) + Math.random() * (canvasRect.width - BALL_RADIUS*2) + BALL_RADIUS;
+        const targetY = (canvasRect.top - wrapperRect.top) + Math.random() * (canvasRect.height - BALL_RADIUS*2) + BALL_RADIUS;
+        dropBall.style.left = targetX + 'px';
+        dropBall.style.top = targetY + 'px';
+        dropBall.style.opacity = '0.8';
+      });
+
+      dropBall.addEventListener('transitionend', () => dropBall.remove());
     }
 
     function applyBonusSpeed() {
@@ -794,16 +883,11 @@
           const dist = Math.sqrt(dx*dx + dy*dy);
           const minDist = a.radius + b.radius;
           if (dist < minDist) {
-            // Нормаль
             const nx = dist > 0.001 ? dx / dist : 1;
             const ny = dist > 0.001 ? dy / dist : 0;
-
-            // Относительная скорость
             const dvx = a.vx - b.vx;
             const dvy = a.vy - b.vy;
             const vn = dvx * nx + dvy * ny;
-
-            // Отталкиваем только если сближаются
             if (vn > 0) {
               const impulse = 2 * vn / (a.mass + b.mass);
               a.vx -= impulse * b.mass * nx;
@@ -811,15 +895,11 @@
               b.vx += impulse * a.mass * nx;
               b.vy += impulse * a.mass * ny;
             }
-
-            // Раздвигаем
             const overlap = minDist - dist;
             const moveX = overlap * nx / 2;
             const moveY = overlap * ny / 2;
-            a.x -= moveX;
-            a.y -= moveY;
-            b.x += moveX;
-            b.y += moveY;
+            a.x -= moveX; a.y -= moveY;
+            b.x += moveX; b.y += moveY;
           }
         }
       }
@@ -831,11 +911,10 @@
         return;
       }
       const sp = applyBonusSpeed();
-      const dt = 1;
 
       for (const b of balls) {
-        b.x += b.vx * sp * dt;
-        b.y += b.vy * sp * dt;
+        b.x += b.vx * sp;
+        b.y += b.vy * sp;
 
         let hit = false;
         if (b.x - b.radius < 0) { b.x = b.radius; b.vx = Math.abs(b.vx); hit = true; }
@@ -860,20 +939,20 @@
         const glow = ballGlowColors[b.colorIndex];
         ctx.save();
         ctx.shadowColor = glow;
-        ctx.shadowBlur = 20;
+        ctx.shadowBlur = 18;
         ctx.beginPath();
         ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
-        const g = ctx.createRadialGradient(b.x - 4, b.y - 4, 2, b.x, b.y, b.radius);
+        const g = ctx.createRadialGradient(b.x - 3, b.y - 3, 2, b.x, b.y, b.radius);
         g.addColorStop(0, '#ffffff');
         g.addColorStop(0.3, color);
-        g.addColorStop(1, '#00000060');
+        g.addColorStop(1, '#00000040');
         ctx.fillStyle = g;
         ctx.fill();
-        ctx.strokeStyle = '#ffffffcc';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#ffffffdd';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
         ctx.beginPath();
-        ctx.arc(b.x - 5, b.y - 5, 4, 0, 2 * Math.PI);
+        ctx.arc(b.x - 4, b.y - 4, 4, 0, 2 * Math.PI);
         ctx.fillStyle = '#ffffffcc';
         ctx.fill();
         ctx.restore();
@@ -897,22 +976,26 @@
         const isLaunched = i < userState.activeBallsInGame;
 
         if (isLaunched) {
+          // Запущенный шар — серый
           circle.classList.add('launched-slot');
-          circle.textContent = '';
+          circle.style.backgroundColor = '#2a2a3a';
+          circle.style.boxShadow = 'none';
         } else if (isUnlocked) {
+          // Доступен, но не запущен — цветной шар
           circle.classList.add('active-slot');
           circle.style.backgroundColor = ballColors[i % ballColors.length];
-          circle.style.boxShadow = `0 0 15px ${ballGlowColors[i % ballColors.length]}`;
-          circle.textContent = '●';
+          circle.style.boxShadow = `0 0 14px ${ballGlowColors[i % ballColors.length]}`;
         } else {
+          // Не открыт — серый
           circle.classList.add('empty-slot');
-          circle.textContent = '';
+          circle.style.backgroundColor = '#2a2a3a';
+          circle.style.boxShadow = 'none';
         }
 
         const label = document.createElement('div');
         label.className = 'slot-label';
         if (i === 0) {
-          label.textContent = isLaunched ? 'Запущен' : 'Старт';
+          label.textContent = isLaunched ? 'В игре' : 'Старт';
         } else {
           label.textContent = `${Math.min(userState.vipReferrals, req)}/${req} VIP`;
         }
@@ -926,13 +1009,17 @@
 
         launchBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (currentUser === 'Casper' || (isUnlocked && !isLaunched)) {
+          if ((currentUser === 'Casper') || (isUnlocked && !isLaunched)) {
             if (userState.activeBallsInGame < userState.ballsCount) {
-              userState.activeBallsInGame++;
-              saveUserState();
-              syncBalls();
-              renderSlots();
-              renderSlots(document.getElementById('inviteSlotsContainer'));
+              const colorIndex = userState.activeBallsInGame % ballColors.length;
+              animateBallDrop(circle, colorIndex);
+              setTimeout(() => {
+                userState.activeBallsInGame++;
+                saveUserState();
+                syncBalls();
+                renderSlots();
+                renderSlots(document.getElementById('inviteSlotsContainer'));
+              }, 400);
             }
           }
         });
@@ -1013,8 +1100,7 @@
     document.getElementById('watchAdBtn').addEventListener('click', ()=>{
       userState.bonusMultiplier = 5;
       userState.bonusEndTime = Date.now() + 60000;
-      saveUserState();
-      updateUI();
+      saveUserState(); updateUI();
       document.getElementById('bonusModal').classList.remove('active');
     });
 
@@ -1039,7 +1125,8 @@
       document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
       document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
       document.getElementById('profileVipStatus').textContent = userState.isVip ?
-        (userState.vipExpiry ? `до ${new Date(userState.vipExpiry).toLocaleDateString()}` : 'навсегда') : 'нет';
+        (userState.vipExpiry ? `до ${new Date(userState.vipExpiry).toLocaleDateString()}` : '♾️ навсегда') : '❌ нет';
+      document.getElementById('profileVipStatus').className = userState.isVip ? 'value vip' : 'value';
       document.getElementById('profileRef').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
       const adminPanel = document.getElementById('adminPanel');
       if (currentUser === 'Casper') {
@@ -1064,9 +1151,10 @@
         users[newName] = {...userState};
         saveUsers(users);
         localStorage.setItem(SESSION_KEY, newName);
-        saveLoginCredentials(newName);
+        saveCredentials(newName, userState.password);
         currentUser = newName;
         updateUI();
+        document.getElementById('profileName').textContent = userState.name;
       }
     });
 
@@ -1076,8 +1164,6 @@
       userState.vipReferrals = Math.max(0, parseInt(document.getElementById('adminVipRefs').value) || 0);
       userState.totalReferrals = Math.max(userState.totalReferrals, userState.vipReferrals);
       recalcBalls(); saveUserState(); updateUI(); renderSlots();
-      document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
-      document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
     });
     document.getElementById('adminAddRefBtn').addEventListener('click', ()=>{
       if (currentUser !== 'Casper') return;
@@ -1085,15 +1171,12 @@
       userState.totalReferrals = Math.max(userState.totalReferrals, userState.vipReferrals);
       recalcBalls(); saveUserState(); updateUI(); renderSlots();
       document.getElementById('adminVipRefs').value = userState.vipReferrals;
-      document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
-      document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
     });
     document.getElementById('adminRemoveRefBtn').addEventListener('click', ()=>{
       if (currentUser !== 'Casper') return;
       userState.vipReferrals = Math.max(0, userState.vipReferrals - 1);
       recalcBalls(); saveUserState(); updateUI(); renderSlots();
       document.getElementById('adminVipRefs').value = userState.vipReferrals;
-      document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
     });
 
     // Вывод
@@ -1126,8 +1209,8 @@
 
     const params = new URLSearchParams(location.search);
     if(params.get('ref') && loadUserState()){
-      if(!sessionStorage.getItem('invited_done_v3')){
-        sessionStorage.setItem('invited_done_v3','1');
+      if(!sessionStorage.getItem('invited_done_v4')){
+        sessionStorage.setItem('invited_done_v4','1');
         userState.totalReferrals++;
         userState.vipReferrals++;
         recalcBalls(); saveUserState(); renderSlots();
@@ -1142,8 +1225,7 @@
         userState.bonusMultiplier = 1; userState.bonusEndTime = 0; saveUserState(); updateUI();
       }
       if (currentUser && userState.bonusEndTime && Date.now() < userState.bonusEndTime) {
-        const remaining = Math.ceil((userState.bonusEndTime - Date.now()) / 1000);
-        document.getElementById('bonusTimer').textContent = `${remaining}s`;
+        document.getElementById('bonusTimer').textContent = Math.ceil((userState.bonusEndTime - Date.now())/1000) + 's';
       }
     }, 1000);
 
