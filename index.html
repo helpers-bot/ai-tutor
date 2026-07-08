@@ -1,1260 +1,842 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shape Racers 3D - Гонки фигур</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Шарики • Звёзды</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    }
+    body {
+      background: #0b0f1c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+      margin: 0;
+    }
 
-        body {
-            background: #000;
-            font-family: 'Arial', sans-serif;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    /* Экраны */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+    }
+    .screen.active {
+      display: block;
+    }
 
-        canvas {
-            display: block;
-        }
+    /* Экран авторизации */
+    .auth-container {
+      background: #1a1f2f;
+      border-radius: 28px;
+      padding: 30px 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      text-align: center;
+      color: white;
+    }
+    .auth-container h2 {
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+    }
+    .auth-container input {
+      width: 100%;
+      padding: 14px;
+      margin: 8px 0;
+      border-radius: 16px;
+      border: none;
+      background: #252b3d;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+    }
+    .auth-container input::placeholder {
+      color: #8890a5;
+    }
+    .auth-container button {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 30px;
+      border: none;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #fbbf24;
+      color: #0b0f1c;
+    }
+    .auth-container .link-btn {
+      background: transparent;
+      color: #fbbf24;
+      text-decoration: underline;
+      font-size: 0.9rem;
+    }
+    .error-msg {
+      color: #ef4444;
+      font-size: 0.85rem;
+      min-height: 20px;
+    }
 
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            transition: all 0.5s;
-            pointer-events: all;
-        }
+    /* Игровой контейнер */
+    .game-container {
+      background: #1a1f2f;
+      border-radius: 32px;
+      padding: 16px 14px 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .top-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #252b3d;
+      border-radius: 24px;
+      padding: 10px 18px;
+      color: white;
+      flex-wrap: wrap;
+    }
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .username {
+      font-weight: 600;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .vip-badge {
+      color: #fbbf24;
+      font-size: 0.9rem;
+      font-weight: bold;
+      background: #3b2e1e;
+      padding: 2px 10px;
+      border-radius: 20px;
+    }
+    .no-vip {
+      color: #ef4444;
+      text-decoration: line-through;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    .balance {
+      background: #fbbf24;
+      color: #0b0f1c;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 1rem;
+    }
 
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
-        }
+    /* Прямоугольный канвас */
+    canvas {
+      width: 100%;
+      height: 300px;
+      background: #10141e;
+      border-radius: 24px;
+      display: block;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
+      touch-action: none;
+    }
 
-        #mainMenu {
-            background: radial-gradient(circle at center, #1a1a4e 0%, #0a0a2e 100%);
-            flex-direction: column;
-            gap: 25px;
-        }
+    /* Слоты шаров сверху */
+    .balls-slots {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      background: #1e2433;
+      border-radius: 20px;
+      padding: 12px;
+      margin-bottom: 4px;
+    }
+    .slot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .slot-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #3b4256;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      color: #aaa;
+      transition: 0.3s;
+      border: 2px solid #555;
+    }
+    .slot-circle.active-slot {
+      background: radial-gradient(circle at 30% 30%, #facc15, #eab308);
+      border-color: #fbbf24;
+      box-shadow: 0 0 12px #fbbf24aa;
+      color: #0b0f1c;
+    }
+    .slot-label {
+      font-size: 0.65rem;
+      color: #8890a5;
+      text-align: center;
+      line-height: 1.1;
+    }
+    .launch-btn {
+      font-size: 0.6rem;
+      background: #fbbf24;
+      color: #0b0f1c;
+      border: none;
+      border-radius: 12px;
+      padding: 3px 8px;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+    }
+    .launch-btn.visible {
+      display: block;
+    }
 
-        .game-title {
-            font-size: 52px;
-            font-weight: 900;
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #FFE66D);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center;
-            animation: glow 2s infinite;
-        }
+    .buttons-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 4px;
+    }
+    .btn {
+      background: #2d3548;
+      border: none;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      flex: 1 1 auto;
+      min-width: 70px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      letter-spacing: 0.3px;
+    }
+    .btn:active { transform: scale(0.96); background: #3e465c; }
+    .btn.primary { background: #fbbf24; color: #0b0f1c; font-weight: bold; }
 
-        @keyframes glow {
-            0%, 100% { filter: brightness(1); }
-            50% { filter: brightness(1.3); }
-        }
-
-        .subtitle {
-            color: rgba(255,255,255,0.7);
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .menu-btn {
-            padding: 16px 45px;
-            font-size: 20px;
-            font-weight: bold;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: white;
-            background: linear-gradient(135deg, #FF6B6B, #ee5a24);
-            box-shadow: 0 8px 25px rgba(255,107,107,0.4);
-            min-width: 250px;
-        }
-
-        .menu-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(255,107,107,0.6);
-        }
-
-        .menu-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .menu-btn.secondary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
-        }
-
-        #characterSelect, #difficultySelect {
-            background: rgba(0,0,0,0.95);
-            flex-direction: column;
-            gap: 20px;
-            color: white;
-        }
-
-        .char-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .char-card {
-            background: rgba(255,255,255,0.08);
-            border: 3px solid rgba(255,255,255,0.15);
-            border-radius: 20px;
-            padding: 25px;
-            width: 220px;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
-        }
-
-        .char-card:hover {
-            transform: translateY(-8px);
-            border-color: #FFD700;
-            box-shadow: 0 15px 35px rgba(255,215,0,0.25);
-        }
-
-        .char-card.selected {
-            border-color: #FFD700;
-            box-shadow: 0 0 35px rgba(255,215,0,0.5);
-            background: rgba(255,215,0,0.15);
-        }
-
-        .char-icon {
-            font-size: 55px;
-            margin-bottom: 8px;
-        }
-
-        .char-name {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 6px 8px;
-            margin: 4px 0;
-            background: rgba(255,255,255,0.04);
-            border-radius: 5px;
-            font-size: 13px;
-        }
-
-        .stat-value.good { color: #4ECDC4; }
-        .stat-value.avg { color: #FFE66D; }
-        .stat-value.bad { color: #FF6B6B; }
-
-        .super-power {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 12px;
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .difficulty-grid {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .diff-btn {
-            padding: 20px 35px;
-            font-size: 18px;
-            font-weight: bold;
-            border: 3px solid rgba(255,255,255,0.2);
-            border-radius: 15px;
-            background: rgba(255,255,255,0.08);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            min-width: 150px;
-        }
-
-        .diff-btn:hover {
-            border-color: #FFD700;
-            transform: scale(1.05);
-        }
-
-        .diff-btn.selected {
-            border-color: #FFD700;
-            background: rgba(255,215,0,0.2);
-            box-shadow: 0 0 30px rgba(255,215,0,0.3);
-        }
-
-        .diff-btn.easy { color: #4ECDC4; }
-        .diff-btn.medium { color: #FFE66D; }
-        .diff-btn.hard { color: #FF6B6B; }
-
-        #gameUI {
-            pointer-events: none;
-        }
-
-        #raceInfo {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 5;
-        }
-
-        .info-box {
-            background: rgba(0,0,0,0.75);
-            backdrop-filter: blur(10px);
-            padding: 10px 18px;
-            border-radius: 50px;
-            color: white;
-            font-weight: bold;
-            border: 2px solid rgba(255,255,255,0.15);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 15px;
-            width: fit-content;
-        }
-
-        #superPowerContainer {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 5;
-            text-align: center;
-        }
-
-        #superPowerBar {
-            width: 300px;
-            height: 20px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 10px;
-            overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.25);
-        }
-
-        #superPowerFill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.1s;
-            box-shadow: 0 0 20px rgba(102,126,234,0.5);
-        }
-
-        #superPowerLabel {
-            color: rgba(255,255,255,0.7);
-            margin-top: 5px;
-            font-size: 13px;
-        }
-
-        #superPowerReady {
-            color: #FFD700;
-            font-weight: bold;
-            font-size: 18px;
-            margin-top: 5px;
-            animation: pulse 0.8s infinite;
-            text-shadow: 0 0 15px rgba(255,215,0,0.7);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.08); }
-        }
-
-        #stunOverlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,0,0,0.25);
-            z-index: 4;
-            display: none;
-            pointer-events: none;
-        }
-
-        #stunText {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 64px;
-            font-weight: bold;
-            z-index: 5;
-            display: none;
-            text-shadow: 0 0 25px rgba(255,0,0,0.8);
-        }
-
-        #speedometer {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            z-index: 5;
-            color: white;
-            font-size: 42px;
-            font-weight: bold;
-            text-shadow: 0 0 12px rgba(255,255,255,0.5);
-        }
-
-        #minimap {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            width: 180px;
-            height: 180px;
-            background: rgba(0,0,0,0.75);
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.25);
-            z-index: 5;
-            overflow: hidden;
-        }
-
-        #minimapCanvas {
-            width: 100%;
-            height: 100%;
-        }
-
-        #finishScreen {
-            background: rgba(0,0,0,0.92);
-            flex-direction: column;
-            gap: 20px;
-            color: white;
-        }
-
-        .finish-title {
-            font-size: 44px;
-            font-weight: 900;
-        }
-
-        .finish-title.winner { color: #FFD700; }
-        .finish-title.loser { color: #FF6B6B; }
-
-        .results-table {
-            background: rgba(255,255,255,0.08);
-            border-radius: 15px;
-            padding: 20px;
-            min-width: 380px;
-            max-height: 350px;
-            overflow-y: auto;
-        }
-
-        .result-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-            align-items: center;
-            gap: 15px;
-        }
-
-        .result-position {
-            font-weight: bold;
-            color: #FFD700;
-            font-size: 18px;
-            min-width: 35px;
-        }
-    </style>
+    /* Модальные окна */
+    .modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.2s ease;
+    }
+    .modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-content {
+      background: #1f2537;
+      padding: 24px;
+      border-radius: 28px;
+      max-width: 320px;
+      width: 90%;
+      color: white;
+      text-align: center;
+      box-shadow: 0 20px 30px black;
+    }
+    .modal-content h3 { margin-bottom: 12px; }
+    .modal-content p { margin: 10px 0; font-size: 0.9rem; }
+    .close-btn {
+      background: #3b4256;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 30px;
+      margin-top: 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .copy-text {
+      background: #0f1322;
+      padding: 8px;
+      border-radius: 12px;
+      word-break: break-all;
+      margin: 10px 0;
+      font-size: 0.8rem;
+    }
+  </style>
 </head>
 <body>
-    <div id="mainMenu" class="screen">
-        <h1 class="game-title">🏁 SHAPE RACERS 3D</h1>
-        <p class="subtitle">Выберите фигуру и побеждайте в 3D гонках!</p>
-        <button class="menu-btn" onclick="showCharacterSelect()">🎮 Играть</button>
-        <button class="menu-btn secondary" onclick="showTutorial()">📚 Как играть</button>
+
+<!-- ЭКРАН АВТОРИЗАЦИИ -->
+<div id="authScreen" class="screen active">
+  <div class="auth-container" id="loginForm">
+    <h2>🔐 Вход</h2>
+    <input type="text" id="loginUsername" placeholder="Логин" autocomplete="off">
+    <input type="password" id="loginPassword" placeholder="Пароль">
+    <div class="error-msg" id="loginError"></div>
+    <button id="loginBtn">Войти</button>
+    <button class="link-btn" id="showRegisterBtn">Нет аккаунта? Зарегистрироваться</button>
+  </div>
+
+  <div class="auth-container" id="registerForm" style="display:none;">
+    <h2>📝 Регистрация</h2>
+    <input type="text" id="regUsername" placeholder="Никнейм" autocomplete="off">
+    <input type="password" id="regPassword1" placeholder="Пароль">
+    <input type="password" id="regPassword2" placeholder="Повторите пароль">
+    <div class="error-msg" id="regError"></div>
+    <button id="registerBtn">Зарегистрироваться</button>
+    <button class="link-btn" id="showLoginBtn">Уже есть аккаунт? Войти</button>
+  </div>
+</div>
+
+<!-- ЭКРАН ИГРЫ -->
+<div id="gameScreen" class="screen">
+  <div class="game-container">
+    <div class="top-panel">
+      <div class="user-info">
+        <span class="username" id="displayName">Игрок</span>
+        <span id="vipStatus" class="no-vip">VIP неактивен</span>
+      </div>
+      <div class="balance" id="balanceDisplay">⭐ 0</div>
     </div>
 
-    <div id="characterSelect" class="screen hidden">
-        <h2 style="font-size: 30px; color: #FFD700;">ВЫБЕРИТЕ ФИГУРУ</h2>
-        <div class="char-grid">
-            <div class="char-card" onclick="selectCharacter('ball')" id="cardBall">
-                <div class="char-icon">⚽</div>
-                <div class="char-name">ШАР</div>
-                <div class="stat-row"><span>Скорость</span><span class="stat-value good">★★★★★</span></div>
-                <div class="stat-row"><span>Ускорение</span><span class="stat-value good">★★★★★</span></div>
-                <div class="stat-row"><span>Вес</span><span class="stat-value bad">★★</span></div>
-                <div class="super-power">⚡ Супер: ТУРБО<br>Мгновенный рывок!</div>
-            </div>
-            <div class="char-card" onclick="selectCharacter('square')" id="cardSquare">
-                <div class="char-icon">🟫</div>
-                <div class="char-name">КВАДРАТ</div>
-                <div class="stat-row"><span>Скорость</span><span class="stat-value bad">★★</span></div>
-                <div class="stat-row"><span>Ускорение</span><span class="stat-value avg">★★★</span></div>
-                <div class="stat-row"><span>Вес</span><span class="stat-value good">★★★★★</span></div>
-                <div class="super-power">⚡ Супер: УДАРНАЯ ВОЛНА<br>Отбрасывает врагов!</div>
-            </div>
-            <div class="char-card" onclick="selectCharacter('cone')" id="cardCone">
-                <div class="char-icon">🔺</div>
-                <div class="char-name">КОНУС</div>
-                <div class="stat-row"><span>Скорость</span><span class="stat-value avg">★★★</span></div>
-                <div class="stat-row"><span>Ускорение</span><span class="stat-value good">★★★★</span></div>
-                <div class="stat-row"><span>Вес</span><span class="stat-value avg">★★★</span></div>
-                <div class="super-power">⚡ Супер: СМЕРЧ<br>Засасывает врагов!</div>
-            </div>
-        </div>
-        <button class="menu-btn" onclick="showDifficultySelect()" id="nextBtn" disabled>Далее →</button>
+    <!-- Слоты шаров -->
+    <div class="balls-slots" id="ballsSlotsContainer"></div>
+
+    <canvas id="gameCanvas" width="400" height="300"></canvas>
+
+    <div class="buttons-grid">
+      <button class="btn primary" id="buyVipBtn">💎 VIP</button>
+      <button class="btn" id="bonusBtn">⚡ x5 бонус</button>
+      <button class="btn" id="inviteBtn">👥 Друзья</button>
+      <button class="btn" id="profileBtn">👤 Профиль</button>
+      <button class="btn" id="logoutBtn" style="background:#4b3a3a;">🚪 Выход</button>
     </div>
+  </div>
+</div>
 
-    <div id="difficultySelect" class="screen hidden">
-        <h2 style="font-size: 30px; color: #FFD700;">СЛОЖНОСТЬ БОТОВ</h2>
-        <div class="difficulty-grid">
-            <button class="diff-btn easy" onclick="selectDifficulty('easy')">🟢 Лёгкая</button>
-            <button class="diff-btn medium" onclick="selectDifficulty('medium')">🟡 Средняя</button>
-            <button class="diff-btn hard" onclick="selectDifficulty('hard')">🔴 Профи</button>
-        </div>
-        <p style="color: rgba(255,255,255,0.6); max-width: 500px; text-align: center; font-size: 14px;">
-            Лёгкая: боты медленные и часто ошибаются<br>
-            Средняя: боты едут хорошо, иногда агрессивны<br>
-            Профи: боты идеально проходят трассу и атакуют
-        </p>
-        <button class="menu-btn" onclick="startRace()" id="startRaceBtn" disabled>🏁 НА СТАРТ!</button>
-    </div>
+<!-- Модальные окна -->
+<div class="modal" id="vipModal">
+  <div class="modal-content">
+    <h3>💎 VIP статус</h3>
+    <p>⭐ Звёзды за удар: <strong>2 вместо 1</strong></p>
+    <p>🔥 Удвоение заработка навсегда</p>
+    <p>💲 Стоимость: <strong>1$ (эмуляция)</strong></p>
+    <button class="close-btn" id="confirmVipBtn">Купить VIP (1$)</button>
+    <button class="close-btn" id="closeVipModal">Отмена</button>
+  </div>
+</div>
 
-    <div id="gameUI" class="hidden">
-        <div id="raceInfo">
-            <div class="info-box"><span>🏆</span><span id="position">1/8</span></div>
-            <div class="info-box"><span>⭐</span><span id="scoreDisplay">0</span></div>
-            <div class="info-box"><span>🔄</span><span id="lapDisplay">Круг 1/3</span></div>
-            <div class="info-box"><span>⏱️</span><span id="timeDisplay">0:00</span></div>
-        </div>
-        <div id="superPowerContainer">
-            <div id="superPowerBar"><div id="superPowerFill" style="width:0%"></div></div>
-            <div id="superPowerLabel">Супер-способность</div>
-            <div id="superPowerReady" style="display:none;">⚡ ГОТОВ! (ПРОБЕЛ) ⚡</div>
-        </div>
-        <div id="speedometer">0 км/ч</div>
-        <div id="minimap"><canvas id="minimapCanvas"></canvas></div>
-        <div id="stunOverlay"></div>
-        <div id="stunText"></div>
-    </div>
+<div class="modal" id="bonusModal">
+  <div class="modal-content">
+    <h3>⚡ Реклама</h3>
+    <p>Посмотрите рекламу, чтобы получить <strong>x5 скорости</strong> на 1 минуту!</p>
+    <button class="close-btn" id="watchAdBtn">▶ Смотреть рекламу</button>
+    <button class="close-btn" id="closeBonusModal">Закрыть</button>
+  </div>
+</div>
 
-    <div id="finishScreen" class="screen hidden">
-        <h2 class="finish-title" id="finishTitle"></h2>
-        <div class="results-table" id="resultsTable"></div>
-        <button class="menu-btn" onclick="restartGame()">🔄 Заново</button>
-        <button class="menu-btn secondary" onclick="goToMainMenu()">🏠 В меню</button>
-    </div>
+<div class="modal" id="inviteModal">
+  <div class="modal-content">
+    <h3>👥 Пригласить друга</h3>
+    <p>Твоя реферальная ссылка:</p>
+    <div class="copy-text" id="refLinkDisplay">загрузка...</div>
+    <button class="close-btn" id="copyRefBtn">📋 Копировать</button>
+    <button class="close-btn" id="closeInviteModal">Закрыть</button>
+    <p style="font-size:0.75rem; margin-top:10px;">+1 шарик за друга с VIP<br>3,10,20,50,100 друзей → ещё шарики</p>
+  </div>
+</div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script>
-        // ============================================
-        // SHAPE RACERS 3D - РАБОЧАЯ ВЕРСИЯ
-        // ============================================
+<div class="modal" id="profileModal">
+  <div class="modal-content">
+    <h3>👤 Профиль</h3>
+    <p>Имя: <span id="profileName"></span> <button id="editNameBtn" style="background:#fbbf24; border:none; padding:2px 10px; border-radius:20px;">✏️</button></p>
+    <p>ID: <strong id="profileId"></strong></p>
+    <p>Баланс: ⭐ <span id="profileBalance"></span></p>
+    <div class="copy-text" id="profileRef"></div>
+    <button class="close-btn" id="copyProfileRefBtn">📋 Копировать ссылку</button>
+    <button class="close-btn" id="closeProfileModal">Закрыть</button>
+  </div>
+</div>
 
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
-        scene.fog = new THREE.Fog(0x87CEEB, 150, 500);
+<script>
+  (function() {
+    // ---------- БАЗА ПОЛЬЗОВАТЕЛЕЙ ----------
+    const USERS_KEY = 'game_users_db';
+    const SESSION_KEY = 'game_current_user';
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.5, 800);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        document.body.appendChild(renderer.domElement);
+    function getUsers() {
+      const data = localStorage.getItem(USERS_KEY);
+      return data ? JSON.parse(data) : {};
+    }
+    function saveUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
 
-        // Освещение
-        const ambientLight = new THREE.AmbientLight(0x404040, 0.7);
-        scene.add(ambientLight);
-        const sunLight = new THREE.DirectionalLight(0xffffff, 0.9);
-        sunLight.position.set(80, 100, 40);
-        sunLight.castShadow = true;
-        sunLight.shadow.mapSize.width = 2048;
-        sunLight.shadow.mapSize.height = 2048;
-        sunLight.shadow.camera.left = -200;
-        sunLight.shadow.camera.right = 200;
-        sunLight.shadow.camera.top = 200;
-        sunLight.shadow.camera.bottom = -200;
-        sunLight.shadow.camera.near = 0.5;
-        sunLight.shadow.camera.far = 500;
-        scene.add(sunLight);
+    // Текущий пользователь
+    let currentUser = null;
+    let userState = {
+      id: null,
+      name: '',
+      balance: 0,
+      isVip: false,
+      ballsCount: 1,
+      invitedFriends: 0,
+      bonusMultiplier: 1,
+      bonusEndTime: 0,
+      activeBallsInGame: 1, // сколько шаров реально в игре (из доступных)
+    };
 
-        // Игровые переменные
-        let playerType = 'ball';
-        let difficulty = 'medium';
-        let playerObj = null;
-        let bots = [];
-        let allRacers = [];
-        let trackPoints = [];
-        let trackWidth = 10;
-        let raceStarted = false;
-        let raceFinished = false;
-        let finishOrder = [];
-        let superPowerCharge = 0;
-        let superPowerReady = false;
-        let superPowerActive = false;
-        let superPowerTimer = 0;
-        let score = 0;
-        let startTime = 0;
-        let maxLaps = 3;
-
-        // Генерация трассы
-        function generateTrack() {
-            trackPoints = [];
-            const waypoints = [
-                { x: 0, z: 0 },
-                { x: 70, z: -15 },
-                { x: 120, z: -50 },
-                { x: 90, z: -110 },
-                { x: 20, z: -130 },
-                { x: -50, z: -100 },
-                { x: -100, z: -40 },
-                { x: -90, z: 30 },
-                { x: -40, z: 80 },
-                { x: 20, z: 70 },
-                { x: 80, z: 30 },
-                { x: 100, z: 0 }
-            ];
-
-            for (let i = 0; i < waypoints.length; i++) {
-                const curr = waypoints[i];
-                const next = waypoints[(i + 1) % waypoints.length];
-                for (let t = 0; t < 25; t++) {
-                    const a = t / 25;
-                    trackPoints.push({
-                        x: curr.x + (next.x - curr.x) * a,
-                        z: curr.z + (next.z - curr.z) * a,
-                        y: 0
-                    });
-                }
-            }
+    function loadUserState() {
+      const session = localStorage.getItem(SESSION_KEY);
+      if (session) {
+        currentUser = session;
+        const users = getUsers();
+        if (users[currentUser]) {
+          userState = { ...userState, ...users[currentUser] };
+          if (!userState.id) userState.id = generateId();
+          if (userState.bonusEndTime && Date.now() > userState.bonusEndTime) {
+            userState.bonusMultiplier = 1;
+            userState.bonusEndTime = 0;
+          }
+          return true;
         }
+      }
+      return false;
+    }
 
-        // Создание 3D трассы
-        function createTrack3D() {
-            // Трасса
-            const trackShape = [];
-            for (let i = 0; i <= trackPoints.length; i++) {
-                const p = trackPoints[i % trackPoints.length];
-                trackShape.push(new THREE.Vector2(p.x, p.z));
-            }
-            
-            for (let i = 0; i < trackPoints.length; i++) {
-                const p1 = trackPoints[i];
-                const p2 = trackPoints[(i + 1) % trackPoints.length];
-                const dx = p2.x - p1.x;
-                const dz = p2.z - p1.z;
-                const len = Math.sqrt(dx*dx + dz*dz);
-                const nx = -dz / len;
-                const nz = dx / len;
+    function saveUserState() {
+      if (!currentUser) return;
+      const users = getUsers();
+      users[currentUser] = { ...userState };
+      saveUsers(users);
+    }
 
-                // Асфальт
-                const segGeom = new THREE.PlaneGeometry(len, trackWidth * 2);
-                const segMat = new THREE.MeshPhongMaterial({ color: 0x555555, side: THREE.DoubleSide });
-                const seg = new THREE.Mesh(segGeom, segMat);
-                seg.rotation.x = -Math.PI / 2;
-                seg.rotation.z = Math.atan2(dz, dx);
-                seg.position.set((p1.x + p2.x) / 2, 0.02, (p1.z + p2.z) / 2);
-                seg.receiveShadow = true;
-                scene.add(seg);
+    function generateId() {
+      return Math.floor(10000000 + Math.random() * 90000000).toString();
+    }
 
-                // Разметка
-                for (let s = -1; s <= 1; s += 2) {
-                    const lineGeom = new THREE.PlaneGeometry(len * 0.3, 0.3);
-                    const lineMat = new THREE.MeshPhongMaterial({ color: s === 0 ? 0xFFFF00 : 0xFFFFFF, side: THREE.DoubleSide });
-                    const line = new THREE.Mesh(lineGeom, lineMat);
-                    line.rotation.x = -Math.PI / 2;
-                    line.rotation.z = Math.atan2(dz, dx);
-                    line.position.set(
-                        (p1.x + p2.x) / 2 + nx * trackWidth * s * 0.6,
-                        0.03,
-                        (p1.z + p2.z) / 2 + nz * trackWidth * s * 0.6
-                    );
-                    scene.add(line);
-                }
+    // ---------- ЭКРАНЫ ----------
+    const authScreen = document.getElementById('authScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
 
-                // Бордюры
-                for (let s = -1; s <= 1; s += 2) {
-                    const curbGeom = new THREE.BoxGeometry(len, 1.5, 0.8);
-                    const curbMat = new THREE.MeshPhongMaterial({ color: 0xFF4444 });
-                    const curb = new THREE.Mesh(curbGeom, curbMat);
-                    curb.position.set(
-                        (p1.x + p2.x) / 2 + nx * trackWidth * s,
-                        0.75,
-                        (p1.z + p2.z) / 2 + nz * trackWidth * s
-                    );
-                    curb.rotation.y = Math.atan2(dx, dz);
-                    curb.castShadow = true;
-                    curb.receiveShadow = true;
-                    scene.add(curb);
-                }
-            }
+    function showAuth() {
+      authScreen.classList.add('active');
+      gameScreen.classList.remove('active');
+      loginForm.style.display = 'block';
+      registerForm.style.display = 'none';
+    }
 
-            // Стартовая линия
-            const startGeom = new THREE.PlaneGeometry(4, trackWidth * 2);
-            const startMat = new THREE.MeshPhongMaterial({ color: 0xFFFFFF, side: THREE.DoubleSide });
-            const startLine = new THREE.Mesh(startGeom, startMat);
-            startLine.rotation.x = -Math.PI / 2;
-            startLine.position.set(trackPoints[0].x, 0.03, trackPoints[0].z);
-            scene.add(startLine);
+    function showGame() {
+      authScreen.classList.remove('active');
+      gameScreen.classList.add('active');
+      updateUI();
+      renderSlots();
+      syncBalls();
+      if (!window._loopStarted) {
+        window._loopStarted = true;
+        requestAnimationFrame(gameLoop);
+      }
+    }
+
+    // Регистрация
+    document.getElementById('showRegisterBtn').addEventListener('click', ()=>{
+      loginForm.style.display = 'none';
+      registerForm.style.display = 'block';
+    });
+    document.getElementById('showLoginBtn').addEventListener('click', ()=>{
+      registerForm.style.display = 'none';
+      loginForm.style.display = 'block';
+    });
+
+    document.getElementById('registerBtn').addEventListener('click', ()=>{
+      const name = document.getElementById('regUsername').value.trim();
+      const p1 = document.getElementById('regPassword1').value;
+      const p2 = document.getElementById('regPassword2').value;
+      const errEl = document.getElementById('regError');
+      if (!name || name.length < 2) { errEl.textContent = 'Никнейм минимум 2 символа'; return; }
+      if (p1.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
+      if (p1 !== p2) { errEl.textContent = 'Пароли не совпадают'; return; }
+
+      const users = getUsers();
+      if (users[name]) { errEl.textContent = 'Такой никнейм уже занят'; return; }
+
+      users[name] = {
+        id: generateId(),
+        name: name,
+        balance: 0,
+        isVip: false,
+        ballsCount: 1,
+        invitedFriends: 0,
+        bonusMultiplier: 1,
+        bonusEndTime: 0,
+        activeBallsInGame: 1,
+      };
+      saveUsers(users);
+      localStorage.setItem(SESSION_KEY, name);
+      currentUser = name;
+      userState = { ...users[name] };
+      errEl.textContent = '';
+      showGame();
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', ()=>{
+      const name = document.getElementById('loginUsername').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      const errEl = document.getElementById('loginError');
+      const users = getUsers();
+      if (!users[name]) { errEl.textContent = 'Пользователь не найден'; return; }
+      if (pass !== name + '_pass') { // упрощённо: пароль проверяем как никнейм+'_pass'
+        errEl.textContent = 'Неверный пароль';
+        return;
+      }
+      localStorage.setItem(SESSION_KEY, name);
+      currentUser = name;
+      userState = { ...users[name] };
+      errEl.textContent = '';
+      showGame();
+    });
+
+    // Выход
+    document.getElementById('logoutBtn').addEventListener('click', ()=>{
+      localStorage.removeItem(SESSION_KEY);
+      currentUser = null;
+      userState = {};
+      balls = [];
+      showAuth();
+    });
+
+    // ---------- ИГРОВАЯ ЛОГИКА ----------
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width > 0) {
+        canvas.width = rect.width;
+        canvas.height = 300;
+      }
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Ball {
+      constructor(x, y, vx, vy, radius = 16) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = radius;
+      }
+    }
+
+    let balls = [];
+
+    function createBalls(count) {
+      balls = [];
+      const w = canvas.width || 400;
+      const h = canvas.height || 300;
+      for (let i = 0; i < count; i++) {
+        let r = 14 + Math.floor(Math.random()*6);
+        let x = Math.random() * (w - 2*r) + r;
+        let y = Math.random() * (h - 2*r) + r;
+        let speed = 1.6 + Math.random()*1.5;
+        let angle = Math.random()*2*Math.PI;
+        balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, r));
+      }
+      resolveOverlap();
+    }
+
+    function resolveOverlap() {
+      const w = canvas.width, h = canvas.height;
+      for (let i=0;i<balls.length;i++) {
+        for (let j=i+1;j<balls.length;j++) {
+          let b1=balls[i], b2=balls[j];
+          let dx=b2.x-b1.x, dy=b2.y-b1.y;
+          let dist=Math.sqrt(dx*dx+dy*dy);
+          let min=b1.radius+b2.radius;
+          if(dist<min && dist>0.001) {
+            let ang=Math.atan2(dy,dx);
+            let move=(min-dist)/2;
+            b1.x-=Math.cos(ang)*move; b1.y-=Math.sin(ang)*move;
+            b2.x+=Math.cos(ang)*move; b2.y+=Math.sin(ang)*move;
+            b1.x=Math.min(Math.max(b1.x,b1.radius),w-b1.radius);
+            b1.y=Math.min(Math.max(b1.y,b1.radius),h-b1.radius);
+            b2.x=Math.min(Math.max(b2.x,b2.radius),w-b2.radius);
+            b2.y=Math.min(Math.max(b2.y,b2.radius),h-b2.radius);
+          }
         }
+      }
+    }
 
-        // Создание окружения
-        function createEnvironment() {
-            // Земля
-            const groundGeom = new THREE.PlaneGeometry(500, 500);
-            const groundMat = new THREE.MeshPhongMaterial({ color: 0x4a8c3f, side: THREE.DoubleSide });
-            const ground = new THREE.Mesh(groundGeom, groundMat);
-            ground.rotation.x = -Math.PI / 2;
-            ground.position.y = -0.5;
-            ground.receiveShadow = true;
-            scene.add(ground);
+    function syncBalls() {
+      const desired = Math.min(userState.activeBallsInGame, userState.ballsCount);
+      if (balls.length !== desired) {
+        createBalls(desired);
+      }
+    }
 
-            // Деревья
-            for (let i = 0; i < 80; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 35 + Math.random() * 60;
-                const x = Math.cos(angle) * dist;
-                const z = Math.sin(angle) * dist;
-                
-                let onTrack = false;
-                for (const p of trackPoints) {
-                    if (Math.sqrt((x-p.x)**2 + (z-p.z)**2) < trackWidth + 6) {
-                        onTrack = true;
-                        break;
-                    }
-                }
-                if (onTrack) continue;
+    function applyBonusSpeed() {
+      if (userState.bonusEndTime && Date.now() < userState.bonusEndTime) return 5;
+      return 1;
+    }
 
-                const trunkGeom = new THREE.CylinderGeometry(0.4, 0.6, 5 + Math.random() * 3);
-                const trunkMat = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
-                const trunk = new THREE.Mesh(trunkGeom, trunkMat);
-                trunk.position.set(x, 2.5, z);
-                trunk.castShadow = true;
-                trunk.receiveShadow = true;
-                scene.add(trunk);
-
-                const leavesGeom = new THREE.ConeGeometry(2.5 + Math.random(), 5 + Math.random() * 3, 8);
-                const leavesMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(0, 0.4 + Math.random() * 0.3, 0) });
-                const leaves = new THREE.Mesh(leavesGeom, leavesMat);
-                leaves.position.set(x, 6, z);
-                leaves.castShadow = true;
-                leaves.receiveShadow = true;
-                scene.add(leaves);
-            }
-
-            // Здания на фоне
-            for (let i = 0; i < 12; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = 80 + Math.random() * 60;
-                const x = Math.cos(angle) * dist;
-                const z = Math.sin(angle) * dist;
-                const h = 8 + Math.random() * 20;
-                
-                const buildGeom = new THREE.BoxGeometry(4 + Math.random() * 8, h, 4 + Math.random() * 8);
-                const buildMat = new THREE.MeshPhongMaterial({ color: new THREE.Color(Math.random() * 0.3 + 0.4, Math.random() * 0.3 + 0.4, Math.random() * 0.4 + 0.5) });
-                const build = new THREE.Mesh(buildGeom, buildMat);
-                build.position.set(x, h/2, z);
-                build.castShadow = true;
-                build.receiveShadow = true;
-                scene.add(build);
-            }
+    function gameLoop(ts) {
+      if (!gameScreen.classList.contains('active')) {
+        requestAnimationFrame(gameLoop);
+        return;
+      }
+      const w = canvas.width, h = canvas.height;
+      const sp = applyBonusSpeed();
+      for (let b of balls) {
+        b.x += b.vx * sp * 0.9;
+        b.y += b.vy * sp * 0.9;
+        let hit = false;
+        if(b.x-b.radius<0){b.x=b.radius; b.vx=Math.abs(b.vx); hit=true;}
+        if(b.x+b.radius>w){b.x=w-b.radius; b.vx=-Math.abs(b.vx); hit=true;}
+        if(b.y-b.radius<0){b.y=b.radius; b.vy=Math.abs(b.vy); hit=true;}
+        if(b.y+b.radius>h){b.y=h-b.radius; b.vy=-Math.abs(b.vy); hit=true;}
+        if(hit){
+          userState.balance += userState.isVip ? 2 : 1;
+          saveUserState();
+          updateUI();
         }
-
-        // Создание 3D модели игрока
-        function createPlayerModel(type) {
-            const group = new THREE.Group();
-            
-            let body;
-            switch(type) {
-                case 'ball':
-                    body = new THREE.Mesh(
-                        new THREE.SphereGeometry(1.2, 32, 32),
-                        new THREE.MeshPhongMaterial({ color: 0x4ECDC4, specular: 0xffffff, shininess: 100 })
-                    );
-                    break;
-                case 'square':
-                    body = new THREE.Mesh(
-                        new THREE.BoxGeometry(2, 2, 2),
-                        new THREE.MeshPhongMaterial({ color: 0xFFE66D, specular: 0xffffff, shininess: 50 })
-                    );
-                    break;
-                case 'cone':
-                    body = new THREE.Mesh(
-                        new THREE.ConeGeometry(1.3, 3.5, 8),
-                        new THREE.MeshPhongMaterial({ color: 0xFF8B94, specular: 0xffffff, shininess: 75 })
-                    );
-                    break;
+      }
+      // столкновения
+      for(let i=0;i<balls.length;i++){
+        for(let j=i+1;j<balls.length;j++){
+          let a=balls[i], b2=balls[j];
+          let dx=b2.x-a.x, dy=b2.y-a.y, dist=Math.sqrt(dx*dx+dy*dy);
+          let min=a.radius+b2.radius;
+          if(dist<min && dist>0.001){
+            let nx=dx/dist, ny=dy/dist;
+            let dvx=a.vx-b2.vx, dvy=a.vy-b2.vy;
+            let vn=dvx*nx+dvy*ny;
+            if(vn<0){
+              let imp=2*vn/(1+1);
+              a.vx-=imp*1*nx; a.vy-=imp*1*ny;
+              b2.vx+=imp*1*nx; b2.vy+=imp*1*ny;
             }
-            body.castShadow = true;
-            body.receiveShadow = true;
-            group.add(body);
-
-            // Свечение для игрока
-            const glowGeom = new THREE.SphereGeometry(1.6, 16, 16);
-            const glowMat = new THREE.MeshBasicMaterial({ color: 0xFFD700, transparent: true, opacity: 0.25 });
-            const glow = new THREE.Mesh(glowGeom, glowMat);
-            group.add(glow);
-
-            group.position.set(trackPoints[0].x, 2, trackPoints[0].z);
-            scene.add(group);
-            return group;
+            let ov=min-dist;
+            a.x-=ov*nx/2; a.y-=ov*ny/2;
+            b2.x+=ov*nx/2; b2.y+=ov*ny/2;
+          }
         }
+      }
+      ctx.clearRect(0,0,w,h);
+      for(let b of balls){
+        ctx.beginPath();
+        ctx.arc(b.x,b.y,b.radius,0,Math.PI*2);
+        let g=ctx.createRadialGradient(b.x-3,b.y-3,2,b.x,b.y,b.radius);
+        g.addColorStop(0,'#facc15'); g.addColorStop(0.7,'#eab308'); g.addColorStop(1,'#a16207');
+        ctx.fillStyle=g; ctx.fill();
+        ctx.strokeStyle='#fef9c3'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(b.x-4,b.y-4,3,0,2*Math.PI); ctx.fillStyle='#ffffff90'; ctx.fill();
+      }
+      requestAnimationFrame(gameLoop);
+    }
 
-        // Создание бота
-        function createBotModel(type, color, index) {
-            const group = new THREE.Group();
-            
-            let body;
-            switch(type) {
-                case 'ball':
-                    body = new THREE.Mesh(
-                        new THREE.SphereGeometry(1.2, 16, 16),
-                        new THREE.MeshPhongMaterial({ color: color })
-                    );
-                    break;
-                case 'square':
-                    body = new THREE.Mesh(
-                        new THREE.BoxGeometry(2, 2, 2),
-                        new THREE.MeshPhongMaterial({ color: color })
-                    );
-                    break;
-                case 'cone':
-                    body = new THREE.Mesh(
-                        new THREE.ConeGeometry(1.3, 3.5, 8),
-                        new THREE.MeshPhongMaterial({ color: color })
-                    );
-                    break;
-            }
-            body.castShadow = true;
-            body.receiveShadow = true;
-            group.add(body);
+    // Слоты шаров
+    const slotsContainer = document.getElementById('ballsSlotsContainer');
+    const slotsRequirements = [0, 1, 3, 10, 20, 50, 100]; // 7 слотов
 
-            const offset = (index + 1) * 5;
-            group.position.set(trackPoints[0].x, 2, trackPoints[0].z + offset);
-            scene.add(group);
-            return group;
+    function renderSlots() {
+      slotsContainer.innerHTML = '';
+      const totalSlots = slotsRequirements.length;
+      for (let i = 0; i < totalSlots; i++) {
+        const req = slotsRequirements[i];
+        const slot = document.createElement('div');
+        slot.className = 'slot';
+
+        const circle = document.createElement('div');
+        circle.className = 'slot-circle';
+        const isActive = i < userState.ballsCount;
+        if (isActive) circle.classList.add('active-slot');
+        circle.textContent = isActive ? '●' : '○';
+
+        const label = document.createElement('div');
+        label.className = 'slot-label';
+        if (i === 0) label.textContent = 'Старт';
+        else label.textContent = `${req} друзей`;
+
+        const launchBtn = document.createElement('button');
+        launchBtn.className = 'launch-btn';
+        launchBtn.textContent = 'Запустить';
+        
+        // Показываем кнопку, если шар доступен, но ещё не в игре
+        const isInGame = i < userState.activeBallsInGame;
+        if (isActive && !isInGame) {
+          launchBtn.classList.add('visible');
         }
-
-        // Инициализация гонки
-        function initRace() {
-            // Очистка
-            while(scene.children.length > 0) scene.remove(scene.children[0]);
-            scene.add(ambientLight);
-            scene.add(sunLight);
-
-            finishOrder = [];
-            superPowerCharge = 0;
-            superPowerReady = false;
-            superPowerActive = false;
-            superPowerTimer = 0;
-            score = 0;
-            raceFinished = false;
-            bots = [];
-            allRacers = [];
-
-            generateTrack();
-            createTrack3D();
-            createEnvironment();
-
-            // Игрок
-            const playerGroup = createPlayerModel(playerType);
-            playerObj = {
-                mesh: playerGroup,
-                x: trackPoints[0].x,
-                z: trackPoints[0].z,
-                speed: 0,
-                rotation: 0,
-                stunned: false,
-                laps: 0,
-                trackIndex: 0,
-                type: playerType,
-                isPlayer: true
-            };
-
-            // Боты
-            const botColors = [0xFF6B6B, 0xFFA500, 0xFF69B4, 0x98FB98, 0xDDA0DD, 0xF0E68C, 0x87CEEB];
-            const botTypes = ['ball', 'ball', 'square', 'square', 'cone', 'cone', 'ball'];
-            
-            const configs = {
-                easy: { speed: 0.12, accuracy: 0.5, aggression: 0.1 },
-                medium: { speed: 0.2, accuracy: 0.75, aggression: 0.4 },
-                hard: { speed: 0.3, accuracy: 0.95, aggression: 0.8 }
-            };
-
-            for (let i = 0; i < 7; i++) {
-                const mesh = createBotModel(botTypes[i], botColors[i], i);
-                const bot = {
-                    mesh: mesh,
-                    x: mesh.position.x,
-                    z: mesh.position.z,
-                    speed: 0,
-                    rotation: 0,
-                    stunned: false,
-                    laps: 0,
-                    trackIndex: 0,
-                    targetIndex: 10,
-                    type: botTypes[i],
-                    isPlayer: false,
-                    config: configs[difficulty]
-                };
-                bots.push(bot);
+        
+        launchBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (currentUser === 'Casper') {
+            // Режим бога: можно добавлять бесконечно
+            if (userState.activeBallsInGame < userState.ballsCount) {
+              userState.activeBallsInGame++;
+              saveUserState();
+              syncBalls();
+              renderSlots();
             }
-
-            allRacers = [playerObj, ...bots];
-            startTime = Date.now();
-            raceStarted = true;
-
-            document.getElementById('gameUI').classList.remove('hidden');
-            document.getElementById('stunOverlay').style.display = 'none';
-            document.getElementById('stunText').style.display = 'none';
-            document.getElementById('superPowerReady').style.display = 'none';
-            document.getElementById('superPowerFill').style.width = '0%';
-        }
-
-        // Поиск ближайшей точки трассы
-        function getTrackInfo(x, z) {
-            let minDist = Infinity;
-            let index = 0;
-            for (let i = 0; i < trackPoints.length; i++) {
-                const dx = x - trackPoints[i].x;
-                const dz = z - trackPoints[i].z;
-                const dist = Math.sqrt(dx*dx + dz*dz);
-                if (dist < minDist) {
-                    minDist = dist;
-                    index = i;
-                }
+          } else {
+            if (isActive && !isInGame) {
+              userState.activeBallsInGame++;
+              saveUserState();
+              syncBalls();
+              renderSlots();
             }
-            return { distance: minDist, index: index };
-        }
-
-        // Физика для разных типов
-        function getPhysics(type) {
-            switch(type) {
-                case 'ball': return { maxSpeed: 0.45, accel: 0.025, brake: 0.03, friction: 0.97, turnSpeed: 0.04, weight: 0.3 };
-                case 'square': return { maxSpeed: 0.3, accel: 0.015, brake: 0.05, friction: 0.95, turnSpeed: 0.055, weight: 1.0 };
-                case 'cone': return { maxSpeed: 0.38, accel: 0.02, brake: 0.04, friction: 0.96, turnSpeed: 0.048, weight: 0.6 };
-            }
-        }
-
-        // Обновление игрока
-        function updatePlayer(dt) {
-            if (!playerObj || playerObj.stunned || raceFinished) return;
-
-            const phys = getPhysics(playerObj.type);
-            let accelInput = 0;
-            let turnInput = 0;
-
-            if (keys['KeyW'] || keys['ArrowUp']) accelInput = 1;
-            if (keys['KeyS'] || keys['ArrowDown']) accelInput = -1;
-            if (keys['KeyA'] || keys['ArrowLeft']) turnInput = 1;
-            if (keys['KeyD'] || keys['ArrowRight']) turnInput = -1;
-
-            // Супер
-            if (keys['Space'] && superPowerReady && !superPowerActive) {
-                activateSuperPower();
-            }
-
-            // Ускорение
-            if (accelInput > 0) {
-                playerObj.speed += phys.accel * dt * 60;
-                playerObj.speed = Math.min(playerObj.speed, phys.maxSpeed);
-                if (superPowerActive && playerObj.type === 'ball') {
-                    playerObj.speed = Math.min(playerObj.speed + 0.05, phys.maxSpeed * 2);
-                }
-            } else if (accelInput < 0) {
-                playerObj.speed -= phys.brake * dt * 60;
-                playerObj.speed = Math.max(playerObj.speed, -phys.maxSpeed * 0.3);
-            } else {
-                playerObj.speed *= Math.pow(phys.friction, dt * 60);
-                if (Math.abs(playerObj.speed) < 0.005) playerObj.speed = 0;
-            }
-
-            // Поворот
-            const speedFactor = Math.abs(playerObj.speed) / phys.maxSpeed;
-            playerObj.rotation += turnInput * phys.turnSpeed * (0.3 + speedFactor * 0.7) * dt * 60;
-
-            // Движение
-            playerObj.x += Math.sin(playerObj.rotation) * playerObj.speed * dt * 60;
-            playerObj.z += Math.cos(playerObj.rotation) * playerObj.speed * dt * 60;
-
-            // Позиция на трассе
-            const info = getTrackInfo(playerObj.x, playerObj.z);
-            playerObj.trackIndex = info.index;
-
-            // Вылетел?
-            if (info.distance > trackWidth + 5) {
-                stunRacer(playerObj, true);
-            }
-
-            // Визуал
-            playerObj.mesh.position.x = playerObj.x;
-            playerObj.mesh.position.z = playerObj.z;
-            playerObj.mesh.position.y = 1.5 + Math.abs(playerObj.speed) * 3;
-
-            // Вращение модели
-            const body = playerObj.mesh.children[0];
-            if (playerObj.type === 'ball') {
-                body.rotation.x += playerObj.speed * 0.6 * dt * 60;
-                body.rotation.z += playerObj.speed * 0.3 * dt * 60;
-            } else if (playerObj.type === 'square') {
-                playerObj.mesh.rotation.y = playerObj.rotation;
-                body.rotation.z += playerObj.speed * 0.4 * dt * 60;
-            } else {
-                playerObj.mesh.rotation.y = playerObj.rotation;
-                body.rotation.z += playerObj.speed * 0.5 * dt * 60;
-            }
-
-            // Прогресс круга
-            checkLapProgress(playerObj);
-        }
-
-        // Обновление ботов
-        function updateBot(bot, dt) {
-            if (bot.stunned || raceFinished) return;
-
-            const phys = getPhysics(bot.type);
-            const cfg = bot.config;
-
-            // Целевая точка
-            const target = trackPoints[bot.targetIndex];
-            const dx = target.x - bot.x;
-            const dz = target.z - bot.z;
-            const dist = Math.sqrt(dx*dx + dz*dz);
-            const targetAngle = Math.atan2(dx, dz);
-
-            // Поворот к цели
-            let diff = targetAngle - bot.rotation;
-            while (diff > Math.PI) diff -= Math.PI*2;
-            while (diff < -Math.PI) diff += Math.PI*2;
-            bot.rotation += diff * 0.08 * cfg.accuracy * dt * 60;
-
-            // Неточность
-            if (Math.random() < (1 - cfg.accuracy) * 0.05) {
-                bot.rotation += (Math.random() - 0.5) * 0.3;
-            }
-
-            // Скорость
-            const targetSpeed = phys.maxSpeed * cfg.speed;
-            bot.speed += (targetSpeed - bot.speed) * 0.05 * dt * 60;
-            bot.speed *= 0.99;
-
-            // Агрессия к игроку
-            if (Math.random() < cfg.aggression * 0.03 && playerObj && !playerObj.stunned) {
-                const px = playerObj.x - bot.x;
-                const pz = playerObj.z - bot.z;
-                const pdist = Math.sqrt(px*px + pz*pz);
-                if (pdist < 10) {
-                    bot.rotation = Math.atan2(px, pz);
-                    bot.speed += 0.05;
-                }
-            }
-
-            // Движение
-            bot.x += Math.sin(bot.rotation) * bot.speed * dt * 60;
-            bot.z += Math.cos(bot.rotation) * bot.speed * dt * 60;
-
-            const info = getTrackInfo(bot.x, bot.z);
-            bot.trackIndex = info.index;
-
-            if (info.distance > trackWidth + 5) {
-                stunRacer(bot, false);
-            }
-
-            bot.mesh.position.x = bot.x;
-            bot.mesh.position.z = bot.z;
-            bot.mesh.position.y = 1.5;
-            bot.mesh.rotation.y = bot.rotation;
-
-            // Следующая точка
-            if (dist < 4) {
-                bot.targetIndex = (bot.targetIndex + 1) % trackPoints.length;
-            }
-
-            checkLapProgress(bot);
-        }
-
-        // Проверка круга
-        function checkLapProgress(racer) {
-            if (racer.trackIndex < 10 && racer._lastIndex > trackPoints.length * 0.8) {
-                racer.laps++;
-                if (racer.laps >= maxLaps && !finishOrder.includes(racer)) {
-                    finishOrder.push(racer);
-                    if (racer.isPlayer) score += 500;
-                    if (finishOrder.length >= allRacers.length) finishRace();
-                }
-            }
-            racer._lastIndex = racer.trackIndex;
-        }
-
-        // Стан
-        function stunRacer(racer, isPlayer) {
-            racer.stunned = true;
-            racer.speed = 0;
-            
-            const nearest = trackPoints[racer.trackIndex];
-            racer.x = nearest.x;
-            racer.z = nearest.z;
-            racer.mesh.position.set(nearest.x, 1.5, nearest.z);
-
-            if (isPlayer) {
-                document.getElementById('stunOverlay').style.display = 'block';
-                document.getElementById('stunText').style.display = 'block';
-                let count = 3;
-                document.getElementById('stunText').textContent = count;
-                const iv = setInterval(() => {
-                    count--;
-                    if (count > 0) {
-                        document.getElementById('stunText').textContent = count;
-                    } else {
-                        clearInterval(iv);
-                        document.getElementById('stunOverlay').style.display = 'none';
-                        document.getElementById('stunText').style.display = 'none';
-                        racer.stunned = false;
-                    }
-                }, 1000);
-                score = Math.max(0, score - 30);
-            } else {
-                setTimeout(() => { racer.stunned = false; }, 2500);
-            }
-        }
-
-        // Супер-способность
-        function activateSuperPower() {
-            superPowerActive = true;
-            superPowerTimer = 180;
-            superPowerReady = false;
-            superPowerCharge = 0;
-            document.getElementById('superPowerReady').style.display = 'none';
-
-            switch(playerObj.type) {
-                case 'ball':
-                    break; // Ускорение в updatePlayer
-                case 'square':
-                    bots.forEach(b => {
-                        const d = Math.sqrt((b.x-playerObj.x)**2 + (b.z-playerObj.z)**2);
-                        if (d < 25) {
-                            b.speed = -0.4;
-                            b.stunned = true;
-                            setTimeout(() => b.stunned = false, 1800);
-                        }
-                    });
-                    break;
-                case 'cone':
-                    bots.forEach(b => {
-                        const d = Math.sqrt((b.x-playerObj.x)**2 + (b.z-playerObj.z)**2);
-                        if (d < 35 && d > 4) {
-                            b.x -= (b.x - playerObj.x) * 0.08;
-                            b.z -= (b.z - playerObj.z) * 0.08;
-                            b.speed *= 0.4;
-                        }
-                    });
-                    break;
-            }
-        }
-
-        // Камера
-        function updateCamera() {
-            if (!playerObj) return;
-            const dist = 14;
-            const height = 7;
-            const tx = playerObj.x - Math.sin(playerObj.rotation) * dist;
-            const tz = playerObj.z - Math.cos(playerObj.rotation) * dist;
-            camera.position.lerp(new THREE.Vector3(tx, height, tz), 0.08);
-            camera.lookAt(playerObj.x, 2.5, playerObj.z + Math.cos(playerObj.rotation) * 10);
-        }
-
-        // UI
-        function updateUI() {
-            if (!playerObj || raceFinished) return;
-
-            const sorted = [...allRacers].sort((a,b) => {
-                if (b.laps !== a.laps) return b.laps - a.laps;
-                return b.trackIndex - a.trackIndex;
-            });
-            const pos = sorted.indexOf(playerObj) + 1;
-            document.getElementById('position').textContent = `${pos}/8`;
-            document.getElementById('scoreDisplay').textContent = score;
-            document.getElementById('lapDisplay').textContent = `Круг ${Math.min(playerObj.laps + 1, maxLaps)}/${maxLaps}`;
-            const el = Math.floor((Date.now() - startTime) / 1000);
-            document.getElementById('timeDisplay').textContent = `${Math.floor(el/60)}:${(el%60).toString().padStart(2,'0')}`;
-            document.getElementById('speedometer').textContent = Math.floor(Math.abs(playerObj.speed) * 120) + ' км/ч';
-
-            if (!superPowerActive && superPowerCharge < 100) {
-                superPowerCharge += 0.055;
-                document.getElementById('superPowerFill').style.width = superPowerCharge + '%';
-                if (superPowerCharge >= 100) {
-                    superPowerReady = true;
-                    document.getElementById('superPowerReady').style.display = 'block';
-                }
-            }
-
-            // Миникарта
-            const mc = document.getElementById('minimapCanvas');
-            mc.width = 180; mc.height = 180;
-            const ctx = mc.getContext('2d');
-            ctx.fillStyle = 'rgba(0,0,0,0.8)';
-            ctx.fillRect(0, 0, 180, 180);
-            ctx.strokeStyle = '#666';
-            ctx.lineWidth = 12;
-            ctx.beginPath();
-            trackPoints.forEach((p, i) => {
-                const mx = 90 + p.x * 0.35;
-                const my = 90 + p.z * 0.35;
-                i === 0 ? ctx.moveTo(mx, my) : ctx.lineTo(mx, my);
-            });
-            ctx.closePath();
-            ctx.stroke();
-
-            ctx.fillStyle = '#FFD700';
-            ctx.beginPath();
-            ctx.arc(90 + playerObj.x * 0.35, 90 + playerObj.z * 0.35, 4, 0, Math.PI*2);
-            ctx.fill();
-
-            bots.forEach(b => {
-                ctx.fillStyle = '#FF4444';
-                ctx.beginPath();
-                ctx.arc(90 + b.x * 0.35, 90 + b.z * 0.35, 2.5, 0, Math.PI*2);
-                ctx.fill();
-            });
-        }
-
-        function finishRace() {
-            raceFinished = true;
-            const pos = finishOrder.indexOf(playerObj) + 1;
-            const pts = {1:500, 2:300, 3:200, 4:100, 5:50, 6:25, 7:10, 8:5};
-            score += pts[pos] || 0;
-
-            document.getElementById('gameUI').classList.add('hidden');
-            document.getElementById('finishScreen').classList.remove('hidden');
-            const title = document.getElementById('finishTitle');
-            title.textContent = pos === 1 ? '🏆 ПОБЕДА!' : `Вы заняли ${pos} место`;
-            title.className = 'finish-title ' + (pos === 1 ? 'winner' : 'loser');
-
-            const table = document.getElementById('resultsTable');
-            table.innerHTML = '<h3 style="margin-bottom:12px;">Результаты:</h3>';
-            finishOrder.forEach((r, i) => {
-                const row = document.createElement('div');
-                row.className = 'result-row';
-                row.innerHTML = `<span class="result-position">#${i+1}</span><span>${r.isPlayer ? '🚀 ВЫ' : `🤖 Бот ${bots.indexOf(r)+1}`}</span><span>${r.type==='ball'?'⚽':r.type==='square'?'🟫':'🔺'} ${r.laps} кр.</span>`;
-                table.appendChild(row);
-            });
-        }
-
-        // Игровой цикл
-        let lastTime = Date.now();
-        function gameLoop() {
-            const now = Date.now();
-            const dt = Math.min((now - lastTime) / 1000, 0.1);
-            lastTime = now;
-
-            if (raceStarted && !raceFinished) {
-                updatePlayer(dt);
-                bots.forEach(b => updateBot(b, dt));
-                updateCamera();
-                updateUI();
-                if (superPowerActive) {
-                    superPowerTimer--;
-                    if (superPowerTimer <= 0) superPowerActive = false;
-                }
-
-                // Проверка столкновений
-                allRacers.forEach(r1 => {
-                    allRacers.forEach(r2 => {
-                        if (r1 === r2 || r1.stunned || r2.stunned) return;
-                        const d = Math.sqrt((r1.x-r2.x)**2 + (r1.z-r2.z)**2);
-                        if (d < 3) {
-                            const angle = Math.atan2(r2.x - r1.x, r2.z - r1.z);
-                            const force = 0.05;
-                            r2.speed += Math.cos(angle) * force * (r1.type === 'square' ? 2 : 1);
-                            r2.x += Math.sin(angle) * 0.5;
-                            r2.z += Math.cos(angle) * 0.5;
-                        }
-                    });
-                });
-            }
-
-            renderer.render(scene, camera);
-            requestAnimationFrame(gameLoop);
-        }
-
-        // Управление
-        const keys = {};
-        document.addEventListener('keydown', e => { keys[e.code] = true; e.preventDefault(); });
-        document.addEventListener('keyup', e => { keys[e.code] = false; e.preventDefault(); });
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+          }
         });
 
-        // Меню
-        function showCharacterSelect() {
-            document.getElementById('mainMenu').classList.add('hidden');
-            document.getElementById('characterSelect').classList.remove('hidden');
-        }
-        function selectCharacter(type) {
-            playerType = type;
-            document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
-            document.getElementById('card' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('selected');
-            document.getElementById('nextBtn').disabled = false;
-        }
-        function showDifficultySelect() {
-            document.getElementById('characterSelect').classList.add('hidden');
-            document.getElementById('difficultySelect').classList.remove('hidden');
-        }
-        function selectDifficulty(diff) {
-            difficulty = diff;
-            document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
-            document.querySelector(`.diff-btn.${diff}`).classList.add('selected');
-            document.getElementById('startRaceBtn').disabled = false;
-        }
-        function startRace() {
-            document.getElementById('difficultySelect').classList.add('hidden');
-            document.getElementById('gameUI').classList.remove('hidden');
-            initRace();
-        }
-        function restartGame() {
-            document.getElementById('finishScreen').classList.add('hidden');
-            initRace();
-        }
-        function goToMainMenu() {
-            document.getElementById('finishScreen').classList.add('hidden');
-            document.getElementById('mainMenu').classList.remove('hidden');
-            raceStarted = false;
-            raceFinished = false;
-        }
-        function showTutorial() {
-            alert('🎮 SHAPE RACERS 3D\n\n' +
-                  'УПРАВЛЕНИЕ:\n' +
-                  'W/↑ - газ вперёд\n' +
-                  'S/↓ - тормоз\n' +
-                  'A/← - поворот влево\n' +
-                  'D/→ - поворот вправо\n' +
-                  'ПРОБЕЛ - супер-способность\n\n' +
-                  'СУПЕР-СПОСОБНОСТИ:\n' +
-                  '⚽ ШАР: Турбо-ускорение\n' +
-                  '🟫 КВАДРАТ: Ударная волна\n' +
-                  '🔺 КОНУС: Смерч\n\n' +
-                  'ЦЕЛЬ: Проехать 3 круга первым!\n' +
-                  'Скидывайте соперников с трассы!');
-        }
+        slot.appendChild(circle);
+        slot.appendChild(label);
+        slot.appendChild(launchBtn);
+        slotsContainer.appendChild(slot);
+      }
+    }
 
-        // Старт
-        generateTrack();
-        createTrack3D();
-        createEnvironment();
-        gameLoop();
-    </script>
+    // UI
+    function updateUI() {
+      document.getElementById('displayName').textContent = userState.name;
+      const vipEl = document.getElementById('vipStatus');
+      if (userState.isVip) {
+        vipEl.className = 'vip-badge';
+        vipEl.textContent = 'VIP ⭐x2';
+      } else {
+        vipEl.className = 'no-vip';
+        vipEl.textContent = 'VIP неактивен';
+      }
+      document.getElementById('balanceDisplay').textContent = `⭐ ${userState.balance}`;
+    }
+
+    function recalcBalls() {
+      const f = userState.invitedFriends;
+      let extra = 0;
+      if (f >= 100) extra = 6;
+      else if (f >= 50) extra = 5;
+      else if (f >= 20) extra = 4;
+      else if (f >= 10) extra = 3;
+      else if (f >= 3) extra = 2;
+      else if (f >= 1) extra = 1;
+      userState.ballsCount = 1 + extra;
+      if (userState.activeBallsInGame > userState.ballsCount) {
+        userState.activeBallsInGame = userState.ballsCount;
+      }
+    }
+
+    // Кнопки действий
+    document.getElementById('buyVipBtn').addEventListener('click', ()=> document.getElementById('vipModal').classList.add('active'));
+    document.getElementById('closeVipModal').addEventListener('click', ()=> document.getElementById('vipModal').classList.remove('active'));
+    document.getElementById('confirmVipBtn').addEventListener('click', ()=>{
+      if(userState.isVip) { alert('VIP уже активен'); return; }
+      userState.isVip = true;
+      saveUserState();
+      updateUI();
+      document.getElementById('vipModal').classList.remove('active');
+    });
+
+    document.getElementById('bonusBtn').addEventListener('click', ()=> document.getElementById('bonusModal').classList.add('active'));
+    document.getElementById('closeBonusModal').addEventListener('click', ()=> document.getElementById('bonusModal').classList.remove('active'));
+    document.getElementById('watchAdBtn').addEventListener('click', ()=>{
+      userState.bonusMultiplier = 5;
+      userState.bonusEndTime = Date.now() + 60000;
+      saveUserState();
+      document.getElementById('bonusModal').classList.remove('active');
+    });
+
+    document.getElementById('inviteBtn').addEventListener('click', ()=>{
+      document.getElementById('refLinkDisplay').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
+      document.getElementById('inviteModal').classList.add('active');
+    });
+    document.getElementById('closeInviteModal').addEventListener('click', ()=> document.getElementById('inviteModal').classList.remove('active'));
+    document.getElementById('copyRefBtn').addEventListener('click', ()=>{
+      navigator.clipboard?.writeText(document.getElementById('refLinkDisplay').textContent).then(()=>alert('Скопировано!'));
+    });
+
+    document.getElementById('profileBtn').addEventListener('click', ()=>{
+      document.getElementById('profileName').textContent = userState.name;
+      document.getElementById('profileId').textContent = userState.id;
+      document.getElementById('profileBalance').textContent = userState.balance;
+      document.getElementById('profileRef').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
+      document.getElementById('profileModal').classList.add('active');
+    });
+    document.getElementById('closeProfileModal').addEventListener('click', ()=> document.getElementById('profileModal').classList.remove('active'));
+    document.getElementById('copyProfileRefBtn').addEventListener('click', ()=>{
+      navigator.clipboard?.writeText(document.getElementById('profileRef').textContent).then(()=>alert('Скопировано!'));
+    });
+    document.getElementById('editNameBtn').addEventListener('click', ()=>{
+      const newName = prompt('Новое имя:', userState.name);
+      if(newName && newName.trim().length>1){
+        const users = getUsers();
+        if(users[newName] && newName !== currentUser) { alert('Имя занято'); return; }
+        delete users[currentUser];
+        userState.name = newName.trim();
+        users[newName] = {...userState};
+        saveUsers(users);
+        localStorage.setItem(SESSION_KEY, newName);
+        currentUser = newName;
+        updateUI();
+        document.getElementById('profileName').textContent = userState.name;
+      }
+    });
+
+    document.querySelectorAll('.modal').forEach(m=> m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('active'); }));
+
+    // Симуляция приглашения через URL
+    const params = new URLSearchParams(location.search);
+    if(params.get('ref') && loadUserState()){
+      if(!sessionStorage.getItem('invited_done')){
+        sessionStorage.setItem('invited_done','1');
+        userState.invitedFriends++;
+        recalcBalls();
+        saveUserState();
+        renderSlots();
+        alert('Друг присоединился! +1 к прогрессу шаров.');
+      }
+    }
+
+    setInterval(()=>{
+      if(userState.bonusEndTime && Date.now()>userState.bonusEndTime){
+        userState.bonusMultiplier=1; userState.bonusEndTime=0; saveUserState();
+      }
+    },1000);
+
+    // Старт
+    if(loadUserState()){
+      recalcBalls();
+      showGame();
+    } else {
+      showAuth();
+    }
+  })();
+</script>
 </body>
 </html>
