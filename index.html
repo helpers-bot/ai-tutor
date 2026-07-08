@@ -27,45 +27,47 @@
     .auth-container .link-btn { background: transparent; color: #7873f5; text-decoration: underline; font-size: 0.9rem; box-shadow: none; }
     .error-msg { color: #ff4444; font-size: 0.85rem; min-height: 20px; }
     
-    .game-container { background: linear-gradient(135deg, #1a1a3e, #0f0f2a); border-radius: 32px; padding: 16px 14px 20px; box-shadow: 0 0 50px rgba(100,100,255,0.2), 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 14px; border: 1px solid #3a3a8a; }
+    .game-container { background: linear-gradient(135deg, #1a1a3e, #0f0f2a); border-radius: 32px; padding: 12px 10px 16px; box-shadow: 0 0 50px rgba(100,100,255,0.2), 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 10px; border: 1px solid #3a3a8a; }
     
-    .top-panel { display: flex; justify-content: space-between; align-items: center; background: rgba(20,20,50,0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 12px 18px; color: white; flex-wrap: wrap; gap: 8px; border: 1px solid #3a3a8a; box-shadow: 0 0 20px rgba(120,115,245,0.2); }
-    .user-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-    .user-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .username { font-weight: 700; font-size: 1.1rem; }
-    .vip-badge { background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; font-size: 0.7rem; font-weight: bold; padding: 3px 10px; border-radius: 20px; box-shadow: 0 0 12px rgba(255,215,0,0.5); white-space: nowrap; }
-    .no-vip { color: #ff4444; text-decoration: line-through; font-weight: 500; font-size: 0.75rem; white-space: nowrap; }
-    .ref-badge { background: rgba(120,115,245,0.25); color: #c0c0e0; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; border: 1px solid #3a3a8a; white-space: nowrap; display: inline-block; line-height: 1.2; }
-    .balance { background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; padding: 8px 16px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 4px; font-size: 1rem; box-shadow: 0 0 20px rgba(255,215,0,0.4); position: relative; white-space: nowrap; }
-    .bonus-timer { position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; font-size: 0.6rem; padding: 2px 7px; border-radius: 10px; display: none; animation: pulse 1s infinite; }
+    .top-panel { display: flex; justify-content: space-between; align-items: center; background: rgba(20,20,50,0.8); backdrop-filter: blur(10px); border-radius: 20px; padding: 8px 14px; color: white; gap: 8px; border: 1px solid #3a3a8a; box-shadow: 0 0 20px rgba(120,115,245,0.2); flex-wrap: nowrap; }
+    .user-info { display: flex; align-items: center; gap: 6px; flex: 1; flex-wrap: nowrap; min-width: 0; }
+    .username { font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
+    .vip-badge { background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; font-size: 0.65rem; font-weight: bold; padding: 2px 8px; border-radius: 20px; box-shadow: 0 0 12px rgba(255,215,0,0.5); white-space: nowrap; }
+    .no-vip { color: #ff4444; text-decoration: line-through; font-weight: 500; font-size: 0.7rem; white-space: nowrap; }
+    .ref-badge { background: rgba(120,115,245,0.25); color: #c0c0e0; padding: 2px 8px; border-radius: 20px; font-size: 0.65rem; border: 1px solid #3a3a8a; white-space: nowrap; }
+    .balance { background: linear-gradient(90deg, #ffd700, #ffaa00); color: #000; padding: 6px 12px; border-radius: 30px; font-weight: bold; display: flex; align-items: center; gap: 4px; font-size: 0.9rem; box-shadow: 0 0 20px rgba(255,215,0,0.4); position: relative; white-space: nowrap; flex-shrink: 0; }
+    .bonus-timer { position: absolute; top: -8px; right: -8px; background: #ff4444; color: white; font-size: 0.55rem; padding: 1px 6px; border-radius: 10px; display: none; animation: pulse 1s infinite; }
     .bonus-timer.active { display: block; }
     @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.15);} }
     
     .canvas-wrapper { position: relative; width: 100%; height: 300px; }
-    canvas { width: 100%; height: 300px; background: radial-gradient(circle at center, #12122a 0%, #0a0a1a 100%); border-radius: 24px; display: block; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(120,115,245,0.2); touch-action: none; border: 1px solid #2a2a5a; cursor: pointer; }
+    canvas { width: 100%; height: 300px; background: radial-gradient(circle at center, #12122a 0%, #0a0a1a 100%); border-radius: 24px; display: block; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(120,115,245,0.2); touch-action: none; border: 2px solid #2a2a5a; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    canvas.boost-active { border-color: #ff4444 !important; box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 30px rgba(255,0,0,0.6), 0 0 60px rgba(255,0,0,0.3) !important; }
+    .hold-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.15); font-size: 2rem; font-weight: 700; pointer-events: none; z-index: 5; letter-spacing: 4px; transition: opacity 0.3s; }
+    .hold-hint.hidden { opacity: 0; }
     .floating-text { position: absolute; pointer-events: none; font-weight: bold; font-size: 1.1rem; color: #ffd700; text-shadow: 0 0 10px #ffd700, 0 0 20px #ffaa00; animation: floatUp 1s ease-out forwards; z-index: 10; }
     @keyframes floatUp { 0%{opacity:1;transform:translateY(0)scale(1);} 100%{opacity:0;transform:translateY(-50px)scale(1.6);} }
     .ball-drop { position: absolute; pointer-events: none; z-index: 20; transition: all 0.5s cubic-bezier(0.25,0.46,0.45,0.94); }
     
-    .boost-bar-container { width: 100%; height: 10px; background: #1a1a2e; border-radius: 10px; margin-top: 2px; overflow: hidden; border: 1px solid #2a2a5a; }
+    .boost-bar-container { width: 100%; height: 8px; background: #1a1a2e; border-radius: 10px; overflow: hidden; border: 1px solid #2a2a5a; }
     .boost-bar-fill { height: 100%; width: 0%; border-radius: 10px; transition: width 0.1s linear; background: #00ff88; }
     .boost-bar-fill.warning { background: #ffaa00; }
     .boost-bar-fill.danger { background: #ff4444; }
-    .boost-locked-text { text-align: center; font-size: 0.65rem; color: #ff4444; margin-top: 2px; display: none; }
+    .boost-locked-text { text-align: center; font-size: 0.6rem; color: #ff4444; margin-top: 1px; display: none; }
     
-    .balls-slots { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; background: rgba(20,20,50,0.6); border-radius: 20px; padding: 12px 8px; border: 1px solid #2a2a5a; }
-    .slot { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; width: 55px; }
-    .slot-circle { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.3s; border: 2px solid #444; position: relative; overflow: hidden; }
+    .balls-slots { display: flex; gap: 8px; justify-content: center; flex-wrap: nowrap; background: rgba(20,20,50,0.6); border-radius: 20px; padding: 8px 6px; border: 1px solid #2a2a5a; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .slot { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative; flex-shrink: 0; width: 48px; }
+    .slot-circle { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; transition: 0.3s; border: 2px solid #444; position: relative; overflow: hidden; }
     .slot-circle.empty-slot { background: #2a2a3a !important; border-color: #444; box-shadow: none !important; }
     .slot-circle.active-slot { border-color: #fff; }
     .slot-circle.launched-slot { border-color: #fff; }
-    .slot-label { font-size: 0.6rem; color: #aaaacc; text-align: center; line-height: 1.2; white-space: nowrap; }
-    .launch-btn { font-size: 0.6rem; background: linear-gradient(90deg, #ff6ec7, #7873f5); color: white; border: none; border-radius: 10px; padding: 3px 8px; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 0 10px rgba(120,115,245,0.5); animation: btnGlow 2s infinite; white-space: nowrap; position: absolute; bottom: -18px; }
+    .slot-label { font-size: 0.55rem; color: #aaaacc; text-align: center; line-height: 1.2; white-space: nowrap; }
+    .launch-btn { font-size: 0.55rem; background: linear-gradient(90deg, #ff6ec7, #7873f5); color: white; border: none; border-radius: 8px; padding: 2px 6px; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 0 8px rgba(120,115,245,0.5); animation: btnGlow 2s infinite; white-space: nowrap; position: absolute; bottom: -16px; }
     .launch-btn.visible { display: block; }
-    @keyframes btnGlow { 0%,100%{box-shadow:0 0 10px rgba(120,115,245,0.5);} 50%{box-shadow:0 0 20px rgba(255,110,199,0.8);} }
+    @keyframes btnGlow { 0%,100%{box-shadow:0 0 8px rgba(120,115,245,0.5);} 50%{box-shadow:0 0 16px rgba(255,110,199,0.8);} }
     
-    .buttons-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 4px; }
-    .btn { background: rgba(30,30,60,0.8); border: 1px solid #3a3a8a; color: white; padding: 12px 14px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; flex: 1 1 auto; min-width: 60px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 4px; backdrop-filter: blur(5px); animation: btnGlow 3s infinite; }
+    .buttons-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .btn { background: rgba(30,30,60,0.8); border: 1px solid #3a3a8a; color: white; padding: 10px 12px; border-radius: 40px; font-weight: 600; font-size: 0.8rem; flex: 1 1 auto; min-width: 55px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 4px; backdrop-filter: blur(5px); animation: btnGlow 3s infinite; }
     .btn:active { transform: scale(0.95); background: rgba(60,60,100,0.9); }
     .btn.primary { background: linear-gradient(90deg, #ff6ec7, #7873f5); border: none; font-weight: bold; box-shadow: 0 0 20px rgba(120,115,245,0.6); }
     .btn.withdraw { background: linear-gradient(90deg, #00ff88, #00cc6a); border: none; color: #000; font-weight: bold; }
@@ -124,11 +126,9 @@
   <div class="game-container">
     <div class="top-panel">
       <div class="user-info">
-        <div class="user-row">
-          <span class="username" id="displayName">Игрок</span>
-          <span id="vipStatus" class="no-vip">VIP неактивен</span>
-        </div>
-        <span class="ref-badge" id="refCountDisplay">👥 0 реф. (0 VIP)</span>
+        <span class="username" id="displayName">Игрок</span>
+        <span id="vipStatus" class="no-vip">VIP</span>
+        <span class="ref-badge" id="refCountDisplay">👥0/0</span>
       </div>
       <div class="balance" id="balanceDisplay">
         ⭐ 0
@@ -138,6 +138,7 @@
     <div class="balls-slots" id="ballsSlotsContainer"></div>
     <div class="canvas-wrapper" id="canvasWrapper">
       <canvas id="gameCanvas" width="400" height="300"></canvas>
+      <div class="hold-hint" id="holdHint">ЗАЖМИ</div>
     </div>
     <div class="boost-bar-container">
       <div class="boost-bar-fill" id="boostBarFill"></div>
@@ -256,10 +257,77 @@
 
 <script>
 (function() {
+  // ==================== АУДИО СИСТЕМА ====================
+  let audioCtx = null;
+  
+  function initAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }
+  
+  function playBounceSound() {
+    if (!audioCtx) return;
+    try {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.1);
+      
+      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + 0.1);
+    } catch(e) {}
+  }
+  
+  let turboOsc = null;
+  let turboGain = null;
+  
+  function startTurboSound() {
+    if (!audioCtx) return;
+    try {
+      stopTurboSound();
+      turboOsc = audioCtx.createOscillator();
+      turboGain = audioCtx.createGain();
+      turboOsc.connect(turboGain);
+      turboGain.connect(audioCtx.destination);
+      
+      turboOsc.type = 'sawtooth';
+      turboOsc.frequency.setValueAtTime(60, audioCtx.currentTime);
+      
+      turboGain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+      
+      turboOsc.start();
+    } catch(e) {}
+  }
+  
+  function stopTurboSound() {
+    try {
+      if (turboOsc) {
+        turboOsc.stop();
+        turboOsc.disconnect();
+        turboOsc = null;
+      }
+      if (turboGain) {
+        turboGain.disconnect();
+        turboGain = null;
+      }
+    } catch(e) {}
+  }
+
   // ==================== БАЗА ДАННЫХ ====================
-  const USERS_KEY = 'vds_users_v6';
-  const SESSION_KEY = 'vds_session_v6';
-  const SAVED_CREDS_KEY = 'vds_saved_creds_v6';
+  const USERS_KEY = 'vds_users_v7';
+  const SESSION_KEY = 'vds_session_v7';
+  const SAVED_CREDS_KEY = 'vds_saved_creds_v7';
 
   function getUsers() {
     const data = localStorage.getItem(USERS_KEY);
@@ -277,10 +345,6 @@
   function getSavedCredentials() {
     const data = localStorage.getItem(SAVED_CREDS_KEY);
     return data ? JSON.parse(data) : null;
-  }
-
-  function clearCredentials() {
-    localStorage.removeItem(SAVED_CREDS_KEY);
   }
 
   // ==================== СОСТОЯНИЕ ====================
@@ -312,7 +376,6 @@
     'rgba(204,0,255,0.8)'
   ];
 
-  // Формат чисел с точками
   function formatNumber(num) {
     return num.toLocaleString('de-DE');
   }
@@ -338,7 +401,6 @@
         if (!userState.vipReferrals) userState.vipReferrals = 0;
         if (!userState.lastSeen) userState.lastSeen = Date.now();
 
-        // Оффлайн-заработок
         const now = Date.now();
         const elapsed = now - userState.lastSeen;
         if (elapsed > 10000) {
@@ -490,17 +552,20 @@
     currentUser = null;
     userState = {};
     balls = [];
+    stopTurboSound();
     showAuth();
   });
 
   window.addEventListener('beforeunload', () => {
     if (currentUser) saveUserState();
+    stopTurboSound();
   });
 
   // ==================== CANVAS И ШАРЫ ====================
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
   const canvasWrapper = document.getElementById('canvasWrapper');
+  const holdHint = document.getElementById('holdHint');
   const FIXED_WIDTH = 400;
   const FIXED_HEIGHT = 300;
   canvas.width = FIXED_WIDTH;
@@ -627,31 +692,43 @@
     }
   }
 
+  // Инициализация аудио при первом взаимодействии
+  document.addEventListener('click', initAudio, { once: true });
+  document.addEventListener('touchstart', initAudio, { once: true });
+
   canvas.addEventListener('pointerdown', (e) => {
     e.preventDefault();
+    initAudio();
     if (!boostLocked) {
       boostActive = true;
+      holdHint.classList.add('hidden');
+      startTurboSound();
     }
   });
 
   canvas.addEventListener('pointerup', (e) => {
     e.preventDefault();
     boostActive = false;
+    stopTurboSound();
   });
 
   canvas.addEventListener('pointerleave', () => {
     boostActive = false;
+    stopTurboSound();
   });
 
   canvas.addEventListener('pointercancel', () => {
     boostActive = false;
+    stopTurboSound();
   });
 
   function processBoost(dt) {
     if (boostLocked) {
       boostLockTimer -= dt;
-      boostCharge = Math.max(0, boostLockTimer / BOOST_LOCK_TIME);
+      // Охлаждение дольше в 2 раза: полоса убывает медленно
+      boostCharge = Math.max(0, boostLockTimer / (BOOST_LOCK_TIME * 2));
       updateBoostBar();
+      canvas.classList.remove('boost-active');
       if (boostLockTimer <= 0) {
         boostLocked = false;
         boostCharge = 0;
@@ -661,19 +738,24 @@
     }
 
     if (boostActive) {
+      canvas.classList.add('boost-active');
       boostCharge += dt / BOOST_MAX_TIME;
       if (boostCharge >= 1) {
         boostCharge = 1;
         boostLocked = true;
-        boostLockTimer = BOOST_LOCK_TIME;
+        boostLockTimer = BOOST_LOCK_TIME * 2;
         boostActive = false;
+        stopTurboSound();
         updateBoostBar();
+        canvas.classList.remove('boost-active');
         return 3;
       }
       updateBoostBar();
       return 3;
     } else {
-      boostCharge = Math.max(0, boostCharge - dt * 2);
+      canvas.classList.remove('boost-active');
+      // Охлаждение дольше в 2 раза если палец убран
+      boostCharge = Math.max(0, boostCharge - dt * 1);
       updateBoostBar();
       return 1;
     }
@@ -768,6 +850,7 @@
         const stars = userState.isVip ? 2 : 1;
         userState.balance += stars;
         spawnFloatingText(b.x, b.y - b.radius, `+${stars}`);
+        playBounceSound();
         saveUserState();
         updateUI();
       }
@@ -821,17 +904,14 @@
       const isLaunched = i < userState.activeBallsInGame;
 
       if (isLaunched) {
-        // Запущенный шар светится
         circle.classList.add('launched-slot');
         circle.style.backgroundColor = ballColors[i % ballColors.length];
         circle.style.boxShadow = `0 0 14px ${ballGlowColors[i % ballColors.length]}`;
       } else if (isUnlocked) {
-        // Доступен, но не запущен — цветной шар с кнопкой
         circle.classList.add('active-slot');
         circle.style.backgroundColor = ballColors[i % ballColors.length];
         circle.style.boxShadow = `0 0 14px ${ballGlowColors[i % ballColors.length]}`;
       } else {
-        // Закрытый шар — серый
         circle.classList.add('empty-slot');
         circle.style.backgroundColor = '#2a2a3a';
         circle.style.boxShadow = 'none';
@@ -886,14 +966,14 @@
     if (userState.isVip) {
       vipEl.className = 'vip-badge';
       const expiry = userState.vipExpiry ? new Date(userState.vipExpiry).toLocaleDateString() : 'навсегда';
-      vipEl.textContent = `VIP ⭐x2 (${expiry})`;
+      vipEl.textContent = `VIP ⭐x2`;
     } else {
       vipEl.className = 'no-vip';
-      vipEl.textContent = 'VIP неактивен';
+      vipEl.textContent = 'VIP';
     }
     
     document.getElementById('balanceDisplay').childNodes[0].textContent = `⭐ ${formatNumber(userState.balance)} `;
-    document.getElementById('refCountDisplay').textContent = `👥 ${userState.totalReferrals} реф. (${userState.vipReferrals} VIP)`;
+    document.getElementById('refCountDisplay').textContent = `👥${userState.totalReferrals}/${userState.vipReferrals}`;
 
     const timerEl = document.getElementById('bonusTimer');
     if (userState.bonusEndTime && Date.now() < userState.bonusEndTime) {
@@ -1120,8 +1200,8 @@
   // ==================== РЕФЕРАЛЬНАЯ СИСТЕМА ====================
   const params = new URLSearchParams(location.search);
   if (params.get('ref') && loadUserState()) {
-    if (!sessionStorage.getItem('invited_done_v6')) {
-      sessionStorage.setItem('invited_done_v6', '1');
+    if (!sessionStorage.getItem('invited_done_v7')) {
+      sessionStorage.setItem('invited_done_v7', '1');
       userState.totalReferrals++;
       userState.vipReferrals++;
       recalcBalls();
