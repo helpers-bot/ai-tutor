@@ -22,8 +22,6 @@
       padding: 10px;
       margin: 0;
     }
-
-    /* Экраны */
     .screen {
       display: none;
       width: 100%;
@@ -32,8 +30,6 @@
     .screen.active {
       display: block;
     }
-
-    /* Экран авторизации */
     .auth-container {
       background: #1a1f2f;
       border-radius: 28px;
@@ -83,8 +79,6 @@
       font-size: 0.85rem;
       min-height: 20px;
     }
-
-    /* Игровой контейнер */
     .game-container {
       background: #1a1f2f;
       border-radius: 32px;
@@ -117,17 +111,18 @@
     }
     .vip-badge {
       color: #fbbf24;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: bold;
       background: #3b2e1e;
-      padding: 2px 10px;
+      padding: 3px 12px;
       border-radius: 20px;
+      display: inline-block;
     }
     .no-vip {
       color: #ef4444;
       text-decoration: line-through;
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
     .balance {
       background: #fbbf24;
@@ -140,8 +135,14 @@
       gap: 4px;
       font-size: 1rem;
     }
-
-    /* Прямоугольный канвас */
+    .ref-count {
+      background: #3b4256;
+      color: #ccc;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
     canvas {
       width: 100%;
       height: 300px;
@@ -151,8 +152,6 @@
       box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
       touch-action: none;
     }
-
-    /* Слоты шаров сверху */
     .balls-slots {
       display: flex;
       gap: 10px;
@@ -174,7 +173,6 @@
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: #3b4256;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -183,11 +181,11 @@
       color: #aaa;
       transition: 0.3s;
       border: 2px solid #555;
+      background: #3b4256;
     }
     .slot-circle.active-slot {
-      background: radial-gradient(circle at 30% 30%, #facc15, #eab308);
-      border-color: #fbbf24;
-      box-shadow: 0 0 12px #fbbf24aa;
+      border-color: #fff;
+      box-shadow: 0 0 12px currentColor;
       color: #0b0f1c;
     }
     .slot-label {
@@ -210,7 +208,6 @@
     .launch-btn.visible {
       display: block;
     }
-
     .buttons-grid {
       display: flex;
       flex-wrap: wrap;
@@ -237,13 +234,21 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.3);
       letter-spacing: 0.3px;
     }
-    .btn:active { transform: scale(0.96); background: #3e465c; }
-    .btn.primary { background: #fbbf24; color: #0b0f1c; font-weight: bold; }
-
-    /* Модальные окна */
+    .btn:active {
+      transform: scale(0.96);
+      background: #3e465c;
+    }
+    .btn.primary {
+      background: #fbbf24;
+      color: #0b0f1c;
+      font-weight: bold;
+    }
     .modal {
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,0,0.7);
       backdrop-filter: blur(6px);
       display: flex;
@@ -262,23 +267,31 @@
       background: #1f2537;
       padding: 24px;
       border-radius: 28px;
-      max-width: 320px;
+      max-width: 360px;
       width: 90%;
       color: white;
       text-align: center;
       box-shadow: 0 20px 30px black;
+      max-height: 80vh;
+      overflow-y: auto;
     }
-    .modal-content h3 { margin-bottom: 12px; }
-    .modal-content p { margin: 10px 0; font-size: 0.9rem; }
+    .modal-content h3 {
+      margin-bottom: 12px;
+    }
+    .modal-content p {
+      margin: 10px 0;
+      font-size: 0.9rem;
+    }
     .close-btn {
       background: #3b4256;
       border: none;
       color: white;
       padding: 10px 20px;
       border-radius: 30px;
-      margin-top: 12px;
+      margin-top: 8px;
       font-weight: bold;
       cursor: pointer;
+      display: inline-block;
     }
     .copy-text {
       background: #0f1322;
@@ -288,11 +301,20 @@
       margin: 10px 0;
       font-size: 0.8rem;
     }
+    .vip-option {
+      background: #252b3d;
+      border-radius: 16px;
+      padding: 12px;
+      margin: 10px 0;
+      text-align: left;
+    }
+    .vip-option button {
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
 
-<!-- ЭКРАН АВТОРИЗАЦИИ -->
 <div id="authScreen" class="screen active">
   <div class="auth-container" id="loginForm">
     <h2>🔐 Вход</h2>
@@ -302,7 +324,6 @@
     <button id="loginBtn">Войти</button>
     <button class="link-btn" id="showRegisterBtn">Нет аккаунта? Зарегистрироваться</button>
   </div>
-
   <div class="auth-container" id="registerForm" style="display:none;">
     <h2>📝 Регистрация</h2>
     <input type="text" id="regUsername" placeholder="Никнейм" autocomplete="off">
@@ -314,22 +335,18 @@
   </div>
 </div>
 
-<!-- ЭКРАН ИГРЫ -->
 <div id="gameScreen" class="screen">
   <div class="game-container">
     <div class="top-panel">
       <div class="user-info">
         <span class="username" id="displayName">Игрок</span>
         <span id="vipStatus" class="no-vip">VIP неактивен</span>
+        <span class="ref-count" id="refCountDisplay">👥 0 рефералов (0 VIP)</span>
       </div>
       <div class="balance" id="balanceDisplay">⭐ 0</div>
     </div>
-
-    <!-- Слоты шаров -->
     <div class="balls-slots" id="ballsSlotsContainer"></div>
-
     <canvas id="gameCanvas" width="400" height="300"></canvas>
-
     <div class="buttons-grid">
       <button class="btn primary" id="buyVipBtn">💎 VIP</button>
       <button class="btn" id="bonusBtn">⚡ x5 бонус</button>
@@ -340,18 +357,27 @@
   </div>
 </div>
 
-<!-- Модальные окна -->
+<!-- VIP модалка -->
 <div class="modal" id="vipModal">
   <div class="modal-content">
     <h3>💎 VIP статус</h3>
     <p>⭐ Звёзды за удар: <strong>2 вместо 1</strong></p>
-    <p>🔥 Удвоение заработка навсегда</p>
-    <p>💲 Стоимость: <strong>1$ (эмуляция)</strong></p>
-    <button class="close-btn" id="confirmVipBtn">Купить VIP (1$)</button>
-    <button class="close-btn" id="closeVipModal">Отмена</button>
+    <div class="vip-option">
+      <strong>📅 На 1 месяц</strong>
+      <p>Стоимость: <strong>1$</strong></p>
+      <p id="vipMonthInfo"></p>
+      <button class="close-btn" id="buyVipMonthBtn">Купить на месяц (1$)</button>
+    </div>
+    <div class="vip-option">
+      <strong>♾️ Навсегда</strong>
+      <p>Стоимость: <strong>20$</strong></p>
+      <button class="close-btn" id="buyVipForeverBtn">Купить навсегда (20$)</button>
+    </div>
+    <button class="close-btn" id="closeVipModal">Закрыть</button>
   </div>
 </div>
 
+<!-- Бонус модалка -->
 <div class="modal" id="bonusModal">
   <div class="modal-content">
     <h3>⚡ Реклама</h3>
@@ -361,23 +387,31 @@
   </div>
 </div>
 
+<!-- Друзья модалка -->
 <div class="modal" id="inviteModal">
   <div class="modal-content">
     <h3>👥 Пригласить друга</h3>
     <p>Твоя реферальная ссылка:</p>
     <div class="copy-text" id="refLinkDisplay">загрузка...</div>
     <button class="close-btn" id="copyRefBtn">📋 Копировать</button>
+    <p style="margin-top:12px;"><strong>Всего рефералов: <span id="invTotalRefs">0</span></strong></p>
+    <p><strong>Купили VIP: <span id="invVipRefs">0</span></strong></p>
+    <div class="balls-slots" id="inviteSlotsContainer" style="margin-top:8px;"></div>
+    <p style="font-size:0.7rem;">Прогресс шаров зависит от рефералов с VIP</p>
     <button class="close-btn" id="closeInviteModal">Закрыть</button>
-    <p style="font-size:0.75rem; margin-top:10px;">+1 шарик за друга с VIP<br>3,10,20,50,100 друзей → ещё шарики</p>
   </div>
 </div>
 
+<!-- Профиль модалка -->
 <div class="modal" id="profileModal">
   <div class="modal-content">
     <h3>👤 Профиль</h3>
     <p>Имя: <span id="profileName"></span> <button id="editNameBtn" style="background:#fbbf24; border:none; padding:2px 10px; border-radius:20px;">✏️</button></p>
     <p>ID: <strong id="profileId"></strong></p>
     <p>Баланс: ⭐ <span id="profileBalance"></span></p>
+    <p>Всего рефералов: <strong id="profileTotalRefs">0</strong></p>
+    <p>Рефералов с VIP: <strong id="profileVipRefs">0</strong></p>
+    <p>VIP: <span id="profileVipStatus"></span></p>
     <div class="copy-text" id="profileRef"></div>
     <button class="close-btn" id="copyProfileRefBtn">📋 Копировать ссылку</button>
     <button class="close-btn" id="closeProfileModal">Закрыть</button>
@@ -386,9 +420,8 @@
 
 <script>
   (function() {
-    // ---------- БАЗА ПОЛЬЗОВАТЕЛЕЙ ----------
-    const USERS_KEY = 'game_users_db';
-    const SESSION_KEY = 'game_current_user';
+    const USERS_KEY = 'game_users_db_v2';
+    const SESSION_KEY = 'game_current_user_v2';
 
     function getUsers() {
       const data = localStorage.getItem(USERS_KEY);
@@ -398,19 +431,25 @@
       localStorage.setItem(USERS_KEY, JSON.stringify(users));
     }
 
-    // Текущий пользователь
     let currentUser = null;
     let userState = {
       id: null,
       name: '',
       balance: 0,
       isVip: false,
+      vipExpiry: null,
       ballsCount: 1,
-      invitedFriends: 0,
+      totalReferrals: 0,
+      vipReferrals: 0,
       bonusMultiplier: 1,
       bonusEndTime: 0,
-      activeBallsInGame: 1, // сколько шаров реально в игре (из доступных)
+      activeBallsInGame: 1,
     };
+
+    const ballColors = [
+      '#facc15', '#60a5fa', '#f472b6', '#34d399', '#fb923c',
+      '#a78bfa', '#fbbf24'
+    ];
 
     function loadUserState() {
       const session = localStorage.getItem(SESSION_KEY);
@@ -420,10 +459,16 @@
         if (users[currentUser]) {
           userState = { ...userState, ...users[currentUser] };
           if (!userState.id) userState.id = generateId();
+          if (userState.vipExpiry && Date.now() > userState.vipExpiry) {
+            userState.isVip = false;
+            userState.vipExpiry = null;
+          }
           if (userState.bonusEndTime && Date.now() > userState.bonusEndTime) {
             userState.bonusMultiplier = 1;
             userState.bonusEndTime = 0;
           }
+          if (!userState.totalReferrals) userState.totalReferrals = 0;
+          if (!userState.vipReferrals) userState.vipReferrals = 0;
           return true;
         }
       }
@@ -441,7 +486,6 @@
       return Math.floor(10000000 + Math.random() * 90000000).toString();
     }
 
-    // ---------- ЭКРАНЫ ----------
     const authScreen = document.getElementById('authScreen');
     const gameScreen = document.getElementById('gameScreen');
     const loginForm = document.getElementById('loginForm');
@@ -466,7 +510,6 @@
       }
     }
 
-    // Регистрация
     document.getElementById('showRegisterBtn').addEventListener('click', ()=>{
       loginForm.style.display = 'none';
       registerForm.style.display = 'block';
@@ -484,20 +527,12 @@
       if (!name || name.length < 2) { errEl.textContent = 'Никнейм минимум 2 символа'; return; }
       if (p1.length < 4) { errEl.textContent = 'Пароль минимум 4 символа'; return; }
       if (p1 !== p2) { errEl.textContent = 'Пароли не совпадают'; return; }
-
       const users = getUsers();
       if (users[name]) { errEl.textContent = 'Такой никнейм уже занят'; return; }
-
       users[name] = {
-        id: generateId(),
-        name: name,
-        balance: 0,
-        isVip: false,
-        ballsCount: 1,
-        invitedFriends: 0,
-        bonusMultiplier: 1,
-        bonusEndTime: 0,
-        activeBallsInGame: 1,
+        id: generateId(), name: name, balance: 0, isVip: false, vipExpiry: null,
+        ballsCount: 1, totalReferrals: 0, vipReferrals: 0,
+        bonusMultiplier: 1, bonusEndTime: 0, activeBallsInGame: 1,
       };
       saveUsers(users);
       localStorage.setItem(SESSION_KEY, name);
@@ -513,10 +548,7 @@
       const errEl = document.getElementById('loginError');
       const users = getUsers();
       if (!users[name]) { errEl.textContent = 'Пользователь не найден'; return; }
-      if (pass !== name + '_pass') { // упрощённо: пароль проверяем как никнейм+'_pass'
-        errEl.textContent = 'Неверный пароль';
-        return;
-      }
+      if (pass !== name + '_pass') { errEl.textContent = 'Неверный пароль'; return; }
       localStorage.setItem(SESSION_KEY, name);
       currentUser = name;
       userState = { ...users[name] };
@@ -524,7 +556,6 @@
       showGame();
     });
 
-    // Выход
     document.getElementById('logoutBtn').addEventListener('click', ()=>{
       localStorage.removeItem(SESSION_KEY);
       currentUser = null;
@@ -533,7 +564,6 @@
       showAuth();
     });
 
-    // ---------- ИГРОВАЯ ЛОГИКА ----------
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -548,12 +578,9 @@
     resizeCanvas();
 
     class Ball {
-      constructor(x, y, vx, vy, radius = 16) {
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.radius = radius;
+      constructor(x, y, vx, vy, radius = 16, color = '#facc15') {
+        this.x = x; this.y = y; this.vx = vx; this.vy = vy;
+        this.radius = radius; this.color = color;
       }
     }
 
@@ -569,7 +596,8 @@
         let y = Math.random() * (h - 2*r) + r;
         let speed = 1.6 + Math.random()*1.5;
         let angle = Math.random()*2*Math.PI;
-        balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, r));
+        let color = ballColors[i % ballColors.length];
+        balls.push(new Ball(x, y, Math.cos(angle)*speed, Math.sin(angle)*speed, r, color));
       }
       resolveOverlap();
     }
@@ -579,8 +607,7 @@
       for (let i=0;i<balls.length;i++) {
         for (let j=i+1;j<balls.length;j++) {
           let b1=balls[i], b2=balls[j];
-          let dx=b2.x-b1.x, dy=b2.y-b1.y;
-          let dist=Math.sqrt(dx*dx+dy*dy);
+          let dx=b2.x-b1.x, dy=b2.y-b1.y, dist=Math.sqrt(dx*dx+dy*dy);
           let min=b1.radius+b2.radius;
           if(dist<min && dist>0.001) {
             let ang=Math.atan2(dy,dx);
@@ -629,7 +656,6 @@
           updateUI();
         }
       }
-      // столкновения
       for(let i=0;i<balls.length;i++){
         for(let j=i+1;j<balls.length;j++){
           let a=balls[i], b2=balls[j];
@@ -640,9 +666,9 @@
             let dvx=a.vx-b2.vx, dvy=a.vy-b2.vy;
             let vn=dvx*nx+dvy*ny;
             if(vn<0){
-              let imp=2*vn/(1+1);
-              a.vx-=imp*1*nx; a.vy-=imp*1*ny;
-              b2.vx+=imp*1*nx; b2.vy+=imp*1*ny;
+              let imp=2*vn/2;
+              a.vx-=imp*nx; a.vy-=imp*ny;
+              b2.vx+=imp*nx; b2.vy+=imp*ny;
             }
             let ov=min-dist;
             a.x-=ov*nx/2; a.y-=ov*ny/2;
@@ -655,90 +681,77 @@
         ctx.beginPath();
         ctx.arc(b.x,b.y,b.radius,0,Math.PI*2);
         let g=ctx.createRadialGradient(b.x-3,b.y-3,2,b.x,b.y,b.radius);
-        g.addColorStop(0,'#facc15'); g.addColorStop(0.7,'#eab308'); g.addColorStop(1,'#a16207');
+        g.addColorStop(0, b.color);
+        g.addColorStop(0.7, b.color);
+        g.addColorStop(1, '#00000040');
         ctx.fillStyle=g; ctx.fill();
-        ctx.strokeStyle='#fef9c3'; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.strokeStyle='#ffffff80'; ctx.lineWidth=1.5; ctx.stroke();
         ctx.beginPath(); ctx.arc(b.x-4,b.y-4,3,0,2*Math.PI); ctx.fillStyle='#ffffff90'; ctx.fill();
       }
       requestAnimationFrame(gameLoop);
     }
 
-    // Слоты шаров
     const slotsContainer = document.getElementById('ballsSlotsContainer');
-    const slotsRequirements = [0, 1, 3, 10, 20, 50, 100]; // 7 слотов
+    const slotsRequirements = [0, 1, 3, 10, 20, 50, 100];
 
-    function renderSlots() {
-      slotsContainer.innerHTML = '';
-      const totalSlots = slotsRequirements.length;
-      for (let i = 0; i < totalSlots; i++) {
+    function renderSlots(container = slotsContainer) {
+      container.innerHTML = '';
+      for (let i = 0; i < slotsRequirements.length; i++) {
         const req = slotsRequirements[i];
         const slot = document.createElement('div');
         slot.className = 'slot';
-
         const circle = document.createElement('div');
         circle.className = 'slot-circle';
         const isActive = i < userState.ballsCount;
-        if (isActive) circle.classList.add('active-slot');
+        if (isActive) {
+          circle.classList.add('active-slot');
+          circle.style.backgroundColor = ballColors[i % ballColors.length];
+          circle.style.color = '#000';
+        }
         circle.textContent = isActive ? '●' : '○';
-
         const label = document.createElement('div');
         label.className = 'slot-label';
         if (i === 0) label.textContent = 'Старт';
-        else label.textContent = `${req} друзей`;
-
+        else label.textContent = `${req} VIP`;
         const launchBtn = document.createElement('button');
         launchBtn.className = 'launch-btn';
         launchBtn.textContent = 'Запустить';
-        
-        // Показываем кнопку, если шар доступен, но ещё не в игре
         const isInGame = i < userState.activeBallsInGame;
-        if (isActive && !isInGame) {
-          launchBtn.classList.add('visible');
-        }
-        
+        if (isActive && !isInGame) launchBtn.classList.add('visible');
         launchBtn.addEventListener('click', (e) => {
           e.stopPropagation();
-          if (currentUser === 'Casper') {
-            // Режим бога: можно добавлять бесконечно
-            if (userState.activeBallsInGame < userState.ballsCount) {
-              userState.activeBallsInGame++;
-              saveUserState();
-              syncBalls();
-              renderSlots();
-            }
-          } else {
-            if (isActive && !isInGame) {
-              userState.activeBallsInGame++;
-              saveUserState();
-              syncBalls();
-              renderSlots();
-            }
+          if (currentUser === 'Casper' || (isActive && !isInGame)) {
+            userState.activeBallsInGame++;
+            saveUserState();
+            syncBalls();
+            renderSlots();
+            renderSlots(document.getElementById('inviteSlotsContainer'));
           }
         });
-
         slot.appendChild(circle);
         slot.appendChild(label);
         slot.appendChild(launchBtn);
-        slotsContainer.appendChild(slot);
+        container.appendChild(slot);
       }
     }
 
-    // UI
     function updateUI() {
       document.getElementById('displayName').textContent = userState.name;
       const vipEl = document.getElementById('vipStatus');
       if (userState.isVip) {
         vipEl.className = 'vip-badge';
-        vipEl.textContent = 'VIP ⭐x2';
+        const expiry = userState.vipExpiry ? new Date(userState.vipExpiry).toLocaleDateString() : 'навсегда';
+        vipEl.textContent = `VIP ⭐x2 (до ${expiry})`;
       } else {
         vipEl.className = 'no-vip';
         vipEl.textContent = 'VIP неактивен';
       }
       document.getElementById('balanceDisplay').textContent = `⭐ ${userState.balance}`;
+      document.getElementById('refCountDisplay').textContent = `👥 ${userState.totalReferrals} реф. (${userState.vipReferrals} VIP)`;
     }
 
     function recalcBalls() {
-      const f = userState.invitedFriends;
+      const f = userState.vipReferrals;
       let extra = 0;
       if (f >= 100) extra = 6;
       else if (f >= 50) extra = 5;
@@ -752,15 +765,28 @@
       }
     }
 
-    // Кнопки действий
-    document.getElementById('buyVipBtn').addEventListener('click', ()=> document.getElementById('vipModal').classList.add('active'));
+    document.getElementById('buyVipBtn').addEventListener('click', ()=>{
+      document.getElementById('vipMonthInfo').textContent = userState.isVip ?
+        `Текущий VIP истекает: ${new Date(userState.vipExpiry).toLocaleDateString()}. Можно продлить.` :
+        'VIP неактивен.';
+      document.getElementById('vipModal').classList.add('active');
+    });
     document.getElementById('closeVipModal').addEventListener('click', ()=> document.getElementById('vipModal').classList.remove('active'));
-    document.getElementById('confirmVipBtn').addEventListener('click', ()=>{
-      if(userState.isVip) { alert('VIP уже активен'); return; }
+    document.getElementById('buyVipMonthBtn').addEventListener('click', ()=>{
       userState.isVip = true;
-      saveUserState();
-      updateUI();
+      const now = Date.now();
+      userState.vipExpiry = userState.vipExpiry && userState.vipExpiry > now ?
+        userState.vipExpiry + 30*24*60*60*1000 : now + 30*24*60*60*1000;
+      saveUserState(); updateUI();
       document.getElementById('vipModal').classList.remove('active');
+      alert('VIP на месяц активирован!');
+    });
+    document.getElementById('buyVipForeverBtn').addEventListener('click', ()=>{
+      userState.isVip = true;
+      userState.vipExpiry = null;
+      saveUserState(); updateUI();
+      document.getElementById('vipModal').classList.remove('active');
+      alert('VIP навсегда активирован!');
     });
 
     document.getElementById('bonusBtn').addEventListener('click', ()=> document.getElementById('bonusModal').classList.add('active'));
@@ -774,6 +800,9 @@
 
     document.getElementById('inviteBtn').addEventListener('click', ()=>{
       document.getElementById('refLinkDisplay').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
+      document.getElementById('invTotalRefs').textContent = userState.totalReferrals;
+      document.getElementById('invVipRefs').textContent = userState.vipReferrals;
+      renderSlots(document.getElementById('inviteSlotsContainer'));
       document.getElementById('inviteModal').classList.add('active');
     });
     document.getElementById('closeInviteModal').addEventListener('click', ()=> document.getElementById('inviteModal').classList.remove('active'));
@@ -785,6 +814,10 @@
       document.getElementById('profileName').textContent = userState.name;
       document.getElementById('profileId').textContent = userState.id;
       document.getElementById('profileBalance').textContent = userState.balance;
+      document.getElementById('profileTotalRefs').textContent = userState.totalReferrals;
+      document.getElementById('profileVipRefs').textContent = userState.vipReferrals;
+      document.getElementById('profileVipStatus').textContent = userState.isVip ?
+        (userState.vipExpiry ? `до ${new Date(userState.vipExpiry).toLocaleDateString()}` : 'навсегда') : 'нет';
       document.getElementById('profileRef').textContent = `${location.origin}${location.pathname}?ref=${userState.id}`;
       document.getElementById('profileModal').classList.add('active');
     });
@@ -804,32 +837,36 @@
         localStorage.setItem(SESSION_KEY, newName);
         currentUser = newName;
         updateUI();
-        document.getElementById('profileName').textContent = userState.name;
       }
     });
 
     document.querySelectorAll('.modal').forEach(m=> m.addEventListener('click', function(e){ if(e.target===m) m.classList.remove('active'); }));
 
-    // Симуляция приглашения через URL
     const params = new URLSearchParams(location.search);
     if(params.get('ref') && loadUserState()){
       if(!sessionStorage.getItem('invited_done')){
         sessionStorage.setItem('invited_done','1');
-        userState.invitedFriends++;
+        userState.totalReferrals++;
+        userState.vipReferrals++;
         recalcBalls();
         saveUserState();
         renderSlots();
-        alert('Друг присоединился! +1 к прогрессу шаров.');
+        alert('Друг с VIP присоединился! +1 к прогрессу шаров.');
       }
     }
 
     setInterval(()=>{
+      if(userState.vipExpiry && Date.now() > userState.vipExpiry){
+        userState.isVip = false;
+        userState.vipExpiry = null;
+        saveUserState();
+        updateUI();
+      }
       if(userState.bonusEndTime && Date.now()>userState.bonusEndTime){
         userState.bonusMultiplier=1; userState.bonusEndTime=0; saveUserState();
       }
     },1000);
 
-    // Старт
     if(loadUserState()){
       recalcBalls();
       showGame();
