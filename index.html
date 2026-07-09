@@ -165,6 +165,32 @@
       overflow-y: auto;
       box-shadow: 0 25px 50px rgba(0,0,0,0.6);
     }
+    .result-content {
+      background: linear-gradient(135deg, #1e1836, #2d2350);
+      padding: 25px 20px;
+      border-radius: 36px;
+      width: 90%;
+      max-width: 380px;
+      border: 2px solid #ffd966;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .result-emoji {
+      font-size: 4rem;
+      animation: bounce 0.6s ease;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -237,6 +263,12 @@
   </div>
 </div>
 
+<!-- Окно результата -->
+<div id="resultModal" class="modal hidden">
+  <div class="result-content" id="resultContent"></div>
+</div>
+
+<!-- Магазин -->
 <div id="shopModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="color:#ffd966;">🛍️ Магазин шариков</h2>
@@ -245,6 +277,7 @@
   </div>
 </div>
 
+<!-- Профиль -->
 <div id="profileModal" class="modal hidden">
   <div class="modal-content">
     <h2>👤 Профиль</h2>
@@ -255,6 +288,7 @@
   </div>
 </div>
 
+<!-- Авторизация -->
 <div id="authModal" class="modal">
   <div class="modal-content">
     <h2>🔐 Вход / Регистрация</h2>
@@ -266,6 +300,62 @@
 
 <script>
   (function() {
+    // ========== ЗВУКОВОЙ ДВИЖОК ==========
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playTone(freq, type, duration, vol = 0.15, delay = 0) {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime + delay;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, now);
+      gain.gain.setValueAtTime(vol, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + duration);
+    }
+
+    function soundDrop() {
+      playTone(200, 'triangle', 0.2, 0.2);
+      setTimeout(() => playTone(150, 'triangle', 0.15, 0.15), 0.1);
+    }
+
+    function soundBounce() {
+      playTone(500, 'sine', 0.08, 0.08);
+    }
+
+    function soundWin(multiplier) {
+      if (multiplier >= 5) {
+        playTone(523, 'sine', 0.15, 0.2);
+        setTimeout(() => playTone(659, 'sine', 0.15, 0.2), 0.15);
+        setTimeout(() => playTone(784, 'sine', 0.25, 0.25), 0.3);
+      } else if (multiplier >= 1) {
+        playTone(440, 'sine', 0.12, 0.15);
+        setTimeout(() => playTone(554, 'sine', 0.12, 0.15), 0.12);
+      } else {
+        playTone(300, 'triangle', 0.2, 0.12);
+      }
+    }
+
+    function soundBuy() {
+      playTone(600, 'sine', 0.1, 0.12);
+      setTimeout(() => playTone(800, 'sine', 0.1, 0.12), 0.1);
+    }
+
+    // ========== БАЗА ДАННЫХ ==========
     const STORAGE_KEY = 'plinko_users_db';
     let currentUser = null;
 
@@ -311,6 +401,7 @@
       }
     }
 
+    // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const GRAVITY = 0.22;
@@ -323,7 +414,7 @@
     const startY = 105;
     const rowSpacing = 35;
     const colSpacing = 32;
-    const colBaseX = 220; // центр canvas 440
+    const colBaseX = 220;
 
     const multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
     const binCount = multipliers.length;
@@ -336,8 +427,13 @@
     let swingSpeed = 0.04;
     const stringAnchorX = 220;
     const stringAnchorY = 18;
-    const stringLength = 48; // длиннее нитка
+    const stringLength = 48;
 
+    // Для отслеживания отскоков (звуки)
+    let lastBounceTime = 0;
+    let bounceCooldown = 80; // мс
+
+    // ========== UI ЭЛЕМЕНТЫ ==========
     const balanceSpan = document.getElementById('balanceDisplay');
     const currentBallValueSpan = document.getElementById('currentBallValue');
     const currentBallEmoji = document.getElementById('currentBallEmoji');
@@ -347,12 +443,14 @@
     const usernameInput = document.getElementById('usernameInput');
     const loginBtn = document.getElementById('loginBtn');
     const gameContainer = document.getElementById('gameContainer');
+    const resultModal = document.getElementById('resultModal');
+    const resultContent = document.getElementById('resultContent');
 
     function buildPlatforms() {
       platforms = [];
       for (let r = 0; r < rows; r++) {
         const y = startY + r * rowSpacing;
-        const pinsInRow = 12; // полностью закрывают ширину
+        const pinsInRow = 12;
         const totalWidth = (pinsInRow - 1) * colSpacing;
         const startX = colBaseX - totalWidth / 2;
         const offsetX = (r % 2 === 0) ? 0 : colSpacing * 0.5;
@@ -399,11 +497,38 @@
       return map[value] || '⭐';
     }
 
+    function showResult(betValue, multiplier, winnings, oldBalance, newBalance) {
+      const netProfit = winnings - betValue;
+      const isWin = netProfit > 0;
+      const emoji = isWin ? '🎉' : '😔';
+      const color = isWin ? '#4caf50' : '#f44336';
+      
+      resultContent.innerHTML = `
+        <div class="result-emoji">${emoji}</div>
+        <h2 style="color: ${color}; margin: 0;">${isWin ? 'Выигрыш!' : 'Не повезло'}</h2>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px;">
+          <p>🔵 Шарик: <strong>${betValue} очков</strong></p>
+          <p>🎯 Ячейка: <strong>x${multiplier}</strong></p>
+          <p>💰 Выигрыш: <strong>${winnings} ⭐</strong></p>
+          <p style="color: ${color};">📊 Чистый доход: <strong>${netProfit >= 0 ? '+' : ''}${netProfit} ⭐</strong></p>
+          <hr style="border-color: rgba(255,255,255,0.2); margin: 10px 0;">
+          <p>💼 Баланс был: ${oldBalance} ⭐</p>
+          <p>💼 Баланс стал: ${newBalance} ⭐</p>
+        </div>
+        <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">👍 Ок</button>
+      `;
+      resultModal.classList.remove('hidden');
+      
+      soundWin(multiplier);
+    }
+
     function dropBall() {
+      initAudio();
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
       if (gameActive || ball.active) return;
       const ballCost = currentUser.selectedBall;
       if (currentUser.balance < ballCost) { alert('Недостаточно средств!'); return; }
+      
       currentUser.balance -= ballCost;
       updateUserData(currentUser);
       updateUI();
@@ -415,10 +540,13 @@
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
       ball.vx = Math.sin(swingAngle) * 2.2;
       ball.vy = 0.9;
+      
+      soundDrop();
     }
 
     function applyPhysics() {
       if (!ball.active || !gameActive) return;
+      
       ball.vy += GRAVITY;
       ball.x += ball.vx;
       ball.y += ball.vy;
@@ -426,6 +554,7 @@
       if (ball.x - BALL_RADIUS < 2) { ball.x = BALL_RADIUS + 2; ball.vx *= -BOUNCE; }
       if (ball.x + BALL_RADIUS > canvas.width - 2) { ball.x = canvas.width - BALL_RADIUS - 2; ball.vx *= -BOUNCE; }
 
+      let bounced = false;
       for (let p of platforms) {
         const dx = ball.x - p.x;
         const dy = ball.y - p.y;
@@ -439,10 +568,16 @@
           if (vn < 0) {
             ball.vx -= (1+BOUNCE)*vn*nx;
             ball.vy -= (1+BOUNCE)*vn*ny;
+            bounced = true;
           }
           ball.vx *= 0.998;
           ball.vy *= 0.998;
         }
+      }
+      
+      if (bounced && Date.now() - lastBounceTime > bounceCooldown) {
+        soundBounce();
+        lastBounceTime = Date.now();
       }
 
       if (ball.y + BALL_RADIUS > canvas.height - 30) {
@@ -452,22 +587,32 @@
         if (binIndex >= binCount) binIndex = binCount - 1;
         const multiplier = multipliers[binIndex];
         const winnings = Math.floor(ball.value * multiplier);
+        
+        const oldBalance = currentUser ? currentUser.balance : 0;
         if (currentUser) {
           currentUser.balance += winnings;
           updateUserData(currentUser);
         }
+        const newBalance = currentUser ? currentUser.balance : 0;
+        
         updateUI();
+        showResult(ball.value, multiplier, winnings, oldBalance, newBalance);
         resetBall();
         gameActive = false;
       }
-      if (ball.y > canvas.height + 70 || ball.y < -50) { resetBall(); gameActive = false; }
+      
+      if (ball.y > canvas.height + 70 || ball.y < -50) { 
+        resetBall(); 
+        gameActive = false; 
+      }
     }
 
     function drawScene() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
+      
       if (!ball.active && !gameActive) {
         swingAngle += swingSpeed;
-        if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1; // амплитуда х5 (0.35*5≈1.75)
+        if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
         const ballX = stringAnchorX + Math.sin(swingAngle) * stringLength;
         const ballY = stringAnchorY + Math.cos(swingAngle) * stringLength;
         ctx.beginPath();
@@ -533,12 +678,13 @@
     }
 
     function shakeScreen() {
+      initAudio();
       if (gameContainer.classList.contains('shake-active')) return;
       gameContainer.classList.add('shake-active');
+      playTone(80, 'sawtooth', 0.3, 0.1);
       setTimeout(() => {
         gameContainer.classList.remove('shake-active');
       }, 1000);
-      // также небольшой импульс шарику, если активен
       if (ball.active && gameActive) {
         ball.vx += (Math.random() - 0.5) * 3.5;
         ball.vy += (Math.random() - 0.2) * 2.8;
@@ -546,6 +692,7 @@
     }
 
     function openShop() {
+      initAudio();
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
       const container = document.getElementById('shopItemsContainer');
       container.innerHTML = '';
@@ -569,6 +716,7 @@
     }
 
     function buyBall(value) {
+      initAudio();
       if (!currentUser) return;
       const price = value * 22;
       if (currentUser.balance < price) { alert('Недостаточно звёзд!'); return; }
@@ -578,6 +726,7 @@
       currentUser.ownedBalls.sort((a,b)=>a-b);
       updateUserData(currentUser);
       updateUI();
+      soundBuy();
       openShop();
     }
 
@@ -627,6 +776,7 @@
       authModal.classList.remove('hidden');
     }
 
+    // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
     dropButton.addEventListener('click', dropBall);
     document.getElementById('shopButton').addEventListener('click', openShop);
     document.getElementById('profileButton').addEventListener('click', showProfile);
@@ -634,7 +784,9 @@
     document.getElementById('closeShopBtn').addEventListener('click', ()=> document.getElementById('shopModal').classList.add('hidden'));
     document.getElementById('closeProfileBtn').addEventListener('click', ()=> document.getElementById('profileModal').classList.add('hidden'));
     document.getElementById('shakeButton').addEventListener('click', shakeScreen);
+    
     loginBtn.addEventListener('click', ()=>{
+      initAudio();
       if(usernameInput.value.trim()) loginUser(usernameInput.value.trim());
     });
     usernameInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') loginBtn.click(); });
@@ -648,10 +800,18 @@
     });
     currentBallValueSpan.style.cursor = 'pointer';
 
+    // Закрытие результата по клику вне окна
+    resultModal.addEventListener('click', (e) => {
+      if (e.target === resultModal) {
+        resultModal.classList.add('hidden');
+      }
+    });
+
     window.addEventListener('beforeunload', ()=>{
       if(currentUser) localStorage.setItem('plinko_current_id', currentUser.id);
     });
 
+    // ========== ЗАПУСК ==========
     buildPlatforms();
     checkSavedSession();
     gameLoop();
