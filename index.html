@@ -66,8 +66,8 @@
     .launch-btn.visible { display: block; }
     @keyframes btnGlow { 0%,100%{box-shadow:0 0 8px rgba(120,115,245,0.5);} 50%{box-shadow:0 0 16px rgba(255,110,199,0.8);} }
     
-    .buttons-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
-    .btn { background: rgba(30,30,60,0.8); border: 1px solid #3a3a8a; color: white; padding: 10px 12px; border-radius: 40px; font-weight: 600; font-size: clamp(0.7rem, 2.5vw, 0.8rem); flex: 1 1 auto; min-width: 55px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 4px; backdrop-filter: blur(5px); animation: btnGlow 3s infinite; }
+    .buttons-grid { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+    .btn { background: rgba(30,30,60,0.8); border: 1px solid #3a3a8a; color: white; padding: 8px 10px; border-radius: 40px; font-weight: 600; font-size: clamp(0.65rem, 2.2vw, 0.75rem); flex: 1 1 auto; min-width: 48px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 4px; backdrop-filter: blur(5px); animation: btnGlow 3s infinite; }
     .btn:active { transform: scale(0.95); background: rgba(60,60,100,0.9); }
     .btn.primary { background: linear-gradient(90deg, #ff6ec7, #7873f5); border: none; font-weight: bold; box-shadow: 0 0 20px rgba(120,115,245,0.6); }
     .btn.withdraw { background: linear-gradient(90deg, #00ff88, #00cc6a); border: none; color: #000; font-weight: bold; }
@@ -149,8 +149,8 @@
       <button class="btn" id="bonusBtn">⚡ x5</button>
       <button class="btn" id="inviteBtn">👥 Друзья</button>
       <button class="btn" id="profileBtn">👤 Профиль</button>
-      <button class="btn withdraw" id="withdrawBtn">💸 Вывод</button>
       <button class="btn" id="logoutBtn" style="background:#442222;">🚪 Выход</button>
+      <button class="btn withdraw" id="withdrawBtn">💸 Вывод</button>
     </div>
   </div>
 </div>
