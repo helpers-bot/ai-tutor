@@ -143,7 +143,7 @@
     <div class="boost-bar-container">
       <div class="boost-bar-fill" id="boostBarFill"></div>
     </div>
-    <div class="boost-locked-text" id="boostLockedText">⏳ Перегрев! Ждите</div>
+    <div class="boost-locked-text" id="boostLockedText">⏳ Перегрев! Ждите 60 сек.</div>
     <div class="buttons-grid">
       <button class="btn primary" id="buyVipBtn">💎 VIP</button>
       <button class="btn" id="bonusBtn">⚡ x5</button>
@@ -281,7 +281,7 @@
       osc.frequency.setValueAtTime(180, audioCtx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.1);
       
-      // Громкость ударов — 0.08 (громче ракеты)
+      // Громкость ударов — 0.08
       gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
       
@@ -305,7 +305,7 @@
       turboOsc.type = 'sawtooth';
       turboOsc.frequency.setValueAtTime(60, audioCtx.currentTime);
       
-      // Громкость ракеты — 0.03 (тише ударов, которые 0.08)
+      // Громкость ракеты — 0.03 (тише ударов)
       turboGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
       
       turboOsc.start();
@@ -415,6 +415,23 @@
             userState.balance += earned;
           }
         }
+        
+        // Обработка остывания буста при возвращении
+        if (userState.boostLocked) {
+          const elapsedSinceLock = (now - (userState.boostLockStartTime || now)) / 1000;
+          const cooldownDuration = userState.boostCooldownDuration || 60;
+          userState.boostLockTimer = Math.max(0, cooldownDuration - elapsedSinceLock);
+          userState.boostCharge = Math.max(0, userState.boostLockTimer / cooldownDuration);
+          
+          if (userState.boostLockTimer <= 0) {
+            userState.boostLocked = false;
+            userState.boostCharge = 0;
+            userState.boostLockTimer = 0;
+            userState.boostLockStartTime = 0;
+            userState.boostCooldownDuration = 0;
+          }
+        }
+        
         userState.lastSeen = now;
         return true;
       }
@@ -455,6 +472,22 @@
   function showGame() {
     authScreen.classList.remove('active');
     gameScreen.classList.add('active');
+    
+    // Инициализируем буст из сохранённого состояния
+    if (userState.boostLocked) {
+      boostLocked = true;
+      boostLockTimer = userState.boostLockTimer || 60;
+      boostCharge = userState.boostCharge || 1;
+      boostActive = false;
+      stopTurboSound();
+    } else {
+      boostLocked = false;
+      boostCharge = userState.boostCharge || 0;
+      boostLockTimer = 0;
+      boostActive = false;
+    }
+    updateBoostBar();
+    
     updateUI();
     renderSlots();
     syncBalls();
@@ -514,6 +547,11 @@
       bonusEndTime: 0,
       activeBallsInGame: 1,
       lastSeen: Date.now(),
+      boostLocked: false,
+      boostLockTimer: 0,
+      boostCharge: 0,
+      boostLockStartTime: 0,
+      boostCooldownDuration: 0,
     };
     
     saveUsers(users);
@@ -544,11 +582,26 @@
     saveCredentials(name, pass);
     currentUser = name;
     userState = { ...users[name] };
+    
+    // Инициализируем поля буста если их нет
+    if (userState.boostLocked === undefined) userState.boostLocked = false;
+    if (userState.boostLockTimer === undefined) userState.boostLockTimer = 0;
+    if (userState.boostCharge === undefined) userState.boostCharge = 0;
+    if (userState.boostLockStartTime === undefined) userState.boostLockStartTime = 0;
+    if (userState.boostCooldownDuration === undefined) userState.boostCooldownDuration = 0;
+    
     errEl.textContent = '';
     showGame();
   });
 
   document.getElementById('logoutBtn').addEventListener('click', () => {
+    // Сохраняем состояние буста
+    userState.boostLocked = boostLocked;
+    userState.boostLockTimer = boostLockTimer;
+    userState.boostCharge = boostCharge;
+    userState.boostLockStartTime = boostLockStartTime;
+    userState.boostCooldownDuration = boostCooldownDuration;
+    
     saveUserState();
     localStorage.removeItem(SESSION_KEY);
     currentUser = null;
@@ -559,7 +612,14 @@
   });
 
   window.addEventListener('beforeunload', () => {
-    if (currentUser) saveUserState();
+    if (currentUser) {
+      userState.boostLocked = boostLocked;
+      userState.boostLockTimer = boostLockTimer;
+      userState.boostCharge = boostCharge;
+      userState.boostLockStartTime = boostLockStartTime;
+      userState.boostCooldownDuration = boostCooldownDuration;
+      saveUserState();
+    }
     stopTurboSound();
   });
 
@@ -666,14 +726,15 @@
     dropBall.addEventListener('transitionend', () => dropBall.remove());
   }
 
-  // ==================== СИСТЕМА БУСТА (НОВАЯ ЛОГИКА) ====================
+  // ==================== СИСТЕМА БУСТА ====================
   let boostActive = false;
   let boostLocked = false;
   let boostLockTimer = 0;
   let boostCharge = 0;
-  let boostHoldTime = 0;          // сколько времени держали в текущем цикле
-  let boostTotalHoldTime = 0;     // общее время удержания до перегрева
-  const BOOST_MAX_TIME = 10;      // 10 секунд до перегрева
+  let boostLockStartTime = 0;
+  let boostCooldownDuration = 60; // 60 секунд при полном перегреве
+  const BOOST_MAX_TIME = 10; // 10 секунд удержания до перегрева
+  const BOOST_LOCK_TIME = 60; // 60 секунд блокировки при полном перегреве
   const boostBarFill = document.getElementById('boostBarFill');
   const boostLockedText = document.getElementById('boostLockedText');
 
@@ -687,12 +748,12 @@
       boostBarFill.classList.add('warning');
     }
     
-    // Показываем текст только при полной блокировке (100% перегрев)
     if (boostLocked) {
       boostLockedText.style.display = 'block';
+      const remaining = Math.ceil(boostLockTimer);
+      boostLockedText.textContent = `⏳ Перегрев! Ждите ${remaining} сек.`;
     } else {
       boostLockedText.style.display = 'none';
-      boostLockedText.textContent = '⏳ Перегрев! Ждите';
     }
   }
 
@@ -703,7 +764,6 @@
   canvas.addEventListener('pointerdown', (e) => {
     e.preventDefault();
     initAudio();
-    // Можно начать удержание только если не заблокирован полностью
     if (!boostLocked) {
       boostActive = true;
       holdHint.classList.add('hidden');
@@ -715,85 +775,81 @@
     e.preventDefault();
     boostActive = false;
     stopTurboSound();
-    // Если не перегрет — запоминаем время удержания для расчёта остывания
-    if (!boostLocked) {
-      boostTotalHoldTime = boostHoldTime;
-    }
   });
 
   canvas.addEventListener('pointerleave', () => {
     boostActive = false;
     stopTurboSound();
-    if (!boostLocked) {
-      boostTotalHoldTime = boostHoldTime;
-    }
   });
 
   canvas.addEventListener('pointercancel', () => {
     boostActive = false;
     stopTurboSound();
-    if (!boostLocked) {
-      boostTotalHoldTime = boostHoldTime;
-    }
   });
 
   function processBoost(dt) {
     if (boostLocked) {
-      // Полный перегрев — остывание в 2 раза дольше времени удержания
+      // Полный перегрев — остывание
       boostLockTimer -= dt;
-      if (boostTotalHoldTime > 0) {
-        boostCharge = Math.max(0, boostLockTimer / (boostTotalHoldTime * 2));
-      } else {
-        boostCharge = Math.max(0, boostLockTimer / (BOOST_MAX_TIME * 2));
-      }
+      boostCharge = Math.max(0, boostLockTimer / boostCooldownDuration);
       updateBoostBar();
       canvas.classList.remove('boost-active');
       
       if (boostLockTimer <= 0) {
-        // Полностью остыл
         boostLocked = false;
         boostCharge = 0;
-        boostHoldTime = 0;
-        boostTotalHoldTime = 0;
+        boostLockTimer = 0;
+        boostLockStartTime = 0;
+        boostCooldownDuration = 60;
         updateBoostBar();
+        
+        // Сохраняем состояние
+        userState.boostLocked = false;
+        userState.boostCharge = 0;
+        userState.boostLockTimer = 0;
+        userState.boostLockStartTime = 0;
+        userState.boostCooldownDuration = 0;
+        saveUserState();
       }
       return 1;
     }
 
     if (boostActive) {
       canvas.classList.add('boost-active');
-      boostHoldTime += dt;
-      boostCharge = Math.min(1, boostHoldTime / BOOST_MAX_TIME);
+      // Заряд растёт с текущего места
+      boostCharge += dt / BOOST_MAX_TIME;
       
       if (boostCharge >= 1) {
-        // Перегрев! Блокируем
+        // Перегрев!
         boostCharge = 1;
         boostLocked = true;
-        boostTotalHoldTime = boostHoldTime; // запомнили сколько держали
-        boostLockTimer = boostTotalHoldTime * 2; // остывание в 2 раза дольше
+        boostLockTimer = BOOST_LOCK_TIME;
+        boostCooldownDuration = BOOST_LOCK_TIME;
+        boostLockStartTime = Date.now();
         boostActive = false;
-        boostHoldTime = 0;
         stopTurboSound();
         updateBoostBar();
         canvas.classList.remove('boost-active');
-        return 3; // boost всё ещё применяется в этом кадре? Нет, уже остановлен
+        
+        // Сохраняем состояние
+        userState.boostLocked = true;
+        userState.boostCharge = 1;
+        userState.boostLockTimer = BOOST_LOCK_TIME;
+        userState.boostLockStartTime = boostLockStartTime;
+        userState.boostCooldownDuration = BOOST_LOCK_TIME;
+        saveUserState();
+        
+        return 1;
       }
       updateBoostBar();
       return 3;
     } else {
       canvas.classList.remove('boost-active');
-      // Палец убран, остывание со скоростью как при полном перегреве
-      if (boostCharge > 0 && !boostLocked) {
-        // Остывание пропорционально: время остывания = boostHoldTime * 2
-        const coolRate = 1 / (boostTotalHoldTime * 2 || 0.1);
-        boostCharge = Math.max(0, boostCharge - dt * coolRate);
-        if (boostCharge <= 0) {
-          boostCharge = 0;
-          boostHoldTime = 0;
-          boostTotalHoldTime = 0;
-        }
+      // Остывание когда палец убран
+      if (boostCharge > 0) {
+        boostCharge = Math.max(0, boostCharge - dt * 0.5);
+        updateBoostBar();
       }
-      updateBoostBar();
       return 1;
     }
   }
