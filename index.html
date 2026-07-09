@@ -267,6 +267,9 @@
     }
     
     canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       display: block;
@@ -358,7 +361,7 @@
       height: 100%;
       width: 0%;
       border-radius: 10px;
-      transition: width 0.1s linear;
+      transition: none;
       background: #00ff88;
     }
     
@@ -758,7 +761,7 @@
     <div class="boost-bar-container">
       <div class="boost-bar-fill" id="boostBarFill"></div>
     </div>
-    <div class="boost-locked-text" id="boostLockedText">⏳ Перегрев! Ждите 0 сек.</div>
+    <div class="boost-locked-text" id="boostLockedText"></div>
     <div class="buttons-grid">
       <button class="btn primary" id="buyVipBtn">💎 VIP</button>
       <button class="btn" id="bonusBtn">⚡ x5</button>
@@ -946,9 +949,9 @@
   }
 
   // ==================== БАЗА ДАННЫХ ====================
-  const USERS_KEY = 'vds_users_v9';
-  const SESSION_KEY = 'vds_session_v9';
-  const SAVED_CREDS_KEY = 'vds_saved_creds_v9';
+  const USERS_KEY = 'vds_users_v10';
+  const SESSION_KEY = 'vds_session_v10';
+  const SAVED_CREDS_KEY = 'vds_saved_creds_v10';
 
   function getUsers() {
     const data = localStorage.getItem(USERS_KEY);
@@ -1191,26 +1194,32 @@
   
   function resizeCanvas() {
     const rect = canvasWrapper.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
+    const w = rect.width;
+    const h = rect.height;
     
-    if (width > 0 && height > 0) {
-      // Устанавливаем размер канваса точно по размеру контейнера
-      canvas.width = width;
-      canvas.height = height;
+    if (w > 0 && h > 0) {
+      // Сохраняем соотношение сторон канваса
+      const dpr = window.devicePixelRatio || 1;
       
-      // Обновляем шары при изменении размера
-      if (balls.length > 0) {
-        const minDim = Math.min(width, height);
-        const newRadius = Math.min(BALL_RADIUS_BASE, minDim * 0.045);
-        const scaleX = width / (canvas.width || width);
-        const scaleY = height / (canvas.height || height);
-        
-        for (const b of balls) {
-          b.radius = newRadius;
-          b.x = Math.min(Math.max(b.x, b.radius), width - b.radius);
-          b.y = Math.min(Math.max(b.y, b.radius), height - b.radius);
-        }
+      // Устанавливаем размер canvas элемента
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      
+      // Устанавливаем разрешение canvas
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      
+      // Масштабируем контекст
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      
+      // Обновляем радиусы шаров
+      const minDim = Math.min(w, h);
+      const newRadius = Math.min(15, minDim * 0.045);
+      for (const b of balls) {
+        b.radius = newRadius;
+        b.x = Math.min(Math.max(b.x, b.radius), w - b.radius);
+        b.y = Math.min(Math.max(b.y, b.radius), h - b.radius);
       }
     }
   }
@@ -1221,15 +1230,13 @@
   });
   resizeCanvas();
 
-  const BALL_RADIUS_BASE = 15;
-
   class Ball {
-    constructor(x, y, vx, vy, colorIndex) {
+    constructor(x, y, vx, vy, colorIndex, radius) {
       this.x = x;
       this.y = y;
       this.vx = vx;
       this.vy = vy;
-      this.radius = BALL_RADIUS_BASE;
+      this.radius = radius;
       this.colorIndex = colorIndex;
       this.mass = 1;
     }
@@ -1239,10 +1246,11 @@
 
   function createBalls(count) {
     balls = [];
-    const w = canvas.width || 400;
-    const h = canvas.height || 300;
+    const rect = canvasWrapper.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
     const minDim = Math.min(w, h);
-    const radius = Math.min(BALL_RADIUS_BASE, minDim * 0.045);
+    const radius = Math.min(15, minDim * 0.045);
     
     for (let i = 0; i < count; i++) {
       let x, y, overlapping;
@@ -1264,9 +1272,7 @@
 
       const speed = 2 + Math.random() * 1.5;
       const angle = Math.random() * 2 * Math.PI;
-      const ball = new Ball(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, i % ballColors.length);
-      ball.radius = radius;
-      balls.push(ball);
+      balls.push(new Ball(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, i % ballColors.length, radius));
     }
   }
 
@@ -1274,15 +1280,6 @@
     const desired = Math.min(userState.activeBallsInGame, userState.ballsCount);
     if (balls.length !== desired) {
       createBalls(desired);
-    } else {
-      // Обновляем радиусы существующих шаров
-      const w = canvas.width || 400;
-      const h = canvas.height || 300;
-      const minDim = Math.min(w, h);
-      const newRadius = Math.min(BALL_RADIUS_BASE, minDim * 0.045);
-      for (const b of balls) {
-        b.radius = newRadius;
-      }
     }
   }
 
@@ -1292,8 +1289,8 @@
     el.textContent = text;
     const canvasRect = canvas.getBoundingClientRect();
     const wrapperRect = canvasWrapper.getBoundingClientRect();
-    const scaleX = canvasRect.width / canvas.width;
-    const scaleY = canvasRect.height / canvas.height;
+    const scaleX = canvasRect.width / canvasRect.width;
+    const scaleY = canvasRect.height / canvasRect.height;
     const left = (x * scaleX) + (canvasRect.left - wrapperRect.left);
     const top = (y * scaleY) + (canvasRect.top - wrapperRect.top);
     el.style.left = left + 'px';
@@ -1306,8 +1303,9 @@
     const slotRect = slotElement.getBoundingClientRect();
     const canvasRect = canvas.getBoundingClientRect();
     const wrapperRect = canvasWrapper.getBoundingClientRect();
+    const radius = balls.length > 0 ? balls[0].radius : 15;
 
-    const size = BALL_RADIUS_BASE * 2;
+    const size = radius * 2;
     const dropBall = document.createElement('div');
     dropBall.className = 'ball-drop';
     dropBall.style.width = size + 'px';
@@ -1315,14 +1313,14 @@
     dropBall.style.borderRadius = '50%';
     dropBall.style.background = `radial-gradient(circle at 30% 30%, #fff, ${ballColors[colorIndex]})`;
     dropBall.style.boxShadow = `0 0 20px ${ballGlowColors[colorIndex]}`;
-    dropBall.style.left = (slotRect.left - wrapperRect.left + slotRect.width / 2 - BALL_RADIUS_BASE) + 'px';
-    dropBall.style.top = (slotRect.top - wrapperRect.top + slotRect.height / 2 - BALL_RADIUS_BASE) + 'px';
+    dropBall.style.left = (slotRect.left - wrapperRect.left + slotRect.width / 2 - radius) + 'px';
+    dropBall.style.top = (slotRect.top - wrapperRect.top + slotRect.height / 2 - radius) + 'px';
 
     canvasWrapper.appendChild(dropBall);
 
     requestAnimationFrame(() => {
-      const targetX = (canvasRect.left - wrapperRect.left) + Math.random() * (canvasRect.width - size) + BALL_RADIUS_BASE;
-      const targetY = (canvasRect.top - wrapperRect.top) + Math.random() * (canvasRect.height - size) + BALL_RADIUS_BASE;
+      const targetX = (canvasRect.left - wrapperRect.left) + Math.random() * (canvasRect.width - size) + radius;
+      const targetY = (canvasRect.top - wrapperRect.top) + Math.random() * (canvasRect.height - size) + radius;
       dropBall.style.left = targetX + 'px';
       dropBall.style.top = targetY + 'px';
       dropBall.style.opacity = '0.8';
@@ -1337,27 +1335,32 @@
   let boostLockTimer = 0;
   let boostCharge = 0;
   let boostHoldTime = 0;
+  let boostMaxHoldTime = 0;
   const BOOST_MAX_TIME = 10;
   const boostBarFill = document.getElementById('boostBarFill');
   const boostLockedText = document.getElementById('boostLockedText');
 
   function updateBoostBar() {
-    const pct = Math.round(boostCharge * 100);
-    boostBarFill.style.width = pct + '%';
-    boostBarFill.classList.remove('warning', 'danger');
-    if (pct > 80) {
+    if (boostLocked) {
+      // Показываем остывание
+      const pct = Math.round(boostCharge * 100);
+      boostBarFill.style.width = pct + '%';
       boostBarFill.classList.add('danger');
-    } else if (pct > 50) {
-      boostBarFill.classList.add('warning');
+    } else {
+      const pct = Math.round(boostCharge * 100);
+      boostBarFill.style.width = pct + '%';
+      boostBarFill.classList.remove('danger');
+      if (pct > 80) {
+        boostBarFill.classList.add('danger');
+      } else if (pct > 50) {
+        boostBarFill.classList.add('warning');
+      } else {
+        boostBarFill.classList.remove('warning');
+      }
     }
     
-    // Показываем текст только при полном перегреве
-    if (boostLocked && boostCharge >= 1) {
-      boostLockedText.style.display = 'block';
-      boostLockedText.textContent = `⏳ Перегрев! Ждите ${Math.ceil(boostLockTimer)} сек.`;
-    } else {
-      boostLockedText.style.display = 'none';
-    }
+    // Никакого текста при остывании
+    boostLockedText.style.display = 'none';
     
     // Показываем x3 при ускорении
     if (boostActive) {
@@ -1382,35 +1385,61 @@
 
   canvas.addEventListener('pointerup', (e) => {
     e.preventDefault();
+    if (boostActive) {
+      boostMaxHoldTime = boostHoldTime;
+    }
     boostActive = false;
     stopTurboSound();
-    // Не блокируем при отпускании, просто начинаем остывание
+    
+    // Если был не полный перегрев, начинаем остывание
+    if (boostCharge < 1 && boostCharge > 0) {
+      boostLocked = true;
+      boostLockTimer = boostMaxHoldTime * 2;
+    }
     updateBoostBar();
   });
 
   canvas.addEventListener('pointerleave', () => {
+    if (boostActive) {
+      boostMaxHoldTime = boostHoldTime;
+    }
     boostActive = false;
     stopTurboSound();
+    
+    if (boostCharge < 1 && boostCharge > 0) {
+      boostLocked = true;
+      boostLockTimer = boostMaxHoldTime * 2;
+    }
     updateBoostBar();
   });
 
   canvas.addEventListener('pointercancel', () => {
+    if (boostActive) {
+      boostMaxHoldTime = boostHoldTime;
+    }
     boostActive = false;
     stopTurboSound();
+    
+    if (boostCharge < 1 && boostCharge > 0) {
+      boostLocked = true;
+      boostLockTimer = boostMaxHoldTime * 2;
+    }
     updateBoostBar();
   });
 
   function processBoost(dt) {
     if (boostLocked) {
-      // Полный перегрев — блокировка
+      // Остывание
       boostLockTimer -= dt;
-      boostCharge = Math.max(0, boostLockTimer / (boostHoldTime * 2 || BOOST_MAX_TIME * 2));
+      boostCharge = Math.max(0, boostLockTimer / (boostMaxHoldTime * 2 || 1));
       updateBoostBar();
       canvas.classList.remove('boost-active');
+      
       if (boostLockTimer <= 0) {
         boostLocked = false;
         boostCharge = 0;
         boostHoldTime = 0;
+        boostMaxHoldTime = 0;
         updateBoostBar();
       }
       return 1;
@@ -1424,6 +1453,7 @@
       if (boostCharge >= 1) {
         // Полный перегрев
         boostCharge = 1;
+        boostMaxHoldTime = boostHoldTime;
         boostLocked = true;
         boostLockTimer = boostHoldTime * 2;
         boostActive = false;
@@ -1437,12 +1467,6 @@
       return 3;
     } else {
       canvas.classList.remove('boost-active');
-      // Остывание если не зажат
-      if (boostCharge > 0 && !boostLocked) {
-        boostCharge = Math.max(0, boostCharge - dt * 0.5);
-        boostHoldTime = Math.max(0, boostHoldTime - dt);
-        updateBoostBar();
-      }
       return 1;
     }
   }
@@ -1506,8 +1530,9 @@
     const boostSp = processBoost(dt);
     const sp = bonusSp * boostSp;
     
-    const w = canvas.width;
-    const h = canvas.height;
+    const rect = canvasWrapper.getBoundingClientRect();
+    const w = rect.width;
+    const h = rect.height;
 
     for (const b of balls) {
       b.x += b.vx * sp * dt * 60;
@@ -1556,7 +1581,6 @@
       ctx.shadowColor = glow;
       ctx.shadowBlur = Math.min(18, b.radius * 0.6);
       ctx.beginPath();
-      // Рисуем идеальный круг
       ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
       const g = ctx.createRadialGradient(b.x - b.radius * 0.2, b.y - b.radius * 0.2, b.radius * 0.1, b.x, b.y, b.radius);
       g.addColorStop(0, '#ffffff');
@@ -1889,8 +1913,8 @@
   // ==================== РЕФЕРАЛЬНАЯ СИСТЕМА ====================
   const params = new URLSearchParams(location.search);
   if (params.get('ref') && loadUserState()) {
-    if (!sessionStorage.getItem('invited_done_v9')) {
-      sessionStorage.setItem('invited_done_v9', '1');
+    if (!sessionStorage.getItem('invited_done_v10')) {
+      sessionStorage.setItem('invited_done_v10', '1');
       userState.totalReferrals++;
       userState.vipReferrals++;
       recalcBalls();
