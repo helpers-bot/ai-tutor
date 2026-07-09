@@ -1,109 +1,671 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plinko Pro Deluxe</title>
-    <style>
-        :root { --accent: #ff6ec7; --bg: #05050f; }
-        body { margin: 0; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; align-items: center; overflow: hidden; height: 100vh; }
-        #gameCanvas { background: #0b0b1a; touch-action: none; border-left: 4px solid #333; border-right: 4px solid #333; }
-        .ui { width: 100%; max-width: 500px; padding: 15px; display: flex; justify-content: space-between; background: #16162e; z-index: 10; }
-        .menu { display: flex; gap: 10px; margin-top: 10px; }
-        button { padding: 12px 20px; border-radius: 12px; border: none; background: var(--accent); font-weight: bold; cursor: pointer; transition: transform 0.2s; }
-        button:active { transform: scale(0.95); }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=2.0, minimum-scale=0.5">
+  <title>Plinko Ball Drop — игра с физикой и магазином</title>
+  <meta name="description" content="Plinko Ball Drop: захватывающая аркада, где шарик падает среди платформ. Зарабатывайте очки, покупайте шарики и улучшайте баланс.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b6b'/%3E%3Ccircle cx='35' cy='35' r='8' fill='white'/%3E%3C/svg%3E">
+  <meta property="og:title" content="Plinko Ball Drop">
+  <meta property="og:description" content="Бросай шарик, лови множители до x20! Магазин, профиль, регистрация.">
+  <meta property="og:image" content="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'%3E%3Crect width='1200' height='630' fill='%231a1a2e'/%3E%3Ctext x='600' y='315' text-anchor='middle' fill='white' font-size='60' font-family='sans-serif'%3EPlinko Ball Drop%3C/text%3E%3C/svg%3E">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      margin: 0;
+      color: #fff;
+    }
+    .game-container {
+      max-width: 600px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      border-radius: 48px;
+      padding: 20px 20px 30px;
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: radial-gradient(circle at 20% 20%, #2d2a4e, #16132b);
+      border-radius: 36px;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 12px 25px rgba(0,0,0,0.6);
+      margin-bottom: 15px;
+      touch-action: none;
+    }
+    .panel {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 5px 0 10px;
+    }
+    .balance-box {
+      background: #1e1a33;
+      border-radius: 40px;
+      padding: 8px 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      font-size: 1.4rem;
+      box-shadow: 0 6px 0 #0b0820;
+      border: 1px solid #ffd966;
+    }
+    .ball-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 30px;
+      padding: 5px 15px;
+    }
+    button {
+      background: #ffb347;
+      border: none;
+      color: #1a1a2e;
+      font-weight: bold;
+      border-radius: 30px;
+      padding: 12px 24px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 0 #cc8a2a;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: linear-gradient(180deg, #ffb85c 0%, #ff8c2a 100%);
+      border: 1px solid #ffd58c;
+    }
+    button:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #cc8a2a;
+    }
+    button:disabled {
+      opacity: 0.5;
+      transform: translateY(2px);
+      box-shadow: 0 3px 0 #7f5a2e;
+      pointer-events: none;
+    }
+    .shop-button {
+      background: linear-gradient(180deg, #c084fc 0%, #7c3aed 100%);
+      box-shadow: 0 6px 0 #4c1d95;
+      border-color: #d8b4fe;
+    }
+    .auth-panel {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    input {
+      padding: 10px 15px;
+      border-radius: 30px;
+      border: none;
+      background: rgba(255,255,255,0.15);
+      color: white;
+      outline: none;
+      font-weight: 500;
+      width: 120px;
+      border: 1px solid rgba(255,255,255,0.25);
+    }
+    input::placeholder {
+      color: #ccc;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+    .modal-content {
+      background: #1e1836;
+      padding: 25px;
+      border-radius: 40px;
+      max-width: 360px;
+      width: 90%;
+      border: 1px solid #b794f4;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .shop-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #2a2346;
+      padding: 12px 18px;
+      border-radius: 25px;
+    }
+    .user-id {
+      font-family: monospace;
+      background: #00000040;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
-
-<div class="ui">
-    <div>💰 <span id="balance">100.0</span></div>
-    <div>🎯 x<span id="multiplier">1</span></div>
+<div class="game-container" id="gameContainer">
+  <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+    <div class="user-id" id="userIdDisplay">ID: ---</div>
+    <div class="balance-box">🪙 <span id="balanceDisplay">100</span></div>
+  </div>
+  
+  <canvas id="gameCanvas" width="400" height="500"></canvas>
+  
+  <div class="panel">
+    <div class="ball-selector">
+      <span>🔵</span>
+      <span id="currentBallValue">1</span>
+      <span>очко</span>
+    </div>
+    <button id="dropButton">🚀 Запуск</button>
+  </div>
+  
+  <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+    <button id="shopButton" class="shop-button">🛒 Магазин</button>
+    <button id="profileButton">👤 Профиль</button>
+    <button id="logoutButton" style="background:#4a4a6a;">🚪 Выйти</button>
+  </div>
+  <div style="font-size:0.9rem; margin-top:5px; color:#aaa;">Множители снизу: 0.5 • 0.8 • 1 • 2 • 5 • 8 • 10 • 15 • 20</div>
 </div>
 
-<canvas id="gameCanvas"></canvas>
+<!-- Модальное окно магазина -->
+<div id="shopModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>🛍️ Магазин шариков</h2>
+    <div id="shopItemsContainer"></div>
+    <button id="closeShopBtn">Закрыть</button>
+  </div>
+</div>
 
-<div class="menu">
-    <button onclick="launchBall()">ЗАПУСК</button>
-    <button onclick="alert('Магазин шаров')">МАГАЗИН</button>
-    <button onclick="alert('Профиль ID: 12345678')">ПРОФИЛЬ</button>
+<!-- Модальное окно профиля -->
+<div id="profileModal" class="modal hidden">
+  <div class="modal-content">
+    <h2>👤 Профиль</h2>
+    <p>Имя: <strong id="profileName"></strong></p>
+    <p>ID: <strong id="profileId"></strong></p>
+    <p>Баланс: <strong id="profileBalance"></strong></p>
+    <button id="closeProfileBtn">Закрыть</button>
+  </div>
+</div>
+
+<!-- Экран входа/регистрации -->
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <h2>🔐 Вход / Регистрация</h2>
+    <input type="text" id="usernameInput" placeholder="Ваше имя" maxlength="16">
+    <button id="loginBtn">▶ Продолжить</button>
+    <p style="font-size:0.8rem; color:#ccc;">Новый пользователь получит случайный ID из 8 цифр.</p>
+  </div>
 </div>
 
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  (function() {
+    // ---------- БАЗА ДАННЫХ В LOCALSTORAGE ----------
+    const STORAGE_KEY = 'plinko_users_db';
+    let currentUser = null; // { id, name, balance, ownedBalls }
 
-function playSound(freq, type, dur) {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
-    osc.connect(gain); gain.connect(audioCtx.destination);
-    osc.start(); osc.stop(audioCtx.currentTime + dur);
-}
-
-// Адаптация размера
-function resize() {
-    canvas.width = Math.min(window.innerWidth, 500);
-    canvas.height = window.innerHeight * 0.7;
-}
-window.onresize = resize; resize();
-
-let balance = 100, ballMult = 1, isRunning = false;
-const pins = [];
-const rows = 12, cols = 10;
-for(let i=0; i<rows; i++) {
-    for(let j=0; j<cols; j++) {
-        pins.push({ x: (canvas.width/(cols+1)) * (j + 1) + (i%2 ? 15 : -15), y: 150 + i * 35 });
+    function loadUsers() {
+      const data = localStorage.getItem(STORAGE_KEY);
+      return data ? JSON.parse(data) : {};
     }
-}
 
-function draw() {
-    ctx.fillStyle = '#0b0b1a'; ctx.fillRect(0,0, canvas.width, canvas.height);
-    ctx.fillStyle = '#ff6ec7';
-    pins.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2); ctx.fill(); });
-    // Ячейки
-    for(let i=0; i<cols; i++) {
-        ctx.fillStyle = i%2 ? '#222' : '#333';
-        ctx.fillRect(i*(canvas.width/cols), canvas.height-40, canvas.width/cols-2, 40);
+    function saveUsers(users) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
     }
-}
 
-function launchBall() {
-    if(isRunning || balance < 1) return;
-    balance--; document.getElementById('balance').innerText = balance.toFixed(1);
-    isRunning = true;
-    let ball = { x: canvas.width/2, y: 50, vx: (Math.random()-0.5)*2, vy: 2 };
+    function getOrCreateUser(name) {
+      const users = loadUsers();
+      const trimmed = name.trim();
+      if (!trimmed) return null;
+      // Ищем по имени
+      for (let [id, user] of Object.entries(users)) {
+        if (user.name === trimmed) return user;
+      }
+      // Создаём нового
+      const newId = generateUniqueId(users);
+      const newUser = {
+        id: newId,
+        name: trimmed,
+        balance: 100,
+        ownedBalls: [1], // всегда есть шарик 1 очко
+        selectedBall: 1
+      };
+      users[newId] = newUser;
+      saveUsers(users);
+      return newUser;
+    }
 
-    function frame() {
-        ball.vy += 0.2; ball.x += ball.vx; ball.y += ball.vy;
-        if(ball.x < 10 || ball.x > canvas.width-10) { ball.vx *= -0.8; playSound(100, 'square', 0.1); }
-        
-        pins.forEach(p => {
-            if(Math.hypot(ball.x-p.x, ball.y-p.y) < 10) {
-                ball.vy = -ball.vy * 0.6; ball.vx = (Math.random()-0.5)*5;
-                playSound(400, 'sine', 0.05);
-            }
-        });
+    function generateUniqueId(users) {
+      let id;
+      do {
+        id = Math.floor(10000000 + Math.random() * 90000000).toString();
+      } while (users[id]);
+      return id;
+    }
 
-        draw();
-        ctx.fillStyle = 'white'; ctx.beginPath(); ctx.arc(ball.x, ball.y, 8, 0, Math.PI*2); ctx.fill();
+    function updateUserData(updatedUser) {
+      const users = loadUsers();
+      if (users[updatedUser.id]) {
+        users[updatedUser.id] = updatedUser;
+        saveUsers(users);
+        currentUser = updatedUser;
+      }
+    }
 
-        if(ball.y < canvas.height - 40) requestAnimationFrame(frame);
-        else {
-            const idx = Math.floor(ball.x / (canvas.width/cols));
-            const rewards = [0.2, 0.5, 1, 2, 5, 5, 2, 1, 0.5, 0.2];
-            balance += rewards[idx] * ballMult;
-            document.getElementById('balance').innerText = balance.toFixed(1);
-            playSound(800, 'triangle', 0.3);
-            isRunning = false;
+    // ---------- СОСТОЯНИЕ ИГРЫ ----------
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Физические параметры
+    const GRAVITY = 0.35;
+    const BOUNCE = 0.55;
+    const PLATFORM_RADIUS = 6;
+    const BALL_RADIUS = 9;
+
+    // Треугольник платформ (пины)
+    let platforms = [];
+    const rows = 7; // рядов
+    const startY = 110;
+    const rowSpacing = 42;
+    const colBaseX = 200; // центр
+    const colSpacing = 38;
+
+    // Множители внизу (слева направо)
+    const multipliers = [0.5, 0.8, 1, 2, 5, 8, 10, 15, 20];
+    const binCount = multipliers.length;
+
+    let ball = {
+      x: 200,
+      y: 45,
+      vx: 0,
+      vy: 0,
+      active: false,
+      value: 1
+    };
+
+    let gameActive = false;
+    let dropRequested = false;
+
+    // UI элементы
+    const balanceSpan = document.getElementById('balanceDisplay');
+    const currentBallValueSpan = document.getElementById('currentBallValue');
+    const userIdDisplay = document.getElementById('userIdDisplay');
+    const dropButton = document.getElementById('dropButton');
+    const authModal = document.getElementById('authModal');
+    const usernameInput = document.getElementById('usernameInput');
+    const loginBtn = document.getElementById('loginBtn');
+
+    function buildPlatforms() {
+      platforms = [];
+      for (let r = 0; r < rows; r++) {
+        const y = startY + r * rowSpacing;
+        const pinsInRow = r + 3; // 3,4,5,6,7,8,9
+        const totalWidth = (pinsInRow - 1) * colSpacing;
+        const startX = colBaseX - totalWidth / 2;
+        for (let c = 0; c < pinsInRow; c++) {
+          platforms.push({
+            x: startX + c * colSpacing,
+            y: y,
+            radius: PLATFORM_RADIUS
+          });
         }
+      }
     }
-    frame();
-}
-draw();
+    buildPlatforms();
+
+    function resetBall() {
+      ball.active = false;
+      ball.x = 200;
+      ball.y = 45;
+      ball.vx = 0;
+      ball.vy = 0;
+      gameActive = false;
+    }
+
+    function getCurrentBallValue() {
+      return currentUser ? currentUser.selectedBall : 1;
+    }
+
+    function updateUI() {
+      if (!currentUser) {
+        balanceSpan.textContent = '0';
+        currentBallValueSpan.textContent = '1';
+        userIdDisplay.textContent = 'ID: ---';
+        return;
+      }
+      balanceSpan.textContent = Math.floor(currentUser.balance);
+      currentBallValueSpan.textContent = currentUser.selectedBall;
+      userIdDisplay.textContent = `ID: ${currentUser.id}`;
+    }
+
+    function dropBall() {
+      if (!currentUser) {
+        alert('Сначала войдите в профиль!');
+        return;
+      }
+      if (gameActive || ball.active) return;
+      const ballCost = currentUser.selectedBall;
+      if (currentUser.balance < ballCost) {
+        alert('Недостаточно средств!');
+        return;
+      }
+      // Списываем стоимость
+      currentUser.balance -= ballCost;
+      updateUserData(currentUser);
+      updateUI();
+
+      ball.value = ballCost;
+      ball.active = true;
+      gameActive = true;
+      ball.x = 200 + (Math.random() - 0.5) * 12;
+      ball.y = 45;
+      ball.vx = (Math.random() - 0.5) * 2.2;
+      ball.vy = 0.8;
+    }
+
+    function applyPhysics() {
+      if (!ball.active || !gameActive) return;
+
+      ball.vy += GRAVITY;
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      // Границы стен
+      if (ball.x - BALL_RADIUS < 5) {
+        ball.x = BALL_RADIUS + 5;
+        ball.vx *= -BOUNCE;
+      }
+      if (ball.x + BALL_RADIUS > canvas.width - 5) {
+        ball.x = canvas.width - BALL_RADIUS - 5;
+        ball.vx *= -BOUNCE;
+      }
+
+      // Столкновение с платформами
+      for (let p of platforms) {
+        const dx = ball.x - p.x;
+        const dy = ball.y - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const minDist = BALL_RADIUS + p.radius;
+        if (dist < minDist && dist > 0.001) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          // выталкиваем
+          const overlap = minDist - dist;
+          ball.x += nx * overlap;
+          ball.y += ny * overlap;
+          // отражение скорости
+          const vn = ball.vx * nx + ball.vy * ny;
+          if (vn < 0) {
+            ball.vx -= (1 + BOUNCE) * vn * nx;
+            ball.vy -= (1 + BOUNCE) * vn * ny;
+          }
+          // небольшое затухание
+          ball.vx *= 0.998;
+          ball.vy *= 0.998;
+        }
+      }
+
+      // Проверка попадания в нижние ячейки
+      if (ball.y + BALL_RADIUS > canvas.height - 30) {
+        const binWidth = canvas.width / binCount;
+        let binIndex = Math.floor(ball.x / binWidth);
+        if (binIndex < 0) binIndex = 0;
+        if (binIndex >= binCount) binIndex = binCount - 1;
+        const multiplier = multipliers[binIndex];
+        const winnings = Math.floor(ball.value * multiplier);
+        if (currentUser) {
+          currentUser.balance += winnings;
+          updateUserData(currentUser);
+        }
+        updateUI();
+        resetBall();
+        gameActive = false;
+      }
+
+      // Если улетел вверх или слишком далеко - сброс
+      if (ball.y > canvas.height + 50 || ball.y < -50) {
+        resetBall();
+        gameActive = false;
+      }
+    }
+
+    function drawScene() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Рисуем платформы (пины)
+      ctx.shadowColor = '#ffd966';
+      ctx.shadowBlur = 8;
+      for (let p of platforms) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#f4d03f';
+        ctx.fill();
+        ctx.strokeStyle = '#b7950b';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
+
+      // Нижние ячейки с множителями
+      const binWidth = canvas.width / binCount;
+      for (let i = 0; i < binCount; i++) {
+        const x = i * binWidth;
+        ctx.fillStyle = i % 2 === 0 ? '#2c2540' : '#3b3155';
+        ctx.fillRect(x, canvas.height - 35, binWidth, 35);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 13px "Segoe UI"';
+        ctx.textAlign = 'center';
+        ctx.fillText(`x${multipliers[i]}`, x + binWidth/2, canvas.height - 12);
+        ctx.strokeStyle = '#9b8ec4';
+        ctx.strokeRect(x, canvas.height-35, binWidth, 35);
+      }
+
+      // Шарик
+      if (ball.active || !gameActive) {
+        ctx.shadowColor = '#ff9f43';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
+        const gradient = ctx.createRadialGradient(ball.x-3, ball.y-3, 2, ball.x, ball.y, BALL_RADIUS+2);
+        gradient.addColorStop(0, '#ffcc80');
+        gradient.addColorStop(0.7, '#e65100');
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+        // значение шарика
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 12px "Segoe UI"';
+        ctx.textAlign = 'center';
+        ctx.fillText(ball.value, ball.x, ball.y-14);
+      }
+    }
+
+    function gameLoop() {
+      if (gameActive && ball.active) {
+        applyPhysics();
+      }
+      drawScene();
+      requestAnimationFrame(gameLoop);
+    }
+
+    // ---------- МАГАЗИН ----------
+    function openShop() {
+      if (!currentUser) {
+        alert('Войдите в аккаунт');
+        return;
+      }
+      const shopModal = document.getElementById('shopModal');
+      const container = document.getElementById('shopItemsContainer');
+      container.innerHTML = '';
+      for (let val = 2; val <= 10; val++) {
+        const price = val * 25; // цена покупки шарика
+        const owned = currentUser.ownedBalls.includes(val);
+        const div = document.createElement('div');
+        div.className = 'shop-item';
+        div.innerHTML = `
+          <span>🔵 Шарик ${val} очков</span>
+          <span>${owned ? '✅ Куплен' : `💰 ${price} монет`}</span>
+          ${!owned ? `<button class="buyBallBtn" data-value="${val}">Купить</button>` : `<button disabled>✓</button>`}
+        `;
+        container.appendChild(div);
+      }
+      document.querySelectorAll('.buyBallBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const value = parseInt(e.target.getAttribute('data-value'));
+          buyBall(value);
+        });
+      });
+      shopModal.classList.remove('hidden');
+    }
+
+    function buyBall(value) {
+      if (!currentUser) return;
+      const price = value * 25;
+      if (currentUser.balance < price) {
+        alert('Недостаточно монет!');
+        return;
+      }
+      if (currentUser.ownedBalls.includes(value)) {
+        alert('Уже куплен!');
+        return;
+      }
+      currentUser.balance -= price;
+      currentUser.ownedBalls.push(value);
+      currentUser.ownedBalls.sort((a,b)=>a-b);
+      updateUserData(currentUser);
+      updateUI();
+      openShop(); // обновить окно
+    }
+
+    function selectBall(value) {
+      if (!currentUser) return;
+      if (!currentUser.ownedBalls.includes(value)) {
+        alert('Купите этот шарик в магазине!');
+        return;
+      }
+      currentUser.selectedBall = value;
+      updateUserData(currentUser);
+      updateUI();
+    }
+
+    // ---------- ПРОФИЛЬ И АВТОРИЗАЦИЯ ----------
+    function showProfile() {
+      if (!currentUser) return;
+      document.getElementById('profileName').textContent = currentUser.name;
+      document.getElementById('profileId').textContent = currentUser.id;
+      document.getElementById('profileBalance').textContent = Math.floor(currentUser.balance);
+      document.getElementById('profileModal').classList.remove('hidden');
+    }
+
+    function loginUser(name) {
+      const user = getOrCreateUser(name);
+      if (!user) {
+        alert('Введите имя');
+        return;
+      }
+      currentUser = user;
+      authModal.classList.add('hidden');
+      updateUI();
+      resetBall();
+    }
+
+    function logout() {
+      currentUser = null;
+      authModal.classList.remove('hidden');
+      resetBall();
+      updateUI();
+    }
+
+    // Проверка сохранённой сессии
+    function checkSavedSession() {
+      const savedId = localStorage.getItem('plinko_current_id');
+      if (savedId) {
+        const users = loadUsers();
+        if (users[savedId]) {
+          currentUser = users[savedId];
+          authModal.classList.add('hidden');
+          updateUI();
+          return;
+        }
+      }
+      authModal.classList.remove('hidden');
+    }
+
+    // Слушатели событий
+    dropButton.addEventListener('click', dropBall);
+    document.getElementById('shopButton').addEventListener('click', openShop);
+    document.getElementById('profileButton').addEventListener('click', showProfile);
+    document.getElementById('logoutButton').addEventListener('click', logout);
+    document.getElementById('closeShopBtn').addEventListener('click', ()=> document.getElementById('shopModal').classList.add('hidden'));
+    document.getElementById('closeProfileBtn').addEventListener('click', ()=> document.getElementById('profileModal').classList.add('hidden'));
+    loginBtn.addEventListener('click', ()=>{
+      const name = usernameInput.value.trim();
+      if(name) loginUser(name);
+    });
+    usernameInput.addEventListener('keypress', (e)=>{
+      if(e.key==='Enter') loginBtn.click();
+    });
+
+    // Переключение шарика по клику на значение
+    currentBallValueSpan.addEventListener('click', ()=>{
+      if(!currentUser) return;
+      const balls = currentUser.ownedBalls;
+      if(balls.length<=1) {
+        alert('У вас только один шарик (1 очко). Купите новые в магазине.');
+        return;
+      }
+      const currentIdx = balls.indexOf(currentUser.selectedBall);
+      const nextIdx = (currentIdx + 1) % balls.length;
+      selectBall(balls[nextIdx]);
+    });
+    currentBallValueSpan.style.cursor = 'pointer';
+    currentBallValueSpan.title = 'Нажмите для смены шарика';
+
+    // Сохранение ID сессии
+    window.addEventListener('beforeunload', ()=>{
+      if(currentUser) localStorage.setItem('plinko_current_id', currentUser.id);
+    });
+
+    // Инициализация
+    buildPlatforms();
+    checkSavedSession();
+    gameLoop();
+    updateUI();
+  })();
 </script>
 </body>
 </html>
