@@ -263,14 +263,15 @@
       aspect-ratio: 4/3;
       max-height: 50vh;
       flex-shrink: 0;
+      overflow: hidden;
     }
     
     canvas {
       width: 100%;
       height: 100%;
+      display: block;
       background: radial-gradient(circle at center, #12122a 0%, #0a0a1a 100%);
       border-radius: clamp(20px, 3vw, 24px);
-      display: block;
       box-shadow: inset 0 0 30px rgba(0,0,0,0.8), 0 0 20px rgba(120,115,245,0.2);
       touch-action: none;
       border: 2px solid #2a2a5a;
@@ -300,6 +301,24 @@
     
     .hold-hint.hidden {
       opacity: 0;
+    }
+    
+    .boost-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 68, 68, 0.4);
+      font-size: clamp(3rem, 8vw, 5rem);
+      font-weight: 900;
+      pointer-events: none;
+      z-index: 5;
+      display: none;
+      text-shadow: 0 0 30px rgba(255,0,0,0.6);
+    }
+    
+    .boost-indicator.active {
+      display: block;
     }
     
     .floating-text {
@@ -666,7 +685,6 @@
       margin: 2px;
     }
     
-    /* Медиа-запросы для разных устройств */
     @media (max-width: 360px) {
       .game-container {
         gap: 6px;
@@ -688,31 +706,6 @@
       }
       .canvas-wrapper {
         max-height: 350px;
-      }
-    }
-    
-    @media (orientation: landscape) and (max-height: 500px) {
-      .game-container {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-      .top-panel {
-        width: 100%;
-      }
-      .balls-slots {
-        width: 100%;
-      }
-      .canvas-wrapper {
-        width: 60%;
-        max-height: 250px;
-      }
-      .boost-bar-container {
-        width: 60%;
-      }
-      .buttons-grid {
-        width: 35%;
-        flex-direction: column;
       }
     }
   </style>
@@ -760,6 +753,7 @@
     <div class="canvas-wrapper" id="canvasWrapper">
       <canvas id="gameCanvas"></canvas>
       <div class="hold-hint" id="holdHint">ЗАЖМИ</div>
+      <div class="boost-indicator" id="boostIndicator">x3</div>
     </div>
     <div class="boost-bar-container">
       <div class="boost-bar-fill" id="boostBarFill"></div>
@@ -920,7 +914,6 @@
       turboOsc = audioCtx.createOscillator();
       turboGain = audioCtx.createGain();
       
-      // Создаём фильтр для более мягкого звука
       const filter = audioCtx.createBiquadFilter();
       filter.type = 'lowpass';
       filter.frequency.setValueAtTime(300, audioCtx.currentTime);
@@ -932,7 +925,6 @@
       turboOsc.type = 'sawtooth';
       turboOsc.frequency.setValueAtTime(50, audioCtx.currentTime);
       
-      // Тише чем удары: громкость 0.04 вместо 0.08
       turboGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
       
       turboOsc.start();
@@ -954,9 +946,9 @@
   }
 
   // ==================== БАЗА ДАННЫХ ====================
-  const USERS_KEY = 'vds_users_v8';
-  const SESSION_KEY = 'vds_session_v8';
-  const SAVED_CREDS_KEY = 'vds_saved_creds_v8';
+  const USERS_KEY = 'vds_users_v9';
+  const SESSION_KEY = 'vds_session_v9';
+  const SAVED_CREDS_KEY = 'vds_saved_creds_v9';
 
   function getUsers() {
     const data = localStorage.getItem(USERS_KEY);
@@ -1195,6 +1187,7 @@
   const ctx = canvas.getContext('2d');
   const canvasWrapper = document.getElementById('canvasWrapper');
   const holdHint = document.getElementById('holdHint');
+  const boostIndicator = document.getElementById('boostIndicator');
   
   function resizeCanvas() {
     const rect = canvasWrapper.getBoundingClientRect();
@@ -1202,8 +1195,23 @@
     const height = rect.height;
     
     if (width > 0 && height > 0) {
+      // Устанавливаем размер канваса точно по размеру контейнера
       canvas.width = width;
       canvas.height = height;
+      
+      // Обновляем шары при изменении размера
+      if (balls.length > 0) {
+        const minDim = Math.min(width, height);
+        const newRadius = Math.min(BALL_RADIUS_BASE, minDim * 0.045);
+        const scaleX = width / (canvas.width || width);
+        const scaleY = height / (canvas.height || height);
+        
+        for (const b of balls) {
+          b.radius = newRadius;
+          b.x = Math.min(Math.max(b.x, b.radius), width - b.radius);
+          b.y = Math.min(Math.max(b.y, b.radius), height - b.radius);
+        }
+      }
     }
   }
   
@@ -1225,10 +1233,6 @@
       this.colorIndex = colorIndex;
       this.mass = 1;
     }
-    
-    getScaledRadius(scaleX, scaleY) {
-      return Math.min(this.radius * Math.min(scaleX, scaleY), this.radius * 1.2);
-    }
   }
 
   let balls = [];
@@ -1238,7 +1242,7 @@
     const w = canvas.width || 400;
     const h = canvas.height || 300;
     const minDim = Math.min(w, h);
-    const radius = Math.min(BALL_RADIUS_BASE, minDim * 0.05);
+    const radius = Math.min(BALL_RADIUS_BASE, minDim * 0.045);
     
     for (let i = 0; i < count; i++) {
       let x, y, overlapping;
@@ -1270,6 +1274,15 @@
     const desired = Math.min(userState.activeBallsInGame, userState.ballsCount);
     if (balls.length !== desired) {
       createBalls(desired);
+    } else {
+      // Обновляем радиусы существующих шаров
+      const w = canvas.width || 400;
+      const h = canvas.height || 300;
+      const minDim = Math.min(w, h);
+      const newRadius = Math.min(BALL_RADIUS_BASE, minDim * 0.045);
+      for (const b of balls) {
+        b.radius = newRadius;
+      }
     }
   }
 
@@ -1294,9 +1307,9 @@
     const canvasRect = canvas.getBoundingClientRect();
     const wrapperRect = canvasWrapper.getBoundingClientRect();
 
+    const size = BALL_RADIUS_BASE * 2;
     const dropBall = document.createElement('div');
     dropBall.className = 'ball-drop';
-    const size = BALL_RADIUS_BASE * 2;
     dropBall.style.width = size + 'px';
     dropBall.style.height = size + 'px';
     dropBall.style.borderRadius = '50%';
@@ -1323,7 +1336,7 @@
   let boostLocked = false;
   let boostLockTimer = 0;
   let boostCharge = 0;
-  let boostHoldTime = 0; // сколько времени держали палец
+  let boostHoldTime = 0;
   const BOOST_MAX_TIME = 10;
   const boostBarFill = document.getElementById('boostBarFill');
   const boostLockedText = document.getElementById('boostLockedText');
@@ -1338,11 +1351,19 @@
       boostBarFill.classList.add('warning');
     }
     
-    if (boostLocked) {
+    // Показываем текст только при полном перегреве
+    if (boostLocked && boostCharge >= 1) {
       boostLockedText.style.display = 'block';
       boostLockedText.textContent = `⏳ Перегрев! Ждите ${Math.ceil(boostLockTimer)} сек.`;
     } else {
       boostLockedText.style.display = 'none';
+    }
+    
+    // Показываем x3 при ускорении
+    if (boostActive) {
+      boostIndicator.classList.add('active');
+    } else {
+      boostIndicator.classList.remove('active');
     }
   }
 
@@ -1361,47 +1382,27 @@
 
   canvas.addEventListener('pointerup', (e) => {
     e.preventDefault();
-    if (boostActive) {
-      // Если палец убран до перегрева, время охлаждения = 2 * время удержания
-      if (boostCharge < 1) {
-        boostLocked = true;
-        boostLockTimer = boostHoldTime * 2;
-        boostCharge = 1; // полоса полная, будет убывать
-      }
-    }
     boostActive = false;
-    boostHoldTime = 0;
     stopTurboSound();
+    // Не блокируем при отпускании, просто начинаем остывание
+    updateBoostBar();
   });
 
   canvas.addEventListener('pointerleave', () => {
-    if (boostActive) {
-      if (boostCharge < 1) {
-        boostLocked = true;
-        boostLockTimer = boostHoldTime * 2;
-        boostCharge = 1;
-      }
-    }
     boostActive = false;
-    boostHoldTime = 0;
     stopTurboSound();
+    updateBoostBar();
   });
 
   canvas.addEventListener('pointercancel', () => {
-    if (boostActive) {
-      if (boostCharge < 1) {
-        boostLocked = true;
-        boostLockTimer = boostHoldTime * 2;
-        boostCharge = 1;
-      }
-    }
     boostActive = false;
-    boostHoldTime = 0;
     stopTurboSound();
+    updateBoostBar();
   });
 
   function processBoost(dt) {
     if (boostLocked) {
+      // Полный перегрев — блокировка
       boostLockTimer -= dt;
       boostCharge = Math.max(0, boostLockTimer / (boostHoldTime * 2 || BOOST_MAX_TIME * 2));
       updateBoostBar();
@@ -1421,6 +1422,7 @@
       boostCharge = Math.min(1, boostHoldTime / BOOST_MAX_TIME);
       
       if (boostCharge >= 1) {
+        // Полный перегрев
         boostCharge = 1;
         boostLocked = true;
         boostLockTimer = boostHoldTime * 2;
@@ -1435,8 +1437,10 @@
       return 3;
     } else {
       canvas.classList.remove('boost-active');
+      // Остывание если не зажат
       if (boostCharge > 0 && !boostLocked) {
         boostCharge = Math.max(0, boostCharge - dt * 0.5);
+        boostHoldTime = Math.max(0, boostHoldTime - dt);
         updateBoostBar();
       }
       return 1;
@@ -1552,6 +1556,7 @@
       ctx.shadowColor = glow;
       ctx.shadowBlur = Math.min(18, b.radius * 0.6);
       ctx.beginPath();
+      // Рисуем идеальный круг
       ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
       const g = ctx.createRadialGradient(b.x - b.radius * 0.2, b.y - b.radius * 0.2, b.radius * 0.1, b.x, b.y, b.radius);
       g.addColorStop(0, '#ffffff');
@@ -1884,8 +1889,8 @@
   // ==================== РЕФЕРАЛЬНАЯ СИСТЕМА ====================
   const params = new URLSearchParams(location.search);
   if (params.get('ref') && loadUserState()) {
-    if (!sessionStorage.getItem('invited_done_v8')) {
-      sessionStorage.setItem('invited_done_v8', '1');
+    if (!sessionStorage.getItem('invited_done_v9')) {
+      sessionStorage.setItem('invited_done_v9', '1');
       userState.totalReferrals++;
       userState.vipReferrals++;
       recalcBalls();
