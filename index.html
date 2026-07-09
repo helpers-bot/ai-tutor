@@ -158,15 +158,17 @@
 <div class="modal" id="vipModal">
   <div class="modal-content">
     <h3>💎 VIP статус</h3>
-    <p>⭐ Звёзды за удар: <strong>2 вместо 1</strong></p>
+    <p>⭐ Базовые звёзды за удар: <strong>0.5</strong></p>
     <div class="vip-option">
       <strong>📅 На 1 месяц</strong>
+      <p>Бонус: <strong>+1 звезда (итого 1.5)</strong></p>
       <p>Стоимость: <strong>1$</strong></p>
       <p id="vipMonthInfo"></p>
       <button class="close-btn" id="buyVipMonthBtn">Купить на месяц</button>
     </div>
     <div class="vip-option">
       <strong>♾️ Навсегда</strong>
+      <p>Бонус: <strong>+2 звезды (итого 2.5)</strong></p>
       <p>Стоимость: <strong>20$</strong></p>
       <button class="close-btn" id="buyVipForeverBtn">Купить навсегда</button>
     </div>
@@ -409,7 +411,7 @@
           const offlineSeconds = Math.floor(elapsed / 1000);
           const ballsInGame = Math.min(userState.activeBallsInGame, userState.ballsCount);
           const hitsPerSecond = ballsInGame * 2;
-          const starsPerHit = userState.isVip ? 2 : 1;
+          const starsPerHit = userState.isVip ? (userState.vipExpiry ? 1.5 : 2.5) : 0.5;
           const earned = Math.floor(offlineSeconds * hitsPerSecond * starsPerHit * 0.3);
           if (earned > 0) {
             userState.balance += earned;
@@ -940,7 +942,7 @@
       }
 
       if (hit) {
-        const stars = userState.isVip ? 2 : 1;
+        const stars = userState.isVip ? (userState.vipExpiry ? 1.5 : 2.5) : 0.5;
         userState.balance += stars;
         spawnFloatingText(b.x, b.y - b.radius, `+${stars}`);
         playBounceSound();
@@ -1059,7 +1061,8 @@
     if (userState.isVip) {
       vipEl.className = 'vip-badge';
       const expiry = userState.vipExpiry ? new Date(userState.vipExpiry).toLocaleDateString() : 'навсегда';
-      vipEl.textContent = `VIP ⭐x2`;
+      const vipBonusText = userState.vipExpiry ? '+1' : '+2';
+      vipEl.textContent = `VIP ⭐${vipBonusText}`;
     } else {
       vipEl.className = 'no-vip';
       vipEl.textContent = 'VIP';
