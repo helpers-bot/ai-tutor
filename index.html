@@ -39,11 +39,22 @@
       align-items: center;
       border: 1px solid rgba(255, 255, 255, 0.2);
       margin: auto;
+      transition: transform 0.1s ease;
+    }
+    .shake-active {
+      animation: shake 0.08s infinite;
+    }
+    @keyframes shake {
+      0% { transform: translate(0px, 0px); }
+      25% { transform: translate(-3px, 2px); }
+      50% { transform: translate(3px, -2px); }
+      75% { transform: translate(-2px, -1px); }
+      100% { transform: translate(2px, 1px); }
     }
     canvas {
       display: block;
       width: 100%;
-      height: auto;
+      aspect-ratio: 1 / 1;
       max-height: 62vh;
       background: radial-gradient(circle at 30% 30%, #2d2a4e, #0d0b1a);
       border-radius: 36px;
@@ -71,7 +82,6 @@
       font-size: 1.5rem;
       box-shadow: 0 4px 0 #0b0820;
       border: 1px solid #ffd966;
-      transition: transform 0.2s;
     }
     .ball-selector {
       display: flex;
@@ -88,8 +98,8 @@
       color: #1a1a2e;
       font-weight: bold;
       border-radius: 30px;
-      padding: 12px 22px;
-      font-size: 1rem;
+      padding: 12px 18px;
+      font-size: 0.95rem;
       cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 5px 0 #cc8a2a;
@@ -208,7 +218,7 @@
     <div class="balance-box">⭐ <span id="balanceDisplay">100</span></div>
   </div>
   
-  <canvas id="gameCanvas" width="400" height="460"></canvas>
+  <canvas id="gameCanvas" width="440" height="440"></canvas>
   
   <div class="panel">
     <div class="ball-selector">
@@ -221,12 +231,12 @@
   
   <div class="action-row">
     <button id="shopButton" class="shop-button">🛒 Магазин</button>
+    <button id="shakeButton" style="background:#5d5b8a;">📳 Встряхнуть</button>
     <button id="profileButton">👤 Профиль</button>
     <button id="logoutButton" style="background:#4a4a6a;">🚪 Выйти</button>
   </div>
 </div>
 
-<!-- Модальное окно магазина -->
 <div id="shopModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="color:#ffd966;">🛍️ Магазин шариков</h2>
@@ -235,7 +245,6 @@
   </div>
 </div>
 
-<!-- Профиль -->
 <div id="profileModal" class="modal hidden">
   <div class="modal-content">
     <h2>👤 Профиль</h2>
@@ -246,7 +255,6 @@
   </div>
 </div>
 
-<!-- Авторизация -->
 <div id="authModal" class="modal">
   <div class="modal-content">
     <h2>🔐 Вход / Регистрация</h2>
@@ -305,32 +313,30 @@
 
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const GRAVITY = 0.22;  // легче
+    const GRAVITY = 0.22;
     const BOUNCE = 0.5;
     const PLATFORM_RADIUS = 5.2;
     const BALL_RADIUS = 8;
 
     let platforms = [];
     const rows = 7;
-    const startY = 95;
-    const rowSpacing = 38;
-    const colBaseX = 200;
-    const colSpacing = 34;
+    const startY = 105;
+    const rowSpacing = 35;
+    const colSpacing = 32;
+    const colBaseX = 220; // центр canvas 440
 
-    // Новые ячейки: симметрично, центр 0.1, дальше пары 0.5,1,2,5,8,10,15,20
     const multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
     const binCount = multipliers.length;
 
     let ball = {
-      x: 200, y: 45, vx: 0, vy: 0, active: false, value: 1
+      x: 220, y: 65, vx: 0, vy: 0, active: false, value: 1
     };
     let gameActive = false;
-    // Параметры качания на нитке
     let swingAngle = 0;
     let swingSpeed = 0.04;
-    const stringAnchorX = 200;
-    const stringAnchorY = 22;
-    const stringLength = 30;
+    const stringAnchorX = 220;
+    const stringAnchorY = 18;
+    const stringLength = 48; // длиннее нитка
 
     const balanceSpan = document.getElementById('balanceDisplay');
     const currentBallValueSpan = document.getElementById('currentBallValue');
@@ -340,15 +346,15 @@
     const authModal = document.getElementById('authModal');
     const usernameInput = document.getElementById('usernameInput');
     const loginBtn = document.getElementById('loginBtn');
+    const gameContainer = document.getElementById('gameContainer');
 
     function buildPlatforms() {
       platforms = [];
       for (let r = 0; r < rows; r++) {
         const y = startY + r * rowSpacing;
-        const pinsInRow = r + 3;
+        const pinsInRow = 12; // полностью закрывают ширину
         const totalWidth = (pinsInRow - 1) * colSpacing;
         const startX = colBaseX - totalWidth / 2;
-        // шахматный сдвиг для чётных рядов
         const offsetX = (r % 2 === 0) ? 0 : colSpacing * 0.5;
         for (let c = 0; c < pinsInRow; c++) {
           platforms.push({
@@ -407,19 +413,18 @@
       gameActive = true;
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
-      ball.vx = Math.sin(swingAngle) * 1.8;
+      ball.vx = Math.sin(swingAngle) * 2.2;
       ball.vy = 0.9;
     }
 
     function applyPhysics() {
       if (!ball.active || !gameActive) return;
-
       ball.vy += GRAVITY;
       ball.x += ball.vx;
       ball.y += ball.vy;
 
-      if (ball.x - BALL_RADIUS < 3) { ball.x = BALL_RADIUS + 3; ball.vx *= -BOUNCE; }
-      if (ball.x + BALL_RADIUS > canvas.width - 3) { ball.x = canvas.width - BALL_RADIUS - 3; ball.vx *= -BOUNCE; }
+      if (ball.x - BALL_RADIUS < 2) { ball.x = BALL_RADIUS + 2; ball.vx *= -BOUNCE; }
+      if (ball.x + BALL_RADIUS > canvas.width - 2) { ball.x = canvas.width - BALL_RADIUS - 2; ball.vx *= -BOUNCE; }
 
       for (let p of platforms) {
         const dx = ball.x - p.x;
@@ -440,7 +445,7 @@
         }
       }
 
-      if (ball.y + BALL_RADIUS > canvas.height - 28) {
+      if (ball.y + BALL_RADIUS > canvas.height - 30) {
         const binWidth = canvas.width / binCount;
         let binIndex = Math.floor(ball.x / binWidth);
         if (binIndex < 0) binIndex = 0;
@@ -455,15 +460,14 @@
         resetBall();
         gameActive = false;
       }
-      if (ball.y > canvas.height + 60 || ball.y < -40) { resetBall(); gameActive = false; }
+      if (ball.y > canvas.height + 70 || ball.y < -50) { resetBall(); gameActive = false; }
     }
 
     function drawScene() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
-      // Нитка и качающийся шар до падения
       if (!ball.active && !gameActive) {
         swingAngle += swingSpeed;
-        if (swingAngle > 0.35 || swingAngle < -0.35) swingSpeed *= -1;
+        if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1; // амплитуда х5 (0.35*5≈1.75)
         const ballX = stringAnchorX + Math.sin(swingAngle) * stringLength;
         const ballY = stringAnchorY + Math.cos(swingAngle) * stringLength;
         ctx.beginPath();
@@ -480,7 +484,6 @@
         ctx.stroke();
       }
 
-      // Платформы
       ctx.shadowColor = '#ffd966';
       ctx.shadowBlur = 6;
       for (let p of platforms) {
@@ -494,7 +497,6 @@
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
 
-      // Ячейки
       const binWidth = canvas.width / binCount;
       for (let i = 0; i < binCount; i++) {
         const x = i * binWidth;
@@ -508,7 +510,6 @@
         ctx.strokeRect(x, canvas.height-30, binWidth, 30);
       }
 
-      // Активный шарик
       if (ball.active) {
         ctx.shadowColor = '#ff9f43';
         ctx.shadowBlur = 12;
@@ -531,6 +532,19 @@
       requestAnimationFrame(gameLoop);
     }
 
+    function shakeScreen() {
+      if (gameContainer.classList.contains('shake-active')) return;
+      gameContainer.classList.add('shake-active');
+      setTimeout(() => {
+        gameContainer.classList.remove('shake-active');
+      }, 1000);
+      // также небольшой импульс шарику, если активен
+      if (ball.active && gameActive) {
+        ball.vx += (Math.random() - 0.5) * 3.5;
+        ball.vy += (Math.random() - 0.2) * 2.8;
+      }
+    }
+
     function openShop() {
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
       const container = document.getElementById('shopItemsContainer');
@@ -549,9 +563,7 @@
         container.appendChild(div);
       }
       document.querySelectorAll('.buyBallBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          buyBall(parseInt(e.target.getAttribute('data-value')));
-        });
+        btn.addEventListener('click', (e) => buyBall(parseInt(e.target.getAttribute('data-value'))));
       });
       document.getElementById('shopModal').classList.remove('hidden');
     }
@@ -621,6 +633,7 @@
     document.getElementById('logoutButton').addEventListener('click', logout);
     document.getElementById('closeShopBtn').addEventListener('click', ()=> document.getElementById('shopModal').classList.add('hidden'));
     document.getElementById('closeProfileBtn').addEventListener('click', ()=> document.getElementById('profileModal').classList.add('hidden'));
+    document.getElementById('shakeButton').addEventListener('click', shakeScreen);
     loginBtn.addEventListener('click', ()=>{
       if(usernameInput.value.trim()) loginUser(usernameInput.value.trim());
     });
@@ -631,8 +644,7 @@
       const balls = currentUser.ownedBalls;
       if(balls.length<=1) { alert('Купите новые шарики в магазине.'); return; }
       const idx = balls.indexOf(currentUser.selectedBall);
-      const next = balls[(idx+1)%balls.length];
-      selectBall(next);
+      selectBall(balls[(idx+1)%balls.length]);
     });
     currentBallValueSpan.style.cursor = 'pointer';
 
