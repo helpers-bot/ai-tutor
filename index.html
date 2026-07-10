@@ -740,7 +740,36 @@
       const w = canvas.width;
       const margin = 10;
       
-      for (let r = 0; r < rows; r++) {
+      // Добавляем вертикальные полосы препятствий слева и справа
+      const sidePlatformCount = Math.floor(rows * 0.7); // Количество боковых препятствий
+      const sideSpacing = (canvas.height - startY - 100) / sidePlatformCount;
+      const leftX = margin + 25; // Левая полоса, не слишком далеко от стены
+      const rightX = w - margin - 25; // Правая полоса
+      
+      for (let i = 0; i < sidePlatformCount; i++) {
+        const y = startY + 50 + i * sideSpacing;
+        if (y < canvas.height - 80) {
+          // Левое препятствие
+          platforms.push({
+            x: leftX,
+            y: y,
+            radius: PLATFORM_RADIUS + 1.5,
+            color1: '#ff6644',
+            type: 'side'
+          });
+          // Правое препятствие
+          platforms.push({
+            x: rightX,
+            y: y,
+            radius: PLATFORM_RADIUS + 1.5,
+            color1: '#44aaff',
+            type: 'side'
+          });
+        }
+      }
+      
+      // Основные препятствия (исключаем последний ряд, где r = rows - 1)
+      for (let r = 0; r < rows - 1; r++) {
         const y = startY + r * rowSpacing;
         if (y < startY + 10) continue;
         
@@ -753,6 +782,9 @@
         for (let c = 0; c < pinsInRow; c++) {
           const px = startX + c * colSpacing + offsetX;
           if (px < margin || px > w - margin) continue;
+          
+          // Пропускаем позиции слишком близко к боковым препятствиям
+          if (Math.abs(px - leftX) < 20 || Math.abs(px - rightX) < 20) continue;
           
           let overlapped = false;
           for (let s of specials) {
@@ -808,6 +840,7 @@
       sessionExp = 0;
       waitingForResultClose = false;
       ballInBin = false;
+      binTimer = 0;
       bonusActive = false;
       bonusBalls = [];
       bonusResults = [];
@@ -985,7 +1018,8 @@
           binTimer: 0,
           finished: false,
           winnings: 0,
-          multiplier: 0
+          multiplier: 0,
+          settled: false
         });
       }
       
@@ -996,6 +1030,7 @@
       ball.vy = 0.6;
       ball.value = ballValue;
       ball.color = ballColor;
+      ball.settled = false;
       
       soundDrop();
       updateUI();
@@ -1171,6 +1206,7 @@
         }
       }
       
+      // Коллизия со стенками корзины - физика продолжает работать
       for (let wall of binWalls) {
         checkWallCollisionForBall(b, wall);
       }
@@ -1230,6 +1266,7 @@
       ball.value = currentUser.selectedBall;
       ball.color = getBallColor(currentUser.selectedBall);
       ball.active = true;
+      ball.settled = false;
       gameActive = true;
       waitingForResultClose = false;
       sessionExp = 0;
@@ -1312,9 +1349,12 @@
       // Обработка основного шара в корзине (обычный режим)
       if (ballInBin && !bonusActive) {
         binTimer--;
+        // Шар продолжает двигаться в корзине, физика работает
+        applyPhysicsToBall(ball);
+        
         if (binTimer <= 0) {
           const binWidth = canvas.width / binCount;
-          let binIndex = Math.floor(ballBinX / binWidth);
+          let binIndex = Math.floor(ball.x / binWidth);
           if (binIndex < 0) binIndex = 0;
           if (binIndex >= binCount) binIndex = binCount - 1;
           const multiplier = multipliers[binIndex];
@@ -1356,8 +1396,11 @@
           if (b.finished) continue;
           allFinished = false;
           
-          if (b.inBin) {
+          // Шар в корзине продолжает двигаться
+          if (b.inBin && !b.settled) {
             b.binTimer--;
+            applyPhysicsToBall(b);
+            
             if (b.binTimer <= 0) {
               processBonusBallResult(b);
             }
@@ -1368,22 +1411,14 @@
             applyPhysicsToBall(b);
           }
           
-          // Проверка попадания в корзину - шары просто падают в ячейки
-          const binY = canvas.height - 30;
-          if (b.active && b.y + BALL_RADIUS >= binY && b.y < canvas.height) {
-            // Шар просто продолжает падать, не прилипает
-            // Проверяем, что шар действительно в зоне корзины
-            if (b.y >= binY - 5) {
-              b.inBin = true;
-              b.binX = b.x;
-              b.binY = binY;
-              b.binTimer = 60;
-              b.active = false;
-              b.y = binY; // Устанавливаем позицию на уровне корзины
-            }
+          // Шар попадает в зону корзины, но продолжает двигаться
+          if (b.active && b.y + BALL_RADIUS >= canvas.height - 30 && b.y < canvas.height + 50) {
+            b.inBin = true;
+            b.binTimer = 90;
+            // Не останавливаем шар, он продолжает двигаться
           }
           
-          if (b.y > canvas.height + 100 || b.y < -100) { 
+          if (b.y > canvas.height + 150 || b.y < -100) { 
             b.finished = true;
             bonusResults.push({
               value: b.value,
@@ -1398,25 +1433,19 @@
           applyPhysicsToBall(ball);
         }
         
-        // Основной шар в корзине
-        const binY = canvas.height - 30;
-        if (ball.active && ball.y + BALL_RADIUS >= binY && ball.y < canvas.height) {
-          if (ball.y >= binY - 5) {
-            ballInBin = true;
-            ballBinX = ball.x;
-            ballBinY = binY;
-            binTimer = 60;
-            ball.active = false;
-            ball.y = binY;
-          }
+        // Основной шар в корзине продолжает двигаться
+        if (ball.active && ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
+          ballInBin = true;
+          binTimer = 90;
+          // Шар продолжает двигаться
         }
         
         // Обработка основного шара в корзине в бонусном режиме
-        if (ballInBin && !ball.finished) {
+        if (ballInBin && !ball.settled) {
           binTimer--;
           if (binTimer <= 0) {
             const binWidth = canvas.width / binCount;
-            let binIndex = Math.floor(ballBinX / binWidth);
+            let binIndex = Math.floor(ball.x / binWidth);
             if (binIndex < 0) binIndex = 0;
             if (binIndex >= binCount) binIndex = binCount - 1;
             const multiplier = multipliers[binIndex];
@@ -1440,14 +1469,15 @@
             });
             bonusTotalWinnings += winnings;
             
-            ball.finished = true;
+            ball.settled = true;
             ballInBin = false;
             soundBin();
           }
         }
         
         // Проверка завершения всех шаров
-        if (allBallsFinished() && (!ball.active || ball.finished) && !ballInBin) {
+        const allBonusSettled = bonusBalls.every(b => b.finished);
+        if (allBonusSettled && (!ball.active || ball.settled)) {
           endBonusGame();
         }
         
@@ -1458,76 +1488,18 @@
       // Обычный режим
       if (!ball.active) return;
       
-      ball.vy += GRAVITY;
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-
-      if (ball.x - BALL_RADIUS < 2) { 
-        ball.x = BALL_RADIUS + 2; 
-        ball.vx = Math.abs(ball.vx) * BOUNCE; 
-        soundBounce();
-      }
-      if (ball.x + BALL_RADIUS > canvas.width - 2) { 
-        ball.x = canvas.width - BALL_RADIUS - 2; 
-        ball.vx = -Math.abs(ball.vx) * BOUNCE; 
-        soundBounce();
-      }
-      
-      if (ball.y - BALL_RADIUS < 2) { 
-        ball.y = BALL_RADIUS + 2; 
-        ball.vy = Math.abs(ball.vy) * BOUNCE; 
-        soundBounce();
-      }
-
-      for (let p of platforms) {
-        const dx = ball.x - p.x;
-        const dy = ball.y - p.y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        const minDist = BALL_RADIUS + p.radius;
-        if (dist < minDist && dist > 0.001) {
-          const nx = dx/dist, ny = dy/dist;
-          ball.x += nx * (minDist - dist);
-          ball.y += ny * (minDist - dist);
-          const vn = ball.vx * nx + ball.vy * ny;
-          if (vn < 0) {
-            ball.vx -= (1+BOUNCE)*vn*nx;
-            ball.vy -= (1+BOUNCE)*vn*ny;
-            soundBounce();
-            
-            if (currentUser) {
-              currentUser.exp += 1;
-              sessionExp += 1;
-              updateUserData(currentUser);
-            }
-          }
-          ball.vx *= 0.999;
-          ball.vy *= 0.999;
-        }
-      }
-      
-      for (let wall of binWalls) {
-        checkWallCollision(wall);
-      }
-      
-      applySpecialEffects();
+      applyPhysicsToBall(ball);
       
       updateUI();
 
-      // Шар падает в корзину без прилипания
-      const binY = canvas.height - 30;
-      if (ball.y + BALL_RADIUS >= binY && ball.y < canvas.height) {
-        if (ball.y >= binY - 5) {
-          ballInBin = true;
-          ballBinX = ball.x;
-          ballBinY = binY;
-          binTimer = 60;
-          ball.active = false;
-          ball.y = binY;
-          soundBin();
-        }
+      // Шар падает в корзину, но продолжает двигаться
+      if (ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
+        ballInBin = true;
+        binTimer = 90;
+        // Шар продолжает двигаться
       }
       
-      if (ball.y > canvas.height + 100 || ball.y < -100) { 
+      if (ball.y > canvas.height + 150 || ball.y < -100) { 
         resetBall(); 
         gameActive = false; 
       }
@@ -1667,15 +1639,7 @@
       // Рисуем бонусные шары
       for (let b of bonusBalls) {
         if (b.finished) continue;
-        if (b.inBin) {
-          ctx.beginPath();
-          ctx.arc(b.binX, b.binY + 15, BALL_RADIUS, 0, 2*Math.PI);
-          ctx.fillStyle = b.color;
-          ctx.fill();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        } else if (b.active) {
+        if (b.active || b.inBin) {
           ctx.beginPath();
           ctx.arc(b.x, b.y, BALL_RADIUS, 0, 2*Math.PI);
           ctx.fillStyle = b.color;
@@ -1687,19 +1651,9 @@
       }
 
       // Рисуем основной шар
-      if (ball.active) {
+      if (ball.active || ballInBin) {
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-      
-      if (ballInBin) {
-        ctx.beginPath();
-        ctx.arc(ballBinX, ballBinY + 15, BALL_RADIUS, 0, 2*Math.PI);
         ctx.fillStyle = ball.color;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
@@ -1812,7 +1766,6 @@
       
       container.innerHTML = '';
       
-      // Цены на шары: 2 - 1000, 3 - 10000, 4 - 26000, 5 - 50000, 6 - 120000
       const ballPrices = {
         1: 0,
         2: 1000,
