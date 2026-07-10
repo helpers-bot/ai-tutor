@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.2, user-scalable=yes, viewport-fit=cover">
-  <title>Plinko Ball Drop — игра с физикой и магазином</title>
-  <meta name="description" content="Plinko Ball Drop: захватывающая аркада, где шарик падает среди платформ. Зарабатывайте очки, покупайте шарики и улучшайте баланс.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%23ff6b6b'/%3E%3Ccircle cx='35' cy='35' r='8' fill='white'/%3E%3C/svg%3E">
-  <meta property="og:title" content="Plinko Ball Drop">
-  <meta property="og:description" content="Бросай шарик, лови множители до x20! Магазин, профиль, регистрация.">
+  <title>Space Pinball Cadet — 3D аркада</title>
+  <meta name="description" content="Space Pinball Cadet: космический пинбол с 5 картами. Зарабатывайте звёзды, открывайте новые уровни.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230066cc'/%3E%3Ccircle cx='35' cy='35' r='8' fill='white'/%3E%3Ccircle cx='65' cy='65' r='6' fill='%23ffcc00'/%3E%3C/svg%3E">
+  <meta property="og:title" content="Space Pinball Cadet">
+  <meta property="og:description" content="Космический пинбол с 5 картами! Открывай новые уровни, собирай звёзды.">
   <style>
     * {
       margin: 0;
@@ -15,7 +15,7 @@
       box-sizing: border-box;
     }
     body {
-      background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
+      background: radial-gradient(ellipse at center, #0a0a2e 0%, #000010 100%);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       height: 100vh;
       display: flex;
@@ -24,21 +24,43 @@
       overflow: hidden;
       touch-action: pan-x pan-y;
       font-size: 0.85rem;
+      color: #fff;
+    }
+    .stars-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--duration) infinite alternate;
+    }
+    @keyframes twinkle {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 1; transform: scale(1.5); }
     }
     .game-container {
+      position: relative;
+      z-index: 1;
       width: 100%;
       max-width: 480px;
       height: 100vh;
       max-height: 820px;
-      background: rgba(255, 255, 255, 0.06);
+      background: linear-gradient(180deg, rgba(0,20,60,0.9) 0%, rgba(0,10,40,0.95) 100%);
       backdrop-filter: blur(20px);
-      border-radius: 40px;
-      padding: 15px 15px 20px;
-      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.8), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 12px 12px 15px;
+      box-shadow: 0 0 40px rgba(0,100,255,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
       display: flex;
       flex-direction: column;
       align-items: center;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(0,150,255,0.4);
       margin: auto;
       transition: transform 0.1s ease;
     }
@@ -56,32 +78,44 @@
       display: block;
       width: 100%;
       aspect-ratio: 1 / 1;
-      max-height: 62vh;
-      background: radial-gradient(circle at 30% 30%, #2d2a4e, #0d0b1a);
-      border-radius: 36px;
-      box-shadow: inset 0 0 35px rgba(0,0,0,0.9), 0 12px 25px rgba(0,0,0,0.7);
+      max-height: 58vh;
+      background: radial-gradient(circle at 30% 30%, #001a4d, #000020);
+      border-radius: 16px;
+      box-shadow: inset 0 0 50px rgba(0,100,255,0.4), 0 0 30px rgba(0,150,255,0.3);
       touch-action: none;
       flex-shrink: 1;
+      border: 2px solid #0066cc;
     }
     .top-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      gap: 8px;
     }
     .stars-box {
-      background: #1e1a33;
-      border-radius: 40px;
-      padding: 6px 16px;
+      background: linear-gradient(180deg, #1a3a6a, #0a1a3a);
+      border-radius: 20px;
+      padding: 6px 14px;
       display: flex;
       align-items: center;
       gap: 6px;
       font-weight: bold;
-      font-size: 1.3rem;
-      box-shadow: 0 4px 0 #0b0820;
-      border: 1px solid #ffd966;
-      color: #ffd966;
+      font-size: 1.2rem;
+      box-shadow: 0 3px 0 #050a1a, 0 0 15px rgba(255,200,0,0.3);
+      border: 1px solid #ffd700;
+      color: #ffd700;
+    }
+    .map-indicator {
+      background: linear-gradient(180deg, #1a3a6a, #0a1a3a);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      box-shadow: 0 3px 0 #050a1a;
+      border: 1px solid #0066cc;
+      color: #66ccff;
     }
     .panel {
       width: 100%;
@@ -89,69 +123,73 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      margin: 10px 0 8px;
+      gap: 6px;
+      margin: 8px 0;
     }
     .ball-selector {
       display: flex;
       align-items: center;
-      gap: 8px;
-      background: rgba(0,0,0,0.5);
-      border-radius: 30px;
-      padding: 6px 18px;
+      gap: 6px;
+      background: rgba(0,40,80,0.6);
+      border-radius: 20px;
+      padding: 5px 14px;
       backdrop-filter: blur(8px);
+      border: 1px solid rgba(100,180,255,0.3);
+      font-size: 0.85rem;
     }
     button {
-      background: #ffb347;
+      background: linear-gradient(180deg, #3388cc 0%, #004488 100%);
       border: none;
-      color: #1a1a2e;
+      color: #fff;
       font-weight: bold;
-      border-radius: 30px;
+      border-radius: 20px;
       padding: 10px 14px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 5px 0 #cc8a2a;
+      box-shadow: 0 4px 0 #002244, 0 0 10px rgba(0,150,255,0.3);
       letter-spacing: 0.5px;
       display: flex;
       align-items: center;
-      gap: 5px;
-      background: linear-gradient(180deg, #ffb85c 0%, #ff8c2a 100%);
-      border: 1px solid #ffd58c;
+      gap: 4px;
+      border: 1px solid rgba(100,180,255,0.5);
       transform: translateY(0);
     }
     button:active {
       transform: translateY(3px);
-      box-shadow: 0 2px 0 #cc8a2a;
+      box-shadow: 0 1px 0 #002244;
     }
     button:disabled {
-      opacity: 0.5;
+      opacity: 0.4;
       transform: translateY(2px);
-      box-shadow: 0 3px 0 #7f5a2e;
+      box-shadow: 0 2px 0 #001122;
       pointer-events: none;
     }
     .big-btn {
-      padding: 14px 22px;
-      font-size: 1rem;
-      border-radius: 34px;
-      box-shadow: 0 6px 0 #cc8a2a;
+      padding: 12px 20px;
+      font-size: 0.95rem;
+      border-radius: 24px;
+      box-shadow: 0 5px 0 #002244, 0 0 15px rgba(0,150,255,0.4);
+      background: linear-gradient(180deg, #44aaff 0%, #0066cc 100%);
     }
     .small-btn {
-      padding: 8px 12px;
-      font-size: 0.75rem;
+      padding: 7px 10px;
+      font-size: 0.7rem;
+      border-radius: 16px;
     }
-    .shop-button {
-      background: linear-gradient(180deg, #c084fc 0%, #7c3aed 100%);
-      box-shadow: 0 5px 0 #4c1d95;
-      border-color: #d8b4fe;
+    .maps-btn {
+      background: linear-gradient(180deg, #9955cc 0%, #5522aa 100%);
+      box-shadow: 0 4px 0 #331166, 0 0 10px rgba(150,100,255,0.3);
+      border-color: rgba(180,130,255,0.5);
     }
     .user-greeting {
-      background: rgba(255,255,255,0.1);
-      padding: 5px 18px;
-      border-radius: 25px;
+      background: rgba(0,100,200,0.2);
+      padding: 5px 14px;
+      border-radius: 16px;
       font-weight: 600;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       backdrop-filter: blur(4px);
+      border: 1px solid rgba(100,180,255,0.3);
     }
     .hidden {
       display: none !important;
@@ -159,8 +197,8 @@
     .modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(10px);
+      background: rgba(0,0,20,0.85);
+      backdrop-filter: blur(15px);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -171,31 +209,31 @@
       from { opacity: 0; } to { opacity: 1; }
     }
     .modal-content {
-      background: #1e1836;
+      background: linear-gradient(180deg, #0a1a3a, #051030);
       padding: 20px;
-      border-radius: 36px;
+      border-radius: 24px;
       width: 90%;
       max-width: 440px;
-      border: 1px solid #b794f4;
+      border: 2px solid #0066cc;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 0 40px rgba(0,100,255,0.5);
+    }
+    .result-content {
+      background: linear-gradient(135deg, #0a1a3a, #102050);
+      padding: 25px 20px;
+      border-radius: 24px;
+      width: 90%;
+      max-width: 380px;
+      border: 2px solid #ffd700;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      max-height: 85vh;
-      overflow-y: auto;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
-    }
-    .result-content {
-      background: linear-gradient(135deg, #1e1836, #2d2350);
-      padding: 25px 20px;
-      border-radius: 36px;
-      width: 90%;
-      max-width: 380px;
-      border: 2px solid #ffd966;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
       text-align: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+      box-shadow: 0 0 40px rgba(255,200,0,0.4);
       animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
     @keyframes popIn {
@@ -210,47 +248,96 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-20px); }
     }
-    .shop-grid {
+    .maps-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 12px;
+      gap: 10px;
     }
-    .shop-item {
-      background: #2a2346;
-      border-radius: 24px;
-      padding: 14px 8px;
+    .map-card {
+      background: linear-gradient(180deg, #0d2040, #081530);
+      border-radius: 16px;
+      padding: 12px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: 0.2s;
-      border: 1px solid #4a3b6b;
+      border: 2px solid #1a3a6a;
+      cursor: pointer;
+      position: relative;
+    }
+    .map-card:hover {
+      border-color: #44aaff;
+      transform: scale(1.03);
+      box-shadow: 0 0 20px rgba(0,150,255,0.3);
+    }
+    .map-card.locked {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .map-card.active {
+      border-color: #ffd700;
+      box-shadow: 0 0 25px rgba(255,200,0,0.4);
+    }
+    .map-icon {
+      font-size: 2rem;
+    }
+    .map-name {
+      font-size: 0.8rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .map-price {
+      font-size: 0.7rem;
+      color: #ffd700;
+    }
+    .lock-icon {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: 0.9rem;
+    }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 10px;
+    }
+    .shop-item {
+      background: linear-gradient(180deg, #0d2040, #081530);
+      border-radius: 16px;
+      padding: 10px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+      border: 1px solid #1a3a6a;
     }
     .shop-item:hover {
-      border-color: #ffb347;
+      border-color: #ffd700;
       transform: scale(1.02);
     }
     .ball-preview {
-      font-size: 2.2rem;
-      filter: drop-shadow(0 6px 6px black);
+      font-size: 1.8rem;
+      filter: drop-shadow(0 4px 4px black);
     }
     input {
-      padding: 12px 18px;
-      border-radius: 30px;
+      padding: 10px 16px;
+      border-radius: 20px;
       border: none;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.1);
       color: white;
       outline: none;
       font-weight: 500;
       width: 100%;
-      border: 1px solid rgba(255,255,255,0.25);
+      border: 1px solid rgba(100,180,255,0.3);
     }
     input::placeholder {
-      color: #ccc;
+      color: #88aacc;
     }
     .action-row {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       justify-content: center;
       flex-wrap: wrap;
       align-items: center;
@@ -258,9 +345,12 @@
   </style>
 </head>
 <body>
+<div class="stars-bg" id="starsBg"></div>
+
 <div class="game-container" id="gameContainer">
   <div class="top-bar">
-    <div class="user-greeting" id="userGreeting">👤 Гость</div>
+    <div class="user-greeting" id="userGreeting">👨‍🚀 Гость</div>
+    <div class="map-indicator" id="mapIndicator">🌍 Карта 1</div>
     <div class="stars-box">⭐ <span id="balanceDisplay">100</span></div>
   </div>
   
@@ -276,10 +366,11 @@
   
   <div class="action-row">
     <button id="dropButton" class="big-btn">🚀 Запуск</button>
-    <button id="shakeButton" class="big-btn" style="background:#5d5b8a;">📳 Встряхнуть</button>
-    <button id="shopButton" class="shop-button small-btn">🛒</button>
+    <button id="shakeButton" class="big-btn">🌌 Толчок</button>
+    <button id="mapsButton" class="maps-btn small-btn">🗺️</button>
+    <button id="shopButton" class="small-btn">🛒</button>
     <button id="profileButton" class="small-btn">👤</button>
-    <button id="logoutButton" class="small-btn" style="background:#4a4a6a;">🚪</button>
+    <button id="logoutButton" class="small-btn">🚪</button>
   </div>
 </div>
 
@@ -288,10 +379,19 @@
   <div class="result-content" id="resultContent"></div>
 </div>
 
+<!-- Выбор карт -->
+<div id="mapsModal" class="modal hidden">
+  <div class="modal-content">
+    <h2 style="color:#ffd700; text-align:center;">🗺️ Карты миссий</h2>
+    <div id="mapsContainer" class="maps-grid"></div>
+    <button id="closeMapsBtn" style="align-self: center;">Закрыть</button>
+  </div>
+</div>
+
 <!-- Магазин -->
 <div id="shopModal" class="modal hidden">
   <div class="modal-content">
-    <h2 style="color:#ffd966;">🛍️ Магазин шариков</h2>
+    <h2 style="color:#ffd700; text-align:center;">🛒 Магазин шариков</h2>
     <div id="shopItemsContainer" class="shop-grid"></div>
     <button id="closeShopBtn" style="align-self: center;">Закрыть</button>
   </div>
@@ -300,10 +400,11 @@
 <!-- Профиль -->
 <div id="profileModal" class="modal hidden">
   <div class="modal-content">
-    <h2>👤 Профиль</h2>
+    <h2>👤 Профиль пилота</h2>
     <p>Имя: <strong id="profileName"></strong></p>
     <p>ID: <strong id="profileId"></strong></p>
-    <p>Баланс: ⭐ <strong id="profileBalance"></strong></p>
+    <p>Звёзд: ⭐ <strong id="profileBalance"></strong></p>
+    <p>Открыто карт: <strong id="profileMaps"></strong></p>
     <button id="closeProfileBtn">Закрыть</button>
   </div>
 </div>
@@ -311,10 +412,10 @@
 <!-- Авторизация -->
 <div id="authModal" class="modal">
   <div class="modal-content">
-    <h2>🔐 Вход / Регистрация</h2>
-    <input type="text" id="usernameInput" placeholder="Ваше имя" maxlength="16" autocomplete="off">
-    <button id="loginBtn">▶ Продолжить</button>
-    <p style="font-size:0.8rem; color:#ccc;">Новый пользователь получит случайный ID из 8 цифр.</p>
+    <h2>🔐 Вход в космопорт</h2>
+    <input type="text" id="usernameInput" placeholder="Позывной пилота" maxlength="16" autocomplete="off">
+    <button id="loginBtn">▶ Запуск</button>
+    <p style="font-size:0.75rem; color:#88aacc;">Новый пилот получит ID и 100 ⭐</p>
   </div>
 </div>
 
@@ -333,7 +434,7 @@
       }
     }
 
-    function playTone(freq, type, duration, vol = 0.15, delay = 0) {
+    function playTone(freq, type, duration, vol = 0.12, delay = 0) {
       if (!audioCtx) return;
       const now = audioCtx.currentTime + delay;
       const osc = audioCtx.createOscillator();
@@ -349,35 +450,70 @@
     }
 
     function soundDrop() {
-      playTone(200, 'triangle', 0.2, 0.2);
-      setTimeout(() => playTone(150, 'triangle', 0.15, 0.15), 0.1);
+      playTone(300, 'square', 0.15, 0.15);
+      setTimeout(() => playTone(200, 'square', 0.12, 0.12), 0.08);
     }
 
     function soundBounce() {
-      playTone(500, 'sine', 0.08, 0.08);
+      playTone(600, 'triangle', 0.06, 0.06);
     }
 
     function soundWin(multiplier) {
       if (multiplier >= 5) {
-        playTone(523, 'sine', 0.15, 0.2);
-        setTimeout(() => playTone(659, 'sine', 0.15, 0.2), 0.15);
-        setTimeout(() => playTone(784, 'sine', 0.25, 0.25), 0.3);
+        playTone(523, 'square', 0.12, 0.2);
+        setTimeout(() => playTone(659, 'square', 0.12, 0.2), 0.12);
+        setTimeout(() => playTone(784, 'square', 0.2, 0.25), 0.25);
       } else if (multiplier >= 1) {
-        playTone(440, 'sine', 0.12, 0.15);
-        setTimeout(() => playTone(554, 'sine', 0.12, 0.15), 0.12);
+        playTone(440, 'triangle', 0.1, 0.15);
+        setTimeout(() => playTone(554, 'triangle', 0.1, 0.15), 0.1);
       } else {
-        playTone(300, 'triangle', 0.2, 0.12);
+        playTone(250, 'triangle', 0.18, 0.1);
       }
     }
 
     function soundBuy() {
-      playTone(600, 'sine', 0.1, 0.12);
-      setTimeout(() => playTone(800, 'sine', 0.1, 0.12), 0.1);
+      playTone(500, 'square', 0.08, 0.1);
+      setTimeout(() => playTone(700, 'square', 0.08, 0.1), 0.08);
     }
 
+    function soundMapUnlock() {
+      playTone(400, 'square', 0.1, 0.15);
+      setTimeout(() => playTone(600, 'square', 0.1, 0.15), 0.1);
+      setTimeout(() => playTone(800, 'square', 0.15, 0.2), 0.2);
+    }
+
+    // ========== ГЕНЕРАЦИЯ ЗВЁЗД НА ФОНЕ ==========
+    function createStars() {
+      const container = document.getElementById('starsBg');
+      container.innerHTML = '';
+      for (let i = 0; i < 80; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        const size = Math.random() * 2.5 + 0.8;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.setProperty('--duration', (Math.random() * 2 + 1) + 's');
+        star.style.animationDelay = Math.random() * 3 + 's';
+        container.appendChild(star);
+      }
+    }
+    createStars();
+
+    // ========== КАРТЫ ==========
+    const maps = [
+      { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, desc: 'Стандартная карта' },
+      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.2, price: 200, desc: '+20% к множителям' },
+      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.4, price: 500, desc: '+40% к множителям' },
+      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.7, price: 1000, desc: '+70% к множителям' },
+      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 1.0, price: 2000, desc: '+100% к множителям' }
+    ];
+
     // ========== БАЗА ДАННЫХ ==========
-    const STORAGE_KEY = 'plinko_users_db';
+    const STORAGE_KEY = 'space_pinball_users_db';
     let currentUser = null;
+    let currentMapId = 1;
 
     function loadUsers() {
       const data = localStorage.getItem(STORAGE_KEY);
@@ -388,10 +524,22 @@
     }
     function getOrCreateUser(name) {
       const users = loadUsers();
-      const trimmed = name.trim();
+      const trimmed = name.trim().toLowerCase();
       if (!trimmed) return null;
+      
+      // Специальная проверка для casper
+      const isCasper = trimmed === 'casper';
+      
       for (let [id, user] of Object.entries(users)) {
-        if (user.name === trimmed) return user;
+        if (user.name.toLowerCase() === trimmed) {
+          // Если это casper, даём ему все карты
+          if (isCasper && !user.unlockedMaps) {
+            user.unlockedMaps = [1, 2, 3, 4, 5];
+          }
+          if (!user.unlockedMaps) user.unlockedMaps = [1];
+          if (!user.currentMapId) user.currentMapId = 1;
+          return user;
+        }
       }
       const newId = generateUniqueId(users);
       const newUser = {
@@ -399,7 +547,9 @@
         name: trimmed,
         balance: 100,
         ownedBalls: [1],
-        selectedBall: 1
+        selectedBall: 1,
+        unlockedMaps: isCasper ? [1, 2, 3, 4, 5] : [1],
+        currentMapId: 1
       };
       users[newId] = newUser;
       saveUsers(users);
@@ -436,10 +586,9 @@
     const colSpacing = 32;
     const colBaseX = 220;
 
-    const multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-    const binCount = multipliers.length;
+    let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
+    const binCount = 17;
 
-    // Физические стенки между ячейками
     let binWalls = [];
 
     let ball = {
@@ -452,15 +601,18 @@
     const stringAnchorY = 18;
     const stringLength = 48;
 
-    // Для отслеживания отскоков (звуки)
     let lastBounceTime = 0;
-    let bounceCooldown = 80; // мс
+    let bounceCooldown = 80;
+
+    // Частицы для эффектов
+    let particles = [];
 
     // ========== UI ЭЛЕМЕНТЫ ==========
     const balanceSpan = document.getElementById('balanceDisplay');
     const currentBallValueSpan = document.getElementById('currentBallValue');
     const currentBallEmoji = document.getElementById('currentBallEmoji');
     const userGreeting = document.getElementById('userGreeting');
+    const mapIndicator = document.getElementById('mapIndicator');
     const dropButton = document.getElementById('dropButton');
     const authModal = document.getElementById('authModal');
     const usernameInput = document.getElementById('usernameInput');
@@ -469,8 +621,28 @@
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
 
+    function getCurrentMap() {
+      return maps.find(m => m.id === currentMapId) || maps[0];
+    }
+
+    function updateMultipliers() {
+      const baseMultipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
+      const bonus = getCurrentMap().multiplierBonus;
+      multipliers = baseMultipliers.map(m => Math.round((m * (1 + bonus)) * 10) / 10);
+    }
+
     function buildPlatforms() {
       platforms = [];
+      const mapConfig = getCurrentMap();
+      const pinColors = {
+        1: ['#f4d03f', '#b7950b'],
+        2: ['#ff6b6b', '#cc3333'],
+        3: ['#ff9944', '#cc6600'],
+        4: ['#bb88ff', '#7733cc'],
+        5: ['#4444ff', '#0000cc']
+      };
+      const colors = pinColors[mapConfig.id] || pinColors[1];
+      
       for (let r = 0; r < rows; r++) {
         const y = startY + r * rowSpacing;
         const pinsInRow = 12;
@@ -481,7 +653,9 @@
           platforms.push({
             x: startX + c * colSpacing + offsetX,
             y: y,
-            radius: PLATFORM_RADIUS
+            radius: PLATFORM_RADIUS,
+            color1: colors[0],
+            color2: colors[1]
           });
         }
       }
@@ -491,21 +665,26 @@
       binWalls = [];
       const binWidth = canvas.width / binCount;
       const binY = canvas.height - 30;
-      const wallHeight = 25; // высота стенок над ячейками
+      const wallHeight = 25;
       for (let i = 0; i <= binCount; i++) {
         const x = i * binWidth;
         binWalls.push({
-          x1: x,
-          y1: binY - wallHeight,
-          x2: x,
-          y2: binY + 30,
+          x1: x, y1: binY - wallHeight,
+          x2: x, y2: binY + 30,
           isWall: true
         });
       }
     }
 
-    buildPlatforms();
-    buildBinWalls();
+    function initMap() {
+      updateMultipliers();
+      buildPlatforms();
+      buildBinWalls();
+      resetBall();
+      if (currentUser) {
+        mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
+      }
+    }
 
     function resetBall() {
       ball.active = false;
@@ -515,20 +694,23 @@
       ball.vy = 0;
       gameActive = false;
       swingAngle = 0;
+      particles = [];
     }
 
     function updateUI() {
       if (!currentUser) {
         balanceSpan.textContent = '0';
         currentBallValueSpan.textContent = '1';
-        userGreeting.textContent = '👤 Гость';
+        userGreeting.textContent = '👨‍🚀 Гость';
         currentBallEmoji.textContent = getBallEmoji(1);
+        mapIndicator.textContent = '🌍 Карта 1';
         return;
       }
       balanceSpan.textContent = Math.floor(currentUser.balance);
       currentBallValueSpan.textContent = currentUser.selectedBall;
-      userGreeting.textContent = `👤 ${currentUser.name}`;
+      userGreeting.textContent = `👨‍🚀 ${currentUser.name}`;
       currentBallEmoji.textContent = getBallEmoji(currentUser.selectedBall);
+      mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
     }
 
     function getBallEmoji(value) {
@@ -539,6 +721,42 @@
       return map[value] || '⭐';
     }
 
+    function spawnParticles(x, y, count, color) {
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: x, y: y,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4 - 2,
+          life: 1,
+          decay: 0.02 + Math.random() * 0.04,
+          color: color,
+          size: 1.5 + Math.random() * 2.5
+        });
+      }
+    }
+
+    function updateParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.05;
+        p.life -= p.decay;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+    }
+
+    function drawParticles() {
+      for (const p of particles) {
+        ctx.globalAlpha = p.life;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
     function showResult(betValue, multiplier, winnings, oldBalance, newBalance) {
       const netProfit = winnings - betValue;
       const isWin = netProfit > 0;
@@ -547,17 +765,18 @@
       
       resultContent.innerHTML = `
         <div class="result-emoji">${emoji}</div>
-        <h2 style="color: ${color}; margin: 0;">${isWin ? 'Выигрыш!' : 'Не повезло'}</h2>
-        <div style="background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px;">
-          <p>🔵 Шарик: <strong>${betValue} очков</strong></p>
+        <h2 style="color: ${color}; margin: 0;">${isWin ? 'Миссия выполнена!' : 'Промах...'}</h2>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 14px;">
+          <p>🛸 Шарик: <strong>${betValue} очков</strong></p>
           <p>🎯 Ячейка: <strong>x${multiplier}</strong></p>
-          <p>💰 Выигрыш: <strong>${winnings} ⭐</strong></p>
+          <p>💰 Награда: <strong>${winnings} ⭐</strong></p>
           <p style="color: ${color};">📊 Чистый доход: <strong>${netProfit >= 0 ? '+' : ''}${netProfit} ⭐</strong></p>
-          <hr style="border-color: rgba(255,255,255,0.2); margin: 10px 0;">
+          <hr style="border-color: rgba(255,255,255,0.2); margin: 8px 0;">
           <p>💼 Баланс был: ${oldBalance} ⭐</p>
           <p>💼 Баланс стал: ${newBalance} ⭐</p>
         </div>
-        <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">👍 Ок</button>
+        <p style="font-size:0.75rem; color:#88aacc;">🗺️ Карта: ${getCurrentMap().name}</p>
+        <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">👍 Понял</button>
       `;
       resultModal.classList.remove('hidden');
       
@@ -569,7 +788,7 @@
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
       if (gameActive || ball.active) return;
       const ballCost = currentUser.selectedBall;
-      if (currentUser.balance < ballCost) { alert('Недостаточно средств!'); return; }
+      if (currentUser.balance < ballCost) { alert('Недостаточно звёзд!'); return; }
       
       currentUser.balance -= ballCost;
       updateUserData(currentUser);
@@ -583,12 +802,11 @@
       ball.vx = Math.sin(swingAngle) * 2.2;
       ball.vy = 0.9;
       
+      spawnParticles(ball.x, ball.y, 8, '#44aaff');
       soundDrop();
     }
 
-    // Проверка столкновения с вертикальной стенкой
     function checkWallCollision(wall) {
-      // Находим ближайшую точку на отрезке стены к центру шара
       const dx = wall.x2 - wall.x1;
       const dy = wall.y2 - wall.y1;
       const lengthSq = dx * dx + dy * dy;
@@ -607,11 +825,9 @@
         const nx = distX / dist;
         const ny = distY / dist;
         
-        // Выталкиваем шар
         ball.x += nx * (BALL_RADIUS - dist);
         ball.y += ny * (BALL_RADIUS - dist);
         
-        // Отражение скорости
         const vn = ball.vx * nx + ball.vy * ny;
         if (vn < 0) {
           ball.vx -= (1 + BOUNCE) * vn * nx;
@@ -634,7 +850,6 @@
 
       let bounced = false;
       
-      // Столкновение с платформами
       for (let p of platforms) {
         const dx = ball.x - p.x;
         const dy = ball.y - p.y;
@@ -649,13 +864,13 @@
             ball.vx -= (1+BOUNCE)*vn*nx;
             ball.vy -= (1+BOUNCE)*vn*ny;
             bounced = true;
+            spawnParticles(p.x, p.y, 3, p.color1);
           }
           ball.vx *= 0.998;
           ball.vy *= 0.998;
         }
       }
       
-      // Столкновение со стенками между ячейками
       for (let wall of binWalls) {
         if (checkWallCollision(wall)) {
           bounced = true;
@@ -684,7 +899,10 @@
         
         updateUI();
         
-        // Задержка 1 секунда перед показом окна
+        const bx = binIndex * binWidth + binWidth / 2;
+        const by = canvas.height - 15;
+        spawnParticles(bx, by, 15, '#ffd700');
+        
         gameActive = false;
         ball.active = false;
         
@@ -698,98 +916,143 @@
         resetBall(); 
         gameActive = false; 
       }
+      
+      updateParticles();
     }
 
     function drawScene() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
+      
+      // Фон карты
+      const mapColors = {
+        1: ['#001a33', '#000020'],
+        2: ['#330000', '#1a0000'],
+        3: ['#1a1000', '#0d0800'],
+        4: ['#0a0033', '#05001a'],
+        5: ['#000010', '#000005']
+      };
+      const bgColors = mapColors[currentMapId] || mapColors[1];
+      const bgGrad = ctx.createRadialGradient(220, 220, 50, 220, 220, 350);
+      bgGrad.addColorStop(0, bgColors[0]);
+      bgGrad.addColorStop(1, bgColors[1]);
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       if (!ball.active && !gameActive) {
         swingAngle += swingSpeed;
         if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
         const ballX = stringAnchorX + Math.sin(swingAngle) * stringLength;
         const ballY = stringAnchorY + Math.cos(swingAngle) * stringLength;
+        
         ctx.beginPath();
         ctx.moveTo(stringAnchorX, stringAnchorY);
         ctx.lineTo(ballX, ballY);
-        ctx.strokeStyle = '#ddd';
-        ctx.lineWidth = 1.8;
+        ctx.strokeStyle = '#66ccff';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
         ctx.stroke();
+        ctx.setLineDash([]);
+        
         ctx.beginPath();
         ctx.arc(ballX, ballY, BALL_RADIUS, 0, 2*Math.PI);
-        ctx.fillStyle = '#f39c12';
+        ctx.fillStyle = '#44aaff';
         ctx.fill();
         ctx.strokeStyle = 'white';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
+        ctx.lineWidth = 1;
       }
 
-      ctx.shadowColor = '#ffd966';
-      ctx.shadowBlur = 6;
+      // Платформы с неоновым свечением
       for (let p of platforms) {
+        ctx.shadowColor = p.color1;
+        ctx.shadowBlur = 8;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, 2*Math.PI);
-        ctx.fillStyle = '#f4d03f';
+        const grad = ctx.createRadialGradient(p.x-1, p.y-1, 1, p.x, p.y, p.radius+2);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.5, p.color1);
+        grad.addColorStop(1, p.color2);
+        ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = '#b7950b';
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 0.8;
         ctx.stroke();
+        ctx.lineWidth = 1;
       }
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
 
-      // Рисуем ячейки с прямыми углами (90°)
+      // Ячейки с неоновыми границами
       const binWidth = canvas.width / binCount;
       const binY = canvas.height - 30;
       for (let i = 0; i < binCount; i++) {
         const x = i * binWidth;
-        ctx.fillStyle = i % 2 === 0 ? '#2c2540' : '#3b3155';
+        ctx.fillStyle = i % 2 === 0 ? '#0a1a30' : '#0d2040';
         ctx.fillRect(x, binY, binWidth, 30);
         
-        // Прямые углы - рисуем без скругления
-        ctx.strokeStyle = '#9b8ec4';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#3399ff';
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = '#3399ff';
+        ctx.shadowBlur = 4;
         ctx.strokeRect(x, binY, binWidth, 30);
+        ctx.shadowBlur = 0;
+        ctx.lineWidth = 1;
         
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 11px "Segoe UI"';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 10px "Segoe UI"';
         ctx.textAlign = 'center';
-        ctx.fillText(`x${multipliers[i]}`, x+binWidth/2, binY+20);
+        ctx.fillText(`x${multipliers[i]}`, x+binWidth/2, binY+19);
       }
 
-      // Рисуем физические стенки между ячейками
-      ctx.strokeStyle = '#6b5b95';
-      ctx.lineWidth = 3;
+      // Стенки между ячейками
+      ctx.strokeStyle = '#2266cc';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#4488ff';
+      ctx.shadowBlur = 5;
       for (let wall of binWalls) {
         ctx.beginPath();
         ctx.moveTo(wall.x1, wall.y1);
         ctx.lineTo(wall.x2, wall.y2);
         ctx.stroke();
       }
+      ctx.shadowBlur = 0;
+      ctx.lineWidth = 1;
       
-      // Верхняя граница ячеек
-      ctx.strokeStyle = '#9b8ec4';
+      ctx.strokeStyle = '#3399ff';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(0, binY);
       ctx.lineTo(canvas.width, binY);
       ctx.stroke();
+      ctx.lineWidth = 1;
 
+      // Частицы
+      drawParticles();
+
+      // Активный шар
       if (ball.active) {
-        ctx.shadowColor = '#ff9f43';
-        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#66ccff';
+        ctx.shadowBlur = 15;
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
-        const grad = ctx.createRadialGradient(ball.x-2, ball.y-2, 2, ball.x, ball.y, BALL_RADIUS+2);
-        grad.addColorStop(0,'#ffcc80');
-        grad.addColorStop(0.7,'#e65100');
+        const grad = ctx.createRadialGradient(ball.x-3, ball.y-3, 2, ball.x, ball.y, BALL_RADIUS+3);
+        grad.addColorStop(0,'#ffffff');
+        grad.addColorStop(0.3,'#66ccff');
+        grad.addColorStop(1,'#003388');
         ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = 'white';
+        ctx.strokeStyle = '#aaddff';
+        ctx.lineWidth = 2;
         ctx.stroke();
+        ctx.lineWidth = 1;
         ctx.shadowBlur = 0;
       }
     }
 
     function gameLoop() {
       if (gameActive && ball.active) applyPhysics();
+      else updateParticles();
       drawScene();
       requestAnimationFrame(gameLoop);
     }
@@ -798,14 +1061,107 @@
       initAudio();
       if (gameContainer.classList.contains('shake-active')) return;
       gameContainer.classList.add('shake-active');
-      playTone(80, 'sawtooth', 0.3, 0.1);
+      playTone(60, 'square', 0.2, 0.08);
       setTimeout(() => {
         gameContainer.classList.remove('shake-active');
-      }, 1000);
+      }, 800);
       if (ball.active && gameActive) {
-        ball.vx += (Math.random() - 0.5) * 3.5;
-        ball.vy += (Math.random() - 0.2) * 2.8;
+        ball.vx += (Math.random() - 0.5) * 4;
+        ball.vy += (Math.random() - 0.2) * 3;
+        spawnParticles(ball.x, ball.y, 5, '#ff8800');
       }
+    }
+
+    function openMaps() {
+      initAudio();
+      if (!currentUser) { alert('Войдите в аккаунт'); return; }
+      const container = document.getElementById('mapsContainer');
+      container.innerHTML = '';
+      
+      maps.forEach(map => {
+        const unlocked = currentUser.unlockedMaps.includes(map.id);
+        const isActive = map.id === currentMapId;
+        const card = document.createElement('div');
+        card.className = 'map-card';
+        if (!unlocked) card.classList.add('locked');
+        if (isActive) card.classList.add('active');
+        
+        card.innerHTML = `
+          <div class="map-icon">${map.icon}</div>
+          <div class="map-name">${map.name}</div>
+          <div style="font-size:0.7rem; color:#88aacc;">${map.desc}</div>
+          ${unlocked 
+            ? (isActive ? '<div style="color:#ffd700; font-size:0.7rem;">✅ Активна</div>' : '<button class="selectMapBtn" data-map="'+map.id+'" style="font-size:0.7rem; padding:4px 10px;">Выбрать</button>')
+            : `<div class="map-price">🔒 ${map.price} ⭐</div><button class="buyMapBtn" data-map="${map.id}" style="font-size:0.7rem; padding:4px 10px;">Купить</button>`
+          }
+        `;
+        
+        if (unlocked && !isActive) {
+          card.addEventListener('click', (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            selectMap(map.id);
+          });
+        }
+        
+        container.appendChild(card);
+      });
+      
+      // Обработчики для кнопок покупки
+      document.querySelectorAll('.buyMapBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          buyMap(parseInt(e.target.getAttribute('data-map')));
+        });
+      });
+      
+      // Обработчики для кнопок выбора
+      document.querySelectorAll('.selectMapBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectMap(parseInt(e.target.getAttribute('data-map')));
+        });
+      });
+      
+      document.getElementById('mapsModal').classList.remove('hidden');
+    }
+
+    function buyMap(mapId) {
+      initAudio();
+      if (!currentUser) return;
+      const map = maps.find(m => m.id === mapId);
+      if (!map) return;
+      if (currentUser.unlockedMaps.includes(mapId)) { alert('Карта уже открыта!'); return; }
+      
+      // Проверка на casper — бесплатно
+      if (currentUser.name.toLowerCase() === 'casper') {
+        currentUser.unlockedMaps.push(mapId);
+        updateUserData(currentUser);
+        updateUI();
+        soundMapUnlock();
+        openMaps();
+        return;
+      }
+      
+      if (currentUser.balance < map.price) { alert('Недостаточно звёзд!'); return; }
+      currentUser.balance -= map.price;
+      currentUser.unlockedMaps.push(mapId);
+      updateUserData(currentUser);
+      updateUI();
+      soundMapUnlock();
+      openMaps();
+    }
+
+    function selectMap(mapId) {
+      if (!currentUser) return;
+      if (!currentUser.unlockedMaps.includes(mapId)) return;
+      currentMapId = mapId;
+      if (currentUser) {
+        currentUser.currentMapId = mapId;
+        updateUserData(currentUser);
+      }
+      initMap();
+      updateUI();
+      document.getElementById('mapsModal').classList.add('hidden');
     }
 
     function openShop() {
@@ -820,9 +1176,9 @@
         div.className = 'shop-item';
         div.innerHTML = `
           <div class="ball-preview">${getBallEmoji(val)}</div>
-          <div><strong>${val} очков</strong></div>
-          <div style="font-size:0.9rem;">${owned ? '✅ Куплен' : `⭐ ${price}`}</div>
-          ${!owned ? `<button class="buyBallBtn" data-value="${val}">Купить</button>` : `<button disabled>✓</button>`}
+          <div style="font-size:0.8rem;"><strong>${val} очков</strong></div>
+          <div style="font-size:0.7rem;">${owned ? '✅ Куплен' : `⭐ ${price}`}</div>
+          ${!owned ? `<button class="buyBallBtn" data-value="${val}" style="font-size:0.7rem; padding:4px 10px;">Купить</button>` : `<button disabled style="font-size:0.7rem; padding:4px 10px;">✓</button>`}
         `;
         container.appendChild(div);
       }
@@ -860,6 +1216,7 @@
       document.getElementById('profileName').textContent = currentUser.name;
       document.getElementById('profileId').textContent = currentUser.id;
       document.getElementById('profileBalance').textContent = Math.floor(currentUser.balance);
+      document.getElementById('profileMaps').textContent = `${currentUser.unlockedMaps.length} / 5`;
       document.getElementById('profileModal').classList.remove('hidden');
     }
 
@@ -867,25 +1224,38 @@
       const user = getOrCreateUser(name);
       if (!user) { alert('Введите имя'); return; }
       currentUser = user;
+      if (user.currentMapId) currentMapId = user.currentMapId;
       authModal.classList.add('hidden');
+      initMap();
       updateUI();
       resetBall();
+      
+      // Приветственное сообщение для casper
+      if (user.name.toLowerCase() === 'casper') {
+        setTimeout(() => {
+          alert('👻 Привет, casper! Все карты открыты бесплатно!');
+        }, 500);
+      }
     }
 
     function logout() {
       currentUser = null;
+      currentMapId = 1;
       authModal.classList.remove('hidden');
+      initMap();
       resetBall();
       updateUI();
     }
 
     function checkSavedSession() {
-      const savedId = localStorage.getItem('plinko_current_id');
+      const savedId = localStorage.getItem('space_pinball_current_id');
       if (savedId) {
         const users = loadUsers();
         if (users[savedId]) {
           currentUser = users[savedId];
+          if (currentUser.currentMapId) currentMapId = currentUser.currentMapId;
           authModal.classList.add('hidden');
+          initMap();
           updateUI();
           return;
         }
@@ -896,9 +1266,11 @@
     // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
     dropButton.addEventListener('click', dropBall);
     document.getElementById('shopButton').addEventListener('click', openShop);
+    document.getElementById('mapsButton').addEventListener('click', openMaps);
     document.getElementById('profileButton').addEventListener('click', showProfile);
     document.getElementById('logoutButton').addEventListener('click', logout);
     document.getElementById('closeShopBtn').addEventListener('click', ()=> document.getElementById('shopModal').classList.add('hidden'));
+    document.getElementById('closeMapsBtn').addEventListener('click', ()=> document.getElementById('mapsModal').classList.add('hidden'));
     document.getElementById('closeProfileBtn').addEventListener('click', ()=> document.getElementById('profileModal').classList.add('hidden'));
     document.getElementById('shakeButton').addEventListener('click', shakeScreen);
     
@@ -917,7 +1289,6 @@
     });
     currentBallValueSpan.style.cursor = 'pointer';
 
-    // Закрытие результата по клику вне окна
     resultModal.addEventListener('click', (e) => {
       if (e.target === resultModal) {
         resultModal.classList.add('hidden');
@@ -925,12 +1296,11 @@
     });
 
     window.addEventListener('beforeunload', ()=>{
-      if(currentUser) localStorage.setItem('plinko_current_id', currentUser.id);
+      if(currentUser) localStorage.setItem('space_pinball_current_id', currentUser.id);
     });
 
     // ========== ЗАПУСК ==========
-    buildPlatforms();
-    buildBinWalls();
+    initMap();
     checkSavedSession();
     gameLoop();
     updateUI();
