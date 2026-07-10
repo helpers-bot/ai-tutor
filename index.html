@@ -23,6 +23,7 @@
       align-items: center;
       overflow: hidden;
       touch-action: pan-x pan-y;
+      font-size: 0.85rem;
     }
     .game-container {
       width: 100%;
@@ -62,6 +63,26 @@
       touch-action: none;
       flex-shrink: 1;
     }
+    .top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+    .stars-box {
+      background: #1e1a33;
+      border-radius: 40px;
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      font-size: 1.3rem;
+      box-shadow: 0 4px 0 #0b0820;
+      border: 1px solid #ffd966;
+      color: #ffd966;
+    }
     .panel {
       width: 100%;
       display: flex;
@@ -70,18 +91,6 @@
       align-items: center;
       gap: 8px;
       margin: 10px 0 8px;
-    }
-    .balance-box {
-      background: #1e1a33;
-      border-radius: 40px;
-      padding: 8px 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: bold;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 0 #0b0820;
-      border: 1px solid #ffd966;
     }
     .ball-selector {
       display: flex;
@@ -98,8 +107,8 @@
       color: #1a1a2e;
       font-weight: bold;
       border-radius: 30px;
-      padding: 12px 18px;
-      font-size: 0.95rem;
+      padding: 10px 14px;
+      font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 5px 0 #cc8a2a;
@@ -121,6 +130,16 @@
       box-shadow: 0 3px 0 #7f5a2e;
       pointer-events: none;
     }
+    .big-btn {
+      padding: 14px 22px;
+      font-size: 1rem;
+      border-radius: 34px;
+      box-shadow: 0 6px 0 #cc8a2a;
+    }
+    .small-btn {
+      padding: 8px 12px;
+      font-size: 0.75rem;
+    }
     .shop-button {
       background: linear-gradient(180deg, #c084fc 0%, #7c3aed 100%);
       box-shadow: 0 5px 0 #4c1d95;
@@ -131,7 +150,7 @@
       padding: 5px 18px;
       border-radius: 25px;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 0.85rem;
       backdrop-filter: blur(4px);
     }
     .hidden {
@@ -234,14 +253,15 @@
       gap: 8px;
       justify-content: center;
       flex-wrap: wrap;
+      align-items: center;
     }
   </style>
 </head>
 <body>
 <div class="game-container" id="gameContainer">
-  <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 5px;">
+  <div class="top-bar">
     <div class="user-greeting" id="userGreeting">👤 Гость</div>
-    <div class="balance-box">⭐ <span id="balanceDisplay">100</span></div>
+    <div class="stars-box">⭐ <span id="balanceDisplay">100</span></div>
   </div>
   
   <canvas id="gameCanvas" width="440" height="440"></canvas>
@@ -252,14 +272,14 @@
       <span id="currentBallValue">1</span>
       <span>очко</span>
     </div>
-    <button id="dropButton">🚀 Запуск</button>
   </div>
   
   <div class="action-row">
-    <button id="shopButton" class="shop-button">🛒 Магазин</button>
-    <button id="shakeButton" style="background:#5d5b8a;">📳 Встряхнуть</button>
-    <button id="profileButton">👤 Профиль</button>
-    <button id="logoutButton" style="background:#4a4a6a;">🚪 Выйти</button>
+    <button id="dropButton" class="big-btn">🚀 Запуск</button>
+    <button id="shakeButton" class="big-btn" style="background:#5d5b8a;">📳 Встряхнуть</button>
+    <button id="shopButton" class="shop-button small-btn">🛒</button>
+    <button id="profileButton" class="small-btn">👤</button>
+    <button id="logoutButton" class="small-btn" style="background:#4a4a6a;">🚪</button>
   </div>
 </div>
 
@@ -419,6 +439,9 @@
     const multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
     const binCount = multipliers.length;
 
+    // Физические стенки между ячейками
+    let binWalls = [];
+
     let ball = {
       x: 220, y: 65, vx: 0, vy: 0, active: false, value: 1
     };
@@ -463,7 +486,26 @@
         }
       }
     }
+
+    function buildBinWalls() {
+      binWalls = [];
+      const binWidth = canvas.width / binCount;
+      const binY = canvas.height - 30;
+      const wallHeight = 25; // высота стенок над ячейками
+      for (let i = 0; i <= binCount; i++) {
+        const x = i * binWidth;
+        binWalls.push({
+          x1: x,
+          y1: binY - wallHeight,
+          x2: x,
+          y2: binY + 30,
+          isWall: true
+        });
+      }
+    }
+
     buildPlatforms();
+    buildBinWalls();
 
     function resetBall() {
       ball.active = false;
@@ -544,6 +586,42 @@
       soundDrop();
     }
 
+    // Проверка столкновения с вертикальной стенкой
+    function checkWallCollision(wall) {
+      // Находим ближайшую точку на отрезке стены к центру шара
+      const dx = wall.x2 - wall.x1;
+      const dy = wall.y2 - wall.y1;
+      const lengthSq = dx * dx + dy * dy;
+      
+      let t = ((ball.x - wall.x1) * dx + (ball.y - wall.y1) * dy) / lengthSq;
+      t = Math.max(0, Math.min(1, t));
+      
+      const closestX = wall.x1 + t * dx;
+      const closestY = wall.y1 + t * dy;
+      
+      const distX = ball.x - closestX;
+      const distY = ball.y - closestY;
+      const dist = Math.sqrt(distX * distX + distY * distY);
+      
+      if (dist < BALL_RADIUS && dist > 0.001) {
+        const nx = distX / dist;
+        const ny = distY / dist;
+        
+        // Выталкиваем шар
+        ball.x += nx * (BALL_RADIUS - dist);
+        ball.y += ny * (BALL_RADIUS - dist);
+        
+        // Отражение скорости
+        const vn = ball.vx * nx + ball.vy * ny;
+        if (vn < 0) {
+          ball.vx -= (1 + BOUNCE) * vn * nx;
+          ball.vy -= (1 + BOUNCE) * vn * ny;
+          return true;
+        }
+      }
+      return false;
+    }
+
     function applyPhysics() {
       if (!ball.active || !gameActive) return;
       
@@ -555,6 +633,8 @@
       if (ball.x + BALL_RADIUS > canvas.width - 2) { ball.x = canvas.width - BALL_RADIUS - 2; ball.vx *= -BOUNCE; }
 
       let bounced = false;
+      
+      // Столкновение с платформами
       for (let p of platforms) {
         const dx = ball.x - p.x;
         const dy = ball.y - p.y;
@@ -575,12 +655,19 @@
         }
       }
       
+      // Столкновение со стенками между ячейками
+      for (let wall of binWalls) {
+        if (checkWallCollision(wall)) {
+          bounced = true;
+        }
+      }
+      
       if (bounced && Date.now() - lastBounceTime > bounceCooldown) {
         soundBounce();
         lastBounceTime = Date.now();
       }
 
-      if (ball.y + BALL_RADIUS > canvas.height - 30) {
+      if (ball.y + BALL_RADIUS > canvas.height - 5) {
         const binWidth = canvas.width / binCount;
         let binIndex = Math.floor(ball.x / binWidth);
         if (binIndex < 0) binIndex = 0;
@@ -596,9 +683,15 @@
         const newBalance = currentUser ? currentUser.balance : 0;
         
         updateUI();
-        showResult(ball.value, multiplier, winnings, oldBalance, newBalance);
-        resetBall();
+        
+        // Задержка 1 секунда перед показом окна
         gameActive = false;
+        ball.active = false;
+        
+        setTimeout(() => {
+          showResult(ball.value, multiplier, winnings, oldBalance, newBalance);
+          resetBall();
+        }, 1000);
       }
       
       if (ball.y > canvas.height + 70 || ball.y < -50) { 
@@ -642,18 +735,42 @@
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
 
+      // Рисуем ячейки с прямыми углами (90°)
       const binWidth = canvas.width / binCount;
+      const binY = canvas.height - 30;
       for (let i = 0; i < binCount; i++) {
         const x = i * binWidth;
         ctx.fillStyle = i % 2 === 0 ? '#2c2540' : '#3b3155';
-        ctx.fillRect(x, canvas.height-30, binWidth, 30);
+        ctx.fillRect(x, binY, binWidth, 30);
+        
+        // Прямые углы - рисуем без скругления
+        ctx.strokeStyle = '#9b8ec4';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, binY, binWidth, 30);
+        
         ctx.fillStyle = '#fff';
         ctx.font = 'bold 11px "Segoe UI"';
         ctx.textAlign = 'center';
-        ctx.fillText(`x${multipliers[i]}`, x+binWidth/2, canvas.height-10);
-        ctx.strokeStyle = '#9b8ec4';
-        ctx.strokeRect(x, canvas.height-30, binWidth, 30);
+        ctx.fillText(`x${multipliers[i]}`, x+binWidth/2, binY+20);
       }
+
+      // Рисуем физические стенки между ячейками
+      ctx.strokeStyle = '#6b5b95';
+      ctx.lineWidth = 3;
+      for (let wall of binWalls) {
+        ctx.beginPath();
+        ctx.moveTo(wall.x1, wall.y1);
+        ctx.lineTo(wall.x2, wall.y2);
+        ctx.stroke();
+      }
+      
+      // Верхняя граница ячеек
+      ctx.strokeStyle = '#9b8ec4';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, binY);
+      ctx.lineTo(canvas.width, binY);
+      ctx.stroke();
 
       if (ball.active) {
         ctx.shadowColor = '#ff9f43';
@@ -813,6 +930,7 @@
 
     // ========== ЗАПУСК ==========
     buildPlatforms();
+    buildBinWalls();
     checkSavedSession();
     gameLoop();
     updateUI();
