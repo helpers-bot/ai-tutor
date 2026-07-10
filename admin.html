@@ -2,647 +2,1040 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Шарики • Звёзды</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель — Редактор карт</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     }
     body {
-      background: #0b0f1c;
+      background: #0a0a1a;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color: #fff;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
-      margin: 0;
+      height: 100vh;
+      overflow: hidden;
     }
-    .game-container {
-      width: 100%;
-      max-width: 480px;
-      background: #1a1f2f;
-      border-radius: 32px;
-      padding: 16px 14px 20px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    
+    .sidebar {
+      width: 320px;
+      min-width: 320px;
+      background: #111133;
+      padding: 15px;
+      overflow-y: auto;
+      border-right: 2px solid #3333aa;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
-    .top-panel {
+    
+    .sidebar h2 {
+      color: #ffd700;
+      text-align: center;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+    
+    .section {
+      background: #1a1a3a;
+      border-radius: 10px;
+      padding: 12px;
+      border: 1px solid #333366;
+    }
+    
+    .section h3 {
+      color: #66ccff;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #aaaacc;
+      margin-bottom: 3px;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #444488;
+      background: #0a0a22;
+      color: #fff;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+    
+    input[type="range"] {
+      padding: 0;
+      height: 20px;
+    }
+    
+    button {
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.9;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(180deg, #4488ff, #2266cc);
+      color: #fff;
+    }
+    
+    .btn-success {
+      background: linear-gradient(180deg, #44cc44, #228822);
+      color: #fff;
+    }
+    
+    .btn-danger {
+      background: linear-gradient(180deg, #ff4444, #cc2222);
+      color: #fff;
+    }
+    
+    .btn-warning {
+      background: linear-gradient(180deg, #ffaa44, #cc7722);
+      color: #fff;
+    }
+    
+    .btn-info {
+      background: linear-gradient(180deg, #aa44ff, #6622cc);
+      color: #fff;
+    }
+    
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 0.7rem;
+      width: auto;
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-group button {
+      flex: 1;
+      min-width: 70px;
+    }
+    
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    
+    .toolbar {
+      background: #111133;
+      padding: 10px 15px;
+      border-bottom: 2px solid #3333aa;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .toolbar button {
+      width: auto;
+      margin-bottom: 0;
+    }
+    
+    .toolbar .info {
+      font-size: 0.8rem;
+      color: #aaaacc;
+      margin-left: auto;
+    }
+    
+    canvas {
+      flex: 1;
+      background: #000015;
+      cursor: crosshair;
+    }
+    
+    .tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.9);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      pointer-events: none;
+      z-index: 100;
+      border: 1px solid #6666aa;
+      display: none;
+    }
+    
+    .map-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .map-item {
+      background: #1a1a3a;
+      padding: 8px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      font-size: 0.8rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #252b3d;
-      border-radius: 24px;
-      padding: 10px 18px;
-      color: white;
-      flex-wrap: wrap;
     }
-    .user-info {
-      display: flex;
-      flex-direction: column;
+    
+    .map-item:hover {
+      border-color: #4488ff;
     }
-    .username {
-      font-weight: 600;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    
+    .map-item.active {
+      border-color: #ffd700;
+      background: #222244;
     }
-    .vip-badge {
-      color: #fbbf24;
-      font-size: 0.9rem;
-      font-weight: bold;
-      background: #3b2e1e;
-      padding: 2px 10px;
-      border-radius: 20px;
-    }
-    .no-vip {
-      color: #ef4444;
-      text-decoration: line-through;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-    .balance {
-      background: #fbbf24;
-      color: #0b0f1c;
-      padding: 6px 14px;
-      border-radius: 30px;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 1rem;
-    }
-    canvas {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #10141e;
-      border-radius: 28px;
-      display: block;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-      touch-action: none; /* улучшает поведение на телефоне */
-    }
-    .buttons-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 4px;
-    }
-    .btn {
-      background: #2d3548;
+    
+    .map-item .delete-map {
+      background: #ff4444;
+      color: #fff;
       border: none;
-      color: white;
-      padding: 12px 16px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      flex: 1 1 auto;
-      min-width: 70px;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      font-size: 0.7rem;
       cursor: pointer;
-      transition: 0.2s;
+      padding: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-      letter-spacing: 0.3px;
     }
-    .btn:active { transform: scale(0.96); background: #3e465c; }
-    .btn.primary { background: #fbbf24; color: #0b0f1c; font-weight: bold; }
-    .modal {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(6px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      visibility: hidden;
-      opacity: 0;
-      transition: 0.2s ease;
+    
+    .obstacle-palette {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
     }
-    .modal.active {
-      visibility: visible;
-      opacity: 1;
-    }
-    .modal-content {
-      background: #1f2537;
-      padding: 24px;
-      border-radius: 28px;
-      max-width: 320px;
-      width: 90%;
-      color: white;
-      text-align: center;
-      box-shadow: 0 20px 30px black;
-    }
-    .modal-content h3 { margin-bottom: 12px; }
-    .modal-content p { margin: 10px 0; font-size: 0.9rem; }
-    .close-btn {
-      background: #3b4256;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      border-radius: 30px;
-      margin-top: 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .copy-text {
-      background: #0f1322;
+    
+    .obstacle-btn {
       padding: 8px;
-      border-radius: 12px;
-      word-break: break-all;
-      margin: 10px 0;
-      font-size: 0.8rem;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.7rem;
+      text-align: center;
+      transition: all 0.2s;
+      background: #1a1a3a;
+      color: #fff;
     }
-    .row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+    
+    .obstacle-btn:hover {
+      border-color: #ffd700;
+    }
+    
+    .obstacle-btn.selected {
+      border-color: #44ff44;
+      background: #223322;
+      box-shadow: 0 0 10px rgba(68,255,68,0.3);
+    }
+    
+    .coords-display {
+      font-family: monospace;
+      font-size: 0.75rem;
+      color: #88ff88;
+    }
+    
+    .obstacle-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .obstacle-item {
+      background: #1a1a3a;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin-bottom: 3px;
+      font-size: 0.7rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #333366;
+    }
+    
+    .obstacle-item:hover {
+      background: #222244;
+    }
+    
+    .obstacle-item .remove-obs {
+      background: #ff4444;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 0.6rem;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    
+    .modal {
+      background: #111133;
+      padding: 20px;
+      border-radius: 12px;
+      border: 2px solid #4488ff;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .modal h3 {
+      color: #ffd700;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    .hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
-<div class="game-container">
-  <div class="top-panel">
-    <div class="user-info">
-      <span class="username" id="displayName">Игрок</span>
-      <span id="vipStatus" class="no-vip">VIP неактивен</span>
+
+<!-- Боковая панель -->
+<div class="sidebar" id="sidebar">
+  <h2>🛠️ Админ-панель</h2>
+  
+  <!-- Список карт -->
+  <div class="section">
+    <h3>📁 Сохранённые карты</h3>
+    <div class="map-list" id="mapList"></div>
+    <div class="btn-group">
+      <button class="btn-primary" onclick="newMap()">➕ Новая</button>
+      <button class="btn-success" onclick="saveMap()">💾 Сохранить</button>
     </div>
-    <div class="balance" id="balanceDisplay">⭐ 0</div>
   </div>
-
-  <canvas id="gameCanvas" width="400" height="400"></canvas>
-
-  <div class="buttons-grid">
-    <button class="btn primary" id="buyVipBtn">💎 VIP</button>
-    <button class="btn" id="bonusBtn">⚡ x5 бонус</button>
-    <button class="btn" id="inviteBtn">👥 Друзья</button>
-    <button class="btn" id="profileBtn">👤 Профиль</button>
+  
+  <!-- Параметры карты -->
+  <div class="section">
+    <h3>⚙️ Параметры карты</h3>
+    <label>Название:</label>
+    <input type="text" id="mapName" value="Новая карта" placeholder="Название карты">
+    
+    <label>Длина трассы (пиксели):</label>
+    <input type="number" id="trackLength" value="3500" min="1000" max="10000" step="100">
+    <input type="range" id="trackLengthRange" value="3500" min="1000" max="10000" step="100" oninput="syncRange('trackLength', this.value)">
+    
+    <label>Количество шаров:</label>
+    <select id="ballCount">
+      <option value="4">4 шара</option>
+      <option value="5">5 шаров</option>
+      <option value="6" selected>6 шаров</option>
+      <option value="8">8 шаров</option>
+      <option value="10">10 шаров</option>
+    </select>
+    
+    <label>Гравитация:</label>
+    <input type="number" id="gravity" value="0.15" min="0.05" max="0.5" step="0.01">
+    
+    <label>Цвет фона:</label>
+    <input type="color" id="bgColor" value="#000015">
+    
+    <label>Ширина трассы (пиксели):</label>
+    <input type="number" id="trackWidth" value="440" min="300" max="600" step="10">
+  </div>
+  
+  <!-- Палитра препятствий -->
+  <div class="section">
+    <h3>🎯 Инструменты</h3>
+    <div class="obstacle-palette" id="obstaclePalette">
+      <button class="obstacle-btn" data-type="pin" style="border-color:#f4d03f;">📌 Пин</button>
+      <button class="obstacle-btn" data-type="bumper" style="border-color:#ff4466;">🔼 Батут</button>
+      <button class="obstacle-btn" data-type="funnel" style="border-color:#8844ff;">🌀 Воронка</button>
+      <button class="obstacle-btn selected" data-type="wall" style="border-color:#888888;">🧱 Стена</button>
+      <button class="obstacle-btn" data-type="tunnel" style="border-color:#666666;">🕳️ Туннель</button>
+      <button class="obstacle-btn" data-type="spinner" style="border-color:#ff8800;">⚙️ Спиннер</button>
+    </div>
+    <button class="btn-danger btn-small" onclick="setTool('delete')" id="deleteTool">🗑️ Удаление</button>
+    <button class="btn-info btn-small" onclick="setTool('select')" id="selectTool">👆 Выбор</button>
+  </div>
+  
+  <!-- Свойства выбранного препятствия -->
+  <div class="section hidden" id="propsPanel">
+    <h3>🔧 Свойства</h3>
+    <div id="propsContent"></div>
+  </div>
+  
+  <!-- Список препятствий -->
+  <div class="section">
+    <h3>📋 Препятствия (<span id="obsCount">0</span>)</h3>
+    <div class="obstacle-list" id="obstacleList"></div>
+    <button class="btn-danger btn-small" onclick="clearAll()">🗑️ Очистить всё</button>
+  </div>
+  
+  <!-- Экспорт/Импорт -->
+  <div class="section">
+    <h3>📤 Экспорт / Импорт</h3>
+    <button class="btn-info btn-small" onclick="exportJSON()">📋 Копировать JSON</button>
+    <button class="btn-warning btn-small" onclick="importJSON()">📥 Импорт JSON</button>
+    <button class="btn-success btn-small" onclick="testMap()">▶ Тестировать</button>
   </div>
 </div>
 
-<!-- Модальные окна -->
-<div class="modal" id="vipModal">
-  <div class="modal-content">
-    <h3>💎 VIP статус</h3>
-    <p>⭐ Звёзды за удар: <strong>2 вместо 1</strong></p>
-    <p>🔥 Удвоение заработка навсегда</p>
-    <p>💲 Стоимость: <strong>1$ (эмуляция)</strong></p>
-    <button class="close-btn" id="confirmVipBtn">Купить VIP (1$)</button>
-    <button class="close-btn" id="closeVipModal">Отмена</button>
+<!-- Основная область -->
+<div class="main-area">
+  <div class="toolbar">
+    <span style="color:#ffd700; font-weight:bold;">🗺️ Редактор карт</span>
+    <button class="btn-primary btn-small" onclick="zoomIn()">🔍 +</button>
+    <button class="btn-primary btn-small" onclick="zoomOut()">🔍 -</button>
+    <button class="btn-primary btn-small" onclick="resetZoom()">↺ Сброс</button>
+    <span class="info">Масштаб: <span id="zoomLevel">1.0</span>x</span>
+    <span class="info coords-display" id="mouseCoords">X: 0, Y: 0</span>
+    <span class="info" id="selectedInfo"></span>
   </div>
+  <canvas id="editorCanvas"></canvas>
+  <div class="tooltip" id="tooltip"></div>
 </div>
 
-<div class="modal" id="bonusModal">
-  <div class="modal-content">
-    <h3>⚡ Реклама</h3>
-    <p>Посмотрите рекламу, чтобы получить <strong>x5 скорости</strong> на 1 минуту!</p>
-    <button class="close-btn" id="watchAdBtn">▶ Смотреть рекламу</button>
-    <button class="close-btn" id="closeBonusModal">Закрыть</button>
-  </div>
-</div>
-
-<div class="modal" id="inviteModal">
-  <div class="modal-content">
-    <h3>👥 Пригласить друга</h3>
-    <p>Твоя реферальная ссылка:</p>
-    <div class="copy-text" id="refLinkDisplay">загрузка...</div>
-    <button class="close-btn" id="copyRefBtn">📋 Копировать</button>
-    <button class="close-btn" id="closeInviteModal">Закрыть</button>
-    <p style="font-size:0.75rem; margin-top:10px;">+1 шарик за друга с VIP<br>3,10,20,50,100 друзей → ещё шарики</p>
-  </div>
-</div>
-
-<div class="modal" id="profileModal">
-  <div class="modal-content">
-    <h3>👤 Профиль</h3>
-    <p>Имя: <span id="profileName"></span> <button id="editNameBtn" style="background:#fbbf24; border:none; padding:2px 10px; border-radius:20px;">✏️</button></p>
-    <p>ID: <strong id="profileId"></strong></p>
-    <p>Баланс: ⭐ <span id="profileBalance"></span></p>
-    <div class="copy-text" id="profileRef"></div>
-    <button class="close-btn" id="copyProfileRefBtn">📋 Копировать ссылку</button>
-    <button class="close-btn" id="closeProfileModal">Закрыть</button>
+<!-- Модальное окно импорта -->
+<div class="modal-overlay hidden" id="importModal">
+  <div class="modal">
+    <h3>📥 Импорт JSON</h3>
+    <textarea id="importJSONText" rows="10" placeholder="Вставьте JSON код карты..."></textarea>
+    <div class="btn-group">
+      <button class="btn-success" onclick="doImport()">✅ Импортировать</button>
+      <button class="btn-danger" onclick="closeImport()">❌ Отмена</button>
+    </div>
   </div>
 </div>
 
 <script>
   (function() {
-    // ---------- СОСТОЯНИЕ ----------
-    const STORAGE_KEY = 'bouncing_balls_vip_game';
-
-    // Дефолтные данные
-    let userState = {
-      id: null,
-      name: 'Игрок',
-      balance: 0,
-      isVip: false,
-      ballsCount: 1,
-      invitedFriends: 0,        // сколько друзей приглашено (симуляция)
-      bonusMultiplier: 1,       // 1 или 5
-      bonusEndTime: 0,
-    };
-
-    // Генерация уникального ID (8 цифр)
-    function generateId() {
-      return Math.floor(10000000 + Math.random() * 90000000).toString();
-    }
-
-    // Загрузка из localStorage
-    function loadState() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          userState = { ...userState, ...parsed };
-          if (!userState.id) userState.id = generateId();
-        } catch (e) { userState.id = generateId(); }
-      } else {
-        userState.id = generateId();
-      }
-      // Корректировка bonusMultiplier если время истекло
-      if (userState.bonusEndTime && Date.now() > userState.bonusEndTime) {
-        userState.bonusMultiplier = 1;
-        userState.bonusEndTime = 0;
-      }
-      if (userState.bonusMultiplier !== 5) userState.bonusMultiplier = 1;
-    }
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(userState));
-    }
-
-    // Обновление UI
-    function updateUI() {
-      document.getElementById('displayName').textContent = userState.name;
-      const vipEl = document.getElementById('vipStatus');
-      if (userState.isVip) {
-        vipEl.className = 'vip-badge';
-        vipEl.textContent = 'VIP ⭐x2';
-      } else {
-        vipEl.className = 'no-vip';
-        vipEl.textContent = 'VIP неактивен';
-      }
-      document.getElementById('balanceDisplay').textContent = `⭐ ${userState.balance}`;
-    }
-
-    // ---------- ШАРИКИ И ФИЗИКА ----------
-    const canvas = document.getElementById('gameCanvas');
+    const canvas = document.getElementById('editorCanvas');
     const ctx = canvas.getContext('2d');
-
-    // Размеры канваса подстраиваются под CSS (в пикселях)
-    function resizeCanvas() {
-      const rect = canvas.getBoundingClientRect();
-      if (rect.width > 0) {
-        canvas.width = rect.width;
-        canvas.height = rect.width; // квадрат
+    
+    // Состояние редактора
+    let currentTool = 'wall';
+    let selectedObstacle = null;
+    let zoom = 1.0;
+    let panX = 0;
+    let panY = 0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
+    let mouseX = 0;
+    let mouseY = 0;
+    
+    // Данные карты
+    let mapData = {
+      name: 'Новая карта',
+      trackLength: 3500,
+      trackWidth: 440,
+      ballCount: 6,
+      gravity: 0.15,
+      bgColor: '#000015',
+      obstacles: [],
+      id: Date.now().toString()
+    };
+    
+    let savedMaps = [];
+    
+    // Загрузка сохранённых карт
+    function loadSavedMaps() {
+      const data = localStorage.getItem('admin_maps');
+      savedMaps = data ? JSON.parse(data) : [];
+      if (savedMaps.length === 0) {
+        // Создаём демо-карту
+        savedMaps = [{
+          ...mapData,
+          name: 'Демо карта',
+          obstacles: generateDemoObstacles()
+        }];
+        saveAllMaps();
+      }
+      renderMapList();
+      if (savedMaps.length > 0) {
+        loadMap(savedMaps[0].id);
       }
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-
-    // Класс шара
-    class Ball {
-      constructor(x, y, vx, vy, radius = 18) {
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-        this.radius = radius;
-        this.mass = 1; // одинаковая масса
-      }
-
-      update(boundsWidth, boundsHeight) {
-        this.x += this.vx;
-        this.y += this.vy;
-
-        let hit = false;
-        // Отскок от стен с реалистичным отражением
-        if (this.x - this.radius < 0) {
-          this.x = this.radius;
-          this.vx = -this.vx;
-          hit = true;
-        } else if (this.x + this.radius > boundsWidth) {
-          this.x = boundsWidth - this.radius;
-          this.vx = -this.vx;
-          hit = true;
-        }
-
-        if (this.y - this.radius < 0) {
-          this.y = this.radius;
-          this.vy = -this.vy;
-          hit = true;
-        } else if (this.y + this.radius > boundsHeight) {
-          this.y = boundsHeight - this.radius;
-          this.vy = -this.vy;
-          hit = true;
-        }
-        return hit;
-      }
-
-      draw(ctx) {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        const gradient = ctx.createRadialGradient(this.x-4, this.y-4, 2, this.x, this.y, this.radius);
-        gradient.addColorStop(0, '#facc15');
-        gradient.addColorStop(0.7, '#eab308');
-        gradient.addColorStop(1, '#a16207');
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        ctx.strokeStyle = '#fef9c3';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        // блик
-        ctx.beginPath();
-        ctx.arc(this.x-5, this.y-5, 4, 0, Math.PI*2);
-        ctx.fillStyle = '#ffffff90';
-        ctx.fill();
-      }
+    
+    function saveAllMaps() {
+      localStorage.setItem('admin_maps', JSON.stringify(savedMaps));
     }
-
-    let balls = [];
-
-    function createBalls(count) {
-      balls = [];
-      const w = canvas.width || 400;
-      const h = canvas.height || 400;
-      for (let i = 0; i < count; i++) {
-        let radius = 16 + Math.floor(Math.random()*6);
-        let x = Math.random() * (w - 2*radius) + radius;
-        let y = Math.random() * (h - 2*radius) + radius;
-        let speed = 1.6 + Math.random() * 1.8;
-        let angle = Math.random() * 2 * Math.PI;
-        let vx = Math.cos(angle) * speed;
-        let vy = Math.sin(angle) * speed;
-        balls.push(new Ball(x, y, vx, vy, radius));
-      }
-      // избегаем наложений
-      resolveInitialOverlap();
-    }
-
-    function resolveInitialOverlap() {
-      const w = canvas.width, h = canvas.height;
-      for (let i=0; i<balls.length; i++) {
-        for (let j=i+1; j<balls.length; j++) {
-          let b1 = balls[i], b2 = balls[j];
-          let dx = b2.x - b1.x, dy = b2.y - b1.y;
-          let dist = Math.sqrt(dx*dx+dy*dy);
-          let minDist = b1.radius + b2.radius;
-          if (dist < minDist && dist > 0.001) {
-            let angle = Math.atan2(dy, dx);
-            let overlap = minDist - dist;
-            let moveX = Math.cos(angle) * overlap/2;
-            let moveY = Math.sin(angle) * overlap/2;
-            b1.x -= moveX; b1.y -= moveY;
-            b2.x += moveX; b2.y += moveY;
-            // держим в границах
-            b1.x = Math.min(Math.max(b1.x, b1.radius), w - b1.radius);
-            b1.y = Math.min(Math.max(b1.y, b1.radius), h - b1.radius);
-            b2.x = Math.min(Math.max(b2.x, b2.radius), w - b2.radius);
-            b2.y = Math.min(Math.max(b2.y, b2.radius), h - b2.radius);
+    
+    function generateDemoObstacles() {
+      const obs = [];
+      const w = mapData.trackWidth;
+      const len = mapData.trackLength;
+      const cx = w / 2;
+      
+      for (let y = 100; y < len - 200; y += 60 + Math.random() * 80) {
+        const type = ['pin', 'bumper', 'funnel', 'wall', 'spinner'][Math.floor(Math.random() * 5)];
+        
+        if (type === 'pin') {
+          const count = 3 + Math.floor(Math.random() * 4);
+          for (let i = 0; i < count; i++) {
+            obs.push({ x: 30 + Math.random() * (w - 60), y: y + Math.random() * 20, radius: 4, type: 'pin', color: '#f4d03f' });
           }
+        } else if (type === 'bumper') {
+          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.6, y: y, width: 50, height: 6, type: 'bumper', color: '#ff4466', force: 4 });
+        } else if (type === 'funnel') {
+          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.4, y: y, radius: 25, type: 'funnel', color: '#8844ff' });
+        } else if (type === 'wall') {
+          const gapX = 40 + Math.random() * (w - 80);
+          obs.push({ x: gapX, y: y, width: 50, type: 'wall_gap', color: '#888888' });
+        } else if (type === 'spinner') {
+          obs.push({ x: cx, y: y, radius: 20, type: 'spinner', color: '#ff8800', speed: 0.04 });
         }
       }
+      return obs;
     }
-
-    function handleCollisions() {
-      for (let i=0; i<balls.length; i++) {
-        for (let j=i+1; j<balls.length; j++) {
-          let b1 = balls[i], b2 = balls[j];
-          let dx = b2.x - b1.x, dy = b2.y - b1.y;
-          let dist = Math.sqrt(dx*dx+dy*dy);
-          let minDist = b1.radius + b2.radius;
-          if (dist < minDist && dist > 0.001) {
-            // Нормали
-            let nx = dx / dist;
-            let ny = dy / dist;
-            // Относительная скорость
-            let dvx = b1.vx - b2.vx;
-            let dvy = b1.vy - b2.vy;
-            let vn = dvx * nx + dvy * ny;
-            if (vn < 0) { // уже удаляются
-              let impulse = 2 * vn / (b1.mass + b2.mass);
-              b1.vx -= impulse * b2.mass * nx;
-              b1.vy -= impulse * b2.mass * ny;
-              b2.vx += impulse * b1.mass * nx;
-              b2.vy += impulse * b1.mass * ny;
-            }
-            // Раздвигаем чтобы не слипались
-            let overlap = minDist - dist;
-            let moveX = overlap * nx / 2;
-            let moveY = overlap * ny / 2;
-            b1.x -= moveX; b1.y -= moveY;
-            b2.x += moveX; b2.y += moveY;
-          }
-        }
-      }
+    
+    function renderMapList() {
+      const list = document.getElementById('mapList');
+      list.innerHTML = savedMaps.map(m => `
+        <div class="map-item ${m.id === mapData.id ? 'active' : ''}" onclick="loadMap('${m.id}')">
+          <span>${m.name} (${m.obstacles.length} об.)</span>
+          <button class="delete-map" onclick="event.stopPropagation(); deleteMap('${m.id}')">×</button>
+        </div>
+      `).join('');
     }
-
-    function applyBonusSpeed() {
-      const now = Date.now();
-      if (userState.bonusEndTime && now < userState.bonusEndTime) {
-        return 5;
-      }
-      return 1;
-    }
-
-    // Игровой цикл
-    let lastTimestamp = 0;
-    function gameLoop(timestamp) {
-      if (!lastTimestamp) lastTimestamp = timestamp;
-      let delta = Math.min(16, timestamp - lastTimestamp); // ограничение
-      lastTimestamp = timestamp;
-
-      const w = canvas.width, h = canvas.height;
-      const speedFactor = applyBonusSpeed();
-      const baseSpeedCorrection = delta / 16.67; // примерно для 60fps
-
-      for (let ball of balls) {
-        // применяем множитель скорости (бонус x5) временно корректируя вектор
-        let currentVX = ball.vx * speedFactor * baseSpeedCorrection;
-        let currentVY = ball.vy * speedFactor * baseSpeedCorrection;
-        // сохраняем оригинальные vx,vy но двигаем с множителем
-        ball.x += currentVX;
-        ball.y += currentVY;
-
-        let hitWall = false;
-        if (ball.x - ball.radius < 0) { ball.x = ball.radius; ball.vx = Math.abs(ball.vx); hitWall = true; }
-        else if (ball.x + ball.radius > w) { ball.x = w - ball.radius; ball.vx = -Math.abs(ball.vx); hitWall = true; }
-        if (ball.y - ball.radius < 0) { ball.y = ball.radius; ball.vy = Math.abs(ball.vy); hitWall = true; }
-        else if (ball.y + ball.radius > h) { ball.y = h - ball.radius; ball.vy = -Math.abs(ball.vy); hitWall = true; }
-
-        if (hitWall) {
-          let starsEarned = userState.isVip ? 2 : 1;
-          userState.balance += starsEarned;
-          saveState();
-          updateUI();
-        }
-      }
-
-      handleCollisions();
-
-      // Отрисовка
-      ctx.clearRect(0, 0, w, h);
-      for (let ball of balls) {
-        ball.draw(ctx);
-      }
-
-      requestAnimationFrame(gameLoop);
-    }
-
-    // Синхронизация количества шаров с состоянием
-    function syncBalls() {
-      const desired = userState.ballsCount;
-      if (balls.length !== desired) {
-        createBalls(desired);
-      }
-    }
-
-    // Вызов при старте и изменениях
-    function refreshBallsAndStart() {
-      syncBalls();
-      if (!window._loopStarted) {
-        window._loopStarted = true;
-        requestAnimationFrame(gameLoop);
-      }
-    }
-
-    // ---------- ЛОГИКА ДРУЗЕЙ И ШАРИКОВ ----------
-    function recalcBallsFromFriends() {
-      let extra = 0;
-      const f = userState.invitedFriends;
-      if (f >= 100) extra = 6;
-      else if (f >= 50) extra = 5;
-      else if (f >= 20) extra = 4;
-      else if (f >= 10) extra = 3;
-      else if (f >= 3) extra = 2;
-      else if (f >= 1) extra = 1;
-      userState.ballsCount = 1 + extra;
-    }
-
-    function addFriendWithVip() {
-      userState.invitedFriends += 1;
-      recalcBallsFromFriends();
-      saveState();
-      syncBalls();
+    
+    window.newMap = function() {
+      mapData = {
+        name: 'Новая карта',
+        trackLength: 3500,
+        trackWidth: 440,
+        ballCount: 6,
+        gravity: 0.15,
+        bgColor: '#000015',
+        obstacles: [],
+        id: Date.now().toString()
+      };
+      selectedObstacle = null;
       updateUI();
+      renderMapList();
+    };
+    
+    window.saveMap = function() {
+      mapData.name = document.getElementById('mapName').value;
+      mapData.trackLength = parseInt(document.getElementById('trackLength').value);
+      mapData.trackWidth = parseInt(document.getElementById('trackWidth').value);
+      mapData.ballCount = parseInt(document.getElementById('ballCount').value);
+      mapData.gravity = parseFloat(document.getElementById('gravity').value);
+      mapData.bgColor = document.getElementById('bgColor').value;
+      
+      const idx = savedMaps.findIndex(m => m.id === mapData.id);
+      if (idx >= 0) {
+        savedMaps[idx] = { ...mapData };
+      } else {
+        savedMaps.push({ ...mapData });
+      }
+      saveAllMaps();
+      renderMapList();
+      alert('✅ Карта сохранена!');
+    };
+    
+    window.loadMap = function(id) {
+      const map = savedMaps.find(m => m.id === id);
+      if (map) {
+        mapData = { ...map, obstacles: map.obstacles.map(o => ({...o})) };
+        selectedObstacle = null;
+        updateUI();
+        renderMapList();
+      }
+    };
+    
+    window.deleteMap = function(id) {
+      if (confirm('Удалить карту?')) {
+        savedMaps = savedMaps.filter(m => m.id !== id);
+        saveAllMaps();
+        if (mapData.id === id && savedMaps.length > 0) {
+          loadMap(savedMaps[0].id);
+        } else if (savedMaps.length === 0) {
+          window.newMap();
+        }
+        renderMapList();
+      }
+    };
+    
+    function updateUI() {
+      document.getElementById('mapName').value = mapData.name;
+      document.getElementById('trackLength').value = mapData.trackLength;
+      document.getElementById('trackLengthRange').value = mapData.trackLength;
+      document.getElementById('trackWidth').value = mapData.trackWidth;
+      document.getElementById('ballCount').value = mapData.ballCount;
+      document.getElementById('gravity').value = mapData.gravity;
+      document.getElementById('bgColor').value = mapData.bgColor;
+      document.getElementById('obsCount').textContent = mapData.obstacles.length;
+      renderObstacleList();
+      updatePropsPanel();
+      resizeCanvas();
+      draw();
     }
-
-    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
-    loadState();
-    recalcBallsFromFriends(); // на случай если загрузилось другое
-    updateUI();
-    refreshBallsAndStart();
-
-    // ---------- ОБРАБОТЧИКИ КНОПОК ----------
-    document.getElementById('buyVipBtn').addEventListener('click', ()=>{
-      document.getElementById('vipModal').classList.add('active');
+    
+    function renderObstacleList() {
+      const list = document.getElementById('obstacleList');
+      list.innerHTML = mapData.obstacles.map((o, i) => `
+        <div class="obstacle-item" onclick="selectObstacle(${i})" style="${selectedObstacle === i ? 'border-color:#ffd700;' : ''}">
+          <span>${getObsIcon(o.type)} ${o.type} (${Math.round(o.x)}, ${Math.round(o.y)})</span>
+          <button class="remove-obs" onclick="event.stopPropagation(); removeObstacle(${i})">×</button>
+        </div>
+      `).join('');
+    }
+    
+    function getObsIcon(type) {
+      const icons = { pin: '📌', bumper: '🔼', funnel: '🌀', wall_gap: '🧱', wall_seg: '🧱', tunnel: '🕳️', spinner: '⚙️' };
+      return icons[type] || '❓';
+    }
+    
+    window.selectObstacle = function(index) {
+      selectedObstacle = index;
+      updatePropsPanel();
+      renderObstacleList();
+      draw();
+    };
+    
+    window.removeObstacle = function(index) {
+      mapData.obstacles.splice(index, 1);
+      if (selectedObstacle === index) selectedObstacle = null;
+      else if (selectedObstacle > index) selectedObstacle--;
+      updateUI();
+      draw();
+    };
+    
+    window.clearAll = function() {
+      if (confirm('Удалить все препятствия?')) {
+        mapData.obstacles = [];
+        selectedObstacle = null;
+        updateUI();
+        draw();
+      }
+    };
+    
+    function updatePropsPanel() {
+      const panel = document.getElementById('propsPanel');
+      const content = document.getElementById('propsContent');
+      
+      if (selectedObstacle !== null && mapData.obstacles[selectedObstacle]) {
+        panel.classList.remove('hidden');
+        const o = mapData.obstacles[selectedObstacle];
+        content.innerHTML = `
+          <label>Тип: <strong>${o.type}</strong></label>
+          <label>X:</label>
+          <input type="number" value="${Math.round(o.x)}" onchange="updateProp('x', parseInt(this.value))">
+          <label>Y:</label>
+          <input type="number" value="${Math.round(o.y)}" onchange="updateProp('y', parseInt(this.value))">
+          ${o.radius !== undefined ? `<label>Радиус:</label><input type="number" value="${o.radius}" onchange="updateProp('radius', parseInt(this.value))">` : ''}
+          ${o.width !== undefined ? `<label>Ширина:</label><input type="number" value="${o.width}" onchange="updateProp('width', parseInt(this.value))">` : ''}
+          ${o.force !== undefined ? `<label>Сила:</label><input type="number" value="${o.force}" step="0.1" onchange="updateProp('force', parseFloat(this.value))">` : ''}
+          ${o.speed !== undefined ? `<label>Скорость:</label><input type="number" value="${o.speed}" step="0.01" onchange="updateProp('speed', parseFloat(this.value))">` : ''}
+          <label>Цвет:</label>
+          <input type="color" value="${o.color || '#ffffff'}" onchange="updateProp('color', this.value)">
+        `;
+      } else {
+        panel.classList.add('hidden');
+        content.innerHTML = '';
+      }
+    }
+    
+    window.updateProp = function(prop, value) {
+      if (selectedObstacle !== null && mapData.obstacles[selectedObstacle]) {
+        mapData.obstacles[selectedObstacle][prop] = value;
+        draw();
+      }
+    };
+    
+    window.syncRange = function(inputId, value) {
+      document.getElementById(inputId).value = value;
+      mapData.trackLength = parseInt(value);
+      resizeCanvas();
+      draw();
+    };
+    
+    window.setTool = function(tool) {
+      currentTool = tool;
+      document.querySelectorAll('.obstacle-btn').forEach(b => b.classList.remove('selected'));
+      document.getElementById('deleteTool').style.borderColor = tool === 'delete' ? '#ff4444' : '';
+      document.getElementById('selectTool').style.borderColor = tool === 'select' ? '#44ff44' : '';
+      
+      if (tool !== 'delete' && tool !== 'select') {
+        const btn = document.querySelector(`[data-type="${tool}"]`);
+        if (btn) btn.classList.add('selected');
+      }
+    };
+    
+    // Инициализация палитры
+    document.querySelectorAll('.obstacle-btn').forEach(btn => {
+      btn.addEventListener('click', () => setTool(btn.dataset.type));
     });
-    document.getElementById('closeVipModal').addEventListener('click', ()=>{
-      document.getElementById('vipModal').classList.remove('active');
-    });
-    document.getElementById('confirmVipBtn').addEventListener('click', ()=>{
-      if (userState.isVip) {
-        alert('VIP уже активирован!');
-        document.getElementById('vipModal').classList.remove('active');
+    
+    // Canvas размеры
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height - 50;
+    }
+    
+    // Преобразование координат
+    function screenToWorld(sx, sy) {
+      const cx = canvas.width / 2;
+      const cy = 50;
+      return {
+        x: (sx - cx) / zoom + mapData.trackWidth / 2 - panX,
+        y: (sy - cy) / zoom - panY
+      };
+    }
+    
+    function worldToScreen(wx, wy) {
+      const cx = canvas.width / 2;
+      const cy = 50;
+      return {
+        x: (wx - mapData.trackWidth / 2 + panX) * zoom + cx,
+        y: (wy + panY) * zoom + cy
+      };
+    }
+    
+    // Отрисовка
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Фон
+      ctx.fillStyle = mapData.bgColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Трасса
+      const topLeft = worldToScreen(0, 0);
+      const bottomRight = worldToScreen(mapData.trackWidth, mapData.trackLength);
+      
+      ctx.fillStyle = '#111122';
+      ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+      
+      // Стены
+      ctx.strokeStyle = '#3333aa';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(topLeft.x, topLeft.y);
+      ctx.lineTo(topLeft.x, bottomRight.y);
+      ctx.moveTo(bottomRight.x, topLeft.y);
+      ctx.lineTo(bottomRight.x, bottomRight.y);
+      ctx.stroke();
+      
+      // Сетка
+      ctx.strokeStyle = '#1a1a33';
+      ctx.lineWidth = 1;
+      for (let y = 0; y < mapData.trackLength; y += 100) {
+        const sy = worldToScreen(0, y).y;
+        ctx.beginPath();
+        ctx.moveTo(topLeft.x, sy);
+        ctx.lineTo(bottomRight.x, sy);
+        ctx.stroke();
+      }
+      
+      // Препятствия
+      mapData.obstacles.forEach((o, i) => {
+        const pos = worldToScreen(o.x, o.y);
+        const isSelected = i === selectedObstacle;
+        
+        if (o.type === 'pin') {
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, o.radius * zoom, 0, Math.PI * 2);
+          ctx.fillStyle = o.color;
+          ctx.fill();
+          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
+          ctx.lineWidth = isSelected ? 3 : 1;
+          ctx.stroke();
+        } else if (o.type === 'bumper') {
+          ctx.fillStyle = o.color;
+          ctx.fillRect(pos.x - o.width/2 * zoom, pos.y - o.height/2 * zoom, o.width * zoom, o.height * zoom);
+          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
+          ctx.lineWidth = isSelected ? 3 : 1;
+          ctx.strokeRect(pos.x - o.width/2 * zoom, pos.y - o.height/2 * zoom, o.width * zoom, o.height * zoom);
+        } else if (o.type === 'funnel') {
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, o.radius * zoom, 0, Math.PI * 2);
+          ctx.strokeStyle = isSelected ? '#ffd700' : o.color;
+          ctx.lineWidth = isSelected ? 4 : 3;
+          ctx.stroke();
+        } else if (o.type === 'wall_gap') {
+          ctx.fillStyle = o.color;
+          const wy = pos.y;
+          ctx.fillRect(topLeft.x, wy - 2 * zoom, (pos.x - o.width/2 * zoom) - topLeft.x, 4 * zoom);
+          ctx.fillRect(pos.x + o.width/2 * zoom, wy - 2 * zoom, bottomRight.x - (pos.x + o.width/2 * zoom), 4 * zoom);
+          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
+          ctx.lineWidth = isSelected ? 3 : 1;
+          ctx.strokeRect(pos.x - o.width/2 * zoom, wy - 4 * zoom, o.width * zoom, 8 * zoom);
+        } else if (o.type === 'wall_seg') {
+          ctx.fillStyle = o.color;
+          ctx.fillRect(pos.x - o.width/2 * zoom, pos.y - o.height/2 * zoom, o.width * zoom, o.height * zoom);
+        } else if (o.type === 'spinner') {
+          ctx.save();
+          ctx.translate(pos.x, pos.y);
+          ctx.fillStyle = o.color;
+          ctx.fillRect(-o.radius * zoom, -2 * zoom, o.radius * 2 * zoom, 4 * zoom);
+          ctx.fillRect(-2 * zoom, -o.radius * zoom, 4 * zoom, o.radius * 2 * zoom);
+          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
+          ctx.strokeRect(-o.radius * zoom, -2 * zoom, o.radius * 2 * zoom, 4 * zoom);
+          ctx.restore();
+        }
+        
+        // Номер
+        ctx.fillStyle = '#fff';
+        ctx.font = `${10 * zoom}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(i, pos.x, pos.y - 12 * zoom);
+      });
+      
+      // Финиш
+      const finishPos = worldToScreen(0, mapData.trackLength);
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([10, 5]);
+      ctx.beginPath();
+      ctx.moveTo(topLeft.x, finishPos.y);
+      ctx.lineTo(bottomRight.x, finishPos.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    
+    // Обработчики мыши
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      const world = screenToWorld(sx, sy);
+      
+      if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
+        // Средняя кнопка или Shift+ЛКМ — панорамирование
+        isDragging = true;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
         return;
       }
-      // Эмуляция покупки за 1$
-      userState.isVip = true;
-      saveState();
-      updateUI();
-      document.getElementById('vipModal').classList.remove('active');
-      alert('VIP куплен! Теперь за удар 2 звезды.');
-    });
-
-    // Бонус
-    document.getElementById('bonusBtn').addEventListener('click', ()=>{
-      document.getElementById('bonusModal').classList.add('active');
-    });
-    document.getElementById('closeBonusModal').addEventListener('click', ()=>{
-      document.getElementById('bonusModal').classList.remove('active');
-    });
-    document.getElementById('watchAdBtn').addEventListener('click', ()=>{
-      // Активируем бонус x5 на 1 минуту
-      userState.bonusMultiplier = 5;
-      userState.bonusEndTime = Date.now() + 60000; // 1 минута
-      saveState();
-      document.getElementById('bonusModal').classList.remove('active');
-      alert('Бонус активирован! x5 скорость на 1 минуту.');
-    });
-
-    // Пригласить друга
-    document.getElementById('inviteBtn').addEventListener('click', ()=>{
-      const refLink = `${window.location.origin}${window.location.pathname}?ref=${userState.id}`;
-      document.getElementById('refLinkDisplay').textContent = refLink;
-      document.getElementById('inviteModal').classList.add('active');
-    });
-    document.getElementById('closeInviteModal').addEventListener('click', ()=>{
-      document.getElementById('inviteModal').classList.remove('active');
-    });
-    document.getElementById('copyRefBtn').addEventListener('click', ()=>{
-      const ref = document.getElementById('refLinkDisplay').textContent;
-      navigator.clipboard?.writeText(ref).then(()=> alert('Ссылка скопирована!'));
-    });
-
-    // Профиль
-    document.getElementById('profileBtn').addEventListener('click', ()=>{
-      document.getElementById('profileName').textContent = userState.name;
-      document.getElementById('profileId').textContent = userState.id;
-      document.getElementById('profileBalance').textContent = userState.balance;
-      const refLink = `${window.location.origin}${window.location.pathname}?ref=${userState.id}`;
-      document.getElementById('profileRef').textContent = refLink;
-      document.getElementById('profileModal').classList.add('active');
-    });
-    document.getElementById('closeProfileModal').addEventListener('click', ()=>{
-      document.getElementById('profileModal').classList.remove('active');
-    });
-    document.getElementById('copyProfileRefBtn').addEventListener('click', ()=>{
-      const ref = document.getElementById('profileRef').textContent;
-      navigator.clipboard?.writeText(ref).then(()=> alert('Ссылка скопирована!'));
-    });
-    document.getElementById('editNameBtn').addEventListener('click', ()=>{
-      const newName = prompt('Введите новое имя (не пустое):', userState.name);
-      if (newName && newName.trim().length > 0) {
-        userState.name = newName.trim();
-        saveState();
+      
+      if (currentTool === 'delete') {
+        // Удаление ближайшего препятствия
+        let closest = null;
+        let minDist = 20 / zoom;
+        mapData.obstacles.forEach((o, i) => {
+          const dist = Math.sqrt((o.x - world.x) ** 2 + (o.y - world.y) ** 2);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = i;
+          }
+        });
+        if (closest !== null) {
+          removeObstacle(closest);
+        }
+      } else if (currentTool === 'select') {
+        let closest = null;
+        let minDist = 30 / zoom;
+        mapData.obstacles.forEach((o, i) => {
+          const dist = Math.sqrt((o.x - world.x) ** 2 + (o.y - world.y) ** 2);
+          if (dist < minDist) {
+            minDist = dist;
+            closest = i;
+          }
+        });
+        selectedObstacle = closest;
         updateUI();
-        document.getElementById('profileName').textContent = userState.name;
+        draw();
+      } else {
+        // Добавление препятствия
+        const newObs = createObstacle(currentTool, world.x, world.y);
+        mapData.obstacles.push(newObs);
+        selectedObstacle = mapData.obstacles.length - 1;
+        updateUI();
+        draw();
       }
     });
-
-    // Симуляция: если URL содержит ?ref=... , считаем что друг приглашён и купил VIP (для теста)
-    const urlParams = new URLSearchParams(window.location.search);
-    const refParam = urlParams.get('ref');
-    if (refParam && refParam !== userState.id) {
-      // Чтобы не накручивать бесконечно, проверяем флаг
-      if (!sessionStorage.getItem('invited_activated')) {
-        sessionStorage.setItem('invited_activated', '1');
-        addFriendWithVip();
-        alert('Друг с VIP присоединился! Вы получили +1 шарик.');
+    
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const sx = e.clientX - rect.left;
+      const sy = e.clientY - rect.top;
+      const world = screenToWorld(sx, sy);
+      
+      mouseX = world.x;
+      mouseY = world.y;
+      
+      document.getElementById('mouseCoords').textContent = `X: ${Math.round(world.x)}, Y: ${Math.round(world.y)}`;
+      
+      if (isDragging) {
+        panX += (e.clientX - dragStartX) / zoom;
+        panY += (e.clientY - dragStartY) / zoom;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        draw();
+      }
+    });
+    
+    canvas.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+    
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+      zoom = Math.max(0.2, Math.min(3, zoom * zoomFactor));
+      document.getElementById('zoomLevel').textContent = zoom.toFixed(1);
+      draw();
+    });
+    
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
+      
+      let closest = null;
+      let minDist = 30 / zoom;
+      mapData.obstacles.forEach((o, i) => {
+        const dist = Math.sqrt((o.x - world.x) ** 2 + (o.y - world.y) ** 2);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
+        }
+      });
+      if (closest !== null) {
+        removeObstacle(closest);
+      }
+    });
+    
+    function createObstacle(type, x, y) {
+      const base = { x, y };
+      switch (type) {
+        case 'pin': return { ...base, type: 'pin', radius: 4, color: '#f4d03f' };
+        case 'bumper': return { ...base, type: 'bumper', width: 50, height: 6, color: '#ff4466', force: 4 };
+        case 'funnel': return { ...base, type: 'funnel', radius: 25, color: '#8844ff' };
+        case 'wall': return { ...base, type: 'wall_gap', width: 50, color: '#888888' };
+        case 'tunnel': return { ...base, type: 'wall_seg', width: 8, height: 14, color: '#666666' };
+        case 'spinner': return { ...base, type: 'spinner', radius: 20, color: '#ff8800', speed: 0.04 };
+        default: return { ...base, type: 'pin', radius: 4, color: '#f4d03f' };
       }
     }
-
-    // Закрытие модалок по клику вне контента
-    document.querySelectorAll('.modal').forEach(modal => {
-      modal.addEventListener('click', function(e) {
-        if (e.target === modal) modal.classList.remove('active');
+    
+    window.zoomIn = function() { zoom = Math.min(3, zoom * 1.2); document.getElementById('zoomLevel').textContent = zoom.toFixed(1); draw(); };
+    window.zoomOut = function() { zoom = Math.max(0.2, zoom * 0.8); document.getElementById('zoomLevel').textContent = zoom.toFixed(1); draw(); };
+    window.resetZoom = function() { zoom = 1; panX = 0; panY = 0; document.getElementById('zoomLevel').textContent = '1.0'; draw(); };
+    
+    window.exportJSON = function() {
+      mapData.name = document.getElementById('mapName').value;
+      mapData.trackLength = parseInt(document.getElementById('trackLength').value);
+      mapData.trackWidth = parseInt(document.getElementById('trackWidth').value);
+      
+      const json = JSON.stringify(mapData, null, 2);
+      navigator.clipboard.writeText(json).then(() => {
+        alert('✅ JSON скопирован в буфер обмена!');
+      }).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = json;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('✅ JSON скопирован в буфер обмена!');
       });
-    });
-
-    // Обработка бонусного таймера в цикле
-    setInterval(() => {
-      if (userState.bonusEndTime && Date.now() > userState.bonusEndTime) {
-        userState.bonusMultiplier = 1;
-        userState.bonusEndTime = 0;
-        saveState();
+    };
+    
+    window.importJSON = function() {
+      document.getElementById('importModal').classList.remove('hidden');
+    };
+    
+    window.doImport = function() {
+      try {
+        const json = JSON.parse(document.getElementById('importJSONText').value);
+        if (json.obstacles && Array.isArray(json.obstacles)) {
+          mapData = { ...json, id: Date.now().toString() };
+          selectedObstacle = null;
+          updateUI();
+          renderMapList();
+          document.getElementById('importModal').classList.add('hidden');
+          alert('✅ Карта импортирована!');
+        } else {
+          alert('❌ Неверный формат JSON!');
+        }
+      } catch (e) {
+        alert('❌ Ошибка парсинга JSON!');
       }
-    }, 1000);
-
+    };
+    
+    window.closeImport = function() {
+      document.getElementById('importModal').classList.add('hidden');
+    };
+    
+    window.testMap = function() {
+      mapData.name = document.getElementById('mapName').value;
+      mapData.trackLength = parseInt(document.getElementById('trackLength').value);
+      
+      const json = JSON.stringify(mapData);
+      localStorage.setItem('test_map', json);
+      
+      const url = window.location.href.replace(/\/[^\/]*$/, '/') + '?test=true';
+      window.open(url, '_blank');
+    };
+    
+    // Горячие клавиши
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Delete' && selectedObstacle !== null) {
+        removeObstacle(selectedObstacle);
+      }
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        window.saveMap();
+      }
+      if (e.ctrlKey && e.key === 'z') {
+        e.preventDefault();
+        if (mapData.obstacles.length > 0) {
+          mapData.obstacles.pop();
+          if (selectedObstacle >= mapData.obstacles.length) selectedObstacle = null;
+          updateUI();
+          draw();
+        }
+      }
+      // Переключение инструментов цифрами
+      const tools = ['pin', 'bumper', 'funnel', 'wall', 'tunnel', 'spinner'];
+      if (e.key >= '1' && e.key <= '6') {
+        setTool(tools[parseInt(e.key) - 1]);
+      }
+    });
+    
+    // Инициализация
+    resizeCanvas();
+    loadSavedMaps();
+    updateUI();
+    draw();
+    
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      draw();
+    });
   })();
 </script>
 </body>
