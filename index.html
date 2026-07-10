@@ -495,20 +495,17 @@
     let platforms = [];
     let specials = [];
     let binWalls = [];
-    let usedTeleports = [];
-    let usedBumpers = [];
 
     let rows = 22;
     let startY = 80;
     let rowSpacing = 13;
     const colSpacing = 36;
-    let colBaseX = 220;
 
     let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
     let binCount = 19;
 
     let ball = {
-      x: 220, y: 60, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
+      x: 220, y: 60, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff', teleported: false, teleportCooldown: 0
     };
     
     // Бонусные шары
@@ -565,7 +562,6 @@
     const authModal = document.getElementById('authModal');
     const usernameInput = document.getElementById('usernameInput');
     const loginBtn = document.getElementById('loginBtn');
-    const gameContainer = document.getElementById('gameContainer');
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
     const bonusButton = document.getElementById('bonusButton');
@@ -592,7 +588,6 @@
     }
 
     function buildAll() {
-      colBaseX = canvas.width / 2;
       stringAnchorX = canvas.width / 2;
       startY = canvas.height * 0.11;
       rowSpacing = (canvas.height - startY - 55) / rows;
@@ -600,22 +595,11 @@
       stringLength = startY - 15;
       stringAnchorY = 10;
       
-      usedTeleports = [];
-      usedBumpers = [];
-      
       updateMultipliers();
       buildSpecials();
       buildPlatforms();
       buildBinWalls();
       resetBall();
-      waitingForResultClose = false;
-      ballInBin = false;
-      bonusActive = false;
-      bonusBalls = [];
-      bonusResults = [];
-      bonusTotalWinnings = 0;
-      bonusGameEndDelay = 0;
-      normalGameEndDelay = 0;
     }
 
     function getRandomPositions(count, rows) {
@@ -691,26 +675,19 @@
           const y1 = startY + rows_pos[0] * rowSpacing;
           const y2 = startY + rows_pos[1] * rowSpacing;
           
-          const teleportId = 'teleport_' + specials.length;
           specials.push({
             x: cx - w * 0.25,
             y: Math.min(y1, h - 90),
             radius: 12,
             type: 'teleport',
-            color: '#00ff88',
-            targetX: cx + w * 0.25,
-            targetY: Math.min(y2, h - 90),
-            pairId: teleportId + '_pair'
+            color: '#00ff88'
           });
           specials.push({
             x: cx + w * 0.25,
             y: Math.min(y2, h - 90),
             radius: 12,
             type: 'teleport',
-            color: '#ff8800',
-            targetX: cx - w * 0.25,
-            targetY: Math.min(y1, h - 90),
-            pairId: teleportId
+            color: '#ff8800'
           });
         }
       }
@@ -806,6 +783,8 @@
       ball.y = stringAnchorY + stringLength;
       ball.vx = 0;
       ball.vy = 0;
+      ball.teleported = false;
+      ball.teleportCooldown = 0;
       gameActive = false;
       swingAngle = 0;
       sessionExp = 0;
@@ -818,8 +797,6 @@
       bonusTotalWinnings = 0;
       bonusGameEndDelay = 0;
       normalGameEndDelay = 0;
-      usedTeleports = [];
-      usedBumpers = [];
     }
 
     function updateUI() {
@@ -890,7 +867,6 @@
     }
 
     function showBonusResult(oldBalance, totalExp) {
-      const ballEmoji = getBallEmoji(currentUser ? currentUser.selectedBall : 1);
       const newBalance = currentUser ? currentUser.balance : 0;
       const totalWinnings = bonusTotalWinnings;
       
@@ -981,7 +957,9 @@
           finished: false,
           winnings: 0,
           multiplier: 0,
-          settled: false
+          settled: false,
+          teleported: false,
+          teleportCooldown: 0
         });
       }
       
@@ -992,6 +970,8 @@
       ball.value = ballValue;
       ball.color = ballColor;
       ball.settled = false;
+      ball.teleported = false;
+      ball.teleportCooldown = 0;
       
       soundDrop();
       updateUI();
@@ -1066,6 +1046,14 @@
     }
 
     function applyPhysicsToBall(b) {
+      // Уменьшаем кулдаун телепорта
+      if (b.teleportCooldown > 0) {
+        b.teleportCooldown--;
+        if (b.teleportCooldown === 0) {
+          b.teleported = false;
+        }
+      }
+      
       b.vy += GRAVITY;
       b.x += b.vx;
       b.y += b.vy;
@@ -1174,16 +1162,20 @@
           checkBumperCollisionForBall(b, s);
         }
         
-        if (s.type === 'teleport') {
+        if (s.type === 'teleport' && !b.teleported) {
           const dx = b.x - s.x;
           const dy = b.y - s.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           const minDist = BALL_RADIUS + s.radius;
           if (dist < minDist) {
-            b.x = s.targetX;
-            b.y = s.targetY;
+            // Телепорт в случайное место вверху экрана
+            const margin = 30;
+            b.x = margin + Math.random() * (canvas.width - margin * 2);
+            b.y = startY + Math.random() * 15;
             b.vx = (Math.random() - 0.5) * 2;
-            b.vy = 0.5;
+            b.vy = 0.5 + Math.random() * 0.5;
+            b.teleported = true;
+            b.teleportCooldown = 30; // Кулдаун 30 кадров (0.5 сек)
             
             soundTeleport();
             
@@ -1214,6 +1206,8 @@
               b.y = s.targetY;
               b.vx = (Math.random() - 0.5) * 3;
               b.vy = 0.5;
+              b.teleported = true;
+              b.teleportCooldown = 20;
               
               soundTeleport();
               
@@ -1237,6 +1231,8 @@
       ball.color = getBallColor(currentUser.selectedBall);
       ball.active = true;
       ball.settled = false;
+      ball.teleported = false;
+      ball.teleportCooldown = 0;
       gameActive = true;
       waitingForResultClose = false;
       sessionExp = 0;
