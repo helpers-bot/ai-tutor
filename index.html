@@ -121,7 +121,7 @@
       width: 100%;
       display: flex;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       gap: 6px;
       margin: 8px 0;
@@ -136,6 +136,7 @@
       backdrop-filter: blur(8px);
       border: 1px solid rgba(100,180,255,0.3);
       font-size: 0.85rem;
+      cursor: pointer;
     }
     button {
       background: linear-gradient(180deg, #3388cc 0%, #004488 100%);
@@ -154,6 +155,7 @@
       gap: 4px;
       border: 1px solid rgba(100,180,255,0.5);
       transform: translateY(0);
+      white-space: nowrap;
     }
     button:active {
       transform: translateY(3px);
@@ -173,8 +175,8 @@
       background: linear-gradient(180deg, #44aaff 0%, #0066cc 100%);
     }
     .small-btn {
-      padding: 7px 10px;
-      font-size: 0.7rem;
+      padding: 8px 12px;
+      font-size: 0.75rem;
       border-radius: 16px;
     }
     .maps-btn {
@@ -228,25 +230,17 @@
       border-radius: 24px;
       width: 90%;
       max-width: 380px;
-      border: 2px solid #ffd700;
+      border: 2px solid #66ccff;
       display: flex;
       flex-direction: column;
       gap: 14px;
       text-align: center;
-      box-shadow: 0 0 40px rgba(255,200,0,0.4);
+      box-shadow: 0 0 40px rgba(100,200,255,0.4);
       animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
     @keyframes popIn {
       0% { transform: scale(0.8); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
-    }
-    .result-emoji {
-      font-size: 4rem;
-      animation: bounce 0.6s ease;
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-20px); }
     }
     .maps-grid {
       display: grid;
@@ -357,20 +351,20 @@
   <canvas id="gameCanvas" width="440" height="440"></canvas>
   
   <div class="panel">
-    <div class="ball-selector">
+    <div class="ball-selector" id="ballSelector" title="Нажмите для смены шара">
       <span id="currentBallEmoji">⚪</span>
-      <span id="currentBallValue">1</span>
-      <span>очко</span>
     </div>
   </div>
   
   <div class="action-row">
     <button id="dropButton" class="big-btn">🚀 Запуск</button>
     <button id="shakeButton" class="big-btn">🌌 Толчок</button>
-    <button id="mapsButton" class="maps-btn small-btn">🗺️</button>
-    <button id="shopButton" class="small-btn">🛒</button>
-    <button id="profileButton" class="small-btn">👤</button>
-    <button id="logoutButton" class="small-btn">🚪</button>
+  </div>
+  <div class="action-row" style="margin-top: 4px;">
+    <button id="mapsButton" class="maps-btn small-btn">🗺️ Карты</button>
+    <button id="shopButton" class="small-btn">🛒 Магазин</button>
+    <button id="profileButton" class="small-btn">👤 Профиль</button>
+    <button id="logoutButton" class="small-btn">🚪 Выйти</button>
   </div>
 </div>
 
@@ -503,11 +497,11 @@
 
     // ========== КАРТЫ ==========
     const maps = [
-      { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, desc: 'Стандартная карта' },
-      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.2, price: 200, desc: '+20% к множителям' },
-      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.4, price: 500, desc: '+40% к множителям' },
-      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.7, price: 1000, desc: '+70% к множителям' },
-      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 1.0, price: 2000, desc: '+100% к множителям' }
+      { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, desc: 'Стандартная карта', specials: [] },
+      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 200, desc: '+10% к множителям', specials: ['bumper'] },
+      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 500, desc: '+20% к множителям', specials: ['bumper', 'blackhole'] },
+      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 1000, desc: '+35% к множителям', specials: ['bumper', 'blackhole', 'portal'] },
+      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 2000, desc: '+50% к множителям', specials: ['bumper', 'blackhole', 'portal', 'magnet'] }
     ];
 
     // ========== БАЗА ДАННЫХ ==========
@@ -527,13 +521,11 @@
       const trimmed = name.trim().toLowerCase();
       if (!trimmed) return null;
       
-      // Специальная проверка для casper
       const isCasper = trimmed === 'casper';
       
       for (let [id, user] of Object.entries(users)) {
         if (user.name.toLowerCase() === trimmed) {
-          // Если это casper, даём ему все карты
-          if (isCasper && !user.unlockedMaps) {
+          if (isCasper && (!user.unlockedMaps || user.unlockedMaps.length < 5)) {
             user.unlockedMaps = [1, 2, 3, 4, 5];
           }
           if (!user.unlockedMaps) user.unlockedMaps = [1];
@@ -586,13 +578,14 @@
     const colSpacing = 32;
     const colBaseX = 220;
 
-    let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-    const binCount = 17;
+    let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
+    const binCount = 19;
 
     let binWalls = [];
+    let specials = [];
 
     let ball = {
-      x: 220, y: 65, vx: 0, vy: 0, active: false, value: 1
+      x: 220, y: 65, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
     };
     let gameActive = false;
     let swingAngle = 0;
@@ -603,9 +596,40 @@
 
     let lastBounceTime = 0;
     let bounceCooldown = 80;
-
-    // Частицы для эффектов
     let particles = [];
+
+    // ========== ЦВЕТА ШАРОВ ==========
+    function getBallColor(value) {
+      const colors = {
+        1: '#44aaff',
+        2: '#4488ff',
+        3: '#44cc44',
+        4: '#ffdd44',
+        5: '#ff9944',
+        6: '#ff4444',
+        7: '#cc44ff',
+        8: '#aa7744',
+        9: '#222222',
+        10: '#ff44ff'
+      };
+      return colors[value] || '#44aaff';
+    }
+
+    function getBallGlow(value) {
+      const glows = {
+        1: '#66ccff',
+        2: '#6688ff',
+        3: '#66ee66',
+        4: '#ffee66',
+        5: '#ffbb66',
+        6: '#ff6666',
+        7: '#ee66ff',
+        8: '#cc9966',
+        9: '#666666',
+        10: '#ff66ff'
+      };
+      return glows[value] || '#66ccff';
+    }
 
     // ========== UI ЭЛЕМЕНТЫ ==========
     const balanceSpan = document.getElementById('balanceDisplay');
@@ -620,15 +644,19 @@
     const gameContainer = document.getElementById('gameContainer');
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
+    const ballSelector = document.getElementById('ballSelector');
 
     function getCurrentMap() {
       return maps.find(m => m.id === currentMapId) || maps[0];
     }
 
     function updateMultipliers() {
-      const baseMultipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
+      const baseMultipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
       const bonus = getCurrentMap().multiplierBonus;
-      multipliers = baseMultipliers.map(m => Math.round((m * (1 + bonus)) * 10) / 10);
+      multipliers = baseMultipliers.map(m => {
+        if (m === -1) return -1;
+        return Math.round((m * (1 + bonus)) * 10) / 10;
+      });
     }
 
     function buildPlatforms() {
@@ -655,7 +683,83 @@
             y: y,
             radius: PLATFORM_RADIUS,
             color1: colors[0],
-            color2: colors[1]
+            color2: colors[1],
+            type: 'pin'
+          });
+        }
+      }
+    }
+
+    function buildSpecials() {
+      specials = [];
+      const mapConfig = getCurrentMap();
+      
+      if (mapConfig.specials.includes('bumper')) {
+        // Батуты — большие круглые объекты, которые сильно отталкивают
+        const bumperCount = mapConfig.id >= 4 ? 4 : 2;
+        for (let i = 0; i < bumperCount; i++) {
+          specials.push({
+            x: 60 + Math.random() * 320,
+            y: 140 + Math.random() * 180,
+            radius: 10 + Math.random() * 6,
+            type: 'bumper',
+            color: '#ff4466',
+            glow: '#ff6688',
+            bounceForce: 1.8
+          });
+        }
+      }
+      
+      if (mapConfig.specials.includes('blackhole')) {
+        // Чёрные дыры — притягивают шар
+        const bhCount = mapConfig.id >= 5 ? 3 : 1;
+        for (let i = 0; i < bhCount; i++) {
+          specials.push({
+            x: 80 + Math.random() * 280,
+            y: 150 + Math.random() * 150,
+            radius: 12,
+            type: 'blackhole',
+            color: '#000000',
+            glow: '#6600cc',
+            pullForce: 0.08
+          });
+        }
+      }
+      
+      if (mapConfig.specials.includes('portal')) {
+        // Порталы — телепортируют шар
+        const p1 = {
+          x: 70 + Math.random() * 140,
+          y: 140 + Math.random() * 140,
+          radius: 9,
+          type: 'portal',
+          color: '#00ff88',
+          glow: '#00ffaa',
+          pairIndex: 0
+        };
+        const p2 = {
+          x: 250 + Math.random() * 120,
+          y: 150 + Math.random() * 130,
+          radius: 9,
+          type: 'portal',
+          color: '#ff8800',
+          glow: '#ffaa00',
+          pairIndex: 0
+        };
+        specials.push(p1, p2);
+      }
+      
+      if (mapConfig.specials.includes('magnet')) {
+        // Магниты — притягивают шар к себе
+        for (let i = 0; i < 2; i++) {
+          specials.push({
+            x: 100 + i * 200,
+            y: 120 + Math.random() * 100,
+            radius: 11,
+            type: 'magnet',
+            color: '#ff4444',
+            glow: '#ff6666',
+            pullForce: 0.12
           });
         }
       }
@@ -679,6 +783,7 @@
     function initMap() {
       updateMultipliers();
       buildPlatforms();
+      buildSpecials();
       buildBinWalls();
       resetBall();
       if (currentUser) {
@@ -700,16 +805,16 @@
     function updateUI() {
       if (!currentUser) {
         balanceSpan.textContent = '0';
-        currentBallValueSpan.textContent = '1';
         userGreeting.textContent = '👨‍🚀 Гость';
-        currentBallEmoji.textContent = getBallEmoji(1);
+        currentBallEmoji.textContent = '⚪';
+        ball.color = getBallColor(1);
         mapIndicator.textContent = '🌍 Карта 1';
         return;
       }
       balanceSpan.textContent = Math.floor(currentUser.balance);
-      currentBallValueSpan.textContent = currentUser.selectedBall;
       userGreeting.textContent = `👨‍🚀 ${currentUser.name}`;
       currentBallEmoji.textContent = getBallEmoji(currentUser.selectedBall);
+      ball.color = getBallColor(currentUser.selectedBall);
       mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
     }
 
@@ -758,25 +863,19 @@
     }
 
     function showResult(betValue, multiplier, winnings, oldBalance, newBalance) {
-      const netProfit = winnings - betValue;
-      const isWin = netProfit > 0;
-      const emoji = isWin ? '🎉' : '😔';
-      const color = isWin ? '#4caf50' : '#f44336';
+      const netProfit = winnings;
       
       resultContent.innerHTML = `
-        <div class="result-emoji">${emoji}</div>
-        <h2 style="color: ${color}; margin: 0;">${isWin ? 'Миссия выполнена!' : 'Промах...'}</h2>
-        <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 14px;">
-          <p>🛸 Шарик: <strong>${betValue} очков</strong></p>
-          <p>🎯 Ячейка: <strong>x${multiplier}</strong></p>
-          <p>💰 Награда: <strong>${winnings} ⭐</strong></p>
-          <p style="color: ${color};">📊 Чистый доход: <strong>${netProfit >= 0 ? '+' : ''}${netProfit} ⭐</strong></p>
-          <hr style="border-color: rgba(255,255,255,0.2); margin: 8px 0;">
-          <p>💼 Баланс был: ${oldBalance} ⭐</p>
-          <p>💼 Баланс стал: ${newBalance} ⭐</p>
+        <h2 style="color: #66ccff; margin: 0; font-size: 1.1rem;">Результат</h2>
+        <div style="background: rgba(0,0,0,0.4); border-radius: 16px; padding: 16px;">
+          <p style="font-size: 0.9rem;">Множитель ячейки: <strong style="color: #ffd700;">x${multiplier}</strong></p>
+          <p style="font-size: 0.9rem;">Баланс был: <strong>${oldBalance} ⭐</strong></p>
+          <p style="font-size: 0.9rem;">Баланс стал: <strong>${newBalance} ⭐</strong></p>
+          <p style="font-size: 0.9rem; color: ${netProfit >= 0 ? '#4caf50' : '#f44336'};">
+            Чистый результат: <strong>${netProfit >= 0 ? '+' : ''}${netProfit} ⭐</strong>
+          </p>
         </div>
-        <p style="font-size:0.75rem; color:#88aacc;">🗺️ Карта: ${getCurrentMap().name}</p>
-        <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">👍 Понял</button>
+        <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">Ок</button>
       `;
       resultModal.classList.remove('hidden');
       
@@ -795,6 +894,7 @@
       updateUI();
 
       ball.value = ballCost;
+      ball.color = getBallColor(currentUser.selectedBall);
       ball.active = true;
       gameActive = true;
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
@@ -802,7 +902,7 @@
       ball.vx = Math.sin(swingAngle) * 2.2;
       ball.vy = 0.9;
       
-      spawnParticles(ball.x, ball.y, 8, '#44aaff');
+      spawnParticles(ball.x, ball.y, 8, ball.color);
       soundDrop();
     }
 
@@ -838,6 +938,79 @@
       return false;
     }
 
+    function applySpecialEffects() {
+      for (let s of specials) {
+        const dx = ball.x - s.x;
+        const dy = ball.y - s.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (s.type === 'bumper') {
+          const minDist = BALL_RADIUS + s.radius;
+          if (dist < minDist && dist > 0.001) {
+            const nx = dx / dist, ny = dy / dist;
+            ball.x += nx * (minDist - dist);
+            ball.y += ny * (minDist - dist);
+            const vn = ball.vx * nx + ball.vy * ny;
+            if (vn < 0) {
+              ball.vx -= (1 + s.bounceForce) * vn * nx;
+              ball.vy -= (1 + s.bounceForce) * vn * ny;
+            }
+            ball.vx += nx * 3;
+            ball.vy += ny * 3;
+            spawnParticles(s.x, s.y, 8, s.color);
+            soundBounce();
+          }
+        }
+        
+        if (s.type === 'blackhole') {
+          const influenceRadius = 60;
+          if (dist < influenceRadius && dist > 0.001) {
+            const force = s.pullForce * (1 - dist / influenceRadius);
+            ball.vx -= (dx / dist) * force;
+            ball.vy -= (dy / dist) * force;
+            if (dist < BALL_RADIUS + s.radius) {
+              ball.vx += (Math.random() - 0.5) * 6;
+              ball.vy = -3 - Math.random() * 4;
+              spawnParticles(s.x, s.y, 10, '#6600cc');
+              soundBounce();
+            }
+          }
+        }
+        
+        if (s.type === 'portal') {
+          const minDist = BALL_RADIUS + s.radius;
+          if (dist < minDist) {
+            // Найти парный портал
+            const pair = specials.find(sp => sp.type === 'portal' && sp !== s && sp.pairIndex === s.pairIndex);
+            if (pair) {
+              ball.x = pair.x;
+              ball.y = pair.y;
+              ball.vx = (Math.random() - 0.5) * 4;
+              ball.vy = -1 - Math.random() * 3;
+              spawnParticles(s.x, s.y, 12, s.color);
+              spawnParticles(pair.x, pair.y, 12, pair.color);
+              soundBounce();
+            }
+          }
+        }
+        
+        if (s.type === 'magnet') {
+          const influenceRadius = 80;
+          if (dist < influenceRadius && dist > 0.001) {
+            const force = s.pullForce * (1 - dist / influenceRadius);
+            ball.vx += (dx / dist) * force;
+            ball.vy += (dy / dist) * force;
+            if (dist < BALL_RADIUS + s.radius) {
+              ball.vx += (Math.random() - 0.5) * 5;
+              ball.vy = -2 - Math.random() * 3;
+              spawnParticles(s.x, s.y, 6, s.color);
+              soundBounce();
+            }
+          }
+        }
+      }
+    }
+
     function applyPhysics() {
       if (!ball.active || !gameActive) return;
       
@@ -871,6 +1044,9 @@
         }
       }
       
+      // Специальные объекты
+      applySpecialEffects();
+      
       for (let wall of binWalls) {
         if (checkWallCollision(wall)) {
           bounced = true;
@@ -888,11 +1064,18 @@
         if (binIndex < 0) binIndex = 0;
         if (binIndex >= binCount) binIndex = binCount - 1;
         const multiplier = multipliers[binIndex];
-        const winnings = Math.floor(ball.value * multiplier);
         
         const oldBalance = currentUser ? currentUser.balance : 0;
+        let winnings;
+        if (multiplier === -1) {
+          winnings = -ball.value; // Отнимаем стоимость шара
+        } else {
+          winnings = Math.floor(ball.value * multiplier) - ball.value; // Чистый выигрыш (вычитаем стоимость)
+        }
+        
         if (currentUser) {
           currentUser.balance += winnings;
+          if (currentUser.balance < 0) currentUser.balance = 0;
           updateUserData(currentUser);
         }
         const newBalance = currentUser ? currentUser.balance : 0;
@@ -901,7 +1084,7 @@
         
         const bx = binIndex * binWidth + binWidth / 2;
         const by = canvas.height - 15;
-        spawnParticles(bx, by, 15, '#ffd700');
+        spawnParticles(bx, by, 10, multiplier >= 0 ? '#ffd700' : '#ff4444');
         
         gameActive = false;
         ball.active = false;
@@ -920,10 +1103,106 @@
       updateParticles();
     }
 
+    function drawSpecials() {
+      for (let s of specials) {
+        ctx.shadowColor = s.glow;
+        ctx.shadowBlur = 15;
+        
+        if (s.type === 'bumper') {
+          const grad = ctx.createRadialGradient(s.x-2, s.y-2, 1, s.x, s.y, s.radius+3);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.4, s.color);
+          grad.addColorStop(1, '#880022');
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = '#ffaabb';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.lineWidth = 1;
+          // Рисунок звёздочки на батуте
+          ctx.fillStyle = '#ffffff';
+          ctx.font = `${s.radius}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.fillText('⭐', s.x, s.y + s.radius * 0.35);
+        }
+        
+        if (s.type === 'blackhole') {
+          const grad = ctx.createRadialGradient(s.x, s.y, 2, s.x, s.y, s.radius + 5);
+          grad.addColorStop(0, '#000000');
+          grad.addColorStop(0.5, '#330066');
+          grad.addColorStop(1, 'rgba(102,0,204,0)');
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius + 5, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = '#000000';
+          ctx.fill();
+          ctx.strokeStyle = '#6600cc';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.lineWidth = 1;
+        }
+        
+        if (s.type === 'portal') {
+          const grad = ctx.createRadialGradient(s.x, s.y, 1, s.x, s.y, s.radius);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.5, s.color);
+          grad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = s.glow;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.lineWidth = 1;
+          // Спираль
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          for (let a = 0; a < Math.PI * 4; a += 0.2) {
+            const r = s.radius * 0.3 + a * 0.3;
+            const px = s.x + Math.cos(a) * r;
+            const py = s.y + Math.sin(a) * r;
+            if (a === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+          ctx.lineWidth = 1;
+        }
+        
+        if (s.type === 'magnet') {
+          const grad = ctx.createRadialGradient(s.x-1, s.y-1, 2, s.x, s.y, s.radius);
+          grad.addColorStop(0, '#ffffff');
+          grad.addColorStop(0.3, s.color);
+          grad.addColorStop(1, '#880000');
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = '#ff8888';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.lineWidth = 1;
+          // Буква N
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 12px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('N', s.x, s.y + 4);
+        }
+        
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+      }
+    }
+
     function drawScene() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
       
-      // Фон карты
       const mapColors = {
         1: ['#001a33', '#000020'],
         2: ['#330000', '#1a0000'],
@@ -955,7 +1234,8 @@
         
         ctx.beginPath();
         ctx.arc(ballX, ballY, BALL_RADIUS, 0, 2*Math.PI);
-        ctx.fillStyle = '#44aaff';
+        const ballColor = currentUser ? getBallColor(currentUser.selectedBall) : '#44aaff';
+        ctx.fillStyle = ballColor;
         ctx.fill();
         ctx.strokeStyle = 'white';
         ctx.lineWidth = 1.5;
@@ -963,7 +1243,10 @@
         ctx.lineWidth = 1;
       }
 
-      // Платформы с неоновым свечением
+      // Специальные объекты
+      drawSpecials();
+
+      // Платформы
       for (let p of platforms) {
         ctx.shadowColor = p.color1;
         ctx.shadowBlur = 8;
@@ -983,29 +1266,31 @@
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
 
-      // Ячейки с неоновыми границами
+      // Ячейки
       const binWidth = canvas.width / binCount;
       const binY = canvas.height - 30;
       for (let i = 0; i < binCount; i++) {
         const x = i * binWidth;
-        ctx.fillStyle = i % 2 === 0 ? '#0a1a30' : '#0d2040';
+        const mult = multipliers[i];
+        const isNegative = mult === -1;
+        ctx.fillStyle = isNegative ? '#2a0000' : (i % 2 === 0 ? '#0a1a30' : '#0d2040');
         ctx.fillRect(x, binY, binWidth, 30);
         
-        ctx.strokeStyle = '#3399ff';
+        ctx.strokeStyle = isNegative ? '#ff4444' : '#3399ff';
         ctx.lineWidth = 1.5;
-        ctx.shadowColor = '#3399ff';
+        ctx.shadowColor = isNegative ? '#ff4444' : '#3399ff';
         ctx.shadowBlur = 4;
         ctx.strokeRect(x, binY, binWidth, 30);
         ctx.shadowBlur = 0;
         ctx.lineWidth = 1;
         
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 10px "Segoe UI"';
+        ctx.fillStyle = isNegative ? '#ff6666' : '#ffffff';
+        ctx.font = 'bold 9px "Segoe UI"';
         ctx.textAlign = 'center';
-        ctx.fillText(`x${multipliers[i]}`, x+binWidth/2, binY+19);
+        ctx.fillText(isNegative ? '−1' : `x${mult}`, x+binWidth/2, binY+19);
       }
 
-      // Стенки между ячейками
+      // Стенки
       ctx.strokeStyle = '#2266cc';
       ctx.lineWidth = 2;
       ctx.shadowColor = '#4488ff';
@@ -1032,17 +1317,18 @@
 
       // Активный шар
       if (ball.active) {
-        ctx.shadowColor = '#66ccff';
+        ctx.shadowColor = getBallGlow(currentUser ? currentUser.selectedBall : 1);
         ctx.shadowBlur = 15;
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
+        const ballColor = ball.color;
         const grad = ctx.createRadialGradient(ball.x-3, ball.y-3, 2, ball.x, ball.y, BALL_RADIUS+3);
         grad.addColorStop(0,'#ffffff');
-        grad.addColorStop(0.3,'#66ccff');
-        grad.addColorStop(1,'#003388');
+        grad.addColorStop(0.3, ballColor);
+        grad.addColorStop(1, '#001133');
         ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = '#aaddff';
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.lineWidth = 1;
@@ -1106,7 +1392,6 @@
         container.appendChild(card);
       });
       
-      // Обработчики для кнопок покупки
       document.querySelectorAll('.buyMapBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1114,7 +1399,6 @@
         });
       });
       
-      // Обработчики для кнопок выбора
       document.querySelectorAll('.selectMapBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1132,7 +1416,6 @@
       if (!map) return;
       if (currentUser.unlockedMaps.includes(mapId)) { alert('Карта уже открыта!'); return; }
       
-      // Проверка на casper — бесплатно
       if (currentUser.name.toLowerCase() === 'casper') {
         currentUser.unlockedMaps.push(mapId);
         updateUserData(currentUser);
@@ -1175,7 +1458,7 @@
         const div = document.createElement('div');
         div.className = 'shop-item';
         div.innerHTML = `
-          <div class="ball-preview">${getBallEmoji(val)}</div>
+          <div class="ball-preview" style="color:${getBallColor(val)}; filter: drop-shadow(0 0 6px ${getBallGlow(val)});">${getBallEmoji(val)}</div>
           <div style="font-size:0.8rem;"><strong>${val} очков</strong></div>
           <div style="font-size:0.7rem;">${owned ? '✅ Куплен' : `⭐ ${price}`}</div>
           ${!owned ? `<button class="buyBallBtn" data-value="${val}" style="font-size:0.7rem; padding:4px 10px;">Купить</button>` : `<button disabled style="font-size:0.7rem; padding:4px 10px;">✓</button>`}
@@ -1230,7 +1513,6 @@
       updateUI();
       resetBall();
       
-      // Приветственное сообщение для casper
       if (user.name.toLowerCase() === 'casper') {
         setTimeout(() => {
           alert('👻 Привет, casper! Все карты открыты бесплатно!');
@@ -1280,14 +1562,13 @@
     });
     usernameInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') loginBtn.click(); });
 
-    currentBallValueSpan.addEventListener('click', ()=>{
+    ballSelector.addEventListener('click', ()=>{
       if(!currentUser) return;
       const balls = currentUser.ownedBalls;
       if(balls.length<=1) { alert('Купите новые шарики в магазине.'); return; }
       const idx = balls.indexOf(currentUser.selectedBall);
       selectBall(balls[(idx+1)%balls.length]);
     });
-    currentBallValueSpan.style.cursor = 'pointer';
 
     resultModal.addEventListener('click', (e) => {
       if (e.target === resultModal) {
