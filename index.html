@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.2, user-scalable=yes, viewport-fit=cover">
-  <title>Space Pinball Cadet — 3D аркада</title>
+  <title>Space Pinball Cadet — Гонка шаров</title>
   <style>
     * {
       margin: 0;
@@ -33,17 +33,23 @@
       height: 100dvh;
       max-width: 500px;
       background: #000a28;
-      padding: 8px 10px 10px;
+      padding: 6px 8px 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
       border: 2px solid #004488;
     }
+    .canvas-wrapper {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      min-height: 0;
+      max-height: 55vh;
+    }
     canvas {
       display: block;
       width: 100%;
-      flex: 1;
-      min-height: 0;
+      height: 100%;
       background: #000020;
       border-radius: 12px;
       border: 2px solid #004488;
@@ -54,41 +60,41 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 6px;
-      gap: 4px;
+      margin-bottom: 4px;
+      gap: 3px;
       flex-shrink: 0;
       flex-wrap: wrap;
     }
     .stars-box {
       background: #0a1a3a;
       border-radius: 20px;
-      padding: 5px 10px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       font-weight: bold;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       border: 1px solid #ffd700;
       color: #ffd700;
     }
     .exp-box {
       background: #0a1a3a;
       border-radius: 20px;
-      padding: 5px 10px;
+      padding: 4px 8px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       font-weight: bold;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       border: 1px solid #44ff44;
       color: #44ff44;
     }
     .map-indicator {
       background: #0a1a3a;
       border-radius: 20px;
-      padding: 5px 10px;
+      padding: 4px 8px;
       font-weight: bold;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       border: 1px solid #0066cc;
       color: #66ccff;
     }
@@ -97,46 +103,48 @@
       border: none;
       color: #fff;
       font-weight: bold;
-      border-radius: 18px;
-      padding: 8px 12px;
-      font-size: 0.75rem;
+      border-radius: 16px;
+      padding: 6px 10px;
+      font-size: 0.7rem;
       cursor: pointer;
       border: 1px solid #4488cc;
       white-space: nowrap;
     }
-    button:active {
-      background: #0066cc;
-    }
-    button:disabled {
-      opacity: 0.4;
-      pointer-events: none;
-    }
+    button:active { background: #0066cc; }
+    button:disabled { opacity: 0.4; pointer-events: none; }
     .big-btn {
-      padding: 10px 16px;
-      font-size: 0.9rem;
-      border-radius: 22px;
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      border-radius: 20px;
       background: #22aa22;
     }
+    .bonus-btn {
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      border-radius: 20px;
+      background: #ff8800;
+      border-color: #ffaa44;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 5px rgba(255,136,0,0.5); }
+      50% { box-shadow: 0 0 20px rgba(255,136,0,0.8); }
+    }
     .small-btn {
-      padding: 7px 10px;
-      font-size: 0.7rem;
-      border-radius: 14px;
+      padding: 6px 8px;
+      font-size: 0.65rem;
+      border-radius: 12px;
     }
-    .maps-btn {
-      background: #5522aa;
-      border-color: #9966dd;
-    }
+    .maps-btn { background: #5522aa; border-color: #9966dd; }
     .user-greeting {
       background: rgba(0,100,200,0.2);
-      padding: 5px 10px;
+      padding: 4px 8px;
       border-radius: 14px;
       font-weight: 600;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       border: 1px solid rgba(100,180,255,0.3);
     }
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
     .modal {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -148,125 +156,147 @@
     }
     .modal-content {
       background: #0a1a3a;
-      padding: 20px;
-      border-radius: 20px;
+      padding: 16px;
+      border-radius: 16px;
       width: 90%;
-      max-width: 420px;
+      max-width: 380px;
       border: 2px solid #0066cc;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 85vh;
+      gap: 8px;
+      max-height: 80vh;
       overflow-y: auto;
     }
     .result-content {
       background: #0a1a3a;
-      padding: 20px;
-      border-radius: 20px;
+      padding: 16px;
+      border-radius: 16px;
       width: 90%;
-      max-width: 380px;
+      max-width: 350px;
       border: 2px solid #66ccff;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       text-align: left;
     }
     .result-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
+      padding: 6px 0;
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-    .result-row:last-child {
-      border-bottom: none;
-    }
-    .result-label {
-      color: #88aacc;
-      font-size: 0.85rem;
-    }
-    .result-value {
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-    .maps-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-      gap: 8px;
-    }
-    .map-card {
-      background: #0d2040;
-      border-radius: 14px;
-      padding: 10px 6px;
+    .result-row:last-child { border-bottom: none; }
+    .result-label { color: #88aacc; font-size: 0.8rem; }
+    .result-value { font-weight: bold; font-size: 0.85rem; }
+    .ball-selection {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-      border: 2px solid #1a3a6a;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .ball-select-item {
+      width: 36px; height: 36px;
+      border-radius: 50%;
       cursor: pointer;
-    }
-    .map-card.locked {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    .map-card.active {
-      border-color: #ffd700;
-    }
-    .map-icon {
-      font-size: 1.8rem;
-    }
-    .map-name {
-      font-size: 0.75rem;
-      font-weight: bold;
-      text-align: center;
-    }
-    .map-price {
-      font-size: 0.65rem;
-      color: #ffd700;
-    }
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 8px;
-    }
-    .shop-item {
-      background: #0d2040;
-      border-radius: 14px;
-      padding: 10px 6px;
+      border: 3px solid transparent;
       display: flex;
-      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .ball-select-item:hover { transform: scale(1.15); }
+    .ball-select-item.selected { border-color: #ffd700; box-shadow: 0 0 10px #ffd700; }
+    .bet-input {
+      display: flex;
       align-items: center;
       gap: 6px;
-      border: 1px solid #1a3a6a;
+      justify-content: center;
     }
-    .shop-item.selected {
-      border-color: #44ff44;
+    .bet-input input {
+      width: 100px;
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid #4488cc;
+      background: #0a0a22;
+      color: #fff;
     }
-    .ball-preview {
-      font-size: 1.6rem;
-    }
-    input {
-      padding: 10px 14px;
-      border-radius: 18px;
-      border: none;
-      background: rgba(255,255,255,0.1);
-      color: white;
-      outline: none;
-      font-weight: 500;
-      width: 100%;
-      border: 1px solid rgba(100,180,255,0.3);
-    }
-    input::placeholder {
-      color: #88aacc;
+    .race-info {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(0,0,0,0.8);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.75rem;
+      color: #ffd700;
+      z-index: 10;
+      pointer-events: none;
     }
     .action-row {
       display: flex;
-      gap: 5px;
+      gap: 4px;
       justify-content: center;
       flex-wrap: wrap;
       align-items: center;
       flex-shrink: 0;
-      margin-top: 6px;
+      margin-top: 4px;
+    }
+    .maps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 6px;
+    }
+    .map-card {
+      background: #0d2040;
+      border-radius: 12px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      border: 2px solid #1a3a6a;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+    .map-card:hover { border-color: #4488ff; }
+    .map-card.active { border-color: #ffd700; }
+    .map-card.locked { opacity: 0.6; cursor: not-allowed; }
+    .map-icon { font-size: 1.5rem; }
+    .map-name { font-size: 0.7rem; font-weight: bold; text-align: center; }
+    .map-price { font-size: 0.6rem; color: #ffd700; }
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: 6px;
+    }
+    .shop-item {
+      background: #0d2040;
+      border-radius: 12px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #1a3a6a;
+    }
+    .shop-item.selected { border-color: #44ff44; }
+    .ball-preview { font-size: 1.4rem; }
+    .bonus-info {
+      position: absolute;
+      top: 8px; left: 8px;
+      background: rgba(0,0,0,0.8);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 0.7rem;
+      color: #ff8800;
+      z-index: 10;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -277,14 +307,18 @@
     <div class="user-greeting" id="userGreeting">👨‍🚀 Гость</div>
     <div class="exp-box">✨ <span id="expDisplay">0</span></div>
     <div class="stars-box">⭐ <span id="balanceDisplay">100</span></div>
-    <div class="map-indicator" id="mapIndicator">🌍 Карта 1</div>
+    <div class="map-indicator" id="mapIndicator">🗺️ Карта</div>
   </div>
   
-  <canvas id="gameCanvas" width="440" height="700"></canvas>
+  <div class="canvas-wrapper">
+    <canvas id="gameCanvas"></canvas>
+    <div class="race-info hidden" id="raceInfo">🏁 1/6</div>
+    <div class="bonus-info hidden" id="bonusInfo">🎁 Бонус: 0/3</div>
+  </div>
   
   <div class="action-row">
-    <button id="dropButton" class="big-btn">🚀 Запуск</button>
-    <button id="shakeButton" class="big-btn">🌌 Толчок</button>
+    <button id="dropButton" class="big-btn">🎯 Выбрать шар</button>
+    <button id="bonusButton" class="bonus-btn">🎁 Бонус</button>
   </div>
   <div class="action-row">
     <button id="mapsButton" class="maps-btn small-btn">🗺️ Карты</button>
@@ -294,1058 +328,633 @@
   </div>
 </div>
 
-<!-- Окно результата -->
+<div id="betModal" class="modal hidden">
+  <div class="modal-content">
+    <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🎯 Выберите шар</h2>
+    <div class="ball-selection" id="ballSelection"></div>
+    <h3 style="color:#ffd700; text-align:center; font-size:0.9rem;">💰 Ставка (⭐)</h3>
+    <div class="bet-input">
+      <button id="betMinus">➖</button>
+      <input type="number" id="betAmount" value="10" min="1" max="999999">
+      <button id="betPlus">➕</button>
+    </div>
+    <div style="display: flex; gap: 8px; justify-content: center;">
+      <button id="confirmBetBtn" class="big-btn">✅ Подтвердить</button>
+      <button id="cancelBetBtn">❌ Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div id="startModal" class="modal hidden">
+  <div class="modal-content">
+    <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🚀 Готовы к гонке?</h2>
+    <p style="text-align:center; font-size:0.85rem;">Выбран шар: <span id="startBallInfo" style="color:#ffd700;"></span></p>
+    <p style="text-align:center; font-size:0.85rem;">Ставка: ⭐ <span id="startBetInfo" style="color:#ffd700;"></span></p>
+    <p style="text-align:center; font-size:0.85rem;" id="bonusStartInfo"></p>
+    <div style="display: flex; gap: 8px; justify-content: center;">
+      <button id="startRaceBtn" class="big-btn" style="background:#44ff44;">🏁 СТАРТ</button>
+      <button id="cancelStartBtn">❌ Отменить</button>
+    </div>
+  </div>
+</div>
+
 <div id="resultModal" class="modal hidden">
   <div class="result-content" id="resultContent"></div>
 </div>
 
-<!-- Выбор карт -->
+<div id="authModal" class="modal">
+  <div class="modal-content">
+    <h2 style="font-size:1rem;">🔐 Вход в космопорт</h2>
+    <input type="text" id="usernameInput" placeholder="Позывной пилота" maxlength="16" autocomplete="off" style="padding:8px;border-radius:12px;border:1px solid #4488cc;background:#0a0a22;color:#fff;width:100%;">
+    <button id="loginBtn">▶ Запуск</button>
+    <p style="font-size:0.7rem; color:#88aacc;">Новый пилот получит ID, 100 ⭐ и 0 ✨</p>
+  </div>
+</div>
+
 <div id="mapsModal" class="modal hidden">
   <div class="modal-content">
-    <h2 style="color:#ffd700; text-align:center;">🗺️ Карты миссий</h2>
-    <p style="text-align:center; font-size:0.8rem; color:#88aacc;">Опыт: ✨ <span id="mapsExpDisplay">0</span></p>
+    <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🗺️ Карты миссий</h2>
+    <p style="text-align:center; font-size:0.75rem; color:#88aacc;">Опыт: ✨ <span id="mapsExpDisplay">0</span></p>
     <div id="mapsContainer" class="maps-grid"></div>
     <button id="closeMapsBtn" style="align-self: center;">Закрыть</button>
   </div>
 </div>
 
-<!-- Магазин -->
 <div id="shopModal" class="modal hidden">
   <div class="modal-content">
-    <h2 style="color:#ffd700; text-align:center;">🛒 Магазин шариков</h2>
-    <p style="text-align:center; font-size:0.8rem; color:#88aacc;">Выбран: <span id="shopSelectedBall" style="color:#ffd700;"></span></p>
+    <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🛒 Магазин шариков</h2>
+    <p style="text-align:center; font-size:0.75rem; color:#88aacc;">Выбран: <span id="shopSelectedBall" style="color:#ffd700;"></span></p>
     <div id="shopItemsContainer" class="shop-grid"></div>
     <button id="closeShopBtn" style="align-self: center;">Закрыть</button>
   </div>
 </div>
 
-<!-- Профиль -->
 <div id="profileModal" class="modal hidden">
   <div class="modal-content">
-    <h2>👤 Профиль пилота</h2>
-    <p>Имя: <strong id="profileName"></strong></p>
-    <p>ID: <strong id="profileId"></strong></p>
-    <p>Звёзд: ⭐ <strong id="profileBalance"></strong></p>
-    <p>Опыт: ✨ <strong id="profileExp"></strong></p>
-    <p>Открыто карт: <strong id="profileMaps"></strong></p>
+    <h2 style="font-size:1rem;">👤 Профиль пилота</h2>
+    <p style="font-size:0.85rem;">Имя: <strong id="profileName"></strong></p>
+    <p style="font-size:0.85rem;">ID: <strong id="profileId"></strong></p>
+    <p style="font-size:0.85rem;">Звёзд: ⭐ <strong id="profileBalance"></strong></p>
+    <p style="font-size:0.85rem;">Опыт: ✨ <strong id="profileExp"></strong></p>
+    <p style="font-size:0.85rem;">Карт: <strong id="profileMaps"></strong></p>
     <button id="closeProfileBtn">Закрыть</button>
-  </div>
-</div>
-
-<!-- Авторизация -->
-<div id="authModal" class="modal">
-  <div class="modal-content">
-    <h2>🔐 Вход в космопорт</h2>
-    <input type="text" id="usernameInput" placeholder="Позывной пилота" maxlength="16" autocomplete="off">
-    <button id="loginBtn">▶ Запуск</button>
-    <p style="font-size:0.75rem; color:#88aacc;">Новый пилот получит ID, 100 ⭐ и 0 ✨</p>
   </div>
 </div>
 
 <script>
   (function() {
-    // ========== ЗВУКИ ==========
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-    let musicGain;
-    let musicOsc1, musicOsc2;
-    let isMusicPlaying = false;
-
-    function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new AudioContext();
-      }
-      if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-      }
-    }
-
-    function playSound(freq, type, duration, vol = 0.1) {
-      if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(audioCtx.currentTime);
-      osc.stop(audioCtx.currentTime + duration);
-    }
-
-    function soundBounce() {
-      playSound(400 + Math.random() * 200, 'triangle', 0.08, 0.06);
-    }
-
-    function soundBumper() {
-      playSound(600, 'square', 0.1, 0.08);
-    }
-
-    function soundBin() {
-      playSound(200, 'triangle', 0.2, 0.12);
-      setTimeout(() => playSound(300, 'triangle', 0.15, 0.1), 0.08);
-    }
-
-    function soundTeleport() {
-      playSound(800, 'sine', 0.15, 0.15);
-      setTimeout(() => playSound(1200, 'sine', 0.15, 0.15), 0.1);
-    }
-
-    function soundDrop() {
-      playSound(250, 'square', 0.12, 0.1);
-    }
-
-    function startMusic() {
-      if (!audioCtx || isMusicPlaying) return;
-      isMusicPlaying = true;
-      
-      musicGain = audioCtx.createGain();
-      musicGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-      musicGain.connect(audioCtx.destination);
-      
-      musicOsc1 = audioCtx.createOscillator();
-      musicOsc2 = audioCtx.createOscillator();
-      
-      musicOsc1.type = 'sine';
-      musicOsc2.type = 'sine';
-      
-      musicOsc1.frequency.setValueAtTime(130.81, audioCtx.currentTime);
-      musicOsc2.frequency.setValueAtTime(164.81, audioCtx.currentTime);
-      
-      musicOsc1.connect(musicGain);
-      musicOsc2.connect(musicGain);
-      
-      musicOsc1.start(audioCtx.currentTime);
-      musicOsc2.start(audioCtx.currentTime);
-      
-      const notes1 = [130.81, 146.83, 164.81, 174.61, 196.00, 174.61, 164.81, 146.83];
-      const notes2 = [164.81, 174.61, 196.00, 220.00, 246.94, 220.00, 196.00, 174.61];
-      let noteIndex = 0;
-      
-      setInterval(() => {
-        if (!isMusicPlaying) return;
-        musicOsc1.frequency.setTargetAtTime(notes1[noteIndex], audioCtx.currentTime, 0.1);
-        musicOsc2.frequency.setTargetAtTime(notes2[noteIndex], audioCtx.currentTime, 0.1);
-        noteIndex = (noteIndex + 1) % notes1.length;
-      }, 2000);
-    }
-
-    function stopMusic() {
-      if (musicOsc1) {
-        musicOsc1.stop();
-        musicOsc2.stop();
-        isMusicPlaying = false;
-      }
-    }
-
     // ========== БАЗА ДАННЫХ ==========
-    const STORAGE_KEY = 'space_pinball_users_db_v4';
+    const STORAGE_KEY = 'space_pinball_db_v5';
     let currentUser = null;
-    let currentMapId = 1;
 
-    function loadUsers() {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : {};
+    function formatNum(n) {
+      return Math.floor(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
-    function saveUsers(users) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-    }
+
+    function loadUsers() { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : {}; }
+    function saveUsers(users) { localStorage.setItem(STORAGE_KEY, JSON.stringify(users)); }
     function getOrCreateUser(name) {
       const users = loadUsers();
       const trimmed = name.trim().toLowerCase();
       if (!trimmed) return null;
-      
-      const isCasper = trimmed === 'casper';
-      
       for (let [id, user] of Object.entries(users)) {
         if (user.name.toLowerCase() === trimmed) {
-          if (isCasper && (!user.unlockedMaps || user.unlockedMaps.length < 5)) {
-            user.unlockedMaps = [1, 2, 3, 4, 5];
-          }
-          if (!user.unlockedMaps) user.unlockedMaps = [1];
-          if (!user.currentMapId) user.currentMapId = 1;
+          if (!user.exp) user.exp = 0;
           if (!user.selectedBall) user.selectedBall = 1;
           if (!user.ownedBalls) user.ownedBalls = [1];
-          if (user.exp === undefined) user.exp = 0;
+          if (!user.unlockedMaps) user.unlockedMaps = [1];
+          if (!user.currentMapId) user.currentMapId = 'default';
+          if (!user.bonusUses) user.bonusUses = 0;
           return user;
         }
       }
-      const newId = generateUniqueId(users);
+      const newId = Math.floor(10_000_000 + Math.random() * 90_000_000).toString();
       const newUser = {
-        id: newId,
-        name: trimmed,
-        balance: 100,
-        exp: 0,
-        ownedBalls: [1],
-        selectedBall: 1,
-        unlockedMaps: isCasper ? [1, 2, 3, 4, 5] : [1],
-        currentMapId: 1
+        id: newId, name: trimmed, balance: 100, exp: 0,
+        ownedBalls: [1], selectedBall: 1,
+        unlockedMaps: [1], currentMapId: 1,
+        bonusUses: 0
       };
       users[newId] = newUser;
       saveUsers(users);
       return newUser;
     }
-    function generateUniqueId(users) {
-      let id;
-      do {
-        id = Math.floor(10000000 + Math.random() * 90000000).toString();
-      } while (users[id]);
-      return id;
-    }
-    function updateUserData(updatedUser) {
-      const users = loadUsers();
-      if (users[updatedUser.id]) {
-        users[updatedUser.id] = updatedUser;
-        saveUsers(users);
-        currentUser = updatedUser;
+    function updateUserData(u) { const users = loadUsers(); if (users[u.id]) { users[u.id] = u; saveUsers(users); currentUser = u; } }
+
+    // ========== ЗАГРУЗКА КАРТ ==========
+    function loadGameMaps() {
+      const data = localStorage.getItem('game_maps');
+      if (data) {
+        try {
+          const maps = JSON.parse(data);
+          if (Array.isArray(maps) && maps.length > 0) {
+            return maps.map((m, i) => ({
+              id: m.id || 'map_' + i,
+              name: m.name || 'Карта ' + (i + 1),
+              icon: '🗺️',
+              expCost: i === 0 ? 0 : (i === 1 ? 2_000 : i === 2 ? 5_000 : i === 3 ? 10_000 : 20_000),
+              trackLength: m.trackLength || 3_500,
+              trackWidth: m.trackWidth || 440,
+              ballCount: m.ballCount || 6,
+              gravity: m.gravity || 0.08,
+              bgColor: m.bgColor || '#000015',
+              obstacles: m.obstacles || []
+            }));
+          }
+        } catch (e) {}
       }
+      return [{
+        id: 'default', name: 'Базовая карта', icon: '🌍', expCost: 0,
+        trackLength: 3_500, trackWidth: 440, ballCount: 6, gravity: 0.08,
+        bgColor: '#000015', obstacles: []
+      }];
     }
 
-    // ========== КАРТЫ ==========
-    const maps = [
-      { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, expCost: 0, desc: 'Стандартная', specials: [] },
-      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 0, expCost: 50, desc: '+10% множители', specials: ['bumper'] },
-      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 0, expCost: 150, desc: '+20% множители', specials: ['bumper', 'teleport'] },
-      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 300, desc: '+35% множители', specials: ['bumper', 'teleport', 'gravity'] },
-      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 500, desc: '+50% множители', specials: ['bumper', 'teleport', 'gravity', 'doublebumper'] }
-    ];
+    let gameMaps = loadGameMaps();
+
+    function getCurrentMap() {
+      const id = currentUser ? currentUser.currentMapId : 1;
+      const found = gameMaps.find(m => m.id === id);
+      return found || gameMaps[0];
+    }
 
     // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
     const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d', { alpha: false });
+    const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
-      const container = canvas.parentElement;
-      const rect = container.getBoundingClientRect();
-      const w = rect.width - 20;
-      const h = rect.height - 130;
-      canvas.width = Math.floor(w);
-      canvas.height = Math.floor(Math.max(h, 400));
+      const wrapper = canvas.parentElement;
+      const rect = wrapper.getBoundingClientRect();
+      canvas.width = Math.floor(rect.width - 16);
+      canvas.height = Math.floor(rect.height - 8);
     }
     resizeCanvas();
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      buildAll();
-    });
+    window.addEventListener('resize', () => { resizeCanvas(); buildTrack(); });
 
-    const GRAVITY = 0.09;
-    const BOUNCE = 0.4;
-    const PLATFORM_RADIUS = 1.75;
-    const BALL_RADIUS = 7;
+    const GRAVITY = 0.08;
+    const BOUNCE = 0.3;
+    const BALL_RADIUS = 12;
+    const BALL_COLORS = ['#ff6666', '#66bbff', '#66ff66', '#ffee66', '#ff66ff', '#ffaa66', '#66ffff', '#ff88cc', '#aaff66', '#ff9966'];
+    const BALL_NAMES = ['Красный', 'Синий', 'Зелёный', 'Жёлтый', 'Розовый', 'Оранжевый', 'Бирюзовый', 'Ягодный', 'Лайм', 'Персик'];
 
-    let platforms = [];
-    let specials = [];
-    let binWalls = [];
-    let usedTeleports = [];
-    let usedBumpers = [];
-
-    let rows = 22;
-    let startY = 80;
-    let rowSpacing = 13;
-    const colSpacing = 36;
-    let colBaseX = 220;
-
-    let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-    let binCount = 19;
-
-    let ball = {
-      x: 220, y: 60, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
-    };
-    let gameActive = false;
-    let swingAngle = 0;
-    let swingSpeed = 0.04;
-    let stringAnchorX = 220;
-    let stringAnchorY = 25;
-    let stringLength = 40;
-
+    let trackLength = 3_500;
+    let trackWidth = 0;
+    let cameraY = 0;
+    let obstacles = [];
+    let finishLine = 3_500;
+    let balls = [];
+    let selectedBallIndex = 0;
+    let betAmount = 10;
+    let raceActive = false;
+    let finishOrder = [];
     let sessionExp = 0;
-    let waitingForResultClose = false;
-    let ballInBin = false;
-    let binTimer = 0;
-    let ballBinX = 0;
-    let ballBinY = 0;
+    let isBonusMode = false;
+    let bonusUsesLeft = 0;
 
-    function getBallColor(value) {
-      const colors = {
-        1: '#44aaff', 2: '#4488ff', 3: '#44cc44', 4: '#ffdd44', 5: '#ff9944',
-        6: '#ff4444', 7: '#cc44ff', 8: '#aa7744', 9: '#222222', 10: '#ff44ff'
-      };
-      return colors[value] || '#44aaff';
-    }
-
-    function getBallEmoji(value) {
-      const map = {
-        1: '⚪', 2: '🔵', 3: '🟢', 4: '🟡', 5: '🟠',
-        6: '🔴', 7: '🟣', 8: '🟤', 9: '⚫', 10: '💎'
-      };
-      return map[value] || '⭐';
-    }
-
-    // ========== UI ==========
-    const balanceSpan = document.getElementById('balanceDisplay');
-    const expSpan = document.getElementById('expDisplay');
-    const userGreeting = document.getElementById('userGreeting');
-    const mapIndicator = document.getElementById('mapIndicator');
-    const dropButton = document.getElementById('dropButton');
-    const authModal = document.getElementById('authModal');
-    const usernameInput = document.getElementById('usernameInput');
-    const loginBtn = document.getElementById('loginBtn');
-    const gameContainer = document.getElementById('gameContainer');
-    const resultModal = document.getElementById('resultModal');
-    const resultContent = document.getElementById('resultContent');
-
-    function getCurrentMap() {
-      return maps.find(m => m.id === currentMapId) || maps[0];
-    }
-
-    function updateMultipliers() {
-      const baseMultipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-      const bonus = getCurrentMap().multiplierBonus;
-      multipliers = baseMultipliers.map(m => {
-        if (m === -1) return -1;
-        return Math.round((m * (1 + bonus)) * 10) / 10;
-      });
-    }
-
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
+    function buildTrack() {
+      const map = getCurrentMap();
+      trackWidth = map.trackWidth || canvas.width;
+      trackLength = map.trackLength || 3_500;
+      finishLine = trackLength - 100;
+      obstacles = [];
+      if (map.obstacles && Array.isArray(map.obstacles)) {
+        obstacles = map.obstacles.map(o => ({ ...o }));
       }
-      return arr;
+      const hasFinish = obstacles.some(o => o.type === 'finish');
+      if (!hasFinish) obstacles.push({ y: finishLine, type: 'finish' });
     }
 
-    function buildAll() {
-      colBaseX = canvas.width / 2;
-      stringAnchorX = canvas.width / 2;
-      startY = canvas.height * 0.11;
-      rowSpacing = (canvas.height - startY - 55) / rows;
-      if (rowSpacing < 11) rowSpacing = 11;
-      stringLength = startY - 15;
-      stringAnchorY = 10;
+    function initBalls() {
+      const map = getCurrentMap();
+      const ballCount = isBonusMode ? 5 : (map.ballCount || 6);
+      balls = [];
+      const spacing = Math.min(20, (trackWidth - 40) / ballCount);
+      const startX = trackWidth / 2 - (ballCount - 1) * spacing / 2;
       
-      usedTeleports = [];
-      usedBumpers = [];
-      
-      updateMultipliers();
-      buildSpecials();
-      buildPlatforms();
-      buildBinWalls();
-      resetBall();
-      waitingForResultClose = false;
-      ballInBin = false;
-    }
-
-    function getRandomPositions(count, rows) {
-      let positions = [];
-      for (let r = 2; r < rows - 1; r++) {
-        positions.push(r);
-      }
-      positions = shuffleArray(positions);
-      return positions.slice(0, count);
-    }
-
-    function buildSpecials() {
-      specials = [];
-      const mapConfig = getCurrentMap();
-      const w = canvas.width;
-      const h = canvas.height;
-      const cx = w / 2;
-      
-      if (mapConfig.specials.includes('bumper')) {
-        const count = Math.floor(Math.random() * 3) + 4;
-        const rows_pos = getRandomPositions(count, rows);
-        const cols = shuffleArray([-0.4, -0.2, 0, 0.2, 0.4]);
-        
-        for (let i = 0; i < count; i++) {
-          const r = rows_pos[i];
-          const y = startY + r * rowSpacing;
-          const colOffset = cols[i % cols.length];
-          
-          specials.push({
-            x: cx + colOffset * w * 0.8,
-            y: y,
-            width: 50,
-            height: 4,
-            type: 'bumper',
-            color: '#ff4466',
-            bounceForce: 2.5,
-            id: i
-          });
-        }
-      }
-      
-      if (mapConfig.specials.includes('doublebumper')) {
-        const rows_pos = getRandomPositions(2, rows);
-        const y1 = startY + rows_pos[0] * rowSpacing;
-        const y2 = startY + rows_pos[1] * rowSpacing;
-        
-        specials.push({
-          x: cx - w * 0.2,
-          y: y1,
-          width: 50,
-          height: 4,
-          type: 'bumper',
-          color: '#ff0044',
-          bounceForce: 3.2,
-          id: specials.length
-        });
-        specials.push({
-          x: cx + w * 0.2,
-          y: y2,
-          width: 50,
-          height: 4,
-          type: 'bumper',
-          color: '#ff0044',
-          bounceForce: 3.2,
-          id: specials.length
+      for (let i = 0; i < ballCount; i++) {
+        const ballValue = currentUser ? currentUser.selectedBall : 1;
+        const colorIndex = isBonusMode ? ballValue - 1 : i;
+        balls.push({
+          x: startX + i * spacing,
+          y: 30,
+          vx: 0, vy: 0,
+          active: true,
+          finished: false,
+          finishPos: 0,
+          color: BALL_COLORS[colorIndex % BALL_COLORS.length],
+          index: i
         });
       }
-      
-      if (mapConfig.specials.includes('teleport')) {
-        const pairCount = mapConfig.id >= 5 ? 2 : 1;
-        for (let p = 0; p < pairCount; p++) {
-          const rows_pos = getRandomPositions(2, rows);
-          const y1 = startY + rows_pos[0] * rowSpacing;
-          const y2 = startY + rows_pos[1] * rowSpacing;
-          
-          const teleportId = specials.length;
-          specials.push({
-            x: cx - w * 0.25,
-            y: Math.min(y1, h - 90),
-            radius: 12,
-            type: 'teleport',
-            color: '#00ff88',
-            targetX: stringAnchorX,
-            targetY: startY - 5,
-            pairId: teleportId + 1
-          });
-          specials.push({
-            x: cx + w * 0.25,
-            y: Math.min(y2, h - 90),
-            radius: 12,
-            type: 'teleport',
-            color: '#ff8800',
-            targetX: stringAnchorX,
-            targetY: startY - 5,
-            pairId: teleportId
-          });
-        }
-      }
-      
-      if (mapConfig.specials.includes('gravity')) {
-        const r = Math.floor(Math.random() * (rows - 6)) + 3;
-        const y = startY + r * rowSpacing;
-        specials.push({
-          x: cx,
-          y: y,
-          radius: 14,
-          type: 'gravity',
-          color: '#6600cc',
-          pullForce: 0.08
-        });
-      }
-    }
-
-    function buildPlatforms() {
-      platforms = [];
-      const mapConfig = getCurrentMap();
-      const pinColors = {
-        1: ['#f4d03f', '#b7950b'],
-        2: ['#ff6b6b', '#cc3333'],
-        3: ['#ff9944', '#cc6600'],
-        4: ['#bb88ff', '#7733cc'],
-        5: ['#4444ff', '#0000cc']
-      };
-      const colors = pinColors[mapConfig.id] || pinColors[1];
-      const w = canvas.width;
-      const margin = 10;
-      
-      for (let r = 0; r < rows; r++) {
-        const y = startY + r * rowSpacing;
-        if (y < startY + 10) continue;
-        
-        const availableWidth = w - margin * 2;
-        const pinsInRow = Math.floor(availableWidth / colSpacing) + 1;
-        const totalWidth = (pinsInRow - 1) * colSpacing;
-        const startX = (w - totalWidth) / 2;
-        const offsetX = (r % 2 === 0) ? 0 : colSpacing * 0.5;
-        
-        for (let c = 0; c < pinsInRow; c++) {
-          const px = startX + c * colSpacing + offsetX;
-          if (px < margin || px > w - margin) continue;
-          
-          let overlapped = false;
-          for (let s of specials) {
-            if (usedTeleports.includes(s.id) || usedBumpers.includes(s.id)) continue;
-            
-            if (s.type === 'bumper') {
-              if (Math.abs(px - s.x) < s.width / 2 + PLATFORM_RADIUS + 3 && 
-                  Math.abs(y - s.y) < s.height / 2 + PLATFORM_RADIUS + 3) {
-                overlapped = true;
-                break;
-              }
-            } else if (s.type === 'teleport' || s.type === 'gravity') {
-              const dx = px - s.x;
-              const dy = y - s.y;
-              if (Math.sqrt(dx*dx+dy*dy) < s.radius + PLATFORM_RADIUS + 5) {
-                overlapped = true;
-                break;
-              }
-            }
-          }
-          if (!overlapped) {
-            platforms.push({
-              x: px, y: y, radius: PLATFORM_RADIUS,
-              color1: colors[0], type: 'pin'
-            });
-          }
-        }
-      }
-    }
-
-    function buildBinWalls() {
-      binWalls = [];
-      const binWidth = canvas.width / binCount;
-      const binY = canvas.height - 30;
-      const wallHeight = 30;
-      for (let i = 0; i <= binCount; i++) {
-        const x = i * binWidth;
-        binWalls.push({
-          x1: x, y1: binY - wallHeight,
-          x2: x, y2: binY + 30
-        });
-      }
-    }
-
-    function resetBall() {
-      ball.active = false;
-      ball.x = stringAnchorX;
-      ball.y = stringAnchorY + stringLength;
-      ball.vx = 0;
-      ball.vy = 0;
-      gameActive = false;
-      swingAngle = 0;
+      cameraY = 0;
+      raceActive = false;
+      finishOrder = [];
       sessionExp = 0;
-      waitingForResultClose = false;
-      ballInBin = false;
-      usedTeleports = [];
-      usedBumpers = [];
     }
 
     function updateUI() {
       if (!currentUser) {
-        balanceSpan.textContent = '0';
-        expSpan.textContent = '0';
-        userGreeting.textContent = '👨‍🚀 Гость';
-        ball.color = getBallColor(1);
-        mapIndicator.textContent = '🌍 Карта 1';
+        document.getElementById('balanceDisplay').textContent = '0';
+        document.getElementById('expDisplay').textContent = '0';
+        document.getElementById('userGreeting').textContent = '👨‍🚀 Гость';
+        document.getElementById('mapIndicator').textContent = '🗺️ Карта';
         return;
       }
-      balanceSpan.textContent = Math.floor(currentUser.balance);
-      expSpan.textContent = Math.floor(currentUser.exp);
-      userGreeting.textContent = `👨‍🚀 ${currentUser.name}`;
-      ball.color = getBallColor(currentUser.selectedBall);
-      mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
-    }
-
-    function showResult(betValue, multiplier, winnings, oldBalance, newBalance, totalExp) {
-      const ballEmoji = getBallEmoji(currentUser ? currentUser.selectedBall : 1);
-      
-      resultContent.innerHTML = `
-        <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">📊 Результат броска</h3>
-        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;">
-          <div class="result-row">
-            <span class="result-label">🎯 Шар</span>
-            <span class="result-value">${ballEmoji} (ставка ${betValue} ⭐)</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">✖️ Множитель</span>
-            <span class="result-value" style="color: #ffd700;">x${multiplier}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">💼 Было</span>
-            <span class="result-value">${oldBalance} ⭐</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">💼 Стало</span>
-            <span class="result-value">${newBalance} ⭐</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📈 Итог</span>
-            <span class="result-value" style="color: ${winnings >= 0 ? '#4caf50' : '#f44336'}; font-size: 1rem;">
-              ${winnings >= 0 ? '+' : ''}${winnings} ⭐
-            </span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">✨ Опыт за бросок</span>
-            <span class="result-value" style="color: #44ff44;">+${sessionExp}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">✨ Всего опыта</span>
-            <span class="result-value" style="color: #44ff44;">${totalExp}</span>
-          </div>
-        </div>
-        <button id="closeResultBtn" style="align-self: center;">Ок</button>
-      `;
-      resultModal.classList.remove('hidden');
-      
-      document.getElementById('closeResultBtn').addEventListener('click', () => {
-        resultModal.classList.add('hidden');
-        waitingForResultClose = false;
-        buildAll();
-        resetBall();
-      });
-    }
-
-    function dropBall() {
-      initAudio();
-      startMusic();
-      if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
-      if (gameActive || ball.active || waitingForResultClose) return;
-      
-      ball.value = currentUser.selectedBall;
-      ball.color = getBallColor(currentUser.selectedBall);
-      ball.active = true;
-      gameActive = true;
-      waitingForResultClose = false;
-      sessionExp = 0;
-      ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
-      ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
-      ball.vx = Math.sin(swingAngle) * 1.2;
-      ball.vy = 0.6;
-      
-      soundDrop();
-    }
-
-    function checkWallCollision(wall) {
-      const dx = wall.x2 - wall.x1;
-      const dy = wall.y2 - wall.y1;
-      const lengthSq = dx * dx + dy * dy;
-      
-      let t = ((ball.x - wall.x1) * dx + (ball.y - wall.y1) * dy) / lengthSq;
-      t = Math.max(0, Math.min(1, t));
-      
-      const closestX = wall.x1 + t * dx;
-      const closestY = wall.y1 + t * dy;
-      
-      const distX = ball.x - closestX;
-      const distY = ball.y - closestY;
-      const dist = Math.sqrt(distX * distX + distY * distY);
-      
-      if (dist < BALL_RADIUS && dist > 0.001) {
-        const nx = distX / dist;
-        const ny = distY / dist;
-        ball.x += nx * (BALL_RADIUS - dist);
-        ball.y += ny * (BALL_RADIUS - dist);
-        const vn = ball.vx * nx + ball.vy * ny;
-        if (vn < 0) {
-          ball.vx -= (1 + BOUNCE) * vn * nx;
-          ball.vy -= (1 + BOUNCE) * vn * ny;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function checkBumperCollision(bumper) {
-      if (usedBumpers.includes(bumper.id)) return false;
-      
-      const halfW = bumper.width / 2;
-      const halfH = bumper.height / 2;
-      
-      if (ball.x > bumper.x - halfW - BALL_RADIUS && 
-          ball.x < bumper.x + halfW + BALL_RADIUS &&
-          ball.y > bumper.y - halfH - BALL_RADIUS && 
-          ball.y < bumper.y + halfH + BALL_RADIUS) {
-        
-        const closestX = Math.max(bumper.x - halfW, Math.min(ball.x, bumper.x + halfW));
-        const closestY = Math.max(bumper.y - halfH, Math.min(ball.y, bumper.y + halfH));
-        
-        const dx = ball.x - closestX;
-        const dy = ball.y - closestY;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        
-        if (dist < BALL_RADIUS && dist > 0.001) {
-          const nx = dx / dist;
-          const ny = dy / dist;
-          ball.x += nx * (BALL_RADIUS - dist);
-          ball.y += ny * (BALL_RADIUS - dist);
-          
-          ball.vy = -Math.abs(ball.vy) * bumper.bounceForce - 3;
-          ball.vx += (Math.random() - 0.5) * 3;
-          
-          usedBumpers.push(bumper.id);
-          soundBumper();
-          
-          if (currentUser) {
-            currentUser.exp += 1;
-            sessionExp += 1;
-            updateUserData(currentUser);
-          }
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function applySpecialEffects() {
-      for (let s of specials) {
-        if (s.type === 'bumper') {
-          checkBumperCollision(s);
-        }
-        
-        if (s.type === 'teleport') {
-          if (usedTeleports.includes(s.id) || usedTeleports.includes(s.pairId)) continue;
-          
-          const dx = ball.x - s.x;
-          const dy = ball.y - s.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const minDist = BALL_RADIUS + s.radius;
-          if (dist < minDist) {
-            ball.x = s.targetX;
-            ball.y = s.targetY;
-            ball.vx = (Math.random() - 0.5) * 1;
-            ball.vy = 0.5;
-            
-            usedTeleports.push(s.id);
-            usedTeleports.push(s.pairId);
-            soundTeleport();
-            
-            if (currentUser) {
-              currentUser.exp += 2;
-              sessionExp += 2;
-              updateUserData(currentUser);
-            }
-          }
-        }
-        
-        if (s.type === 'gravity') {
-          const dx = ball.x - s.x;
-          const dy = ball.y - s.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const influenceRadius = 80;
-          if (dist < influenceRadius && dist > 0.001) {
-            const force = s.pullForce * (1 - dist / influenceRadius);
-            ball.vx += (dx / dist) * force;
-            ball.vy += (dy / dist) * force;
-            ball.vx += (-dy / dist) * force * 0.3;
-            ball.vy += (dx / dist) * force * 0.3;
-          }
-        }
-      }
+      document.getElementById('balanceDisplay').textContent = formatNum(currentUser.balance);
+      document.getElementById('expDisplay').textContent = formatNum(currentUser.exp);
+      document.getElementById('userGreeting').textContent = `👨‍🚀 ${currentUser.name}`;
+      const cm = getCurrentMap();
+      document.getElementById('mapIndicator').textContent = `${cm.icon || '🗺️'} ${cm.name}`;
+      document.getElementById('bonusInfo').textContent = `🎁 Бонус: ${currentUser.bonusUses || 0}/3`;
     }
 
     function applyPhysics() {
-      if (!gameActive) return;
+      if (!raceActive) return;
       
-      if (ballInBin) {
-        binTimer--;
-        if (binTimer <= 0) {
-          const binWidth = canvas.width / binCount;
-          let binIndex = Math.floor(ballBinX / binWidth);
-          if (binIndex < 0) binIndex = 0;
-          if (binIndex >= binCount) binIndex = binCount - 1;
-          const multiplier = multipliers[binIndex];
-          
-          const oldBalance = currentUser ? currentUser.balance : 0;
-          let winnings;
-          if (multiplier === -1) {
-            winnings = -ball.value;
-          } else {
-            winnings = Math.floor(ball.value * multiplier);
-          }
-          
-          if (currentUser) {
-            currentUser.balance += winnings;
-            updateUserData(currentUser);
-          }
-          const newBalance = currentUser ? currentUser.balance : 0;
-          const totalExp = currentUser ? currentUser.exp : 0;
-          
-          ballInBin = false;
-          gameActive = false;
-          ball.active = false;
-          waitingForResultClose = true;
-          
-          updateUI();
-          
-          setTimeout(() => {
-            showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
-          }, 500);
-        }
-        return;
-      }
+      let allFinished = true;
       
-      if (!ball.active) return;
-      
-      ball.vy += GRAVITY;
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-
-      if (ball.x - BALL_RADIUS < 2) { 
-        ball.x = BALL_RADIUS + 2; 
-        ball.vx = Math.abs(ball.vx) * BOUNCE; 
-        soundBounce();
-      }
-      if (ball.x + BALL_RADIUS > canvas.width - 2) { 
-        ball.x = canvas.width - BALL_RADIUS - 2; 
-        ball.vx = -Math.abs(ball.vx) * BOUNCE; 
-        soundBounce();
-      }
-      
-      if (ball.y - BALL_RADIUS < 2) { 
-        ball.y = BALL_RADIUS + 2; 
-        ball.vy = Math.abs(ball.vy) * BOUNCE; 
-        soundBounce();
-      }
-
-      for (let p of platforms) {
-        const dx = ball.x - p.x;
-        const dy = ball.y - p.y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        const minDist = BALL_RADIUS + p.radius;
-        if (dist < minDist && dist > 0.001) {
-          const nx = dx/dist, ny = dy/dist;
-          ball.x += nx * (minDist - dist);
-          ball.y += ny * (minDist - dist);
-          const vn = ball.vx * nx + ball.vy * ny;
-          if (vn < 0) {
-            ball.vx -= (1+BOUNCE)*vn*nx;
-            ball.vy -= (1+BOUNCE)*vn*ny;
-            soundBounce();
-            
-            if (currentUser) {
-              currentUser.exp += 1;
-              sessionExp += 1;
-              updateUserData(currentUser);
+      for (let b of balls) {
+        if (!b.active || b.finished) continue;
+        allFinished = false;
+        
+        b.vy += getCurrentMap().gravity || GRAVITY;
+        b.x += b.vx;
+        b.y += b.vy;
+        
+        // Столкновения между шарами
+        for (let other of balls) {
+          if (other === b || !other.active || other.finished) continue;
+          const dx = b.x - other.x;
+          const dy = b.y - other.y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < BALL_RADIUS * 2 && dist > 0.001) {
+            const nx = dx/dist, ny = dy/dist;
+            const overlap = BALL_RADIUS * 2 - dist;
+            b.x += nx * overlap / 2;
+            b.y += ny * overlap / 2;
+            other.x -= nx * overlap / 2;
+            other.y -= ny * overlap / 2;
+            const vn = (b.vx - other.vx) * nx + (b.vy - other.vy) * ny;
+            if (vn < 0) {
+              b.vx -= vn * nx * 0.8;
+              b.vy -= vn * ny * 0.8;
+              other.vx += vn * nx * 0.8;
+              other.vy += vn * ny * 0.8;
             }
           }
-          ball.vx *= 0.999;
-          ball.vy *= 0.999;
         }
+        
+        if (b.x - BALL_RADIUS < 5) { b.x = BALL_RADIUS + 5; b.vx = Math.abs(b.vx) * BOUNCE; }
+        if (b.x + BALL_RADIUS > trackWidth - 5) { b.x = trackWidth - BALL_RADIUS - 5; b.vx = -Math.abs(b.vx) * BOUNCE; }
+        
+        for (let obs of obstacles) {
+          if (obs.type === 'pin') {
+            const dx = b.x - obs.x, dy = b.y - obs.y;
+            const dist = Math.sqrt(dx*dx+dy*dy);
+            if (dist < BALL_RADIUS + (obs.radius || 4)) {
+              const nx = dx/dist, ny = dy/dist;
+              b.x += nx * (BALL_RADIUS + (obs.radius || 4) - dist);
+              b.y += ny * (BALL_RADIUS + (obs.radius || 4) - dist);
+              const vn = b.vx*nx + b.vy*ny;
+              if (vn < 0) { b.vx -= 1.2*vn*nx; b.vy -= 1.2*vn*ny; }
+              if (currentUser) { currentUser.exp += 1; sessionExp += 1; updateUserData(currentUser); }
+            }
+          } else if (obs.type === 'bumper') {
+            if (b.x > obs.x - obs.width/2 - BALL_RADIUS && b.x < obs.x + obs.width/2 + BALL_RADIUS &&
+                b.y > obs.y - obs.height/2 - BALL_RADIUS && b.y < obs.y + obs.height/2 + BALL_RADIUS) {
+              b.vy = -Math.abs(b.vy) * (obs.force || 2.5) - 2;
+              b.vx += (Math.random() - 0.5) * 2;
+              if (currentUser) { currentUser.exp += 1; sessionExp += 1; updateUserData(currentUser); }
+            }
+          } else if (obs.type === 'funnel') {
+            const dx = b.x - obs.x, dy = b.y - obs.y;
+            const dist = Math.sqrt(dx*dx+dy*dy);
+            if (dist < (obs.radius || 25) && dist > 5) {
+              b.vx += (-dy/dist) * 0.08;
+              b.vy += (dx/dist) * 0.08;
+            }
+          } else if (obs.type === 'wall_seg') {
+            if (b.x > obs.x - obs.width/2 - BALL_RADIUS && b.x < obs.x + obs.width/2 + BALL_RADIUS &&
+                b.y > obs.y - obs.height/2 - BALL_RADIUS && b.y < obs.y + obs.height/2 + BALL_RADIUS) {
+              if (b.x < obs.x) { b.x = obs.x - obs.width/2 - BALL_RADIUS; b.vx = -Math.abs(b.vx) * BOUNCE; }
+              else { b.x = obs.x + obs.width/2 + BALL_RADIUS; b.vx = Math.abs(b.vx) * BOUNCE; }
+            }
+          } else if (obs.type === 'wall_gap') {
+            if (Math.abs(b.y - obs.y) < BALL_RADIUS + 3) {
+              if (b.x < obs.x - obs.width/2 || b.x > obs.x + obs.width/2) {
+                b.vy = Math.abs(b.vy) * BOUNCE;
+                b.y = obs.y - BALL_RADIUS - 3;
+              }
+            }
+          } else if (obs.type === 'wall_angled') {
+            const angle = (obs.angle || 0) * Math.PI / 180;
+            const cos = Math.cos(angle), sin = Math.sin(angle);
+            const dx = b.x - obs.x, dy = b.y - obs.y;
+            const localX = dx*cos + dy*sin;
+            const localY = -dx*sin + dy*cos;
+            if (Math.abs(localX) < obs.width/2 + BALL_RADIUS && Math.abs(localY) < 3 + BALL_RADIUS) {
+              if (localY > 0) {
+                b.x -= -sin*(3+BALL_RADIUS-localY); b.y -= cos*(3+BALL_RADIUS-localY);
+              } else {
+                b.x -= -sin*(-3-BALL_RADIUS-localY); b.y -= cos*(-3-BALL_RADIUS-localY);
+              }
+            }
+          }
+        }
+        
+        if (b.y >= finishLine && !b.finished) {
+          b.finished = true;
+          b.finishPos = finishOrder.length + 1;
+          finishOrder.push(b.index);
+        }
+        
+        b.vx *= 0.999;
+        b.vy *= 0.999;
       }
       
-      for (let wall of binWalls) {
-        checkWallCollision(wall);
+      const selectedBall = balls[selectedBallIndex];
+      if (selectedBall && selectedBall.active && !isBonusMode) {
+        const targetY = selectedBall.y - canvas.height * 0.4;
+        cameraY += (targetY - cameraY) * 0.08;
+        if (cameraY < 0) cameraY = 0;
+        if (cameraY > trackLength - canvas.height) cameraY = trackLength - canvas.height;
+      } else if (isBonusMode) {
+        const leadBall = balls.reduce((a, b) => (b.y > a.y ? b : a), balls[0]);
+        const targetY = leadBall.y - canvas.height * 0.5;
+        cameraY += (targetY - cameraY) * 0.06;
+        if (cameraY < 0) cameraY = 0;
+        if (cameraY > trackLength - canvas.height) cameraY = trackLength - canvas.height;
       }
       
-      applySpecialEffects();
+      updateRacePosition();
       
+      if (allFinished || finishOrder.length >= balls.length) endRace();
       updateUI();
+    }
 
-      if (ball.y + BALL_RADIUS > canvas.height - 30 && ball.y < canvas.height) {
-        ballInBin = true;
-        ballBinX = ball.x;
-        ballBinY = canvas.height - 30;
-        binTimer = 60;
-        ball.active = false;
-        soundBin();
-      }
-      
-      if (ball.y > canvas.height + 100 || ball.y < -100) { 
-        resetBall(); 
-        gameActive = false; 
+    function updateRacePosition() {
+      const info = document.getElementById('raceInfo');
+      if (isBonusMode) {
+        const sorted = balls.filter(b => b.active).sort((a, b) => b.y - a.y);
+        info.textContent = `🎁 Бонус`;
+        info.classList.remove('hidden');
+      } else {
+        const selectedBall = balls[selectedBallIndex];
+        if (!selectedBall || selectedBall.finished) { info.classList.add('hidden'); return; }
+        const sorted = balls.filter(b => b.active).sort((a, b) => b.y - a.y);
+        const pos = sorted.indexOf(selectedBall) + 1;
+        info.textContent = `🏁 ${pos}/${sorted.length}`;
+        info.classList.remove('hidden');
       }
     }
 
-    function drawSpecials() {
-      for (let s of specials) {
-        if (s.type === 'bumper') {
-          if (usedBumpers.includes(s.id)) continue;
-          
-          const halfW = s.width / 2;
-          const halfH = s.height / 2;
-          
-          ctx.fillStyle = s.color;
-          ctx.fillRect(s.x - halfW, s.y - halfH, s.width, s.height * 2);
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(s.x - halfW, s.y - halfH, s.width, s.height * 2);
-          
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 10px sans-serif';
-          ctx.textAlign = 'center';
-          const arrowCount = Math.floor(s.width / 25);
-          for (let a = 0; a < arrowCount; a++) {
-            const ax = s.x - halfW + 15 + a * (s.width / arrowCount);
-            ctx.fillText('▲', ax, s.y + 4);
-          }
-        }
+    function endRace() {
+      raceActive = false;
+      document.getElementById('raceInfo').classList.add('hidden');
+      
+      if (isBonusMode) {
+        const totalExp = currentUser ? currentUser.exp : 0;
+        const resultDiv = document.getElementById('resultContent');
+        resultDiv.innerHTML = `
+          <h3 style="color:#ff8800; text-align:center; font-size:0.95rem;">🎁 Бонус-режим</h3>
+          <div style="background:rgba(0,0,0,0.3); border-radius:12px; padding:10px;">
+            <p style="text-align:center; color:#ffd700;">Все 5 шаров — ваши!</p>
+            <p style="text-align:center;">Опыт: ✨ +${sessionExp}</p>
+            <p style="text-align:center;">Всего опыта: ✨ ${formatNum(totalExp)}</p>
+          </div>
+          <button id="closeResultBtn" style="align-self:center;">Ок</button>
+        `;
+        document.getElementById('resultModal').classList.remove('hidden');
+        document.getElementById('closeResultBtn').onclick = () => {
+          document.getElementById('resultModal').classList.add('hidden');
+          resetGame();
+        };
+      } else {
+        const selectedPos = balls[selectedBallIndex].finishPos || finishOrder.indexOf(selectedBallIndex) + 1;
+        let multiplier = 0, winnings = 0;
+        if (selectedPos === 1) { multiplier = 3; winnings = betAmount * 3; }
+        else if (selectedPos === 2) { multiplier = 2; winnings = betAmount * 2; }
+        else if (selectedPos === 3) { multiplier = 1; winnings = betAmount; }
+        else if (selectedPos === 4) { multiplier = 0.5; winnings = -Math.floor(betAmount * 0.5); }
+        else { multiplier = 0; winnings = -betAmount; }
         
-        if (s.type === 'teleport') {
-          if (usedTeleports.includes(s.id)) continue;
-          
-          ctx.strokeStyle = s.color;
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.moveTo(s.x - s.radius, s.y - s.radius);
-          ctx.lineTo(s.x - s.radius, s.y + s.radius);
-          ctx.moveTo(s.x + s.radius, s.y - s.radius);
-          ctx.lineTo(s.x + s.radius, s.y + s.radius);
-          ctx.stroke();
-          
-          ctx.fillStyle = s.color;
-          ctx.font = 'bold 8px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('⏫', s.x, s.y + 3);
-        }
+        const oldBalance = currentUser ? currentUser.balance : 0;
+        if (currentUser) { currentUser.balance += winnings; updateUserData(currentUser); }
+        const newBalance = currentUser ? currentUser.balance : 0;
+        const totalExp = currentUser ? currentUser.exp : 0;
         
-        if (s.type === 'gravity') {
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-          ctx.fillStyle = '#000000';
-          ctx.fill();
-          ctx.strokeStyle = s.color;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.lineWidth = 1;
-        }
+        const positions = ['', '🥇', '🥈', '🥉'];
+        let orderHTML = finishOrder.map((idx, i) => 
+          `<div style="color:${BALL_COLORS[idx % BALL_COLORS.length]}; margin: 2px 0; font-size:0.8rem;">${positions[i+1] || (i+1)+' место'} ${BALL_NAMES[idx % BALL_NAMES.length]}</div>`
+        ).join('');
+        
+        const resultDiv = document.getElementById('resultContent');
+        resultDiv.innerHTML = `
+          <h3 style="color:#66ccff; text-align:center; font-size:0.95rem;">🏁 Результаты гонки</h3>
+          <div style="background:rgba(0,0,0,0.3); border-radius:12px; padding:10px;">
+            <div style="margin-bottom:8px;">${orderHTML}</div>
+            <div class="result-row"><span class="result-label">Ваш шар</span><span class="result-value">${selectedPos} место</span></div>
+            <div class="result-row"><span class="result-label">Ставка</span><span class="result-value">⭐ ${formatNum(betAmount)}</span></div>
+            <div class="result-row"><span class="result-label">Множитель</span><span class="result-value" style="color:#ffd700;">x${multiplier}</span></div>
+            <div class="result-row"><span class="result-label">Выигрыш</span><span class="result-value" style="color:${winnings>=0?'#4caf50':'#f44336'};">${winnings>=0?'+':''}${formatNum(winnings)} ⭐</span></div>
+            <div class="result-row"><span class="result-label">Опыт</span><span class="result-value" style="color:#44ff44;">+${sessionExp} ✨</span></div>
+          </div>
+          <button id="closeResultBtn" style="align-self:center;">Ок</button>
+        `;
+        document.getElementById('resultModal').classList.remove('hidden');
+        document.getElementById('closeResultBtn').onclick = () => {
+          document.getElementById('resultModal').classList.add('hidden');
+          resetGame();
+        };
       }
+    }
+
+    function resetGame() {
+      gameMaps = loadGameMaps();
+      isBonusMode = false;
+      initBalls();
+      buildTrack();
+      document.getElementById('dropButton').textContent = '🎯 Выбрать шар';
+      document.getElementById('dropButton').disabled = false;
+      document.getElementById('bonusButton').disabled = false;
+      document.getElementById('raceInfo').classList.add('hidden');
+      updateUI();
     }
 
     function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      ctx.fillStyle = '#000020';
+      const map = getCurrentMap();
+      ctx.fillStyle = map.bgColor || '#000015';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#1a1a3a';
+      ctx.fillRect(0, 0, 5, canvas.height);
+      ctx.fillRect(trackWidth - 5, 0, 5, canvas.height);
       
-      ctx.strokeStyle = '#4488cc';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, 2);
-      ctx.lineTo(canvas.width, 2);
-      ctx.stroke();
-      ctx.lineWidth = 1;
+      ctx.save();
+      ctx.translate(0, -cameraY);
       
-      if (!ball.active && !gameActive && !waitingForResultClose) {
-        swingAngle += swingSpeed;
-        if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
-        const ballX = stringAnchorX + Math.sin(swingAngle) * stringLength;
-        const ballY = stringAnchorY + Math.cos(swingAngle) * stringLength;
-        
-        ctx.beginPath();
-        ctx.moveTo(stringAnchorX, stringAnchorY);
-        ctx.lineTo(ballX, ballY);
-        ctx.strokeStyle = '#66ccff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.arc(ballX, ballY, BALL_RADIUS, 0, 2*Math.PI);
-        const ballColor = currentUser ? getBallColor(currentUser.selectedBall) : '#44aaff';
-        ctx.fillStyle = ballColor;
-        ctx.fill();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      drawSpecials();
-
-      for (let p of platforms) {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, 2*Math.PI);
-        ctx.fillStyle = p.color1;
-        ctx.fill();
-      }
-
-      const binWidth = canvas.width / binCount;
-      const binY = canvas.height - 30;
-      for (let i = 0; i < binCount; i++) {
-        const x = i * binWidth;
-        const mult = multipliers[i];
-        const isNegative = mult === -1;
-        ctx.fillStyle = isNegative ? '#2a0000' : '#0a1a30';
-        ctx.fillRect(x, binY, binWidth, 30);
-        
-        ctx.strokeStyle = isNegative ? '#ff4444' : '#3399ff';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, binY, binWidth, 30);
-        
-        ctx.fillStyle = isNegative ? '#ff6666' : '#ffffff';
-        ctx.font = 'bold 9px "Segoe UI"';
-        ctx.textAlign = 'center';
-        ctx.fillText(isNegative ? '−1' : `x${mult}`, x+binWidth/2, binY+19);
-      }
-
-      ctx.strokeStyle = '#4488cc';
-      ctx.lineWidth = 2;
-      for (let wall of binWalls) {
-        ctx.beginPath();
-        ctx.moveTo(wall.x1, wall.y1);
-        ctx.lineTo(wall.x2, wall.y2);
-        ctx.stroke();
-      }
-      ctx.lineWidth = 1;
-
-      if (ball.active) {
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+      for (let obs of obstacles) {
+        if (obs.y < cameraY - 50 || obs.y > cameraY + canvas.height + 50) continue;
+        if (obs.type === 'pin') {
+          ctx.beginPath(); ctx.arc(obs.x, obs.y, obs.radius || 4, 0, Math.PI*2);
+          ctx.fillStyle = obs.color || '#f4d03f'; ctx.fill();
+        } else if (obs.type === 'bumper') {
+          ctx.fillStyle = obs.color || '#ff4466';
+          ctx.fillRect(obs.x - obs.width/2, obs.y - obs.height/2, obs.width, obs.height || 6);
+        } else if (obs.type === 'funnel') {
+          ctx.beginPath(); ctx.arc(obs.x, obs.y, obs.radius || 25, 0, Math.PI*2);
+          ctx.strokeStyle = obs.color || '#8844ff'; ctx.lineWidth = 2; ctx.stroke();
+        } else if (obs.type === 'wall_seg') {
+          ctx.fillStyle = obs.color || '#666666';
+          ctx.fillRect(obs.x - obs.width/2, obs.y - obs.height/2, obs.width, obs.height || 14);
+        } else if (obs.type === 'wall_gap') {
+          ctx.fillStyle = obs.color || '#888888';
+          ctx.fillRect(0, obs.y - 2, obs.x - obs.width/2, 4);
+          ctx.fillRect(obs.x + obs.width/2, obs.y - 2, trackWidth - obs.x - obs.width/2, 4);
+        } else if (obs.type === 'wall_angled') {
+          ctx.save(); ctx.translate(obs.x, obs.y); ctx.rotate((obs.angle||0)*Math.PI/180);
+          ctx.fillStyle = obs.color || '#ff6644'; ctx.fillRect(-obs.width/2, -3, obs.width, 6);
+          ctx.restore();
+        } else if (obs.type === 'finish') {
+          for (let fx = 0; fx < trackWidth; fx += 16) {
+            ctx.fillStyle = (Math.floor(fx/16)%2===0) ? '#000' : '#ffd700';
+            ctx.fillRect(fx, obs.y - 2, 16, 4);
+          }
+        }
       }
       
-      if (ballInBin) {
-        ctx.beginPath();
-        ctx.arc(ballBinX, ballBinY + 15, BALL_RADIUS, 0, 2*Math.PI);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+      for (let b of balls) {
+        if (!b.active) continue;
+        if (b.y < cameraY - 50 || b.y > cameraY + canvas.height + 50) continue;
+        ctx.beginPath(); ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI*2);
+        const grad = ctx.createRadialGradient(b.x-3, b.y-3, BALL_RADIUS*0.2, b.x, b.y, BALL_RADIUS);
+        grad.addColorStop(0, '#ffffff'); grad.addColorStop(0.4, b.color); grad.addColorStop(1, '#000033');
+        ctx.fillStyle = grad; ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+        if (!isBonusMode && b.index === selectedBallIndex) {
+          ctx.beginPath(); ctx.arc(b.x, b.y, BALL_RADIUS + 4, 0, Math.PI*2);
+          ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+        }
       }
+      ctx.restore();
     }
 
     function gameLoop() {
-      if (gameActive) {
-        applyPhysics();
-      }
+      if (raceActive) applyPhysics();
       drawScene();
       requestAnimationFrame(gameLoop);
     }
 
-    function shakeScreen() {
-      if (ball.active && gameActive) {
-        ball.vx += (Math.random() - 0.5) * 5;
-        ball.vy += (Math.random() - 0.2) * 3;
+    function openBetModal() {
+      if (!currentUser) { alert('Войдите в аккаунт'); return; }
+      const map = getCurrentMap();
+      const ballCount = map.ballCount || 6;
+      const selection = document.getElementById('ballSelection');
+      selection.innerHTML = '';
+      for (let i = 0; i < ballCount; i++) {
+        const div = document.createElement('div');
+        div.className = 'ball-select-item';
+        if (i === selectedBallIndex) div.classList.add('selected');
+        div.style.backgroundColor = BALL_COLORS[i % BALL_COLORS.length];
+        div.textContent = i + 1;
+        div.addEventListener('click', () => {
+          selectedBallIndex = i;
+          document.querySelectorAll('.ball-select-item').forEach((el, idx) => el.classList.toggle('selected', idx === i));
+        });
+        selection.appendChild(div);
       }
+      document.getElementById('betAmount').value = betAmount;
+      document.getElementById('betModal').classList.remove('hidden');
+    }
+
+    function activateBonus() {
+      if (!currentUser) { alert('Войдите в аккаунт'); return; }
+      initAudio();
+      
+      // Симуляция просмотра рекламы
+      if (confirm('🎁 Посмотреть рекламу для получения бонуса?\n\nБонус: 5 шаров запускаются одновременно!\nДоступно использований: 3\nОсталось: ' + (3 - (currentUser.bonusUses || 0)))) {
+        currentUser.bonusUses = (currentUser.bonusUses || 0) + 1;
+        if (currentUser.bonusUses > 3) currentUser.bonusUses = 3;
+        updateUserData(currentUser);
+        updateUI();
+        
+        isBonusMode = true;
+        initBalls();
+        buildTrack();
+        raceActive = true;
+        selectedBallIndex = 0;
+        document.getElementById('dropButton').textContent = '🎁 Бонус...';
+        document.getElementById('dropButton').disabled = true;
+        document.getElementById('bonusButton').disabled = true;
+        
+        if (currentUser.bonusUses >= 3) {
+          document.getElementById('bonusButton').textContent = '🎁 Бонус (0)';
+          document.getElementById('bonusButton').disabled = true;
+        } else {
+          document.getElementById('bonusButton').textContent = `🎁 Бонус (${3 - currentUser.bonusUses})`;
+        }
+        updateUI();
+      }
+    }
+
+    // Экономика шаров
+    function getBallPrice(val) {
+      if (val === 1) return 0;
+      if (val === 2) return 1_000;
+      if (val === 3) return 10_000;
+      if (val === 4) return 26_000;
+      if (val === 5) return 50_000;
+      if (val === 6) return 120_000;
+      if (val === 7) return 250_000;
+      if (val === 8) return 500_000;
+      if (val === 9) return 1_000_000;
+      if (val === 10) return 2_000_000;
+      return val * 200_000;
+    }
+
+    function showProfile() {
+      if (!currentUser) return;
+      document.getElementById('profileName').textContent = currentUser.name;
+      document.getElementById('profileId').textContent = currentUser.id;
+      document.getElementById('profileBalance').textContent = formatNum(currentUser.balance);
+      document.getElementById('profileExp').textContent = formatNum(currentUser.exp);
+      document.getElementById('profileMaps').textContent = `${currentUser.unlockedMaps ? currentUser.unlockedMaps.length : 1}`;
+      document.getElementById('profileModal').classList.remove('hidden');
     }
 
     function openMaps() {
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
+      gameMaps = loadGameMaps();
       const container = document.getElementById('mapsContainer');
-      document.getElementById('mapsExpDisplay').textContent = Math.floor(currentUser.exp);
+      document.getElementById('mapsExpDisplay').textContent = formatNum(currentUser.exp);
       container.innerHTML = '';
       
-      maps.forEach(map => {
-        const unlocked = currentUser.unlockedMaps.includes(map.id);
-        const isActive = map.id === currentMapId;
+      gameMaps.forEach((map, i) => {
+        const unlocked = currentUser.unlockedMaps ? currentUser.unlockedMaps.includes(map.id) : i === 0;
+        const isActive = map.id === (currentUser.currentMapId || gameMaps[0].id);
         const card = document.createElement('div');
         card.className = 'map-card';
         if (!unlocked) card.classList.add('locked');
         if (isActive) card.classList.add('active');
         
-        const costText = map.expCost > 0 ? `✨ ${map.expCost}` : 'Бесплатно';
+        const costText = map.expCost > 0 ? `✨ ${formatNum(map.expCost)}` : 'Бесплатно';
         
         card.innerHTML = `
-          <div class="map-icon">${map.icon}</div>
+          <div class="map-icon">${map.icon || '🗺️'}</div>
           <div class="map-name">${map.name}</div>
-          <div style="font-size:0.65rem; color:#88aacc;">${map.desc}</div>
           ${unlocked 
-            ? (isActive ? '<div style="color:#ffd700; font-size:0.65rem;">✅ Активна</div>' : '<button class="selectMapBtn" data-map="'+map.id+'" style="font-size:0.65rem; padding:4px 8px;">Выбрать</button>')
-            : `<div class="map-price">🔒 ${costText}</div><button class="buyMapBtn" data-map="${map.id}" style="font-size:0.65rem; padding:4px 8px;">Открыть</button>`
+            ? (isActive ? '<div style="color:#ffd700; font-size:0.6rem;">✅ Активна</div>' : '<button class="selectMapBtn" style="font-size:0.6rem; padding:3px 6px;">Выбрать</button>')
+            : `<div class="map-price">🔒 ${costText}</div><button class="buyMapBtn" style="font-size:0.6rem; padding:3px 6px;">Открыть</button>`
           }
         `;
         
-        if (unlocked && !isActive) {
-          card.addEventListener('click', (e) => {
-            if (e.target.tagName === 'BUTTON') return;
-            selectMap(map.id);
+        if (!isActive && unlocked) {
+          card.addEventListener('click', () => {
+            currentUser.currentMapId = map.id;
+            updateUserData(currentUser);
+            updateUI();
+            buildTrack();
+            initBalls();
+            openMaps();
           });
         }
         
@@ -1355,64 +964,33 @@
       document.querySelectorAll('.buyMapBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
-          buyMap(parseInt(e.target.getAttribute('data-map')));
-        });
-      });
-      
-      document.querySelectorAll('.selectMapBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          selectMap(parseInt(e.target.getAttribute('data-map')));
+          const idx = Array.from(container.children).indexOf(e.target.closest('.map-card'));
+          const map = gameMaps[idx];
+          if (map && currentUser.exp >= map.expCost) {
+            currentUser.exp -= map.expCost;
+            if (!currentUser.unlockedMaps) currentUser.unlockedMaps = [gameMaps[0].id];
+            currentUser.unlockedMaps.push(map.id);
+            currentUser.currentMapId = map.id;
+            updateUserData(currentUser);
+            updateUI();
+            openMaps();
+          } else {
+            alert(`Недостаточно опыта! Нужно ✨ ${formatNum(map.expCost)}`);
+          }
         });
       });
       
       document.getElementById('mapsModal').classList.remove('hidden');
     }
 
-    function buyMap(mapId) {
-      if (!currentUser) return;
-      const map = maps.find(m => m.id === mapId);
-      if (!map) return;
-      if (currentUser.unlockedMaps.includes(mapId)) { alert('Карта уже открыта!'); return; }
-      
-      if (currentUser.name.toLowerCase() === 'casper') {
-        currentUser.unlockedMaps.push(mapId);
-        updateUserData(currentUser);
-        updateUI();
-        openMaps();
-        return;
-      }
-      
-      if (currentUser.exp < map.expCost) { alert(`Недостаточно опыта! Нужно ✨ ${map.expCost}`); return; }
-      currentUser.exp -= map.expCost;
-      currentUser.unlockedMaps.push(mapId);
-      updateUserData(currentUser);
-      updateUI();
-      openMaps();
-    }
-
-    function selectMap(mapId) {
-      if (!currentUser) return;
-      if (!currentUser.unlockedMaps.includes(mapId)) return;
-      currentMapId = mapId;
-      if (currentUser) {
-        currentUser.currentMapId = mapId;
-        updateUserData(currentUser);
-      }
-      buildAll();
-      updateUI();
-      document.getElementById('mapsModal').classList.add('hidden');
-    }
-
     function openShop() {
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
       const container = document.getElementById('shopItemsContainer');
-      const selectedSpan = document.getElementById('shopSelectedBall');
-      selectedSpan.textContent = `${getBallEmoji(currentUser.selectedBall)} (${currentUser.selectedBall} очк.)`;
+      document.getElementById('shopSelectedBall').textContent = `${getBallEmoji(currentUser.selectedBall)} (${currentUser.selectedBall})`;
       
       container.innerHTML = '';
       for (let val = 1; val <= 10; val++) {
-        const price = val === 1 ? 0 : val * 22;
+        const price = getBallPrice(val);
         const owned = currentUser.ownedBalls.includes(val);
         const isSelected = currentUser.selectedBall === val;
         const div = document.createElement('div');
@@ -1421,11 +999,11 @@
         
         div.innerHTML = `
           <div class="ball-preview" style="color:${getBallColor(val)};">${getBallEmoji(val)}</div>
-          <div style="font-size:0.75rem;"><strong>${val} очк.</strong></div>
-          <div style="font-size:0.65rem;">${owned ? '✅' : `⭐ ${price}`}</div>
-          ${!owned && val > 1 ? `<button class="buyBallBtn" data-value="${val}" style="font-size:0.65rem; padding:3px 8px;">Купить</button>` : ''}
-          ${owned && !isSelected ? `<button class="selectBallBtn" data-value="${val}" style="font-size:0.65rem; padding:3px 8px; background: #228822;">Выбрать</button>` : ''}
-          ${isSelected ? '<span style="font-size:0.65rem; color:#44ff44;">Выбран</span>' : ''}
+          <div style="font-size:0.75rem;"><strong>${val}</strong></div>
+          <div style="font-size:0.6rem;">${owned ? '✅' : `⭐ ${formatNum(price)}`}</div>
+          ${!owned && price > 0 ? `<button class="buyBallBtn" data-value="${val}" style="font-size:0.6rem; padding:3px 6px;">Купить</button>` : ''}
+          ${owned && !isSelected ? `<button class="selectBallBtn" data-value="${val}" style="font-size:0.6rem; padding:3px 6px; background:#228822;">Выбрать</button>` : ''}
+          ${isSelected ? '<span style="font-size:0.6rem; color:#44ff44;">Выбран</span>' : ''}
         `;
         container.appendChild(div);
       }
@@ -1436,7 +1014,6 @@
           buyBall(parseInt(e.target.getAttribute('data-value')));
         });
       });
-      
       document.querySelectorAll('.selectBallBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
@@ -1449,9 +1026,8 @@
 
     function buyBall(value) {
       if (!currentUser) return;
-      const price = value * 22;
-      if (currentUser.balance < price) { alert('Недостаточно звёзд!'); return; }
-      if (currentUser.ownedBalls.includes(value)) { alert('Уже куплен!'); return; }
+      const price = getBallPrice(value);
+      if (currentUser.balance < price) { alert(`Недостаточно звёзд! Нужно ⭐ ${formatNum(price)}`); return; }
       currentUser.balance -= price;
       currentUser.ownedBalls.push(value);
       currentUser.ownedBalls.sort((a,b)=>a-b);
@@ -1470,99 +1046,128 @@
       openShop();
     }
 
-    function showProfile() {
-      if (!currentUser) return;
-      document.getElementById('profileName').textContent = currentUser.name;
-      document.getElementById('profileId').textContent = currentUser.id;
-      document.getElementById('profileBalance').textContent = Math.floor(currentUser.balance);
-      document.getElementById('profileExp').textContent = Math.floor(currentUser.exp);
-      document.getElementById('profileMaps').textContent = `${currentUser.unlockedMaps.length} / 5`;
-      document.getElementById('profileModal').classList.remove('hidden');
+    function getBallColor(value) {
+      const colors = {
+        1: '#44aaff', 2: '#4488ff', 3: '#44cc44', 4: '#ffdd44', 5: '#ff9944',
+        6: '#ff4444', 7: '#cc44ff', 8: '#aa7744', 9: '#222222', 10: '#ff44ff'
+      };
+      return colors[value] || '#44aaff';
+    }
+
+    function getBallEmoji(value) {
+      const map = {
+        1: '⚪', 2: '🔵', 3: '🟢', 4: '🟡', 5: '🟠',
+        6: '🔴', 7: '🟣', 8: '🟤', 9: '⚫', 10: '💎'
+      };
+      return map[value] || '⭐';
+    }
+
+    function initAudio() {
+      // Пустая функция — звуки убраны
     }
 
     function loginUser(name) {
       const user = getOrCreateUser(name);
       if (!user) { alert('Введите имя'); return; }
       currentUser = user;
-      if (user.currentMapId) currentMapId = user.currentMapId;
-      authModal.classList.add('hidden');
-      buildAll();
-      updateUI();
-      resetBall();
-      
-      if (user.name.toLowerCase() === 'casper') {
-        setTimeout(() => {
-          alert('👻 Привет, casper! Все карты открыты бесплатно!');
-        }, 500);
+      if (!currentUser.currentMapId || !gameMaps.find(m => m.id === currentUser.currentMapId)) {
+        currentUser.currentMapId = gameMaps[0].id;
       }
+      document.getElementById('authModal').classList.add('hidden');
+      initBalls();
+      buildTrack();
+      updateUI();
     }
 
     function logout() {
-      stopMusic();
       currentUser = null;
-      currentMapId = 1;
-      authModal.classList.remove('hidden');
-      buildAll();
-      resetBall();
+      document.getElementById('authModal').classList.remove('hidden');
+      resetGame();
       updateUI();
     }
 
-    function checkSavedSession() {
-      const savedId = localStorage.getItem('space_pinball_current_id');
-      if (savedId) {
-        const users = loadUsers();
-        if (users[savedId]) {
-          currentUser = users[savedId];
-          if (currentUser.currentMapId) currentMapId = currentUser.currentMapId;
-          authModal.classList.add('hidden');
-          buildAll();
-          updateUI();
-          return;
-        }
-      }
-      authModal.classList.remove('hidden');
-    }
-
     // ========== ОБРАБОТЧИКИ ==========
-    dropButton.addEventListener('click', dropBall);
+    document.getElementById('dropButton').addEventListener('click', () => {
+      if (isBonusMode) return;
+      if (raceActive) return;
+      openBetModal();
+    });
+    document.getElementById('bonusButton').addEventListener('click', activateBonus);
     document.getElementById('shopButton').addEventListener('click', openShop);
     document.getElementById('mapsButton').addEventListener('click', openMaps);
     document.getElementById('profileButton').addEventListener('click', showProfile);
     document.getElementById('logoutButton').addEventListener('click', logout);
-    document.getElementById('closeShopBtn').addEventListener('click', ()=> document.getElementById('shopModal').classList.add('hidden'));
-    document.getElementById('closeMapsBtn').addEventListener('click', ()=> document.getElementById('mapsModal').classList.add('hidden'));
-    document.getElementById('closeProfileBtn').addEventListener('click', ()=> document.getElementById('profileModal').classList.add('hidden'));
-    document.getElementById('shakeButton').addEventListener('click', shakeScreen);
-    
-    loginBtn.addEventListener('click', ()=>{
-      initAudio();
-      if(usernameInput.value.trim()) loginUser(usernameInput.value.trim());
-    });
-    usernameInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') loginBtn.click(); });
+    document.getElementById('closeMapsBtn').addEventListener('click', () => document.getElementById('mapsModal').classList.add('hidden'));
+    document.getElementById('closeShopBtn').addEventListener('click', () => document.getElementById('shopModal').classList.add('hidden'));
+    document.getElementById('closeProfileBtn').addEventListener('click', () => document.getElementById('profileModal').classList.add('hidden'));
 
-    resultModal.addEventListener('click', (e) => {
-      if (e.target === resultModal) {
-        resultModal.classList.add('hidden');
-        waitingForResultClose = false;
-        buildAll();
-        resetBall();
+    document.getElementById('betPlus').addEventListener('click', () => {
+      document.getElementById('betAmount').value = Math.min(999_999, parseInt(document.getElementById('betAmount').value) + 10);
+    });
+    document.getElementById('betMinus').addEventListener('click', () => {
+      document.getElementById('betAmount').value = Math.max(1, parseInt(document.getElementById('betAmount').value) - 10);
+    });
+
+    document.getElementById('confirmBetBtn').addEventListener('click', () => {
+      betAmount = Math.max(1, parseInt(document.getElementById('betAmount').value) || 10);
+      if (currentUser && betAmount > currentUser.balance) { alert('Недостаточно звёзд!'); return; }
+      document.getElementById('betModal').classList.add('hidden');
+      document.getElementById('startBallInfo').textContent = BALL_NAMES[selectedBallIndex % BALL_NAMES.length];
+      document.getElementById('startBallInfo').style.color = BALL_COLORS[selectedBallIndex % BALL_COLORS.length];
+      document.getElementById('startBetInfo').textContent = formatNum(betAmount);
+      document.getElementById('bonusStartInfo').textContent = '';
+      document.getElementById('startModal').classList.remove('hidden');
+    });
+
+    document.getElementById('cancelBetBtn').addEventListener('click', () => document.getElementById('betModal').classList.add('hidden'));
+
+    document.getElementById('startRaceBtn').addEventListener('click', () => {
+      document.getElementById('startModal').classList.add('hidden');
+      isBonusMode = false;
+      initBalls();
+      buildTrack();
+      raceActive = true;
+      document.getElementById('dropButton').textContent = '🏁 Гонка...';
+      document.getElementById('dropButton').disabled = true;
+      document.getElementById('bonusButton').disabled = true;
+      updateUI();
+    });
+
+    document.getElementById('cancelStartBtn').addEventListener('click', () => document.getElementById('startModal').classList.add('hidden'));
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+      const name = document.getElementById('usernameInput').value.trim();
+      if (name) loginUser(name);
+    });
+    document.getElementById('usernameInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+
+    // ========== ИНИЦИАЛИЗАЦИЯ ==========
+    const savedId = localStorage.getItem('space_pinball_current_v5');
+    if (savedId) {
+      const users = loadUsers();
+      if (users[savedId]) {
+        currentUser = users[savedId];
+        if (!currentUser.currentMapId || !gameMaps.find(m => m.id === currentUser.currentMapId)) {
+          currentUser.currentMapId = gameMaps[0].id;
+        }
+        document.getElementById('authModal').classList.add('hidden');
+      } else {
+        document.getElementById('authModal').classList.remove('hidden');
       }
+    } else {
+      document.getElementById('authModal').classList.remove('hidden');
+    }
+
+    window.addEventListener('beforeunload', () => {
+      if (currentUser) localStorage.setItem('space_pinball_current_v5', currentUser.id);
     });
 
-    window.addEventListener('beforeunload', ()=>{
-      if(currentUser) localStorage.setItem('space_pinball_current_id', currentUser.id);
-    });
-
-    window.addEventListener('resize', () => {
-      resizeCanvas();
-      buildAll();
-    });
-
-    // ========== ЗАПУСК ==========
-    buildAll();
-    checkSavedSession();
-    gameLoop();
+    initBalls();
+    buildTrack();
     updateUI();
+    gameLoop();
   })();
 </script>
 </body>
