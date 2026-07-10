@@ -4,16 +4,42 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.2, user-scalable=yes, viewport-fit=cover">
   <title>Space Pinball Cadet — 3D аркада</title>
-  <meta name="description" content="Space Pinball Cadet: космический пинбол с 5 картами. Зарабатывайте звёзды, открывайте новые уровни.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='45' fill='%230066cc'/%3E%3Ccircle cx='35' cy='35' r='8' fill='white'/%3E%3Ccircle cx='65' cy='65' r='6' fill='%23ffcc00'/%3E%3C/svg%3E">
-  <meta property="og:title" content="Space Pinball Cadet">
-  <meta property="og:description" content="Космический пинбол с 5 картами! Открывай новые уровни, собирай звёзды.">
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}html,body{height:100%;width:100%;overflow:hidden}body{background:radial-gradient(ellipse at center,#0a0a2e 0%,#000010 100%);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;display:flex;justify-content:center;align-items:center;touch-action:pan-x pan-y;font-size:0.85rem;color:#fff}.stars-bg{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}.star{position:absolute;background:white;border-radius:50%;animation:twinkle var(--duration) infinite alternate}@keyframes twinkle{0%{opacity:0.3;transform:scale(1)}100%{opacity:1;transform:scale(1.5)}}.game-container{position:relative;z-index:1;width:100%;height:100vh;height:100dvh;max-width:500px;background:linear-gradient(180deg,rgba(0,20,60,0.9) 0%,rgba(0,10,40,0.95) 100%);backdrop-filter:blur(20px);padding:6px 8px 8px;box-shadow:0 0 40px rgba(0,100,255,0.3),inset 0 1px 1px rgba(255,255,255,0.1);display:flex;flex-direction:column;align-items:center;border:2px solid rgba(0,150,255,0.4);transition:transform 0.1s ease}.shake-active{animation:shake .08s infinite}@keyframes shake{0%{transform:translate(0px,0px)}25%{transform:translate(-3px,2px)}50%{transform:translate(3px,-2px)}75%{transform:translate(-2px,-1px)}100%{transform:translate(2px,1px)}}canvas{display:block;width:100%;flex:1;min-height:0;background:radial-gradient(circle at 30% 30%,#001a4d,#000020);border-radius:10px;box-shadow:inset 0 0 50px rgba(0,100,255,0.4),0 0 30px rgba(0,150,255,0.3);touch-action:none;border:2px solid #0066cc}.top-bar{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:3px;flex-shrink:0;flex-wrap:wrap}.stars-box{background:linear-gradient(180deg,#1a3a6a,#0a1a3a);border-radius:16px;padding:4px 8px;display:flex;align-items:center;gap:3px;font-weight:bold;font-size:0.8rem;box-shadow:0 2px 0 #050a1a,0 0 10px rgba(255,200,0,0.3);border:1px solid #ffd700;color:#ffd700}.exp-box{background:linear-gradient(180deg,#1a3a6a,#0a1a3a);border-radius:16px;padding:4px 8px;display:flex;align-items:center;gap:3px;font-weight:bold;font-size:0.8rem;box-shadow:0 2px 0 #050a1a,0 0 10px rgba(100,255,100,0.3);border:1px solid #44ff44;color:#44ff44}.map-indicator{background:linear-gradient(180deg,#1a3a6a,#0a1a3a);border-radius:16px;padding:4px 8px;font-weight:bold;font-size:0.7rem;box-shadow:0 2px 0 #050a1a;border:1px solid #0066cc;color:#66ccff}button{background:linear-gradient(180deg,#3388cc 0%,#004488 100%);border:none;color:#fff;font-weight:bold;border-radius:16px;padding:7px 10px;font-size:0.7rem;cursor:pointer;transition:all 0.2s ease;box-shadow:0 3px 0 #002244,0 0 8px rgba(0,150,255,0.3);letter-spacing:0.5px;display:flex;align-items:center;gap:3px;border:1px solid rgba(100,180,255,0.5);transform:translateY(0);white-space:nowrap}button:active{transform:translateY(2px);box-shadow:0 1px 0 #002244}button:disabled{opacity:0.4;transform:translateY(1px);box-shadow:0 1px 0 #001122;pointer-events:none}.big-btn{padding:9px 14px;font-size:0.85rem;border-radius:20px;box-shadow:0 4px 0 #1a6633,0 0 12px rgba(68,255,68,0.4);background:linear-gradient(180deg,#44cc44 0%,#228822 100%);border-color:rgba(100,255,100,0.5)}.small-btn{padding:6px 8px;font-size:0.65rem;border-radius:12px}.maps-btn{background:linear-gradient(180deg,#9955cc 0%,#5522aa 100%);box-shadow:0 3px 0 #331166,0 0 8px rgba(150,100,255,0.3);border-color:rgba(180,130,255,0.5)}.user-greeting{background:rgba(0,100,200,0.2);padding:4px 8px;border-radius:12px;font-weight:600;font-size:0.65rem;backdrop-filter:blur(4px);border:1px solid rgba(100,180,255,0.3)}.hidden{display:none!important}.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,20,0.85);backdrop-filter:blur(15px);display:flex;justify-content:center;align-items:center;z-index:100;animation:fadeIn .25s ease}@keyframes fadeIn{from{opacity:0}to{opacity:1}}.modal-content{background:linear-gradient(180deg,#0a1a3a,#051030);padding:16px;border-radius:18px;width:90%;max-width:400px;border:2px solid #0066cc;display:flex;flex-direction:column;gap:8px;max-height:85vh;overflow-y:auto;box-shadow:0 0 40px rgba(0,100,255,0.5)}.result-content{background:linear-gradient(135deg,#0a1a3a,#102050);padding:16px;border-radius:18px;width:90%;max-width:360px;border:2px solid #66ccff;display:flex;flex-direction:column;gap:10px;text-align:left;box-shadow:0 0 40px rgba(100,200,255,0.4);animation:popIn .3s cubic-bezier(0.68,-0.55,0.27,1.55)}@keyframes popIn{0%{transform:scale(0.8);opacity:0}100%{transform:scale(1);opacity:1}}.result-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.1)}.result-row:last-child{border-bottom:none}.result-label{color:#88aacc;font-size:0.8rem}.result-value{font-weight:bold;font-size:0.85rem}.maps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:6px}.map-card{background:linear-gradient(180deg,#0d2040,#081530);border-radius:12px;padding:8px 5px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:0.2s;border:2px solid #1a3a6a;cursor:pointer;position:relative}.map-card:hover{border-color:#44aaff;transform:scale(1.03);box-shadow:0 0 15px rgba(0,150,255,0.3)}.map-card.locked{opacity:0.6;cursor:not-allowed}.map-card.active{border-color:#ffd700;box-shadow:0 0 20px rgba(255,200,0,0.4)}.map-icon{font-size:1.5rem}.map-name{font-size:0.7rem;font-weight:bold;text-align:center}.map-price{font-size:0.6rem;color:#ffd700}.shop-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:6px}.shop-item{background:linear-gradient(180deg,#0d2040,#081530);border-radius:12px;padding:8px 5px;display:flex;flex-direction:column;align-items:center;gap:4px;transition:0.2s;border:1px solid #1a3a6a}.shop-item:hover{border-color:#ffd700;transform:scale(1.02)}.shop-item.selected{border-color:#44ff44;box-shadow:0 0 10px rgba(68,255,68,0.3)}.ball-preview{font-size:1.4rem;filter:drop-shadow(0 2px 2px black)}input{padding:8px 12px;border-radius:16px;border:none;background:rgba(255,255,255,0.1);color:white;outline:none;font-weight:500;width:100%;border:1px solid rgba(100,180,255,0.3)}input::placeholder{color:#88aacc}.action-row{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;align-items:center;flex-shrink:0;margin-top:4px}
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; width:100%; overflow:hidden; background:#0a0a2e; font-family:'Segoe UI',system-ui,sans-serif; touch-action:pan-x pan-y; color:#fff; }
+    .game-container { position:relative; z-index:1; width:100%; height:100vh; height:100dvh; max-width:500px; margin:0 auto; background:linear-gradient(180deg,#00143c,#000010); padding:6px 8px 8px; display:flex; flex-direction:column; border:2px solid #0066cc; box-shadow:0 0 40px rgba(0,100,255,0.3); }
+    .top-bar { width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:4px; flex-shrink:0; flex-wrap:wrap; }
+    .stars-box, .exp-box, .map-indicator, .user-greeting { background:linear-gradient(180deg,#1a3a6a,#0a1a3a); border-radius:16px; padding:4px 8px; font-weight:bold; font-size:0.7rem; border:1px solid #0066cc; box-shadow:0 2px 0 #050a1a; }
+    .stars-box { color:#ffd700; border-color:#ffd700; }
+    .exp-box { color:#44ff44; border-color:#44ff44; }
+    .map-indicator { color:#66ccff; }
+    .user-greeting { background:rgba(0,100,200,0.2); border-color:rgba(100,180,255,0.3); }
+    canvas { display:block; width:100%; flex:1; min-height:0; background:radial-gradient(circle at 30% 30%, #001a4d, #000020); border-radius:10px; border:2px solid #0066cc; touch-action:none; }
+    .action-row { display:flex; gap:5px; justify-content:center; flex-wrap:wrap; align-items:center; flex-shrink:0; margin-top:4px; }
+    button { background:linear-gradient(180deg,#3388cc 0%,#004488 100%); border:none; color:#fff; font-weight:bold; border-radius:18px; padding:8px 12px; font-size:0.75rem; cursor:pointer; box-shadow:0 3px 0 #002244; transition:all 0.1s; border:1px solid rgba(100,180,255,0.5); white-space:nowrap; }
+    button:active { transform:translateY(3px); box-shadow:0 1px 0 #002244; }
+    .big-btn { padding:10px 16px; font-size:0.9rem; border-radius:22px; box-shadow:0 4px 0 #002244; }
+    .big-btn#dropButton, .big-btn#shakeButton { background:linear-gradient(180deg,#44cc44 0%,#228822 100%); border-color:#44ff44; box-shadow:0 4px 0 #1a5a1a; }
+    .maps-btn { background:linear-gradient(180deg,#9955cc,#5522aa); border-color:#9944ff; }
+    .hidden { display:none !important; }
+    .modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,20,0.85); backdrop-filter:blur(10px); display:flex; justify-content:center; align-items:center; z-index:100; }
+    .modal-content { background:linear-gradient(180deg,#0a1a3a,#051030); padding:16px; border-radius:20px; width:92%; max-width:400px; border:2px solid #0066cc; max-height:85vh; overflow-y:auto; box-shadow:0 0 40px rgba(0,100,255,0.4); }
+    .result-content { background:linear-gradient(135deg,#0a1a3a,#102050); padding:16px; border-radius:20px; width:92%; max-width:380px; border:2px solid #66ccff; box-shadow:0 0 40px rgba(100,200,255,0.4); }
+    .result-row { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid rgba(255,255,255,0.1); }
+    .maps-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); gap:6px; }
+    .map-card { background:linear-gradient(180deg,#0d2040,#081530); border-radius:12px; padding:8px 4px; text-align:center; border:2px solid #1a3a6a; cursor:pointer; }
+    .map-card.active { border-color:#ffd700; box-shadow:0 0 20px rgba(255,200,0,0.3); }
+    .map-card.locked { opacity:0.5; cursor:not-allowed; }
+    .shop-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:6px; }
+    .shop-item { background:linear-gradient(180deg,#0d2040,#081530); border-radius:12px; padding:8px 4px; text-align:center; border:1px solid #1a3a6a; }
+    .shop-item.selected { border-color:#44ff44; }
+    input { padding:8px 12px; border-radius:18px; border:none; background:rgba(255,255,255,0.1); color:#fff; width:100%; border:1px solid rgba(100,180,255,0.3); }
+    .ball-preview { font-size:1.8rem; }
+    .shake-active { animation:shake 0.08s infinite; }
+    @keyframes shake { 0% { transform:translate(0,0); } 25% { transform:translate(-2px,1px); } 50% { transform:translate(2px,-1px); } 75% { transform:translate(-1px,-1px); } 100% { transform:translate(1px,1px); } }
   </style>
 </head>
 <body>
-<div class="stars-bg" id="starsBg"></div>
 <div class="game-container" id="gameContainer">
   <div class="top-bar">
     <div class="user-greeting" id="userGreeting">👨‍🚀 Гость</div>
@@ -21,249 +47,467 @@
     <div class="stars-box">⭐ <span id="balanceDisplay">100</span></div>
     <div class="map-indicator" id="mapIndicator">🌍 Карта 1</div>
   </div>
-  <canvas id="gameCanvas"></canvas>
+  <canvas id="gameCanvas" width="440" height="700"></canvas>
   <div class="action-row">
     <button id="dropButton" class="big-btn">🚀 Запуск</button>
     <button id="shakeButton" class="big-btn">🌌 Толчок</button>
   </div>
   <div class="action-row">
-    <button id="mapsButton" class="maps-btn small-btn">🗺️ Карты</button>
-    <button id="shopButton" class="small-btn">🛒 Магазин</button>
-    <button id="profileButton" class="small-btn">👤 Профиль</button>
-    <button id="logoutButton" class="small-btn">🚪 Выйти</button>
+    <button id="mapsButton" class="maps-btn">🗺️ Карты</button>
+    <button id="shopButton">🛒 Магазин</button>
+    <button id="profileButton">👤 Профиль</button>
+    <button id="logoutButton">🚪 Выйти</button>
   </div>
 </div>
+
 <div id="resultModal" class="modal hidden"><div class="result-content" id="resultContent"></div></div>
-<div id="mapsModal" class="modal hidden"><div class="modal-content"><h2 style="color:#ffd700;text-align:center;">🗺️ Карты миссий</h2><p style="text-align:center;font-size:0.75rem;color:#88aacc;">Опыт: ✨ <span id="mapsExpDisplay">0</span></p><div id="mapsContainer" class="maps-grid"></div><button id="closeMapsBtn" style="align-self:center;">Закрыть</button></div></div>
-<div id="shopModal" class="modal hidden"><div class="modal-content"><h2 style="color:#ffd700;text-align:center;">🛒 Магазин шариков</h2><p style="text-align:center;font-size:0.75rem;color:#88aacc;">Выбран: <span id="shopSelectedBall" style="color:#ffd700;"></span></p><div id="shopItemsContainer" class="shop-grid"></div><button id="closeShopBtn" style="align-self:center;">Закрыть</button></div></div>
-<div id="profileModal" class="modal hidden"><div class="modal-content"><h2>👤 Профиль пилота</h2><p>Имя: <strong id="profileName"></strong></p><p>ID: <strong id="profileId"></strong></p><p>Звёзд: ⭐ <strong id="profileBalance"></strong></p><p>Опыт: ✨ <strong id="profileExp"></strong></p><p>Открыто карт: <strong id="profileMaps"></strong></p><button id="closeProfileBtn">Закрыть</button></div></div>
-<div id="authModal" class="modal"><div class="modal-content"><h2>🔐 Вход в космопорт</h2><input type="text" id="usernameInput" placeholder="Позывной пилота" maxlength="16" autocomplete="off"><button id="loginBtn">▶ Запуск</button><p style="font-size:0.7rem;color:#88aacc;">Новый пилот получит ID, 100 ⭐ и 0 ✨</p></div></div>
+<div id="mapsModal" class="modal hidden"><div class="modal-content"><h2 style="color:#ffd700;">🗺️ Карты</h2><p style="font-size:0.8rem;color:#88aacc;">Опыт: ✨ <span id="mapsExpDisplay">0</span></p><div id="mapsContainer" class="maps-grid"></div><button id="closeMapsBtn">Закрыть</button></div></div>
+<div id="shopModal" class="modal hidden"><div class="modal-content"><h2 style="color:#ffd700;">🛒 Шарики</h2><p style="font-size:0.8rem;color:#88aacc;">Выбран: <span id="shopSelectedBall"></span></p><div id="shopItemsContainer" class="shop-grid"></div><button id="closeShopBtn">Закрыть</button></div></div>
+<div id="profileModal" class="modal hidden"><div class="modal-content"><h2>👤 Профиль</h2><p>Имя: <strong id="profileName"></strong></p><p>ID: <strong id="profileId"></strong></p><p>⭐ <strong id="profileBalance"></strong> | ✨ <strong id="profileExp"></strong></p><p>Карт: <strong id="profileMaps"></strong></p><button id="closeProfileBtn">Закрыть</button></div></div>
+<div id="authModal" class="modal"><div class="modal-content"><h2>🔐 Вход</h2><input type="text" id="usernameInput" placeholder="Позывной" maxlength="16"><button id="loginBtn">▶ Запуск</button><p style="font-size:0.7rem;color:#88aacc;">Новый пилот: 100 ⭐ и 0 ✨</p></div></div>
 
 <script>
 (function(){
-  const AudioContext=window.AudioContext||window.webkitAudioContext;let audioCtx;
-  function initAudio(){if(!audioCtx){audioCtx=new AudioContext()}if(audioCtx.state==='suspended')audioCtx.resume()}
-  function playTone(freq,type,duration,vol=0.1,delay=0){if(!audioCtx)return;const t=audioCtx.currentTime+delay;const o=audioCtx.createOscillator();const g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(0.001,t+duration);o.connect(g);g.connect(audioCtx.destination);o.start(t);o.stop(t+duration)}
-  function sd(){playTone(300,'square',0.12,0.12);setTimeout(()=>playTone(200,'square',0.1,0.1),0.06)}
-  function sb(){playTone(500,'triangle',0.05,0.05)}
-  function sbu(){playTone(700,'square',0.07,0.08)}
-  function st(){playTone(900,'sine',0.12,0.15);setTimeout(()=>playTone(1300,'sine',0.12,0.15),0.08)}
-  function sw(m){if(m>=5){playTone(523,'square',0.1,0.15);setTimeout(()=>playTone(659,'square',0.1,0.15),0.1);setTimeout(()=>playTone(784,'square',0.15,0.2),0.2)}else if(m>=1){playTone(440,'triangle',0.08,0.12);setTimeout(()=>playTone(554,'triangle',0.08,0.12),0.08)}else{playTone(250,'triangle',0.15,0.08)}}
-  function sby(){playTone(500,'square',0.06,0.08);setTimeout(()=>playTone(700,'square',0.06,0.08),0.06)}
-  function smu(){playTone(400,'square',0.08,0.12);setTimeout(()=>playTone(600,'square',0.08,0.12),0.08);setTimeout(()=>playTone(800,'square',0.12,0.18),0.18)}
+  // ===== АУДИО =====
+  const AudioContext = window.AudioContext || window.webkitAudioContext;
+  let audioCtx;
+  function initAudio(){ if(!audioCtx){ audioCtx=new AudioContext(); } if(audioCtx.state==='suspended') audioCtx.resume(); }
+  function playTone(freq,type,dur,vol=0.1,delay=0){ if(!audioCtx)return; const now=audioCtx.currentTime+delay; const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type=type; o.frequency.setValueAtTime(freq,now); g.gain.setValueAtTime(vol,now); g.gain.exponentialRampToValueAtTime(0.001,now+dur); o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+dur); }
+  function soundDrop(){ playTone(300,'square',0.12,0.12); setTimeout(()=>playTone(200,'square',0.1,0.1),0.06); }
+  function soundBounce(){ playTone(600,'triangle',0.05,0.05); }
+  function soundBumper(){ playTone(800,'square',0.06,0.08); }
+  function soundTeleport(){ playTone(1000,'sine',0.12,0.15); setTimeout(()=>playTone(1500,'sine',0.12,0.15),0.08); }
+  function soundWin(mult){ if(mult>=5){ playTone(523,'square',0.1,0.15); setTimeout(()=>playTone(659,'square',0.1,0.15),0.1); setTimeout(()=>playTone(784,'square',0.15,0.2),0.2); } else if(mult>=1){ playTone(440,'triangle',0.08,0.1); setTimeout(()=>playTone(554,'triangle',0.08,0.1),0.08); } else playTone(250,'triangle',0.15,0.08); }
+  function soundBuy(){ playTone(500,'square',0.06,0.08); setTimeout(()=>playTone(700,'square',0.06,0.08),0.06); }
+  function soundMapUnlock(){ playTone(400,'square',0.08,0.1); setTimeout(()=>playTone(600,'square',0.08,0.1),0.08); setTimeout(()=>playTone(800,'square',0.12,0.15),0.16); }
 
-  // Stars BG
-  (function(){const c=document.getElementById('starsBg');for(let i=0;i<60;i++){const s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';const sz=Math.random()*2+0.6;s.style.width=sz+'px';s.style.height=sz+'px';s.style.setProperty('--duration',(Math.random()*2+1)+'s');s.style.animationDelay=Math.random()*3+'s';c.appendChild(s)}})();
-
-  const maps=[
-    {id:1,name:'Лунная база',icon:'🌙',mb:0,expCost:0,desc:'Стандартная',specials:[]},
-    {id:2,name:'Марс',icon:'🔴',mb:0.1,expCost:50,desc:'+10%',specials:['bumper']},
-    {id:3,name:'Астероиды',icon:'☄️',mb:0.2,expCost:150,desc:'+20%',specials:['bumper','teleport']},
-    {id:4,name:'Туманность',icon:'🌟',mb:0.35,expCost:300,desc:'+35%',specials:['bumper','teleport','gravity']},
-    {id:5,name:'Чёрная дыра',icon:'🕳️',mb:0.5,expCost:500,desc:'+50%',specials:['bumper','teleport','gravity','doublebumper']}
+  // ===== КАРТЫ =====
+  const maps = [
+    { id:1, name:'Лунная база', icon:'🌙', multiplierBonus:0, price:0, expCost:0, desc:'Стандартная', specials:[] },
+    { id:2, name:'Марсианский каньон', icon:'🔴', multiplierBonus:0.1, price:0, expCost:50, desc:'+10% множители', specials:['bumper'] },
+    { id:3, name:'Пояс астероидов', icon:'☄️', multiplierBonus:0.2, price:0, expCost:150, desc:'+20% множители', specials:['bumper','teleport'] },
+    { id:4, name:'Туманность Ориона', icon:'🌟', multiplierBonus:0.35, price:0, expCost:300, desc:'+35% множители', specials:['bumper','teleport','gravity'] },
+    { id:5, name:'Чёрная дыра', icon:'🕳️', multiplierBonus:0.5, price:0, expCost:500, desc:'+50% множители', specials:['bumper','teleport','gravity'] }
   ];
 
-  const SK='space_pinball_db_v3';let currentUser=null,currentMapId=1;
-  function lu(){const d=localStorage.getItem(SK);return d?JSON.parse(d):{}}
-  function su(u){localStorage.setItem(SK,JSON.stringify(u))}
-  function gcU(name){const users=lu();const t=name.trim().toLowerCase();if(!t)return null;const isC=t==='casper';
-    for(let[id,u]of Object.entries(users)){if(u.name.toLowerCase()===t){if(isC&&(!u.unlockedMaps||u.unlockedMaps.length<5))u.unlockedMaps=[1,2,3,4,5];if(!u.unlockedMaps)u.unlockedMaps=[1];if(!u.currentMapId)u.currentMapId=1;if(!u.selectedBall)u.selectedBall=1;if(!u.ownedBalls)u.ownedBalls=[1];if(u.exp===undefined)u.exp=0;return u}}
-    const nid=(()=>{let id;do{id=Math.floor(10000000+Math.random()*90000000).toString()}while(users[id]);return id})();
-    const nu={id:nid,name:t,balance:100,exp:0,ownedBalls:[1],selectedBall:1,unlockedMaps:isC?[1,2,3,4,5]:[1],currentMapId:1};users[nid]=nu;su(users);return nu}
-  function uud(uu){const users=lu();if(users[uu.id]){users[uu.id]=uu;su(users);currentUser=uu}}
+  // ===== БАЗА ДАННЫХ =====
+  const STORAGE_KEY='space_pinball_users_db_v2';
+  let currentUser=null, currentMapId=1;
 
-  const canvas=document.getElementById('gameCanvas');const ctx=canvas.getContext('2d');
-  let W,H;
-  function rs(){const r=canvas.parentElement.getBoundingClientRect();W=Math.floor(r.width-16);H=Math.floor(Math.max(r.height-120,380));canvas.width=W;canvas.height=H}
-  rs();window.addEventListener('resize',()=>{rs();ba()});
+  function loadUsers(){ const data=localStorage.getItem(STORAGE_KEY); return data?JSON.parse(data):{}; }
+  function saveUsers(users){ localStorage.setItem(STORAGE_KEY,JSON.stringify(users)); }
+  function getOrCreateUser(name){
+    const users=loadUsers(); const trimmed=name.trim().toLowerCase(); if(!trimmed)return null;
+    const isCasper=trimmed==='casper';
+    for(let [id,user] of Object.entries(users)){
+      if(user.name.toLowerCase()===trimmed){
+        if(isCasper && (!user.unlockedMaps||user.unlockedMaps.length<5)) user.unlockedMaps=[1,2,3,4,5];
+        if(!user.unlockedMaps) user.unlockedMaps=[1];
+        if(!user.currentMapId) user.currentMapId=1;
+        if(!user.selectedBall) user.selectedBall=1;
+        if(!user.ownedBalls) user.ownedBalls=[1];
+        if(user.exp===undefined) user.exp=0;
+        return user;
+      }
+    }
+    const newId=Math.floor(10000000+Math.random()*90000000).toString();
+    const newUser={ id:newId, name:trimmed, balance:100, exp:0, ownedBalls:[1], selectedBall:1, unlockedMaps:isCasper?[1,2,3,4,5]:[1], currentMapId:1 };
+    users[newId]=newUser; saveUsers(users); return newUser;
+  }
+  function updateUserData(u){ const users=loadUsers(); if(users[u.id]){ users[u.id]=u; saveUsers(users); currentUser=u; } }
 
-  const GRAVITY=0.16;const BOUNCE=0.5;const PR=2.8;const BR=6.5;
-  let platforms=[],specials=[],binWalls=[];
-  let rows=20,startY=70,rowSpacing=24,colSpacing=32,colBaseX=220;
-  let multipliers=[20,15,10,8,5,2,1,0.5,0.1,-1,0.1,0.5,1,2,5,8,10,15,20];let binCount=19;
-  let ball={x:220,y:50,vx:0,vy:0,active:false,value:1,color:'#44aaff'};
-  let gameActive=false;let swingAngle=0,swingSpeed=0.04;let sAX=220,sAY=20,sL=35;
-  let lastBounceTime=0,bc=40;let particles=[];
-  let sessionExp=0;let waitingForResultClose=false;
+  // ===== ИГРОВЫЕ ПЕРЕМЕННЫЕ =====
+  const canvas=document.getElementById('gameCanvas'), ctx=canvas.getContext('2d');
+  let W=440, H=700;
+  function resizeCanvas(){ const rect=canvas.parentElement.getBoundingClientRect(); W=Math.floor(rect.width-16); H=Math.floor(Math.max(rect.height-120,380)); canvas.width=W; canvas.height=H; }
+  resizeCanvas(); window.addEventListener('resize',()=>{ resizeCanvas(); buildAll(); });
 
-  function gc(v){const c={1:'#44aaff',2:'#4488ff',3:'#44cc44',4:'#ffdd44',5:'#ff9944',6:'#ff4444',7:'#cc44ff',8:'#aa7744',9:'#222222',10:'#ff44ff'};return c[v]||'#44aaff'}
-  function gg(v){const g={1:'#66ccff',2:'#6688ff',3:'#66ee66',4:'#ffee66',5:'#ffbb66',6:'#ff6666',7:'#ee66ff',8:'#cc9966',9:'#666666',10:'#ff66ff'};return g[v]||'#66ccff'}
-  function ge(v){const m={1:'⚪',2:'🔵',3:'🟢',4:'🟡',5:'🟠',6:'🔴',7:'🟣',8:'🟤',9:'⚫',10:'💎'};return m[v]||'⭐'}
+  const GRAVITY=0.16, BOUNCE=0.5, PLATFORM_RADIUS=3.5, BALL_RADIUS=7;
+  let platforms=[], specials=[], binWalls=[];
+  let rows=22, startY=80, rowSpacing=24, colSpacing=32, colBaseX=220;
+  let multipliers=[20,15,10,8,5,2,1,0.5,0.1,-1,0.1,0.5,1,2,5,8,10,15,20];
+  let binCount=19;
+  let ball={ x:220, y:60, vx:0, vy:0, active:false, value:1, color:'#44aaff' };
+  let gameActive=false, swingAngle=0, swingSpeed=0.04, stringAnchorX=220, stringAnchorY=25, stringLength=40;
+  let lastBounceTime=0, bounceCooldown=50, particles=[], sessionExp=0, waitingForResultClose=false;
 
-  const bs=document.getElementById('balanceDisplay'),es=document.getElementById('expDisplay');
-  const ug=document.getElementById('userGreeting'),mi=document.getElementById('mapIndicator');
-  const db=document.getElementById('dropButton'),am=document.getElementById('authModal');
-  const ui=document.getElementById('usernameInput'),lb=document.getElementById('loginBtn');
-  const gc_=document.getElementById('gameContainer'),rm=document.getElementById('resultModal');
-  const rc=document.getElementById('resultContent');
+  function getCurrentMap(){ return maps.find(m=>m.id===currentMapId)||maps[0]; }
+  function getBallColor(v){ const c={1:'#44aaff',2:'#4488ff',3:'#44cc44',4:'#ffdd44',5:'#ff9944',6:'#ff4444',7:'#cc44ff',8:'#aa7744',9:'#222222',10:'#ff44ff'}; return c[v]||'#44aaff'; }
+  function getBallGlow(v){ const g={1:'#66ccff',2:'#6688ff',3:'#66ee66',4:'#ffee66',5:'#ffbb66',6:'#ff6666',7:'#ee66ff',8:'#cc9966',9:'#666666',10:'#ff66ff'}; return g[v]||'#66ccff'; }
+  function getBallEmoji(v){ const m={1:'⚪',2:'🔵',3:'🟢',4:'🟡',5:'🟠',6:'🔴',7:'🟣',8:'🟤',9:'⚫',10:'💎'}; return m[v]||'⭐'; }
 
-  function gCM(){return maps.find(m=>m.id===currentMapId)||maps[0]}
-  function um(){const b=[20,15,10,8,5,2,1,0.5,0.1,-1,0.1,0.5,1,2,5,8,10,15,20];const bn=gCM().mb;multipliers=b.map(m=>m===-1?-1:Math.round((m*(1+bn))*10)/10)}
+  function updateMultipliers(){
+    const base=[20,15,10,8,5,2,1,0.5,0.1,-1,0.1,0.5,1,2,5,8,10,15,20];
+    const bonus=getCurrentMap().multiplierBonus;
+    multipliers=base.map(m=>m===-1?-1:Math.round((m*(1+bonus))*10)/10);
+  }
 
-  function ba(){
-    colBaseX=W/2;sAX=W/2;startY=H*0.1;rowSpacing=Math.max(20,(H-startY-50)/rows);sL=startY-12;sAY=8;
-    um();buildSpecials();buildPlatforms();buildBinWalls();resetBall();waitingForResultClose=false;
+  // ===== ПОСТРОЕНИЕ ПРЕПЯТСТВИЙ (в 2 раза меньше, батуты узкие) =====
+  function buildAll(){
+    colBaseX=W/2; stringAnchorX=W/2; startY=H*0.11; rowSpacing=(H-startY-50)/rows; if(rowSpacing<22) rowSpacing=22;
+    stringLength=startY-15; stringAnchorY=10;
+    updateMultipliers();
+    buildSpecials();
+    buildPlatforms();
+    buildBinWalls();
+    resetBall();
+    waitingForResultClose=false;
   }
 
   function buildSpecials(){
-    specials=[];const mc=gCM();const cx=W/2;
-    if(mc.specials.includes('bumper')){const cnt=mc.id>=5?6:(mc.id>=3?5:4);
-      for(let i=0;i<cnt;i++){const y=startY+rowSpacing*(2+i*Math.floor((rows-3)/(cnt+0.5)));
-        specials.push({x:cx,y:y,w:Math.min(50,W*0.4),h:5,type:'bumper',color:'#ff4466',glow:'#ff6688',bf:2.5})}}
-    if(mc.specials.includes('doublebumper')){
-      specials.push({x:cx-W*0.1,y:startY+rowSpacing*Math.floor(rows*0.35),w:50,h:6,type:'bumper',color:'#ff0044',glow:'#ff4488',bf:3.2});
-      specials.push({x:cx+W*0.1,y:startY+rowSpacing*Math.floor(rows*0.6),w:50,h:6,type:'bumper',color:'#ff0044',glow:'#ff4488',bf:3.2})}
-    if(mc.specials.includes('teleport')){const pc=mc.id>=5?2:1;
-      for(let p=0;p<pc;p++){const y=startY+rowSpacing*(4+p*7);
-        specials.push({x:cx-W*0.28,y:Math.min(y,H-80),r:8,type:'teleport',color:'#00ff88',glow:'#00ffaa',tx:cx+W*0.2,ty:startY-5});
-        specials.push({x:cx+W*0.28,y:Math.min(y+rowSpacing*2,H-80),r:8,type:'teleport',color:'#ff8800',glow:'#ffaa00',tx:cx-W*0.2,ty:startY-5})}}
-    if(mc.specials.includes('gravity')){specials.push({x:cx,y:startY+rowSpacing*Math.floor(rows*0.5),r:12,type:'gravity',color:'#6600cc',glow:'#9944ff',pf:0.1})}
-  }
-
-  function buildPlatforms(){
-    platforms=[];const mc=gCM();const pc={1:['#f4d03f','#b7950b'],2:['#ff6b6b','#cc3333'],3:['#ff9944','#cc6600'],4:['#bb88ff','#7733cc'],5:['#4444ff','#0000cc']};
-    const co=pc[mc.id]||pc[1];const m=8;
-    for(let r=2;r<rows-2;r++){
-      const y=startY+r*rowSpacing;const aw=W-m*2;const pir=Math.floor(aw/colSpacing)+1;const tw=(pir-1)*colSpacing;const sx=(W-tw)/2;const ox=(r%2===0)?0:colSpacing*0.5;
-      for(let c=0;c<pir;c++){const px=sx+c*colSpacing+ox;if(px<m||px>W-m)continue;let ov=false;
-        for(let s of specials){if(s.type==='bumper'){if(Math.abs(px-s.x)<s.w/2+PR+2&&Math.abs(y-s.y)<s.h/2+PR+2){ov=true;break}}else if(s.r){const dx=px-s.x,dy=y-s.y;if(Math.sqrt(dx*dx+dy*dy)<s.r+PR+4){ov=true;break}}}
-        if(!ov)platforms.push({x:px,y:y,r:PR,c1:co[0],c2:co[1]})}
+    specials=[];
+    const map=getCurrentMap(), w=W, h=H, cx=w/2;
+    // Батуты: от 4 до 6 штук, ширина ≤50px
+    if(map.specials.includes('bumper')){
+      const count=Math.min(6, Math.max(4, map.id+3));
+      const totalWidth=Math.min(50, w*0.12);
+      for(let i=0;i<count;i++){
+        const y=startY+rowSpacing*(2+ i*Math.floor(rows/(count+1)));
+        specials.push({
+          x:cx, y:y, width:totalWidth, height:6, type:'bumper',
+          color:'#ff4466', glow:'#ff6688', bounceForce:2.8
+        });
+      }
+    }
+    if(map.specials.includes('teleport')){
+      const pairCount=map.id>=5?2:1;
+      for(let p=0;p<pairCount;p++){
+        const y=startY+rowSpacing*(4+p*7);
+        specials.push({ x:cx-w*0.3, y:Math.min(y,h-90), radius:9, type:'teleport', color:'#00ff88', glow:'#00ffaa', targetX:cx+w*0.2, targetY:startY-5 });
+        specials.push({ x:cx+w*0.3, y:Math.min(y+rowSpacing*2,h-90), radius:9, type:'teleport', color:'#ff8800', glow:'#ffaa00', targetX:cx-w*0.2, targetY:startY-5 });
+      }
+    }
+    if(map.specials.includes('gravity')){
+      const y=startY+rowSpacing*Math.floor(rows*0.5);
+      specials.push({ x:cx, y:y, radius:12, type:'gravity', color:'#6600cc', glow:'#9944ff', pullForce:0.12 });
     }
   }
 
-  function buildBinWalls(){binWalls=[];const bw=W/binCount;const by=H-28;const wh=22;for(let i=0;i<=binCount;i++){const x=i*bw;binWalls.push({x1:x,y1:by-wh,x2:x,y2:by+28})}}
-
-  function resetBall(){ball.active=false;ball.x=sAX;ball.y=sAY+sL;ball.vx=0;ball.vy=0;gameActive=false;swingAngle=0;particles=[];sessionExp=0;waitingForResultClose=false}
-
-  function uui(){
-    if(!currentUser){bs.textContent='0';es.textContent='0';ug.textContent='👨‍🚀 Гость';ball.color=gc(1);mi.textContent='🌍 Карта 1';return}
-    bs.textContent=Math.floor(currentUser.balance);es.textContent=Math.floor(currentUser.exp);
-    ug.textContent=`👨‍🚀 ${currentUser.name}`;ball.color=gc(currentUser.selectedBall);mi.textContent=`${gCM().icon} ${gCM().name}`}
-
-  function sp(x,y,n,c){for(let i=0;i<n;i++)particles.push({x,y,vx:(Math.random()-0.5)*3,vy:(Math.random()-0.5)*3-1.5,life:1,decay:0.03+Math.random()*0.04,color:c,size:1+Math.random()*2})}
-  function up(){for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.x+=p.vx;p.y+=p.vy;p.vy+=0.04;p.life-=p.decay;if(p.life<=0)particles.splice(i,1)}}
-  function dp(){for(const p of particles){ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
-
-  function showResult(bv,mult,win,oB,nB,tE){
-    rc.innerHTML=`<h3 style="color:#66ccff;margin:0 0 2px 0;font-size:0.9rem;">📊 Результат броска</h3>
-    <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:10px;">
-    <div class="result-row"><span class="result-label">🎯 Шар</span><span class="result-value">${ge(currentUser?currentUser.selectedBall:1)} (${bv}⭐)</span></div>
-    <div class="result-row"><span class="result-label">✖️ Множитель</span><span class="result-value" style="color:#ffd700;">x${mult}</span></div>
-    <div class="result-row"><span class="result-label">💼 Было</span><span class="result-value">${oB}⭐</span></div>
-    <div class="result-row"><span class="result-label">💼 Стало</span><span class="result-value">${nB}⭐</span></div>
-    <div class="result-row"><span class="result-label">📈 Итог</span><span class="result-value" style="color:${win>=0?'#4caf50':'#f44336'};font-size:0.95rem;">${win>=0?'+':''}${win}⭐</span></div>
-    <div class="result-row"><span class="result-label">✨ За бросок</span><span class="result-value" style="color:#44ff44;">+${sessionExp}</span></div>
-    <div class="result-row"><span class="result-label">✨ Всего</span><span class="result-value" style="color:#44ff44;">${tE}</span></div></div>
-    <button id="closeResultBtn" style="align-self:center;">Ок</button>`;
-    rm.classList.remove('hidden');
-    document.getElementById('closeResultBtn').addEventListener('click',()=>{rm.classList.add('hidden');waitingForResultClose=false;resetBall()});
-    sw(mult)}
-
-  function dropBall(){
-    initAudio();if(!currentUser){alert('Войдите в профиль!');return}if(gameActive||ball.active||waitingForResultClose)return;
-    ball.value=currentUser.selectedBall;ball.color=gc(currentUser.selectedBall);ball.active=true;gameActive=true;waitingForResultClose=false;sessionExp=0;
-    ball.x=sAX+Math.sin(swingAngle)*sL;ball.y=sAY+Math.cos(swingAngle)*sL;ball.vx=Math.sin(swingAngle)*1.8;ball.vy=0.7;sp(ball.x,ball.y,6,ball.color);sd()}
-
-  function checkWC(w){
-    const dx=w.x2-w.x1,dy=w.y2-w.y1,ls=dx*dx+dy*dy;let t=((ball.x-w.x1)*dx+(ball.y-w.y1)*dy)/ls;t=Math.max(0,Math.min(1,t));
-    const cx=w.x1+t*dx,cy=w.y1+t*dy,dbx=ball.x-cx,dby=ball.y-cy,dist=Math.sqrt(dbx*dbx+dby*dby);
-    if(dist<BR&&dist>0.001){const nx=dbx/dist,ny=dby/dist;ball.x+=nx*(BR-dist);ball.y+=ny*(BR-dist);const vn=ball.vx*nx+ball.vy*ny;if(vn<0){ball.vx-=(1+BOUNCE)*vn*nx;ball.vy-=(1+BOUNCE)*vn*ny;return true}}return false}
-
-  function checkBC(b){
-    const hw=b.w/2,hh=b.h/2;
-    if(ball.x>b.x-hw-BR&&ball.x<b.x+hw+BR&&ball.y>b.y-hh-BR&&ball.y<b.y+hh+BR){
-      const cx=Math.max(b.x-hw,Math.min(ball.x,b.x+hw)),cy=Math.max(b.y-hh,Math.min(ball.y,b.y+hh));
-      const dx=ball.x-cx,dy=ball.y-cy,dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<BR&&dist>0.001){const nx=dx/dist,ny=dy/dist;ball.x+=nx*(BR-dist);ball.y+=ny*(BR-dist);ball.vy=-Math.abs(ball.vy)*b.bf-2.5;ball.vx+=(Math.random()-0.5)*2.5;sp(ball.x,ball.y,8,b.color);sbu();if(currentUser){currentUser.exp+=1;sessionExp+=1;uud(currentUser)}return true}}return false}
-
-  function ase(){
-    for(let s of specials){
-      if(s.type==='bumper')checkBC(s);
-      if(s.type==='teleport'){const dx=ball.x-s.x,dy=ball.y-s.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<BR+s.r){ball.x=s.tx;ball.y=s.ty;ball.vx=(Math.random()-0.5)*2.5;ball.vy=0.4;sp(s.x,s.y,10,s.color);sp(s.tx,s.ty,10,s.glow);st();if(currentUser){currentUser.exp+=2;sessionExp+=2;uud(currentUser)}}}
-      if(s.type==='gravity'){const dx=ball.x-s.x,dy=ball.y-s.y,dist=Math.sqrt(dx*dx+dy*dy),ir=80;if(dist<ir&&dist>0.001){const f=s.pf*(1-dist/ir);ball.vx+=(dx/dist)*f;ball.vy+=(dy/dist)*f;ball.vx+=(-dy/dist)*f*0.4;ball.vy+=(dx/dist)*f*0.4;if(dist<BR+s.r){ball.vx+=(Math.random()-0.5)*6;ball.vy=-4-Math.random()*3;sp(s.x,s.y,10,'#9944ff');sb();if(currentUser){currentUser.exp+=1;sessionExp+=1;uud(currentUser)}}}}}
+  function buildPlatforms(){
+    platforms=[];
+    const map=getCurrentMap();
+    const pinColors={1:['#f4d03f','#b7950b'],2:['#ff6b6b','#cc3333'],3:['#ff9944','#cc6600'],4:['#bb88ff','#7733cc'],5:['#4444ff','#0000cc']};
+    const colors=pinColors[map.id]||pinColors[1];
+    const margin=10, w=W;
+    // Убираем 2 нижние и 1 верхнюю горизонтальные строчки
+    const startRow=2, endRow=rows-3; // rows-1, rows-2 (нижние) и row 0,1 (верхние) убраны
+    for(let r=startRow; r<=endRow; r++){
+      const y=startY+r*rowSpacing;
+      const availableWidth=w-margin*2;
+      const pinsInRow=Math.floor(availableWidth/colSpacing)+1;
+      const totalWidth=(pinsInRow-1)*colSpacing;
+      const startX=(w-totalWidth)/2;
+      const offsetX=(r%2===0)?0:colSpacing*0.5;
+      for(let c=0;c<pinsInRow;c++){
+        const px=startX+c*colSpacing+offsetX;
+        if(px<margin || px>w-margin) continue;
+        let overlapped=false;
+        for(let s of specials){
+          if(s.type==='bumper'){
+            if(Math.abs(px-s.x)<s.width/2+PLATFORM_RADIUS+3 && Math.abs(y-s.y)<s.height/2+PLATFORM_RADIUS+3){ overlapped=true; break; }
+          } else if(s.type==='teleport'||s.type==='gravity'){
+            const dx=px-s.x, dy=y-s.y;
+            if(Math.sqrt(dx*dx+dy*dy)<s.radius+PLATFORM_RADIUS+4){ overlapped=true; break; }
+          }
+        }
+        if(!overlapped) platforms.push({ x:px, y:y, radius:PLATFORM_RADIUS, color1:colors[0], color2:colors[1], type:'pin' });
+      }
+    }
   }
 
-  function ap(){
-    if(!ball.active||!gameActive)return;
-    ball.vy+=GRAVITY;ball.x+=ball.vx;ball.y+=ball.vy;
-    if(ball.x-BR<2){ball.x=BR+2;ball.vx*=-BOUNCE}if(ball.x+BR>W-2){ball.x=W-BR-2;ball.vx*=-BOUNCE}
-    let bounced=false;
-    for(let p of platforms){const dx=ball.x-p.x,dy=ball.y-p.y,dist=Math.sqrt(dx*dx+dy*dy),md=BR+p.r;if(dist<md&&dist>0.001){const nx=dx/dist,ny=dy/dist;ball.x+=nx*(md-dist);ball.y+=ny*(md-dist);const vn=ball.vx*nx+ball.vy*ny;if(vn<0){ball.vx-=(1+BOUNCE)*vn*nx;ball.vy-=(1+BOUNCE)*vn*ny;bounced=true;sp(p.x,p.y,1,p.c1);if(currentUser){currentUser.exp+=1;sessionExp+=1;uud(currentUser)}}ball.vx*=0.998;ball.vy*=0.998}}
-    ase();
-    for(let w of binWalls){if(checkWC(w))bounced=true}
-    if(bounced&&Date.now()-lastBounceTime>bc){sb();lastBounceTime=Date.now()}
-    uui();
-    if(ball.y+BR>H-3){const bw=W/binCount;let bi=Math.floor(ball.x/bw);if(bi<0)bi=0;if(bi>=binCount)bi=binCount-1;const mult=multipliers[bi];const oB=currentUser?currentUser.balance:0;let win=mult===-1?-ball.value:Math.floor(ball.value*mult);if(currentUser){currentUser.balance+=win;uud(currentUser)}const nB=currentUser?currentUser.balance:0;const tE=currentUser?currentUser.exp:0;const bxx=bi*bw+bw/2;sp(bxx,H-13,12,win>=0?'#ffd700':'#ff4444');gameActive=false;ball.active=false;waitingForResultClose=true;uui();setTimeout(()=>{showResult(ball.value,mult,win,oB,nB,tE)},1000)}
-    if(ball.y>H+50||ball.y<-40){resetBall();gameActive=false}
-    up()}
+  function buildBinWalls(){
+    binWalls=[]; const binWidth=W/binCount, binY=H-30, wallHeight=22;
+    for(let i=0;i<=binCount;i++){ const x=i*binWidth; binWalls.push({ x1:x,y1:binY-wallHeight,x2:x,y2:binY+28,isWall:true }); }
+  }
 
-  function drawSpecials(){
-    for(let s of specials){ctx.shadowColor=s.glow;ctx.shadowBlur=10;
-      if(s.type==='bumper'){const hw=s.w/2,hh=s.h/2;const g=ctx.createLinearGradient(s.x-hw,s.y,s.x+hw,s.y);g.addColorStop(0,s.color);g.addColorStop(0.3,'#fff');g.addColorStop(0.5,s.color);g.addColorStop(0.7,'#fff');g.addColorStop(1,s.color);ctx.fillStyle=g;ctx.beginPath();ctx.roundRect(s.x-hw,s.y-hh,s.w,s.h*2,2);ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.2;ctx.stroke();ctx.lineWidth=1;ctx.fillStyle='#fff';ctx.font='bold 8px sans-serif';ctx.textAlign='center';const ac=Math.floor(s.w/20);for(let a=0;a<ac;a++){ctx.fillText('▲',s.x-hw+12+a*(s.w/ac),s.y+3)}}
-      if(s.type==='teleport'){const g=ctx.createRadialGradient(s.x,s.y,1,s.x,s.y,s.r);g.addColorStop(0,'#fff');g.addColorStop(0.4,s.color);g.addColorStop(1,'rgba(0,0,0,0)');ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=s.glow;ctx.lineWidth=1.5;ctx.stroke();ctx.lineWidth=1;ctx.strokeStyle='#fff';ctx.lineWidth=0.8;ctx.beginPath();for(let a=0;a<Math.PI*4;a+=0.15){const r=s.r*0.15+a*0.25;ctx.lineTo(s.x+Math.cos(a)*r,s.y+Math.sin(a)*r)}ctx.stroke();ctx.lineWidth=1}
-      if(s.type==='gravity'){const g=ctx.createRadialGradient(s.x,s.y,2,s.x,s.y,s.r+6);g.addColorStop(0,'#000');g.addColorStop(0.3,'#306');g.addColorStop(1,'rgba(96,0,192,0)');ctx.beginPath();ctx.arc(s.x,s.y,s.r+6,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fillStyle='#000';ctx.fill();ctx.strokeStyle='#94f';ctx.lineWidth=1.5;ctx.stroke();ctx.lineWidth=1}
-      ctx.shadowBlur=0;ctx.shadowColor='transparent'}}
+  function resetBall(){ ball.active=false; ball.x=stringAnchorX; ball.y=stringAnchorY+stringLength; ball.vx=0; ball.vy=0; gameActive=false; swingAngle=0; particles=[]; sessionExp=0; waitingForResultClose=false; }
+
+  function updateUI(){
+    if(!currentUser){ document.getElementById('balanceDisplay').textContent='0'; document.getElementById('expDisplay').textContent='0'; document.getElementById('userGreeting').textContent='👨‍🚀 Гость'; document.getElementById('mapIndicator').textContent='🌍 Карта 1'; return; }
+    document.getElementById('balanceDisplay').textContent=Math.floor(currentUser.balance);
+    document.getElementById('expDisplay').textContent=Math.floor(currentUser.exp);
+    document.getElementById('userGreeting').textContent=`👨‍🚀 ${currentUser.name}`;
+    document.getElementById('mapIndicator').textContent=`${getCurrentMap().icon} ${getCurrentMap().name}`;
+    ball.color=getBallColor(currentUser.selectedBall);
+  }
+
+  function spawnParticles(x,y,count,color){ for(let i=0;i<count;i++){ particles.push({ x,y, vx:(Math.random()-0.5)*4, vy:(Math.random()-0.5)*4-2, life:1, decay:0.02+Math.random()*0.04, color, size:1.5+Math.random()*2.5 }); } }
+  function updateParticles(){ for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.05; p.life-=p.decay; if(p.life<=0) particles.splice(i,1); } }
+
+  function showResult(bet,mult,winnings,oldBal,newBal,totalExp){
+    const emoji=getBallEmoji(currentUser?currentUser.selectedBall:1);
+    document.getElementById('resultContent').innerHTML=`
+      <h3 style="color:#66ccff;">📊 Результат</h3>
+      <div style="background:rgba(0,0,0,0.3);border-radius:10px;padding:10px;">
+        <div class="result-row"><span class="result-label">🎯 Шар</span><span>${emoji} (${bet} ⭐)</span></div>
+        <div class="result-row"><span class="result-label">✖️ Множитель</span><span style="color:#ffd700;">x${mult}</span></div>
+        <div class="result-row"><span class="result-label">💼 Было</span><span>${oldBal} ⭐</span></div>
+        <div class="result-row"><span class="result-label">💼 Стало</span><span>${newBal} ⭐</span></div>
+        <div class="result-row"><span class="result-label">📈 Итог</span><span style="color:${winnings>=0?'#4caf50':'#f44336'};">${winnings>=0?'+':''}${winnings} ⭐</span></div>
+        <div class="result-row"><span class="result-label">✨ Опыт</span><span style="color:#44ff44;">+${sessionExp}</span></div>
+        <div class="result-row"><span class="result-label">✨ Всего</span><span style="color:#44ff44;">${totalExp}</span></div>
+      </div>
+      <button id="closeResultBtn" style="align-self:center;margin-top:6px;">Ок</button>
+    `;
+    document.getElementById('resultModal').classList.remove('hidden');
+    document.getElementById('closeResultBtn').addEventListener('click',()=>{ document.getElementById('resultModal').classList.add('hidden'); waitingForResultClose=false; resetBall(); });
+    soundWin(mult);
+  }
+
+  function dropBall(){
+    initAudio();
+    if(!currentUser){ alert('Войдите в профиль!'); return; }
+    if(gameActive||ball.active||waitingForResultClose) return;
+    ball.value=currentUser.selectedBall; ball.color=getBallColor(currentUser.selectedBall);
+    ball.active=true; gameActive=true; waitingForResultClose=false; sessionExp=0;
+    ball.x=stringAnchorX+Math.sin(swingAngle)*stringLength;
+    ball.y=stringAnchorY+Math.cos(swingAngle)*stringLength;
+    ball.vx=Math.sin(swingAngle)*2; ball.vy=0.8;
+    spawnParticles(ball.x,ball.y,8,ball.color); soundDrop();
+  }
+
+  function applyPhysics(){
+    if(!ball.active||!gameActive) return;
+    ball.vy+=GRAVITY; ball.x+=ball.vx; ball.y+=ball.vy;
+    if(ball.x-BALL_RADIUS<2){ ball.x=BALL_RADIUS+2; ball.vx*=-BOUNCE; }
+    if(ball.x+BALL_RADIUS>W-2){ ball.x=W-BALL_RADIUS-2; ball.vx*=-BOUNCE; }
+    let bounced=false;
+    for(let p of platforms){
+      const dx=ball.x-p.x, dy=ball.y-p.y, dist=Math.sqrt(dx*dx+dy*dy), minDist=BALL_RADIUS+p.radius;
+      if(dist<minDist && dist>0.001){
+        const nx=dx/dist, ny=dy/dist;
+        ball.x+=nx*(minDist-dist); ball.y+=ny*(minDist-dist);
+        const vn=ball.vx*nx+ball.vy*ny;
+        if(vn<0){ ball.vx-=(1+BOUNCE)*vn*nx; ball.vy-=(1+BOUNCE)*vn*ny; bounced=true; spawnParticles(p.x,p.y,2,p.color1); if(currentUser){ currentUser.exp+=1; sessionExp+=1; updateUserData(currentUser); } }
+        ball.vx*=0.998; ball.vy*=0.998;
+      }
+    }
+    // Спецэффекты
+    for(let s of specials){
+      if(s.type==='bumper'){
+        const hw=s.width/2, hh=s.height/2;
+        if(ball.x>s.x-hw-BALL_RADIUS && ball.x<s.x+hw+BALL_RADIUS && ball.y>s.y-hh-BALL_RADIUS && ball.y<s.y+hh+BALL_RADIUS){
+          const cx=Math.max(s.x-hw,Math.min(ball.x,s.x+hw)), cy=Math.max(s.y-hh,Math.min(ball.y,s.y+hh));
+          const dx=ball.x-cx, dy=ball.y-cy, dist=Math.sqrt(dx*dx+dy*dy);
+          if(dist<BALL_RADIUS && dist>0.001){
+            const nx=dx/dist, ny=dy/dist;
+            ball.x+=nx*(BALL_RADIUS-dist); ball.y+=ny*(BALL_RADIUS-dist);
+            ball.vy=-Math.abs(ball.vy)*s.bounceForce-3; ball.vx+=(Math.random()-0.5)*3;
+            spawnParticles(ball.x,ball.y,10,s.color); soundBumper();
+            if(currentUser){ currentUser.exp+=1; sessionExp+=1; updateUserData(currentUser); }
+          }
+        }
+      }
+      if(s.type==='teleport'){
+        const dx=ball.x-s.x, dy=ball.y-s.y, dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<BALL_RADIUS+s.radius){
+          ball.x=s.targetX; ball.y=s.targetY; ball.vx=(Math.random()-0.5)*3; ball.vy=0.5;
+          spawnParticles(s.x,s.y,15,s.color); spawnParticles(s.targetX,s.targetY,15,s.glow); soundTeleport();
+          if(currentUser){ currentUser.exp+=2; sessionExp+=2; updateUserData(currentUser); }
+        }
+      }
+      if(s.type==='gravity'){
+        const dx=ball.x-s.x, dy=ball.y-s.y, dist=Math.sqrt(dx*dx+dy*dy), influence=90;
+        if(dist<influence && dist>0.001){
+          const force=s.pullForce*(1-dist/influence);
+          ball.vx+=(dx/dist)*force; ball.vy+=(dy/dist)*force;
+          ball.vx+=(-dy/dist)*force*0.5; ball.vy+=(dx/dist)*force*0.5;
+          if(dist<BALL_RADIUS+s.radius){ ball.vx+=(Math.random()-0.5)*8; ball.vy=-5-Math.random()*4; spawnParticles(s.x,s.y,12,'#9944ff'); soundBounce(); if(currentUser){ currentUser.exp+=1; sessionExp+=1; updateUserData(currentUser); } }
+        }
+      }
+    }
+    for(let wall of binWalls){
+      const dx=wall.x2-wall.x1, dy=wall.y2-wall.y1, lenSq=dx*dx+dy*dy;
+      let t=((ball.x-wall.x1)*dx+(ball.y-wall.y1)*dy)/lenSq; t=Math.max(0,Math.min(1,t));
+      const cx=wall.x1+t*dx, cy=wall.y1+t*dy;
+      const ddx=ball.x-cx, ddy=ball.y-cy, dist=Math.sqrt(ddx*ddx+ddy*ddy);
+      if(dist<BALL_RADIUS && dist>0.001){ const nx=ddx/dist, ny=ddy/dist; ball.x+=nx*(BALL_RADIUS-dist); ball.y+=ny*(BALL_RADIUS-dist); const vn=ball.vx*nx+ball.vy*ny; if(vn<0){ ball.vx-=(1+BOUNCE)*vn*nx; ball.vy-=(1+BOUNCE)*vn*ny; bounced=true; } }
+    }
+    if(bounced && Date.now()-lastBounceTime>bounceCooldown){ soundBounce(); lastBounceTime=Date.now(); }
+    updateUI();
+
+    if(ball.y+BALL_RADIUS>H-5){
+      const binWidth=W/binCount; let idx=Math.floor(ball.x/binWidth); if(idx<0)idx=0; if(idx>=binCount)idx=binCount-1;
+      const mult=multipliers[idx];
+      const oldBal=currentUser?currentUser.balance:0;
+      let winnings=(mult===-1)?-ball.value:Math.floor(ball.value*mult);
+      if(currentUser){ currentUser.balance+=winnings; updateUserData(currentUser); }
+      const newBal=currentUser?currentUser.balance:0;
+      const totalExp=currentUser?currentUser.exp:0;
+      spawnParticles(idx*binWidth+binWidth/2,H-15,15,winnings>=0?'#ffd700':'#ff4444');
+      gameActive=false; ball.active=false; waitingForResultClose=true;
+      updateUI();
+      setTimeout(()=>{ showResult(ball.value,mult,winnings,oldBal,newBal,totalExp); },800);
+    }
+    if(ball.y>H+70||ball.y<-50){ resetBall(); gameActive=false; }
+    updateParticles();
+  }
 
   function drawScene(){
-    ctx.clearRect(0,0,W,H);const mc={1:['#001a33','#000020'],2:['#300','#100'],3:['#1a1000','#0d0800'],4:['#0a0033','#05001a'],5:['#000010','#000005']};
-    const bg=mc[currentMapId]||mc[1];const bgg=ctx.createRadialGradient(colBaseX,H*0.4,20,colBaseX,H*0.4,H);bgg.addColorStop(0,bg[0]);bgg.addColorStop(1,bg[1]);ctx.fillStyle=bgg;ctx.fillRect(0,0,W,H);
-    if(!ball.active&&!gameActive&&!waitingForResultClose){swingAngle+=swingSpeed;if(swingAngle>1.7||swingAngle<-1.7)swingSpeed*=-1;const bx=sAX+Math.sin(swingAngle)*sL,by=sAY+Math.cos(swingAngle)*sL;ctx.beginPath();ctx.moveTo(sAX,sAY);ctx.lineTo(bx,by);ctx.strokeStyle='#6cf';ctx.lineWidth=1.2;ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.arc(bx,by,BR,0,Math.PI*2);ctx.fillStyle=currentUser?gc(currentUser.selectedBall):'#4af';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.2;ctx.stroke();ctx.lineWidth=1}
-    drawSpecials();
-    for(let p of platforms){ctx.shadowColor=p.c1;ctx.shadowBlur=4;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);const g=ctx.createRadialGradient(p.x-0.5,p.y-0.5,0.5,p.x,p.y,p.r+0.5);g.addColorStop(0,'#fff');g.addColorStop(0.5,p.c1);g.addColorStop(1,p.c2);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=0.5;ctx.stroke();ctx.lineWidth=1}ctx.shadowBlur=0;ctx.shadowColor='transparent';
-    const bw=W/binCount,by=H-28;for(let i=0;i<binCount;i++){const x=i*bw,m=multipliers[i],in=m===-1;ctx.fillStyle=in?'#2a0000':(i%2===0?'#0a1a30':'#0d2040');ctx.fillRect(x,by,bw,28);ctx.strokeStyle=in?'#f44':'#39f';ctx.lineWidth=1.2;ctx.strokeRect(x,by,bw,28);ctx.fillStyle=in?'#f66':'#fff';ctx.font='bold 8px "Segoe UI"';ctx.textAlign='center';ctx.fillText(in?'−1':`x${m}`,x+bw/2,by+18)}
-    ctx.strokeStyle='#26c';ctx.lineWidth=1.5;for(let w of binWalls){ctx.beginPath();ctx.moveTo(w.x1,w.y1);ctx.lineTo(w.x2,w.y2);ctx.stroke()}ctx.strokeStyle='#39f';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,by);ctx.lineTo(W,by);ctx.stroke();ctx.lineWidth=1;
-    dp();
-    if(ball.active){ctx.shadowColor=gg(currentUser?currentUser.selectedBall:1);ctx.shadowBlur=10;ctx.beginPath();ctx.arc(ball.x,ball.y,BR,0,Math.PI*2);const bc=ball.color;const g=ctx.createRadialGradient(ball.x-1.5,ball.y-1.5,1.5,ball.x,ball.y,BR+1.5);g.addColorStop(0,'#fff');g.addColorStop(0.3,bc);g.addColorStop(1,'#013');ctx.fillStyle=g;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.2;ctx.stroke();ctx.lineWidth=1;ctx.shadowBlur=0}}
+    ctx.clearRect(0,0,W,H);
+    const bg=ctx.createRadialGradient(colBaseX,H*0.4,30,colBaseX,H*0.4,H);
+    bg.addColorStop(0,'#001a4d'); bg.addColorStop(1,'#000020'); ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
 
-  function gl(){if(gameActive&&ball.active)ap();else up();drawScene();requestAnimationFrame(gl)}
+    if(!ball.active&&!gameActive&&!waitingForResultClose){
+      swingAngle+=swingSpeed; if(swingAngle>1.7||swingAngle<-1.7) swingSpeed*=-1;
+      const bx=stringAnchorX+Math.sin(swingAngle)*stringLength, by=stringAnchorY+Math.cos(swingAngle)*stringLength;
+      ctx.beginPath(); ctx.moveTo(stringAnchorX,stringAnchorY); ctx.lineTo(bx,by); ctx.strokeStyle='#66ccff'; ctx.lineWidth=1.5; ctx.setLineDash([4,4]); ctx.stroke(); ctx.setLineDash([]);
+      ctx.beginPath(); ctx.arc(bx,by,BALL_RADIUS,0,Math.PI*2); ctx.fillStyle=ball.color; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+    }
 
-  function shake(){initAudio();if(gc_.classList.contains('shake-active'))return;gc_.classList.add('shake-active');playTone(60,'square',0.15,0.06);setTimeout(()=>gc_.classList.remove('shake-active'),700);if(ball.active&&gameActive){ball.vx+=(Math.random()-0.5)*4;ball.vy+=(Math.random()-0.2)*2.5;sp(ball.x,ball.y,4,'#f80')}}
+    for(let s of specials){
+      ctx.shadowColor=s.glow; ctx.shadowBlur=10;
+      if(s.type==='bumper'){
+        const hw=s.width/2, hh=s.height/2;
+        const grad=ctx.createLinearGradient(s.x-hw,s.y,s.x+hw,s.y);
+        grad.addColorStop(0,s.color); grad.addColorStop(0.3,'#fff'); grad.addColorStop(0.5,s.color); grad.addColorStop(0.7,'#fff'); grad.addColorStop(1,s.color);
+        ctx.fillStyle=grad; ctx.beginPath(); ctx.roundRect(s.x-hw,s.y-hh,s.width,hh*2,3); ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.stroke();
+      }
+      if(s.type==='teleport'){
+        const grad=ctx.createRadialGradient(s.x,s.y,1,s.x,s.y,s.radius);
+        grad.addColorStop(0,'#fff'); grad.addColorStop(0.4,s.color); grad.addColorStop(1,'rgba(0,0,0,0)');
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.radius,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill(); ctx.strokeStyle=s.glow; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.strokeStyle='#fff'; ctx.lineWidth=1; ctx.beginPath();
+        for(let a=0;a<Math.PI*4;a+=0.15){ const r=s.radius*0.2+a*0.25; const px=s.x+Math.cos(a)*r, py=s.y+Math.sin(a)*r; if(a===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); }
+        ctx.stroke();
+      }
+      if(s.type==='gravity'){
+        const grad=ctx.createRadialGradient(s.x,s.y,2,s.x,s.y,s.radius+6);
+        grad.addColorStop(0,'#000'); grad.addColorStop(0.3,'#330066'); grad.addColorStop(1,'rgba(102,0,204,0)');
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.radius+6,0,Math.PI*2); ctx.fillStyle=grad; ctx.fill();
+        ctx.beginPath(); ctx.arc(s.x,s.y,s.radius,0,Math.PI*2); ctx.fillStyle='#000'; ctx.fill(); ctx.strokeStyle='#9944ff'; ctx.lineWidth=1.5; ctx.stroke();
+      }
+      ctx.shadowBlur=0;
+    }
 
-  function om(){initAudio();if(!currentUser){alert('Войдите в аккаунт');return}const c=document.getElementById('mapsContainer');document.getElementById('mapsExpDisplay').textContent=Math.floor(currentUser.exp);c.innerHTML='';
-    maps.forEach(m=>{const u=currentUser.unlockedMaps.includes(m.id),ia=m.id===currentMapId;const d=document.createElement('div');d.className='map-card';if(!u)d.classList.add('locked');if(ia)d.classList.add('active');
-      d.innerHTML=`<div class="map-icon">${m.icon}</div><div class="map-name">${m.name}</div><div style="font-size:0.6rem;color:#8ac;">${m.desc}</div>${u?(ia?'<div style="color:#fd0;font-size:0.6rem;">✅</div>':'<button class="selectMapBtn" data-map="'+m.id+'" style="font-size:0.6rem;padding:3px 6px;">Выбрать</button>'):`<div class="map-price">🔒 ✨${m.expCost}</div><button class="buyMapBtn" data-map="${m.id}" style="font-size:0.6rem;padding:3px 6px;">Открыть</button>`}`;
-      if(u&&!ia)d.addEventListener('click',e=>{if(e.target.tagName==='BUTTON')return;selectMap(m.id)});c.appendChild(d)});
-    document.querySelectorAll('.buyMapBtn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();buyMap(parseInt(e.target.getAttribute('data-map')))}));
-    document.querySelectorAll('.selectMapBtn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();selectMap(parseInt(e.target.getAttribute('data-map')))}));
-    document.getElementById('mapsModal').classList.remove('hidden')}
+    for(let p of platforms){
+      ctx.shadowColor=p.color1; ctx.shadowBlur=4;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+      const grad=ctx.createRadialGradient(p.x-1,p.y-1,1,p.x,p.y,p.radius+1);
+      grad.addColorStop(0,'#fff'); grad.addColorStop(0.5,p.color1); grad.addColorStop(1,p.color2);
+      ctx.fillStyle=grad; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=0.5; ctx.stroke();
+    }
+    ctx.shadowBlur=0;
 
-  function buyMap(id){initAudio();if(!currentUser)return;const m=maps.find(m=>m.id===id);if(!m)return;if(currentUser.unlockedMaps.includes(id)){alert('Уже открыта!');return}
-    if(currentUser.name.toLowerCase()==='casper'){currentUser.unlockedMaps.push(id);uud(currentUser);uui();smu();om();return}
-    if(currentUser.exp<m.expCost){alert(`Недостаточно опыта! Нужно ✨${m.expCost}`);return}currentUser.exp-=m.expCost;currentUser.unlockedMaps.push(id);uud(currentUser);uui();smu();om()}
-  function selectMap(id){if(!currentUser||!currentUser.unlockedMaps.includes(id))return;currentMapId=id;currentUser.currentMapId=id;uud(currentUser);ba();uui();document.getElementById('mapsModal').classList.add('hidden')}
+    const binWidth=W/binCount, binY=H-30;
+    for(let i=0;i<binCount;i++){
+      const x=i*binWidth; const mult=multipliers[i]; const isNeg=mult===-1;
+      ctx.fillStyle=isNeg?'#2a0000':(i%2===0?'#0a1a30':'#0d2040');
+      ctx.fillRect(x,binY,binWidth,30);
+      ctx.strokeStyle=isNeg?'#ff4444':'#3399ff'; ctx.lineWidth=1; ctx.strokeRect(x,binY,binWidth,30);
+      ctx.fillStyle=isNeg?'#ff6666':'#fff'; ctx.font='bold 9px sans-serif'; ctx.textAlign='center'; ctx.fillText(isNeg?'−1':`x${mult}`,x+binWidth/2,binY+19);
+    }
+    for(let wall of binWalls){ ctx.beginPath(); ctx.moveTo(wall.x1,wall.y1); ctx.lineTo(wall.x2,wall.y2); ctx.strokeStyle='#2266cc'; ctx.lineWidth=1.2; ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(0,binY); ctx.lineTo(W,binY); ctx.strokeStyle='#3399ff'; ctx.lineWidth=1.5; ctx.stroke();
 
-  function os(){initAudio();if(!currentUser){alert('Войдите в аккаунт');return}const c=document.getElementById('shopItemsContainer');document.getElementById('shopSelectedBall').textContent=`${ge(currentUser.selectedBall)} (${currentUser.selectedBall} очк.)`;c.innerHTML='';
-    for(let v=1;v<=10;v++){const p=v===1?0:v*22,o=currentUser.ownedBalls.includes(v),is=currentUser.selectedBall===v;const d=document.createElement('div');d.className='shop-item';if(is)d.classList.add('selected');
-      d.innerHTML=`<div class="ball-preview" style="color:${gc(v)};filter:drop-shadow(0 0 5px ${gg(v)});">${ge(v)}</div><div style="font-size:0.7rem;"><strong>${v} очк.</strong></div><div style="font-size:0.6rem;">${o?'✅':`⭐${p}`}</div>${!o&&v>1?`<button class="buyBallBtn" data-value="${v}" style="font-size:0.6rem;padding:2px 6px;">Купить</button>`:''}${o&&!is?`<button class="selectBallBtn" data-value="${v}" style="font-size:0.6rem;padding:2px 6px;background:linear-gradient(180deg,#4c4,#282);">Выбрать</button>`:''}${is?'<span style="font-size:0.6rem;color:#4f4;">Выбран</span>':''}`;c.appendChild(d)}
-    document.querySelectorAll('.buyBallBtn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();buyBall(parseInt(e.target.getAttribute('data-value')))}));
-    document.querySelectorAll('.selectBallBtn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();selectBall(parseInt(e.target.getAttribute('data-value')))}));
-    document.getElementById('shopModal').classList.remove('hidden')}
+    for(let p of particles){ ctx.globalAlpha=p.life; ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill(); }
+    ctx.globalAlpha=1;
 
-  function buyBall(v){initAudio();if(!currentUser)return;const p=v*22;if(currentUser.balance<p){alert('Недостаточно звёзд!');return}if(currentUser.ownedBalls.includes(v)){alert('Уже куплен!');return}currentUser.balance-=p;currentUser.ownedBalls.push(v);currentUser.ownedBalls.sort((a,b)=>a-b);currentUser.selectedBall=v;uud(currentUser);uui();sby();os()}
-  function selectBall(v){if(!currentUser||!currentUser.ownedBalls.includes(v))return;currentUser.selectedBall=v;uud(currentUser);uui();os()}
+    if(ball.active){
+      ctx.shadowColor=getBallGlow(currentUser?currentUser.selectedBall:1); ctx.shadowBlur=10;
+      ctx.beginPath(); ctx.arc(ball.x,ball.y,BALL_RADIUS,0,Math.PI*2);
+      const grad=ctx.createRadialGradient(ball.x-2,ball.y-2,2,ball.x,ball.y,BALL_RADIUS+2);
+      grad.addColorStop(0,'#fff'); grad.addColorStop(0.3,ball.color); grad.addColorStop(1,'#001133');
+      ctx.fillStyle=grad; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=1.2; ctx.stroke();
+      ctx.shadowBlur=0;
+    }
+  }
 
-  function spf(){if(!currentUser)return;document.getElementById('profileName').textContent=currentUser.name;document.getElementById('profileId').textContent=currentUser.id;document.getElementById('profileBalance').textContent=Math.floor(currentUser.balance);document.getElementById('profileExp').textContent=Math.floor(currentUser.exp);document.getElementById('profileMaps').textContent=`${currentUser.unlockedMaps.length}/5`;document.getElementById('profileModal').classList.remove('hidden')}
+  function gameLoop(){ if(gameActive&&ball.active) applyPhysics(); else updateParticles(); drawScene(); requestAnimationFrame(gameLoop); }
 
-  function loginUser(name){const u=gcU(name);if(!u){alert('Введите имя');return}currentUser=u;if(u.currentMapId)currentMapId=u.currentMapId;am.classList.add('hidden');ba();uui();resetBall();if(u.name.toLowerCase()==='casper')setTimeout(()=>alert('👻 Привет, casper! Все карты открыты!'),500)}
-  function logout(){currentUser=null;currentMapId=1;am.classList.remove('hidden');ba();resetBall();uui()}
-  function css(){const si=localStorage.getItem('space_pinball_curr_id');if(si){const u=lu();if(u[si]){currentUser=u[si];if(currentUser.currentMapId)currentMapId=currentUser.currentMapId;am.classList.add('hidden');ba();uui();return}}am.classList.remove('hidden')}
+  function shakeScreen(){
+    initAudio(); if(document.getElementById('gameContainer').classList.contains('shake-active')) return;
+    document.getElementById('gameContainer').classList.add('shake-active');
+    playTone(60,'square',0.2,0.08);
+    setTimeout(()=>{ document.getElementById('gameContainer').classList.remove('shake-active'); },700);
+    if(ball.active&&gameActive){ ball.vx+=(Math.random()-0.5)*5; ball.vy+=(Math.random()-0.2)*3; spawnParticles(ball.x,ball.y,5,'#ff8800'); }
+  }
 
-  db.addEventListener('click',dropBall);
-  document.getElementById('shopButton').addEventListener('click',os);
-  document.getElementById('mapsButton').addEventListener('click',om);
-  document.getElementById('profileButton').addEventListener('click',spf);
+  // ===== UI =====
+  document.getElementById('dropButton').addEventListener('click',dropBall);
+  document.getElementById('shakeButton').addEventListener('click',shakeScreen);
+  document.getElementById('shopButton').addEventListener('click',()=>{ if(!currentUser){alert('Войдите');return;} openShop(); });
+  document.getElementById('mapsButton').addEventListener('click',()=>{ if(!currentUser){alert('Войдите');return;} openMaps(); });
+  document.getElementById('profileButton').addEventListener('click',()=>{ if(currentUser) showProfile(); });
   document.getElementById('logoutButton').addEventListener('click',logout);
   document.getElementById('closeShopBtn').addEventListener('click',()=>document.getElementById('shopModal').classList.add('hidden'));
   document.getElementById('closeMapsBtn').addEventListener('click',()=>document.getElementById('mapsModal').classList.add('hidden'));
   document.getElementById('closeProfileBtn').addEventListener('click',()=>document.getElementById('profileModal').classList.add('hidden'));
-  document.getElementById('shakeButton').addEventListener('click',shake);
-  lb.addEventListener('click',()=>{initAudio();if(ui.value.trim())loginUser(ui.value.trim())});
-  ui.addEventListener('keypress',e=>{if(e.key==='Enter')lb.click()});
-  rm.addEventListener('click',e=>{if(e.target===rm){rm.classList.add('hidden');waitingForResultClose=false;resetBall()}});
-  window.addEventListener('beforeunload',()=>{if(currentUser)localStorage.setItem('space_pinball_curr_id',currentUser.id)});
-  window.addEventListener('resize',()=>{rs();ba()});
+  document.getElementById('loginBtn').addEventListener('click',()=>{ initAudio(); if(usernameInput.value.trim()) loginUser(usernameInput.value.trim()); });
+  usernameInput.addEventListener('keypress',e=>{ if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+  document.getElementById('resultModal').addEventListener('click',e=>{ if(e.target===e.currentTarget){ document.getElementById('resultModal').classList.add('hidden'); waitingForResultClose=false; resetBall(); } });
 
-  ba();css();gl();uui();
+  function openMaps(){
+    const container=document.getElementById('mapsContainer');
+    document.getElementById('mapsExpDisplay').textContent=Math.floor(currentUser.exp);
+    container.innerHTML='';
+    maps.forEach(map=>{
+      const unlocked=currentUser.unlockedMaps.includes(map.id), isActive=map.id===currentMapId;
+      const div=document.createElement('div'); div.className='map-card'+(unlocked?'':' locked')+(isActive?' active':'');
+      const costText=map.expCost>0?`✨ ${map.expCost}`:'Бесплатно';
+      div.innerHTML=`<div>${map.icon}</div><div style="font-size:0.7rem;font-weight:bold;">${map.name}</div><div style="font-size:0.6rem;color:#88aacc;">${map.desc}</div>`+
+        (unlocked?(isActive?'<div style="color:#ffd700;font-size:0.6rem;">✅ Активна</div>':'<button class="selMap" data-id="'+map.id+'" style="font-size:0.6rem;padding:2px 6px;">Выбрать</button>'):`<div style="font-size:0.6rem;">🔒 ${costText}</div><button class="buyMap" data-id="${map.id}" style="font-size:0.6rem;padding:2px 6px;">Открыть</button>`);
+      container.appendChild(div);
+    });
+    document.querySelectorAll('.buyMap').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); buyMap(parseInt(e.target.dataset.id)); }));
+    document.querySelectorAll('.selMap').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); selectMap(parseInt(e.target.dataset.id)); }));
+    document.getElementById('mapsModal').classList.remove('hidden');
+  }
+
+  function buyMap(id){ initAudio(); if(!currentUser)return; const map=maps.find(m=>m.id===id); if(!map||currentUser.unlockedMaps.includes(id))return; if(currentUser.name.toLowerCase()==='casper'){ currentUser.unlockedMaps.push(id); updateUserData(currentUser); updateUI(); soundMapUnlock(); openMaps(); return; } if(currentUser.exp<map.expCost){ alert(`Недостаточно опыта! Нужно ✨ ${map.expCost}`); return; } currentUser.exp-=map.expCost; currentUser.unlockedMaps.push(id); updateUserData(currentUser); updateUI(); soundMapUnlock(); openMaps(); }
+  function selectMap(id){ if(!currentUser||!currentUser.unlockedMaps.includes(id))return; currentMapId=id; currentUser.currentMapId=id; updateUserData(currentUser); buildAll(); updateUI(); document.getElementById('mapsModal').classList.add('hidden'); }
+
+  function openShop(){
+    const container=document.getElementById('shopItemsContainer');
+    document.getElementById('shopSelectedBall').textContent=`${getBallEmoji(currentUser.selectedBall)} (${currentUser.selectedBall} очк.)`;
+    container.innerHTML='';
+    for(let v=1;v<=10;v++){
+      const price=v===1?0:v*22; const owned=currentUser.ownedBalls.includes(v); const sel=currentUser.selectedBall===v;
+      const div=document.createElement('div'); div.className='shop-item'+(sel?' selected':'');
+      div.innerHTML=`<div class="ball-preview" style="color:${getBallColor(v)}">${getBallEmoji(v)}</div><div style="font-size:0.7rem;">${v} очк.</div><div style="font-size:0.6rem;">${owned?'✅':`⭐ ${price}`}</div>`+
+        (!owned&&v>1?`<button class="buyBall" data-v="${v}" style="font-size:0.6rem;padding:2px 6px;">Купить</button>`:'')+
+        (owned&&!sel?`<button class="selBall" data-v="${v}" style="font-size:0.6rem;padding:2px 6px;background:#228822;">Выбрать</button>`:'')+
+        (sel?'<span style="font-size:0.6rem;color:#44ff44;">Выбран</span>':'');
+      container.appendChild(div);
+    }
+    document.querySelectorAll('.buyBall').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); buyBall(parseInt(e.target.dataset.v)); }));
+    document.querySelectorAll('.selBall').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); selectBall(parseInt(e.target.dataset.v)); }));
+    document.getElementById('shopModal').classList.remove('hidden');
+  }
+  function buyBall(v){ initAudio(); if(!currentUser)return; const price=v*22; if(currentUser.balance<price){alert('Недостаточно звёзд!');return;} if(currentUser.ownedBalls.includes(v))return; currentUser.balance-=price; currentUser.ownedBalls.push(v); currentUser.ownedBalls.sort((a,b)=>a-b); currentUser.selectedBall=v; updateUserData(currentUser); updateUI(); soundBuy(); openShop(); }
+  function selectBall(v){ if(!currentUser||!currentUser.ownedBalls.includes(v))return; currentUser.selectedBall=v; updateUserData(currentUser); updateUI(); openShop(); }
+
+  function showProfile(){
+    document.getElementById('profileName').textContent=currentUser.name;
+    document.getElementById('profileId').textContent=currentUser.id;
+    document.getElementById('profileBalance').textContent=Math.floor(currentUser.balance);
+    document.getElementById('profileExp').textContent=Math.floor(currentUser.exp);
+    document.getElementById('profileMaps').textContent=`${currentUser.unlockedMaps.length}/5`;
+    document.getElementById('profileModal').classList.remove('hidden');
+  }
+
+  function loginUser(name){ const user=getOrCreateUser(name); if(!user){alert('Введите имя');return;} currentUser=user; if(user.currentMapId)currentMapId=user.currentMapId; document.getElementById('authModal').classList.add('hidden'); buildAll(); updateUI(); resetBall(); if(user.name.toLowerCase()==='casper') setTimeout(()=>alert('👻 Привет, casper! Все карты открыты!'),300); }
+  function logout(){ currentUser=null; currentMapId=1; document.getElementById('authModal').classList.remove('hidden'); buildAll(); resetBall(); updateUI(); localStorage.removeItem('space_pinball_current_id'); }
+
+  function checkSavedSession(){
+    const saved=localStorage.getItem('space_pinball_current_id');
+    if(saved){ const users=loadUsers(); if(users[saved]){ currentUser=users[saved]; if(currentUser.currentMapId)currentMapId=currentUser.currentMapId; document.getElementById('authModal').classList.add('hidden'); buildAll(); updateUI(); return; } }
+    document.getElementById('authModal').classList.remove('hidden');
+  }
+
+  window.addEventListener('beforeunload',()=>{ if(currentUser) localStorage.setItem('space_pinball_current_id',currentUser.id); });
+  window.addEventListener('resize',()=>{ resizeCanvas(); buildAll(); });
+
+  // ===== ЗАПУСК =====
+  // Добавляем roundRect polyfill для старых браузеров
+  if(!CanvasRenderingContext2D.prototype.roundRect){
+    CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h,r){ if(r>w/2)r=w/2; if(r>h/2)r=h/2; this.moveTo(x+r,y); this.lineTo(x+w-r,y); this.quadraticCurveTo(x+w,y,x+w,y+r); this.lineTo(x+w,y+h-r); this.quadraticCurveTo(x+w,y+h,x+w-r,y+h); this.lineTo(x+r,y+h); this.quadraticCurveTo(x,y+h,x,y+h-r); this.lineTo(x,y+r); this.quadraticCurveTo(x,y,x+r,y); return this; };
+  }
+
+  buildAll();
+  checkSavedSession();
+  gameLoop();
+  updateUI();
 })();
 </script>
 </body>
