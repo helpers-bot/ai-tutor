@@ -348,9 +348,9 @@
 
 <script>
   (function() {
-    // ========== ЗВУКИ (ФОНОВЫЙ ШУМ УБРАН, МУЗЫКА ОТКЛЮЧЕНА) ==========
+    // ========== ЗВУКИ ==========
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
+    let audioCtx = null;
 
     function initAudio() {
       if (!audioCtx) {
@@ -363,16 +363,20 @@
 
     function playSound(freq, type, duration, vol = 0.1) {
       if (!audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(audioCtx.currentTime);
-      osc.stop(audioCtx.currentTime + duration);
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {
+        // Игнорируем ошибки звука
+      }
     }
 
     function soundBounce() {
@@ -465,10 +469,10 @@
     // ========== КАРТЫ ==========
     const maps = [
       { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, expCost: 0, desc: 'Стандартная', specials: [] },
-      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 0, expCost: 2.000, desc: '+10% множители', specials: ['bumper'] },
-      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 0, expCost: 5.000, desc: '+20% множители', specials: ['bumper', 'teleport'] },
-      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 10.000, desc: '+35% множители', specials: ['bumper', 'teleport', 'gravity'] },
-      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 20.000, desc: '+50% множители', specials: ['bumper', 'teleport', 'gravity', 'doublebumper'] }
+      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 0, expCost: 2000, desc: '+10% множители', specials: ['bumper'] },
+      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 0, expCost: 5000, desc: '+20% множители', specials: ['bumper', 'teleport'] },
+      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 10000, desc: '+35% множители', specials: ['bumper', 'teleport', 'gravity'] },
+      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 20000, desc: '+50% множители', specials: ['bumper', 'teleport', 'gravity', 'doublebumper'] }
     ];
 
     // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
@@ -480,7 +484,7 @@
       const rect = container.getBoundingClientRect();
       const w = rect.width - 20;
       const h = rect.height - 130;
-      canvas.width = Math.floor(w);
+      canvas.width = Math.floor(Math.max(w, 300));
       canvas.height = Math.floor(Math.max(h, 400));
     }
     resizeCanvas();
@@ -560,7 +564,6 @@
     const authModal = document.getElementById('authModal');
     const usernameInput = document.getElementById('usernameInput');
     const loginBtn = document.getElementById('loginBtn');
-    const gameContainer = document.getElementById('gameContainer');
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
     const bonusButton = document.getElementById('bonusButton');
@@ -1174,16 +1177,60 @@
       soundDrop();
     }
 
-    function checkWallCollision(wall) {
-      return checkWallCollisionForBall(ball, wall);
+    function allBallsFinished() {
+      return bonusBalls.every(b => b.finished);
     }
 
-    function checkBumperCollision(bumper) {
-      return checkBumperCollisionForBall(ball, bumper);
+    function processMainBallResult() {
+      const binWidth = canvas.width / binCount;
+      let binIndex = Math.floor(ballBinX / binWidth);
+      if (binIndex < 0) binIndex = 0;
+      if (binIndex >= binCount) binIndex = binCount - 1;
+      const multiplier = multipliers[binIndex];
+      
+      const oldBalance = currentUser ? currentUser.balance : 0;
+      let winnings;
+      if (multiplier === -1) {
+        winnings = -ball.value;
+      } else {
+        winnings = Math.floor(ball.value * multiplier);
+      }
+      
+      if (currentUser) {
+        currentUser.balance += winnings;
+        updateUserData(currentUser);
+      }
+      const newBalance = currentUser ? currentUser.balance : 0;
+      const totalExp = currentUser ? currentUser.exp : 0;
+      
+      ballInBin = false;
+      gameActive = false;
+      ball.active = false;
+      bonusActive = false;
+      waitingForResultClose = true;
+      
+      updateUI();
+      
+      setTimeout(() => {
+        showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
+      }, 500);
     }
 
-    function applySpecialEffects() {
-      applyPhysicsToBall(ball);
+    function endGame() {
+      const oldBalance = currentUser ? currentUser.balance : 0;
+      const newBalance = currentUser ? currentUser.balance : 0;
+      const totalExp = currentUser ? currentUser.exp : 0;
+      
+      gameActive = false;
+      ball.active = false;
+      bonusActive = false;
+      waitingForResultClose = true;
+      
+      updateUI();
+      
+      setTimeout(() => {
+        showResult(ball.value, 0, 0, oldBalance, newBalance, totalExp);
+      }, 500);
     }
 
     function applyPhysics() {
@@ -1313,58 +1360,7 @@
       // Обычный режим
       if (!ball.active) return;
       
-      ball.vy += GRAVITY;
-      ball.x += ball.vx;
-      ball.y += ball.vy;
-
-      if (ball.x - BALL_RADIUS < 2) { 
-        ball.x = BALL_RADIUS + 2; 
-        ball.vx = Math.abs(ball.vx) * BOUNCE; 
-        soundBounce();
-      }
-      if (ball.x + BALL_RADIUS > canvas.width - 2) { 
-        ball.x = canvas.width - BALL_RADIUS - 2; 
-        ball.vx = -Math.abs(ball.vx) * BOUNCE; 
-        soundBounce();
-      }
-      
-      if (ball.y - BALL_RADIUS < 2) { 
-        ball.y = BALL_RADIUS + 2; 
-        ball.vy = Math.abs(ball.vy) * BOUNCE; 
-        soundBounce();
-      }
-
-      for (let p of platforms) {
-        const dx = ball.x - p.x;
-        const dy = ball.y - p.y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        const minDist = BALL_RADIUS + p.radius;
-        if (dist < minDist && dist > 0.001) {
-          const nx = dx/dist, ny = dy/dist;
-          ball.x += nx * (minDist - dist);
-          ball.y += ny * (minDist - dist);
-          const vn = ball.vx * nx + ball.vy * ny;
-          if (vn < 0) {
-            ball.vx -= (1+BOUNCE)*vn*nx;
-            ball.vy -= (1+BOUNCE)*vn*ny;
-            soundBounce();
-            
-            if (currentUser) {
-              currentUser.exp += 1;
-              sessionExp += 1;
-              updateUserData(currentUser);
-            }
-          }
-          ball.vx *= 0.999;
-          ball.vy *= 0.999;
-        }
-      }
-      
-      for (let wall of binWalls) {
-        checkWallCollision(wall);
-      }
-      
-      applySpecialEffects();
+      applyPhysicsToBall(ball);
       
       updateUI();
 
@@ -1381,62 +1377,6 @@
         resetBall(); 
         gameActive = false; 
       }
-    }
-
-    function allBallsFinished() {
-      return bonusBalls.every(b => b.finished);
-    }
-
-    function processMainBallResult() {
-      const binWidth = canvas.width / binCount;
-      let binIndex = Math.floor(ballBinX / binWidth);
-      if (binIndex < 0) binIndex = 0;
-      if (binIndex >= binCount) binIndex = binCount - 1;
-      const multiplier = multipliers[binIndex];
-      
-      const oldBalance = currentUser ? currentUser.balance : 0;
-      let winnings;
-      if (multiplier === -1) {
-        winnings = -ball.value;
-      } else {
-        winnings = Math.floor(ball.value * multiplier);
-      }
-      
-      if (currentUser) {
-        currentUser.balance += winnings;
-        updateUserData(currentUser);
-      }
-      const newBalance = currentUser ? currentUser.balance : 0;
-      const totalExp = currentUser ? currentUser.exp : 0;
-      
-      ballInBin = false;
-      gameActive = false;
-      ball.active = false;
-      bonusActive = false;
-      waitingForResultClose = true;
-      
-      updateUI();
-      
-      setTimeout(() => {
-        showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
-      }, 500);
-    }
-
-    function endGame() {
-      const oldBalance = currentUser ? currentUser.balance : 0;
-      const newBalance = currentUser ? currentUser.balance : 0;
-      const totalExp = currentUser ? currentUser.exp : 0;
-      
-      gameActive = false;
-      ball.active = false;
-      bonusActive = false;
-      waitingForResultClose = true;
-      
-      updateUI();
-      
-      setTimeout(() => {
-        showResult(ball.value, 0, 0, oldBalance, newBalance, totalExp);
-      }, 500);
     }
 
     function drawSpecials() {
@@ -1508,7 +1448,7 @@
       ctx.stroke();
       ctx.lineWidth = 1;
       
-      // Рисуем бонусные шары на веревке
+      // Рисуем маятник
       if (!ball.active && !gameActive && !waitingForResultClose && !bonusActive) {
         swingAngle += swingSpeed;
         if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
@@ -1718,18 +1658,17 @@
       
       container.innerHTML = '';
       
-      // Цены на шары: 2 - 1.000, 3 - 10.000, 4 - 26.000, 5 - 50.000, 6 - 120.000
       const ballPrices = {
         1: 0,
-        2: 1.000,
-        3: 10.000,
-        4: 26.000,
-        5: 50.000,
-        6: 120.000,
-        7: 250.000,
-        8: 500.000,
-        9: 1.000.000,
-        10: 2.000.000
+        2: 1000,
+        3: 10000,
+        4: 26000,
+        5: 50000,
+        6: 120000,
+        7: 250000,
+        8: 500000,
+        9: 1000000,
+        10: 2000000
       };
       
       for (let val = 1; val <= 10; val++) {
@@ -1772,15 +1711,15 @@
       if (!currentUser) return;
       const ballPrices = {
         1: 0,
-        2: 1.000,
-        3: 10.000,
-        4: 26.000,
-        5: 50.000,
-        6: 120.000,
-        7: 250.000,
-        8: 500.000,
-        9: 1.000.000,
-        10: 2.000.000
+        2: 1000,
+        3: 10000,
+        4: 26000,
+        5: 50000,
+        6: 120000,
+        7: 250000,
+        8: 500000,
+        9: 1000000,
+        10: 2000000
       };
       const price = ballPrices[value] || value * 22;
       if (currentUser.balance < price) { alert('Недостаточно звёзд!'); return; }
