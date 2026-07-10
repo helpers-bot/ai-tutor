@@ -426,7 +426,6 @@
           if (!user.selectedBall) user.selectedBall = 1;
           if (!user.ownedBalls) user.ownedBalls = [1];
           if (user.exp === undefined) user.exp = 0;
-          if (!user.bonusUses) user.bonusUses = 3;
           return user;
         }
       }
@@ -439,8 +438,7 @@
         ownedBalls: [1],
         selectedBall: 1,
         unlockedMaps: isCasper ? [1, 2, 3, 4, 5] : [1],
-        currentMapId: 1,
-        bonusUses: 3
+        currentMapId: 1
       };
       users[newId] = newUser;
       saveUsers(users);
@@ -528,12 +526,12 @@
     let waitingForResultClose = false;
     let ballInBin = false;
     let binTimer = 0;
-    let ballBinX = 0;
-    let ballBinY = 0;
 
     // Для бонусного режима - собираем результаты
     let bonusResults = [];
     let bonusTotalWinnings = 0;
+    let bonusGameEndDelay = 0;
+    let normalGameEndDelay = 0;
 
     function getBallColor(value) {
       const colors = {
@@ -613,6 +611,8 @@
       bonusBalls = [];
       bonusResults = [];
       bonusTotalWinnings = 0;
+      bonusGameEndDelay = 0;
+      normalGameEndDelay = 0;
     }
 
     function getRandomPositions(count, rows) {
@@ -740,35 +740,7 @@
       const w = canvas.width;
       const margin = 10;
       
-      // Добавляем вертикальные полосы препятствий слева и справа
-      const sidePlatformCount = Math.floor(rows * 0.7); // Количество боковых препятствий
-      const sideSpacing = (canvas.height - startY - 100) / sidePlatformCount;
-      const leftX = margin + 25; // Левая полоса, не слишком далеко от стены
-      const rightX = w - margin - 25; // Правая полоса
-      
-      for (let i = 0; i < sidePlatformCount; i++) {
-        const y = startY + 50 + i * sideSpacing;
-        if (y < canvas.height - 80) {
-          // Левое препятствие
-          platforms.push({
-            x: leftX,
-            y: y,
-            radius: PLATFORM_RADIUS + 1.5,
-            color1: '#ff6644',
-            type: 'side'
-          });
-          // Правое препятствие
-          platforms.push({
-            x: rightX,
-            y: y,
-            radius: PLATFORM_RADIUS + 1.5,
-            color1: '#44aaff',
-            type: 'side'
-          });
-        }
-      }
-      
-      // Основные препятствия (исключаем последний ряд, где r = rows - 1)
+      // Основные препятствия, расширенные до краёв (исключаем последний ряд)
       for (let r = 0; r < rows - 1; r++) {
         const y = startY + r * rowSpacing;
         if (y < startY + 10) continue;
@@ -782,9 +754,6 @@
         for (let c = 0; c < pinsInRow; c++) {
           const px = startX + c * colSpacing + offsetX;
           if (px < margin || px > w - margin) continue;
-          
-          // Пропускаем позиции слишком близко к боковым препятствиям
-          if (Math.abs(px - leftX) < 20 || Math.abs(px - rightX) < 20) continue;
           
           let overlapped = false;
           for (let s of specials) {
@@ -845,6 +814,8 @@
       bonusBalls = [];
       bonusResults = [];
       bonusTotalWinnings = 0;
+      bonusGameEndDelay = 0;
+      normalGameEndDelay = 0;
       usedTeleports = [];
       usedBumpers = [];
     }
@@ -864,7 +835,7 @@
       userGreeting.textContent = `👨‍🚀 ${currentUser.name}`;
       ball.color = getBallColor(currentUser.selectedBall);
       mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
-      bonusButton.textContent = `🎁 Бонус (${currentUser.bonusUses || 0})`;
+      bonusButton.textContent = '🎁 Бонус';
     }
 
     function showResult(betValue, multiplier, winnings, oldBalance, newBalance, totalExp) {
@@ -976,16 +947,8 @@
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
       if (gameActive || ball.active || waitingForResultClose || bonusActive) return;
       
-      if (!currentUser.bonusUses || currentUser.bonusUses <= 0) {
-        alert('Бонусы закончились!');
-        return;
-      }
-      
       // Имитация просмотра рекламы
       alert('📺 Смотрим рекламу...\n🎁 Получено 5 шаров!');
-      
-      currentUser.bonusUses--;
-      updateUserData(currentUser);
       
       bonusActive = true;
       gameActive = true;
@@ -993,6 +956,7 @@
       sessionExp = 0;
       bonusResults = [];
       bonusTotalWinnings = 0;
+      bonusGameEndDelay = 0;
       
       const ballValue = currentUser.selectedBall;
       const ballColor = getBallColor(ballValue);
@@ -1270,6 +1234,7 @@
       gameActive = true;
       waitingForResultClose = false;
       sessionExp = 0;
+      normalGameEndDelay = 0;
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
       ball.vx = Math.sin(swingAngle) * 1.2;
@@ -1296,7 +1261,7 @@
 
     function processBonusBallResult(b) {
       const binWidth = canvas.width / binCount;
-      let binIndex = Math.floor(b.binX / binWidth);
+      let binIndex = Math.floor(b.x / binWidth);
       if (binIndex < 0) binIndex = 0;
       if (binIndex >= binCount) binIndex = binCount - 1;
       const multiplier = multipliers[binIndex];
@@ -1346,44 +1311,45 @@
     function applyPhysics() {
       if (!gameActive) return;
       
-      // Обработка основного шара в корзине (обычный режим)
+      // Обработка основного шара в корзине (обычный режим) с задержкой 0.5 сек
       if (ballInBin && !bonusActive) {
-        binTimer--;
-        // Шар продолжает двигаться в корзине, физика работает
         applyPhysicsToBall(ball);
         
-        if (binTimer <= 0) {
-          const binWidth = canvas.width / binCount;
-          let binIndex = Math.floor(ball.x / binWidth);
-          if (binIndex < 0) binIndex = 0;
-          if (binIndex >= binCount) binIndex = binCount - 1;
-          const multiplier = multipliers[binIndex];
-          
-          const oldBalance = currentUser ? currentUser.balance : 0;
-          let winnings;
-          if (multiplier === -1) {
-            winnings = -ball.value;
-          } else {
-            winnings = Math.floor(ball.value * multiplier);
+        if (ball.y > canvas.height + 30) {
+          normalGameEndDelay++;
+          if (normalGameEndDelay > 30) { // ~0.5 сек при 60fps
+            const binWidth = canvas.width / binCount;
+            let binIndex = Math.floor(ball.x / binWidth);
+            if (binIndex < 0) binIndex = 0;
+            if (binIndex >= binCount) binIndex = binCount - 1;
+            const multiplier = multipliers[binIndex];
+            
+            const oldBalance = currentUser ? currentUser.balance : 0;
+            let winnings;
+            if (multiplier === -1) {
+              winnings = -ball.value;
+            } else {
+              winnings = Math.floor(ball.value * multiplier);
+            }
+            
+            if (currentUser) {
+              currentUser.balance += winnings;
+              updateUserData(currentUser);
+            }
+            const newBalance = currentUser ? currentUser.balance : 0;
+            const totalExp = currentUser ? currentUser.exp : 0;
+            
+            ballInBin = false;
+            gameActive = false;
+            ball.active = false;
+            waitingForResultClose = true;
+            
+            updateUI();
+            
+            setTimeout(() => {
+              showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
+            }, 500);
           }
-          
-          if (currentUser) {
-            currentUser.balance += winnings;
-            updateUserData(currentUser);
-          }
-          const newBalance = currentUser ? currentUser.balance : 0;
-          const totalExp = currentUser ? currentUser.exp : 0;
-          
-          ballInBin = false;
-          gameActive = false;
-          ball.active = false;
-          waitingForResultClose = true;
-          
-          updateUI();
-          
-          setTimeout(() => {
-            showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
-          }, 500);
         }
         return;
       }
@@ -1398,11 +1364,13 @@
           
           // Шар в корзине продолжает двигаться
           if (b.inBin && !b.settled) {
-            b.binTimer--;
             applyPhysicsToBall(b);
             
-            if (b.binTimer <= 0) {
-              processBonusBallResult(b);
+            if (b.y > canvas.height + 30) {
+              b.binTimer++;
+              if (b.binTimer > 30) {
+                processBonusBallResult(b);
+              }
             }
             continue;
           }
@@ -1414,8 +1382,7 @@
           // Шар попадает в зону корзины, но продолжает двигаться
           if (b.active && b.y + BALL_RADIUS >= canvas.height - 30 && b.y < canvas.height + 50) {
             b.inBin = true;
-            b.binTimer = 90;
-            // Не останавливаем шар, он продолжает двигаться
+            b.binTimer = 0;
           }
           
           if (b.y > canvas.height + 150 || b.y < -100) { 
@@ -1436,49 +1403,52 @@
         // Основной шар в корзине продолжает двигаться
         if (ball.active && ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
           ballInBin = true;
-          binTimer = 90;
-          // Шар продолжает двигаться
         }
         
         // Обработка основного шара в корзине в бонусном режиме
         if (ballInBin && !ball.settled) {
-          binTimer--;
-          if (binTimer <= 0) {
-            const binWidth = canvas.width / binCount;
-            let binIndex = Math.floor(ball.x / binWidth);
-            if (binIndex < 0) binIndex = 0;
-            if (binIndex >= binCount) binIndex = binCount - 1;
-            const multiplier = multipliers[binIndex];
-            
-            let winnings;
-            if (multiplier === -1) {
-              winnings = -ball.value;
-            } else {
-              winnings = Math.floor(ball.value * multiplier);
+          if (ball.y > canvas.height + 30) {
+            ball.binTimer = (ball.binTimer || 0) + 1;
+            if (ball.binTimer > 30) {
+              const binWidth = canvas.width / binCount;
+              let binIndex = Math.floor(ball.x / binWidth);
+              if (binIndex < 0) binIndex = 0;
+              if (binIndex >= binCount) binIndex = binCount - 1;
+              const multiplier = multipliers[binIndex];
+              
+              let winnings;
+              if (multiplier === -1) {
+                winnings = -ball.value;
+              } else {
+                winnings = Math.floor(ball.value * multiplier);
+              }
+              
+              if (currentUser) {
+                currentUser.balance += winnings;
+                updateUserData(currentUser);
+              }
+              
+              bonusResults.push({
+                value: ball.value,
+                multiplier: multiplier,
+                winnings: winnings
+              });
+              bonusTotalWinnings += winnings;
+              
+              ball.settled = true;
+              ballInBin = false;
+              soundBin();
             }
-            
-            if (currentUser) {
-              currentUser.balance += winnings;
-              updateUserData(currentUser);
-            }
-            
-            bonusResults.push({
-              value: ball.value,
-              multiplier: multiplier,
-              winnings: winnings
-            });
-            bonusTotalWinnings += winnings;
-            
-            ball.settled = true;
-            ballInBin = false;
-            soundBin();
           }
         }
         
-        // Проверка завершения всех шаров
+        // Проверка завершения всех шаров с задержкой 0.5 сек
         const allBonusSettled = bonusBalls.every(b => b.finished);
         if (allBonusSettled && (!ball.active || ball.settled)) {
-          endBonusGame();
+          bonusGameEndDelay++;
+          if (bonusGameEndDelay > 30) { // ~0.5 сек задержка
+            endBonusGame();
+          }
         }
         
         updateUI();
@@ -1495,8 +1465,6 @@
       // Шар падает в корзину, но продолжает двигаться
       if (ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
         ballInBin = true;
-        binTimer = 90;
-        // Шар продолжает двигаться
       }
       
       if (ball.y > canvas.height + 150 || ball.y < -100) { 
