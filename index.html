@@ -585,40 +585,44 @@
       buildAll();
     });
 
-    const GRAVITY = 0.18;
+    const GRAVITY = 0.16;
     const BOUNCE = 0.5;
-    const PLATFORM_RADIUS = 4.5;
+    const PLATFORM_RADIUS = 3.8;
     const BALL_RADIUS = 7;
 
     let platforms = [];
     let specials = [];
     let binWalls = [];
 
-    let rows = 10;
-    let startY = 80;
-    let rowSpacing = 38;
-    const colSpacing = 30;
+    let rows = 20;
+    let startY = 60;
+    let rowSpacing = 28;
+    const colSpacing = 36;
     let colBaseX = 220;
 
     let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
     let binCount = 19;
 
     let ball = {
-      x: 220, y: 50, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
+      x: 220, y: 40, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
     };
     let gameActive = false;
     let swingAngle = 0;
     let swingSpeed = 0.04;
     let stringAnchorX = 220;
-    let stringAnchorY = 12;
-    let stringLength = 40;
+    let stringAnchorY = 10;
+    let stringLength = 30;
 
     let lastBounceTime = 0;
-    let bounceCooldown = 60;
+    let bounceCooldown = 50;
     let particles = [];
 
-    // Телепорты — пары для симметрии
-    let teleportPairs = [];
+    // Подсветка ячейки
+    let highlightedBin = -1;
+    let highlightTimer = 0;
+
+    // Шар ждёт пока закроют окно
+    let waitingForResultClose = false;
 
     function getBallColor(value) {
       const colors = {
@@ -669,18 +673,87 @@
       });
     }
 
+    function isOverlappingSpecial(sx, sy, sradius) {
+      for (let s of specials) {
+        const dx = sx - s.x;
+        const dy = sy - s.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < sradius + s.radius + 4) return true;
+      }
+      return false;
+    }
+
     function buildAll() {
       colBaseX = canvas.width / 2;
       stringAnchorX = canvas.width / 2;
-      startY = canvas.height * 0.12;
-      rowSpacing = (canvas.height - startY - 50) / (rows + 1);
-      stringLength = startY - 20;
+      startY = canvas.height * 0.08;
+      rowSpacing = (canvas.height - startY - 55) / rows;
+      stringLength = startY - 12;
       
       updateMultipliers();
-      buildPlatforms();
       buildSpecials();
+      buildPlatforms();
       buildBinWalls();
       resetBall();
+      waitingForResultClose = false;
+    }
+
+    function buildSpecials() {
+      specials = [];
+      const mapConfig = getCurrentMap();
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const margin = 15;
+      
+      if (mapConfig.specials.includes('bumper')) {
+        const count = mapConfig.id >= 5 ? 4 : (mapConfig.id >= 3 ? 3 : 2);
+        for (let i = 0; i < count; i++) {
+          const y = startY + rowSpacing * (3 + i * (rows / (count + 1)));
+          specials.push({
+            x: cx, y: y, width: w * 0.65, height: 7, type: 'bumper',
+            color: '#ff4466', glow: '#ff6688', bounceForce: 2.5
+          });
+        }
+      }
+      
+      if (mapConfig.specials.includes('doublebumper')) {
+        const y1 = startY + rowSpacing * (rows * 0.3);
+        const y2 = startY + rowSpacing * (rows * 0.65);
+        specials.push({
+          x: cx, y: y1, width: w * 0.7, height: 8, type: 'bumper',
+          color: '#ff0044', glow: '#ff4488', bounceForce: 3.2
+        });
+        specials.push({
+          x: cx, y: y2, width: w * 0.7, height: 8, type: 'bumper',
+          color: '#ff0044', glow: '#ff4488', bounceForce: 3.2
+        });
+      }
+      
+      if (mapConfig.specials.includes('teleport')) {
+        const pairCount = mapConfig.id >= 5 ? 2 : 1;
+        for (let p = 0; p < pairCount; p++) {
+          const y = startY + rowSpacing * (5 + p * 7);
+          specials.push({
+            x: cx - w * 0.28, y: Math.min(y, h - 90), radius: 10,
+            type: 'teleport', color: '#00ff88', glow: '#00ffaa',
+            targetX: cx + w * 0.15, targetY: startY - 5
+          });
+          specials.push({
+            x: cx + w * 0.28, y: Math.min(y + rowSpacing * 2, h - 90), radius: 10,
+            type: 'teleport', color: '#ff8800', glow: '#ffaa00',
+            targetX: cx - w * 0.15, targetY: startY - 5
+          });
+        }
+      }
+      
+      if (mapConfig.specials.includes('gravity')) {
+        const y = startY + rowSpacing * (rows * 0.55);
+        specials.push({
+          x: cx, y: y, radius: 15, type: 'gravity',
+          color: '#6600cc', glow: '#9944ff', pullForce: 0.12
+        });
+      }
     }
 
     function buildPlatforms() {
@@ -694,101 +767,43 @@
         5: ['#4444ff', '#0000cc']
       };
       const colors = pinColors[mapConfig.id] || pinColors[1];
+      const w = canvas.width;
+      const margin = 12;
       
       for (let r = 0; r < rows; r++) {
         const y = startY + r * rowSpacing;
-        const pinsInRow = 12;
+        const pinsInRow = Math.floor((w - margin * 2) / colSpacing) + 1;
         const totalWidth = (pinsInRow - 1) * colSpacing;
         const startX = colBaseX - totalWidth / 2;
         const offsetX = (r % 2 === 0) ? 0 : colSpacing * 0.5;
+        
         for (let c = 0; c < pinsInRow; c++) {
-          platforms.push({
-            x: startX + c * colSpacing + offsetX,
-            y: y,
-            radius: PLATFORM_RADIUS,
-            color1: colors[0],
-            color2: colors[1],
-            type: 'pin'
-          });
-        }
-      }
-    }
-
-    function buildSpecials() {
-      specials = [];
-      teleportPairs = [];
-      const mapConfig = getCurrentMap();
-      const w = canvas.width;
-      const h = canvas.height;
-      const cx = w / 2;
-      
-      if (mapConfig.specials.includes('bumper')) {
-        // Батуты — симметрично по бокам на разной высоте
-        const count = mapConfig.id >= 4 ? 3 : 2;
-        for (let i = 0; i < count; i++) {
-          const y = startY + rowSpacing * (2 + i * 3);
-          const offsetX = w * 0.2 + i * 15;
-          specials.push({
-            x: cx - offsetX, y: y, radius: 12, type: 'bumper',
-            color: '#ff4466', glow: '#ff6688', bounceForce: 2.2
-          });
-          specials.push({
-            x: cx + offsetX, y: y, radius: 12, type: 'bumper',
-            color: '#ff4466', glow: '#ff6688', bounceForce: 2.2
-          });
-        }
-      }
-      
-      if (mapConfig.specials.includes('doublebumper')) {
-        // Двойные батуты — мощнее
-        const y = startY + rowSpacing * 5;
-        specials.push({
-          x: cx - w * 0.25, y: y, radius: 14, type: 'bumper',
-          color: '#ff0000', glow: '#ff4444', bounceForce: 3.0
-        });
-        specials.push({
-          x: cx + w * 0.25, y: y, radius: 14, type: 'bumper',
-          color: '#ff0000', glow: '#ff4444', bounceForce: 3.0
-        });
-      }
-      
-      if (mapConfig.specials.includes('teleport')) {
-        // Телепорты — парами, телепортируют наверх
-        const pairCount = mapConfig.id >= 5 ? 2 : 1;
-        for (let p = 0; p < pairCount; p++) {
-          const y1 = startY + rowSpacing * (4 + p * 3);
-          const y2 = startY + rowSpacing * (7 + p);
-          const pair = {
-            id: p,
-            portal1: {
-              x: cx - w * 0.3, y: Math.min(y1, h - 80), radius: 10,
-              type: 'teleport', color: '#00ff88', glow: '#00ffaa', targetIndex: -1
-            },
-            portal2: {
-              x: cx + w * 0.3, y: Math.min(y2, h - 80), radius: 10,
-              type: 'teleport', color: '#ff8800', glow: '#ffaa00', targetIndex: -1
+          const px = startX + c * colSpacing + offsetX;
+          // Проверяем, не перекрывается ли с препятствием
+          let overlapped = false;
+          for (let s of specials) {
+            if (s.type === 'bumper') {
+              if (Math.abs(px - s.x) < s.width / 2 + PLATFORM_RADIUS + 4 && 
+                  Math.abs(y - s.y) < s.height / 2 + PLATFORM_RADIUS + 4) {
+                overlapped = true;
+                break;
+              }
+            } else if (s.type === 'teleport' || s.type === 'gravity') {
+              const dx = px - s.x;
+              const dy = y - s.y;
+              if (Math.sqrt(dx*dx+dy*dy) < s.radius + PLATFORM_RADIUS + 5) {
+                overlapped = true;
+                break;
+              }
             }
-          };
-          // Телепорт 1 отправляет на самый верх слева
-          pair.portal1.targetX = cx - w * 0.15;
-          pair.portal1.targetY = startY - 10;
-          // Телепорт 2 отправляет на самый верх справа
-          pair.portal2.targetX = cx + w * 0.15;
-          pair.portal2.targetY = startY - 10;
-          
-          specials.push(pair.portal1);
-          specials.push(pair.portal2);
-          teleportPairs.push(pair);
+          }
+          if (!overlapped) {
+            platforms.push({
+              x: px, y: y, radius: PLATFORM_RADIUS,
+              color1: colors[0], color2: colors[1], type: 'pin'
+            });
+          }
         }
-      }
-      
-      if (mapConfig.specials.includes('gravity')) {
-        // Гравитационные колодцы — притягивают и закручивают
-        const y = startY + rowSpacing * 6;
-        specials.push({
-          x: cx, y: y, radius: 16, type: 'gravity',
-          color: '#6600cc', glow: '#9944ff', pullForce: 0.15
-        });
       }
     }
 
@@ -801,8 +816,7 @@
         const x = i * binWidth;
         binWalls.push({
           x1: x, y1: binY - wallHeight,
-          x2: x, y2: binY + 30,
-          isWall: true
+          x2: x, y2: binY + 30, isWall: true
         });
       }
     }
@@ -816,6 +830,8 @@
       gameActive = false;
       swingAngle = 0;
       particles = [];
+      highlightedBin = -1;
+      waitingForResultClose = false;
     }
 
     function updateUI() {
@@ -838,10 +854,8 @@
           x: x, y: y,
           vx: (Math.random() - 0.5) * 4,
           vy: (Math.random() - 0.5) * 4 - 2,
-          life: 1,
-          decay: 0.02 + Math.random() * 0.04,
-          color: color,
-          size: 1.5 + Math.random() * 2.5
+          life: 1, decay: 0.02 + Math.random() * 0.04,
+          color: color, size: 1.5 + Math.random() * 2.5
         });
       }
     }
@@ -854,6 +868,10 @@
         p.vy += 0.05;
         p.life -= p.decay;
         if (p.life <= 0) particles.splice(i, 1);
+      }
+      if (highlightTimer > 0) {
+        highlightTimer -= 16;
+        if (highlightTimer <= 0) highlightedBin = -1;
       }
     }
 
@@ -897,16 +915,23 @@
             </span>
           </div>
         </div>
-        <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">Ок</button>
+        <button id="closeResultBtn" style="align-self: center;">Ок</button>
       `;
       resultModal.classList.remove('hidden');
+      
+      document.getElementById('closeResultBtn').addEventListener('click', () => {
+        resultModal.classList.add('hidden');
+        waitingForResultClose = false;
+        resetBall();
+      });
+      
       soundWin(multiplier);
     }
 
     function dropBall() {
       initAudio();
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
-      if (gameActive || ball.active) return;
+      if (gameActive || ball.active || waitingForResultClose) return;
       const ballCost = currentUser.selectedBall;
       if (currentUser.balance < ballCost) { alert('Недостаточно звёзд!'); return; }
       
@@ -918,6 +943,7 @@
       ball.color = getBallColor(currentUser.selectedBall);
       ball.active = true;
       gameActive = true;
+      waitingForResultClose = false;
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
       ball.vx = Math.sin(swingAngle) * 2;
@@ -957,33 +983,53 @@
       return false;
     }
 
+    function checkBumperCollision(bumper) {
+      // Батут — горизонтальная полоска
+      const halfW = bumper.width / 2;
+      const halfH = bumper.height / 2;
+      
+      if (ball.x > bumper.x - halfW - BALL_RADIUS && 
+          ball.x < bumper.x + halfW + BALL_RADIUS &&
+          ball.y > bumper.y - halfH - BALL_RADIUS && 
+          ball.y < bumper.y + halfH + BALL_RADIUS) {
+        
+        // Ближайшая точка на прямоугольнике
+        const closestX = Math.max(bumper.x - halfW, Math.min(ball.x, bumper.x + halfW));
+        const closestY = Math.max(bumper.y - halfH, Math.min(ball.y, bumper.y + halfH));
+        
+        const dx = ball.x - closestX;
+        const dy = ball.y - closestY;
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        
+        if (dist < BALL_RADIUS && dist > 0.001) {
+          const nx = dx / dist;
+          const ny = dy / dist;
+          ball.x += nx * (BALL_RADIUS - dist);
+          ball.y += ny * (BALL_RADIUS - dist);
+          
+          // Отскок от батута — всегда подкидываем вверх
+          ball.vy = -Math.abs(ball.vy) * bumper.bounceForce - 3;
+          ball.vx += (Math.random() - 0.5) * 3;
+          spawnParticles(ball.x, ball.y, 10, bumper.color);
+          soundBumper();
+          return true;
+        }
+      }
+      return false;
+    }
+
     function applySpecialEffects() {
       for (let s of specials) {
-        const dx = ball.x - s.x;
-        const dy = ball.y - s.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        
         if (s.type === 'bumper') {
-          const minDist = BALL_RADIUS + s.radius;
-          if (dist < minDist && dist > 0.001) {
-            const nx = dx / dist, ny = dy / dist;
-            ball.x += nx * (minDist - dist);
-            ball.y += ny * (minDist - dist);
-            const vn = ball.vx * nx + ball.vy * ny;
-            if (vn < 0) {
-              ball.vx -= (1 + s.bounceForce) * vn * nx;
-              ball.vy -= (1 + s.bounceForce) * vn * ny;
-            }
-            ball.vy -= s.bounceForce * 2;
-            spawnParticles(s.x, s.y, 10, s.color);
-            soundBumper();
-          }
+          checkBumperCollision(s);
         }
         
         if (s.type === 'teleport') {
+          const dx = ball.x - s.x;
+          const dy = ball.y - s.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
           const minDist = BALL_RADIUS + s.radius;
           if (dist < minDist) {
-            // Телепорт наверх
             ball.x = s.targetX;
             ball.y = s.targetY;
             ball.vx = (Math.random() - 0.5) * 3;
@@ -995,12 +1041,14 @@
         }
         
         if (s.type === 'gravity') {
+          const dx = ball.x - s.x;
+          const dy = ball.y - s.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
           const influenceRadius = 100;
           if (dist < influenceRadius && dist > 0.001) {
             const force = s.pullForce * (1 - dist / influenceRadius);
             ball.vx += (dx / dist) * force;
             ball.vy += (dy / dist) * force;
-            // Закручивание
             ball.vx += (-dy / dist) * force * 0.5;
             ball.vy += (dx / dist) * force * 0.5;
             if (dist < BALL_RADIUS + s.radius) {
@@ -1084,16 +1132,20 @@
         
         updateUI();
         
+        // Подсвечиваем ячейку
+        highlightedBin = binIndex;
+        highlightTimer = 1000;
+        
         const bx = binIndex * binWidth + binWidth / 2;
         const by = canvas.height - 15;
-        spawnParticles(bx, by, 10, winnings >= 0 ? '#ffd700' : '#ff4444');
+        spawnParticles(bx, by, 15, winnings >= 0 ? '#ffd700' : '#ff4444');
         
         gameActive = false;
         ball.active = false;
+        waitingForResultClose = true;
         
         setTimeout(() => {
           showResult(ball.value, multiplier, winnings, oldBalance, newBalance);
-          resetBall();
         }, 1000);
       }
       
@@ -1111,22 +1163,34 @@
         ctx.shadowBlur = 12;
         
         if (s.type === 'bumper') {
-          const grad = ctx.createRadialGradient(s.x-2, s.y-2, 1, s.x, s.y, s.radius+2);
-          grad.addColorStop(0, '#ffffff');
-          grad.addColorStop(0.3, s.color);
-          grad.addColorStop(1, '#880022');
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          // Горизонтальная полоска
+          const halfW = s.width / 2;
+          const halfH = s.height / 2;
+          const grad = ctx.createLinearGradient(s.x - halfW, s.y, s.x + halfW, s.y);
+          grad.addColorStop(0, s.color);
+          grad.addColorStop(0.3, '#ffffff');
+          grad.addColorStop(0.5, s.color);
+          grad.addColorStop(0.7, '#ffffff');
+          grad.addColorStop(1, s.color);
+          
           ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.roundRect(s.x - halfW, s.y - halfH, s.width, s.height * 2, 3);
           ctx.fill();
-          ctx.strokeStyle = '#ffaabb';
-          ctx.lineWidth = 2;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
           ctx.stroke();
           ctx.lineWidth = 1;
+          
+          // Стрелки вверх
           ctx.fillStyle = '#ffffff';
-          ctx.font = `bold ${s.radius * 0.8}px sans-serif`;
+          ctx.font = 'bold 10px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('↑', s.x, s.y + s.radius * 0.3);
+          const arrowCount = Math.floor(s.width / 25);
+          for (let a = 0; a < arrowCount; a++) {
+            const ax = s.x - halfW + 15 + a * (s.width / arrowCount);
+            ctx.fillText('▲', ax, s.y + 4);
+          }
         }
         
         if (s.type === 'teleport') {
@@ -1142,7 +1206,7 @@
           ctx.lineWidth = 2;
           ctx.stroke();
           ctx.lineWidth = 1;
-          // Спираль
+          
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 1;
           ctx.beginPath();
@@ -1198,7 +1262,8 @@
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      if (!ball.active && !gameActive) {
+      // Подвешенный шар
+      if (!ball.active && !gameActive && !waitingForResultClose) {
         swingAngle += swingSpeed;
         if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
         const ballX = stringAnchorX + Math.sin(swingAngle) * stringLength;
@@ -1226,6 +1291,7 @@
 
       drawSpecials();
 
+      // Платформы
       for (let p of platforms) {
         ctx.shadowColor = p.color1;
         ctx.shadowBlur = 6;
@@ -1245,29 +1311,38 @@
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
 
+      // Ячейки
       const binWidth = canvas.width / binCount;
       const binY = canvas.height - 30;
       for (let i = 0; i < binCount; i++) {
         const x = i * binWidth;
         const mult = multipliers[i];
         const isNegative = mult === -1;
-        ctx.fillStyle = isNegative ? '#2a0000' : (i % 2 === 0 ? '#0a1a30' : '#0d2040');
+        const isHighlighted = (i === highlightedBin && highlightTimer > 0);
+        
+        if (isHighlighted) {
+          const alpha = Math.min(1, highlightTimer / 300);
+          ctx.fillStyle = `rgba(255, 50, 50, ${0.7 * alpha})`;
+        } else {
+          ctx.fillStyle = isNegative ? '#2a0000' : (i % 2 === 0 ? '#0a1a30' : '#0d2040');
+        }
         ctx.fillRect(x, binY, binWidth, 30);
         
-        ctx.strokeStyle = isNegative ? '#ff4444' : '#3399ff';
-        ctx.lineWidth = 1.5;
-        ctx.shadowColor = isNegative ? '#ff4444' : '#3399ff';
-        ctx.shadowBlur = 3;
+        ctx.strokeStyle = isHighlighted ? '#ff0000' : (isNegative ? '#ff4444' : '#3399ff');
+        ctx.lineWidth = isHighlighted ? 3 : 1.5;
+        ctx.shadowColor = isHighlighted ? '#ff0000' : (isNegative ? '#ff4444' : '#3399ff');
+        ctx.shadowBlur = isHighlighted ? 8 : 3;
         ctx.strokeRect(x, binY, binWidth, 30);
         ctx.shadowBlur = 0;
         ctx.lineWidth = 1;
         
-        ctx.fillStyle = isNegative ? '#ff6666' : '#ffffff';
+        ctx.fillStyle = isHighlighted ? '#ffffff' : (isNegative ? '#ff6666' : '#ffffff');
         ctx.font = 'bold 9px "Segoe UI"';
         ctx.textAlign = 'center';
         ctx.fillText(isNegative ? '−1' : `x${mult}`, x+binWidth/2, binY+19);
       }
 
+      // Стенки
       ctx.strokeStyle = '#2266cc';
       ctx.lineWidth = 2;
       ctx.shadowColor = '#4488ff';
@@ -1291,6 +1366,7 @@
 
       drawParticles();
 
+      // Активный шар
       if (ball.active) {
         ctx.shadowColor = getBallGlow(currentUser ? currentUser.selectedBall : 1);
         ctx.shadowBlur = 12;
@@ -1562,6 +1638,8 @@
     resultModal.addEventListener('click', (e) => {
       if (e.target === resultModal) {
         resultModal.classList.add('hidden');
+        waitingForResultClose = false;
+        resetBall();
       }
     });
 
