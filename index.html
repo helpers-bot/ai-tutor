@@ -348,9 +348,9 @@
 
 <script>
   (function() {
-    // ========== ЗВУКИ ==========
+    // ========== ЗВУКИ (ФОНОВЫЙ ШУМ УБРАН, МУЗЫКА ОТКЛЮЧЕНА) ==========
     const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx = null;
+    let audioCtx;
 
     function initAudio() {
       if (!audioCtx) {
@@ -363,20 +363,16 @@
 
     function playSound(freq, type, duration, vol = 0.1) {
       if (!audioCtx) return;
-      try {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(audioCtx.currentTime);
-        osc.stop(audioCtx.currentTime + duration);
-      } catch(e) {
-        // Игнорируем ошибки звука
-      }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(audioCtx.currentTime);
+      osc.stop(audioCtx.currentTime + duration);
     }
 
     function soundBounce() {
@@ -484,7 +480,7 @@
       const rect = container.getBoundingClientRect();
       const w = rect.width - 20;
       const h = rect.height - 130;
-      canvas.width = Math.floor(Math.max(w, 300));
+      canvas.width = Math.floor(w);
       canvas.height = Math.floor(Math.max(h, 400));
     }
     resizeCanvas();
@@ -535,6 +531,10 @@
     let ballBinX = 0;
     let ballBinY = 0;
 
+    // Для бонусного режима - собираем результаты
+    let bonusResults = [];
+    let bonusTotalWinnings = 0;
+
     function getBallColor(value) {
       const colors = {
         1: '#44aaff', 2: '#4488ff', 3: '#44cc44', 4: '#ffdd44', 5: '#ff9944',
@@ -564,6 +564,7 @@
     const authModal = document.getElementById('authModal');
     const usernameInput = document.getElementById('usernameInput');
     const loginBtn = document.getElementById('loginBtn');
+    const gameContainer = document.getElementById('gameContainer');
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
     const bonusButton = document.getElementById('bonusButton');
@@ -610,6 +611,8 @@
       ballInBin = false;
       bonusActive = false;
       bonusBalls = [];
+      bonusResults = [];
+      bonusTotalWinnings = 0;
     }
 
     function getRandomPositions(count, rows) {
@@ -807,6 +810,8 @@
       ballInBin = false;
       bonusActive = false;
       bonusBalls = [];
+      bonusResults = [];
+      bonusTotalWinnings = 0;
       usedTeleports = [];
       usedBumpers = [];
     }
@@ -878,6 +883,61 @@
       });
     }
 
+    function showBonusResult(oldBalance, totalExp) {
+      const ballEmoji = getBallEmoji(currentUser ? currentUser.selectedBall : 1);
+      const newBalance = currentUser ? currentUser.balance : 0;
+      const totalWinnings = bonusTotalWinnings;
+      
+      let resultsHtml = '';
+      bonusResults.forEach((r, i) => {
+        const emoji = getBallEmoji(r.value);
+        resultsHtml += `
+          <div class="result-row">
+            <span class="result-label">🎯 Шар ${i+1}</span>
+            <span class="result-value">${emoji} x${r.multiplier} → ${r.winnings >= 0 ? '+' : ''}${formatNumber(r.winnings)} ⭐</span>
+          </div>
+        `;
+      });
+      
+      resultContent.innerHTML = `
+        <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">🎁 Бонус-бросок (5 шаров)</h3>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;">
+          ${resultsHtml}
+          <div class="result-row" style="border-top: 2px solid rgba(255,255,255,0.2); margin-top: 4px;">
+            <span class="result-label">💼 Было</span>
+            <span class="result-value">${formatNumber(oldBalance)} ⭐</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">💼 Стало</span>
+            <span class="result-value">${formatNumber(newBalance)} ⭐</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">📈 Общий итог</span>
+            <span class="result-value" style="color: ${totalWinnings >= 0 ? '#4caf50' : '#f44336'}; font-size: 1rem;">
+              ${totalWinnings >= 0 ? '+' : ''}${formatNumber(totalWinnings)} ⭐
+            </span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">✨ Опыт за бросок</span>
+            <span class="result-value" style="color: #44ff44;">+${formatNumber(sessionExp)}</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">✨ Всего опыта</span>
+            <span class="result-value" style="color: #44ff44;">${formatNumber(totalExp)}</span>
+          </div>
+        </div>
+        <button id="closeResultBtn" style="align-self: center;">Ок</button>
+      `;
+      resultModal.classList.remove('hidden');
+      
+      document.getElementById('closeResultBtn').addEventListener('click', () => {
+        resultModal.classList.add('hidden');
+        waitingForResultClose = false;
+        buildAll();
+        resetBall();
+      });
+    }
+
     function launchBonus() {
       initAudio();
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
@@ -898,6 +958,8 @@
       gameActive = true;
       ball.active = true;
       sessionExp = 0;
+      bonusResults = [];
+      bonusTotalWinnings = 0;
       
       const ballValue = currentUser.selectedBall;
       const ballColor = getBallColor(ballValue);
@@ -921,7 +983,9 @@
           binX: 0,
           binY: 0,
           binTimer: 0,
-          finished: false
+          finished: false,
+          winnings: 0,
+          multiplier: 0
         });
       }
       
@@ -1177,48 +1241,57 @@
       soundDrop();
     }
 
+    function checkWallCollision(wall) {
+      return checkWallCollisionForBall(ball, wall);
+    }
+
+    function checkBumperCollision(bumper) {
+      return checkBumperCollisionForBall(ball, bumper);
+    }
+
+    function applySpecialEffects() {
+      applyPhysicsToBall(ball);
+    }
+
     function allBallsFinished() {
       return bonusBalls.every(b => b.finished);
     }
 
-    function processMainBallResult() {
+    function processBonusBallResult(b) {
       const binWidth = canvas.width / binCount;
-      let binIndex = Math.floor(ballBinX / binWidth);
+      let binIndex = Math.floor(b.binX / binWidth);
       if (binIndex < 0) binIndex = 0;
       if (binIndex >= binCount) binIndex = binCount - 1;
       const multiplier = multipliers[binIndex];
       
-      const oldBalance = currentUser ? currentUser.balance : 0;
       let winnings;
       if (multiplier === -1) {
-        winnings = -ball.value;
+        winnings = -b.value;
       } else {
-        winnings = Math.floor(ball.value * multiplier);
+        winnings = Math.floor(b.value * multiplier);
       }
+      
+      b.winnings = winnings;
+      b.multiplier = multiplier;
       
       if (currentUser) {
         currentUser.balance += winnings;
         updateUserData(currentUser);
       }
-      const newBalance = currentUser ? currentUser.balance : 0;
-      const totalExp = currentUser ? currentUser.exp : 0;
       
-      ballInBin = false;
-      gameActive = false;
-      ball.active = false;
-      bonusActive = false;
-      waitingForResultClose = true;
+      bonusResults.push({
+        value: b.value,
+        multiplier: multiplier,
+        winnings: winnings
+      });
+      bonusTotalWinnings += winnings;
       
-      updateUI();
-      
-      setTimeout(() => {
-        showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
-      }, 500);
+      b.finished = true;
+      soundBin();
     }
 
-    function endGame() {
-      const oldBalance = currentUser ? currentUser.balance : 0;
-      const newBalance = currentUser ? currentUser.balance : 0;
+    function endBonusGame() {
+      const oldBalance = currentUser ? currentUser.balance - bonusTotalWinnings : 0;
       const totalExp = currentUser ? currentUser.exp : 0;
       
       gameActive = false;
@@ -1229,14 +1302,14 @@
       updateUI();
       
       setTimeout(() => {
-        showResult(ball.value, 0, 0, oldBalance, newBalance, totalExp);
+        showBonusResult(oldBalance, totalExp);
       }, 500);
     }
 
     function applyPhysics() {
       if (!gameActive) return;
       
-      // Обработка основного шара в корзине
+      // Обработка основного шара в корзине (обычный режим)
       if (ballInBin && !bonusActive) {
         binTimer--;
         if (binTimer <= 0) {
@@ -1286,25 +1359,7 @@
           if (b.inBin) {
             b.binTimer--;
             if (b.binTimer <= 0) {
-              const binWidth = canvas.width / binCount;
-              let binIndex = Math.floor(b.binX / binWidth);
-              if (binIndex < 0) binIndex = 0;
-              if (binIndex >= binCount) binIndex = binCount - 1;
-              const multiplier = multipliers[binIndex];
-              
-              let winnings;
-              if (multiplier === -1) {
-                winnings = -b.value;
-              } else {
-                winnings = Math.floor(b.value * multiplier);
-              }
-              
-              if (currentUser) {
-                currentUser.balance += winnings;
-                updateUserData(currentUser);
-              }
-              b.finished = true;
-              soundBin();
+              processBonusBallResult(b);
             }
             continue;
           }
@@ -1313,17 +1368,28 @@
             applyPhysicsToBall(b);
           }
           
-          // Проверка попадания в корзину
-          if (b.y + BALL_RADIUS > canvas.height - 30 && b.y < canvas.height && b.active) {
-            b.inBin = true;
-            b.binX = b.x;
-            b.binY = canvas.height - 30;
-            b.binTimer = 60;
-            b.active = false;
+          // Проверка попадания в корзину - шары просто падают в ячейки
+          const binY = canvas.height - 30;
+          if (b.active && b.y + BALL_RADIUS >= binY && b.y < canvas.height) {
+            // Шар просто продолжает падать, не прилипает
+            // Проверяем, что шар действительно в зоне корзины
+            if (b.y >= binY - 5) {
+              b.inBin = true;
+              b.binX = b.x;
+              b.binY = binY;
+              b.binTimer = 60;
+              b.active = false;
+              b.y = binY; // Устанавливаем позицию на уровне корзины
+            }
           }
           
           if (b.y > canvas.height + 100 || b.y < -100) { 
             b.finished = true;
+            bonusResults.push({
+              value: b.value,
+              multiplier: 0,
+              winnings: 0
+            });
           }
         }
         
@@ -1333,24 +1399,56 @@
         }
         
         // Основной шар в корзине
-        if (ball.active && ball.y + BALL_RADIUS > canvas.height - 30 && ball.y < canvas.height) {
-          ballInBin = true;
-          ballBinX = ball.x;
-          ballBinY = canvas.height - 30;
-          binTimer = 60;
-          ball.active = false;
-        }
-        
-        // Проверка завершения
-        if (ballInBin && allBallsFinished()) {
-          binTimer--;
-          if (binTimer <= 0) {
-            processMainBallResult();
+        const binY = canvas.height - 30;
+        if (ball.active && ball.y + BALL_RADIUS >= binY && ball.y < canvas.height) {
+          if (ball.y >= binY - 5) {
+            ballInBin = true;
+            ballBinX = ball.x;
+            ballBinY = binY;
+            binTimer = 60;
+            ball.active = false;
+            ball.y = binY;
           }
         }
         
-        if (allBallsFinished() && !ballInBin && !ball.active) {
-          endGame();
+        // Обработка основного шара в корзине в бонусном режиме
+        if (ballInBin && !ball.finished) {
+          binTimer--;
+          if (binTimer <= 0) {
+            const binWidth = canvas.width / binCount;
+            let binIndex = Math.floor(ballBinX / binWidth);
+            if (binIndex < 0) binIndex = 0;
+            if (binIndex >= binCount) binIndex = binCount - 1;
+            const multiplier = multipliers[binIndex];
+            
+            let winnings;
+            if (multiplier === -1) {
+              winnings = -ball.value;
+            } else {
+              winnings = Math.floor(ball.value * multiplier);
+            }
+            
+            if (currentUser) {
+              currentUser.balance += winnings;
+              updateUserData(currentUser);
+            }
+            
+            bonusResults.push({
+              value: ball.value,
+              multiplier: multiplier,
+              winnings: winnings
+            });
+            bonusTotalWinnings += winnings;
+            
+            ball.finished = true;
+            ballInBin = false;
+            soundBin();
+          }
+        }
+        
+        // Проверка завершения всех шаров
+        if (allBallsFinished() && (!ball.active || ball.finished) && !ballInBin) {
+          endBonusGame();
         }
         
         updateUI();
@@ -1360,17 +1458,73 @@
       // Обычный режим
       if (!ball.active) return;
       
-      applyPhysicsToBall(ball);
+      ball.vy += GRAVITY;
+      ball.x += ball.vx;
+      ball.y += ball.vy;
+
+      if (ball.x - BALL_RADIUS < 2) { 
+        ball.x = BALL_RADIUS + 2; 
+        ball.vx = Math.abs(ball.vx) * BOUNCE; 
+        soundBounce();
+      }
+      if (ball.x + BALL_RADIUS > canvas.width - 2) { 
+        ball.x = canvas.width - BALL_RADIUS - 2; 
+        ball.vx = -Math.abs(ball.vx) * BOUNCE; 
+        soundBounce();
+      }
+      
+      if (ball.y - BALL_RADIUS < 2) { 
+        ball.y = BALL_RADIUS + 2; 
+        ball.vy = Math.abs(ball.vy) * BOUNCE; 
+        soundBounce();
+      }
+
+      for (let p of platforms) {
+        const dx = ball.x - p.x;
+        const dy = ball.y - p.y;
+        const dist = Math.sqrt(dx*dx+dy*dy);
+        const minDist = BALL_RADIUS + p.radius;
+        if (dist < minDist && dist > 0.001) {
+          const nx = dx/dist, ny = dy/dist;
+          ball.x += nx * (minDist - dist);
+          ball.y += ny * (minDist - dist);
+          const vn = ball.vx * nx + ball.vy * ny;
+          if (vn < 0) {
+            ball.vx -= (1+BOUNCE)*vn*nx;
+            ball.vy -= (1+BOUNCE)*vn*ny;
+            soundBounce();
+            
+            if (currentUser) {
+              currentUser.exp += 1;
+              sessionExp += 1;
+              updateUserData(currentUser);
+            }
+          }
+          ball.vx *= 0.999;
+          ball.vy *= 0.999;
+        }
+      }
+      
+      for (let wall of binWalls) {
+        checkWallCollision(wall);
+      }
+      
+      applySpecialEffects();
       
       updateUI();
 
-      if (ball.y + BALL_RADIUS > canvas.height - 30 && ball.y < canvas.height) {
-        ballInBin = true;
-        ballBinX = ball.x;
-        ballBinY = canvas.height - 30;
-        binTimer = 60;
-        ball.active = false;
-        soundBin();
+      // Шар падает в корзину без прилипания
+      const binY = canvas.height - 30;
+      if (ball.y + BALL_RADIUS >= binY && ball.y < canvas.height) {
+        if (ball.y >= binY - 5) {
+          ballInBin = true;
+          ballBinX = ball.x;
+          ballBinY = binY;
+          binTimer = 60;
+          ball.active = false;
+          ball.y = binY;
+          soundBin();
+        }
       }
       
       if (ball.y > canvas.height + 100 || ball.y < -100) { 
@@ -1448,7 +1602,7 @@
       ctx.stroke();
       ctx.lineWidth = 1;
       
-      // Рисуем маятник
+      // Рисуем бонусные шары на веревке
       if (!ball.active && !gameActive && !waitingForResultClose && !bonusActive) {
         swingAngle += swingSpeed;
         if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
@@ -1658,6 +1812,7 @@
       
       container.innerHTML = '';
       
+      // Цены на шары: 2 - 1000, 3 - 10000, 4 - 26000, 5 - 50000, 6 - 120000
       const ballPrices = {
         1: 0,
         2: 1000,
