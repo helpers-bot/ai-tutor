@@ -419,7 +419,6 @@
       musicOsc1.start(audioCtx.currentTime);
       musicOsc2.start(audioCtx.currentTime);
       
-      // Меняем ноты для простой мелодии
       const notes1 = [130.81, 146.83, 164.81, 174.61, 196.00, 174.61, 164.81, 146.83];
       const notes2 = [164.81, 174.61, 196.00, 220.00, 246.94, 220.00, 196.00, 174.61];
       let noteIndex = 0;
@@ -530,8 +529,8 @@
       buildAll();
     });
 
-    const GRAVITY = 0.18;
-    const BOUNCE = 0.45;
+    const GRAVITY = 0.09;
+    const BOUNCE = 0.4;
     const PLATFORM_RADIUS = 1.75;
     const BALL_RADIUS = 7;
 
@@ -543,7 +542,7 @@
 
     let rows = 22;
     let startY = 80;
-    let rowSpacing = 26;
+    let rowSpacing = 13;
     const colSpacing = 36;
     let colBaseX = 220;
 
@@ -622,7 +621,7 @@
       stringAnchorX = canvas.width / 2;
       startY = canvas.height * 0.11;
       rowSpacing = (canvas.height - startY - 55) / rows;
-      if (rowSpacing < 22) rowSpacing = 22;
+      if (rowSpacing < 11) rowSpacing = 11;
       stringLength = startY - 15;
       stringAnchorY = 10;
       
@@ -640,7 +639,7 @@
 
     function getRandomPositions(count, rows) {
       let positions = [];
-      for (let r = 1; r < rows - 1; r++) {
+      for (let r = 2; r < rows - 1; r++) {
         positions.push(r);
       }
       positions = shuffleArray(positions);
@@ -718,8 +717,8 @@
             radius: 12,
             type: 'teleport',
             color: '#00ff88',
-            targetX: cx + w * 0.25,
-            targetY: Math.min(y2, h - 90),
+            targetX: stringAnchorX,
+            targetY: startY - 5,
             pairId: teleportId + 1
           });
           specials.push({
@@ -728,15 +727,15 @@
             radius: 12,
             type: 'teleport',
             color: '#ff8800',
-            targetX: cx - w * 0.25,
-            targetY: Math.min(y1, h - 90),
+            targetX: stringAnchorX,
+            targetY: startY - 5,
             pairId: teleportId
           });
         }
       }
       
       if (mapConfig.specials.includes('gravity')) {
-        const r = Math.floor(Math.random() * (rows - 4)) + 2;
+        const r = Math.floor(Math.random() * (rows - 6)) + 3;
         const y = startY + r * rowSpacing;
         specials.push({
           x: cx,
@@ -765,6 +764,8 @@
       
       for (let r = 0; r < rows; r++) {
         const y = startY + r * rowSpacing;
+        if (y < startY + 10) continue;
+        
         const availableWidth = w - margin * 2;
         const pinsInRow = Math.floor(availableWidth / colSpacing) + 1;
         const totalWidth = (pinsInRow - 1) * colSpacing;
@@ -912,8 +913,8 @@
       sessionExp = 0;
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
-      ball.vx = Math.sin(swingAngle) * 2;
-      ball.vy = 1;
+      ball.vx = Math.sin(swingAngle) * 1.2;
+      ball.vy = 0.6;
       
       soundDrop();
     }
@@ -1005,7 +1006,7 @@
           if (dist < minDist) {
             ball.x = s.targetX;
             ball.y = s.targetY;
-            ball.vx = (Math.random() - 0.5) * 2;
+            ball.vx = (Math.random() - 0.5) * 1;
             ball.vy = 0.5;
             
             usedTeleports.push(s.id);
@@ -1083,7 +1084,6 @@
       ball.x += ball.vx;
       ball.y += ball.vy;
 
-      // Отскок от стен
       if (ball.x - BALL_RADIUS < 2) { 
         ball.x = BALL_RADIUS + 2; 
         ball.vx = Math.abs(ball.vx) * BOUNCE; 
@@ -1095,14 +1095,12 @@
         soundBounce();
       }
       
-      // Отскок от верхней стенки
       if (ball.y - BALL_RADIUS < 2) { 
         ball.y = BALL_RADIUS + 2; 
         ball.vy = Math.abs(ball.vy) * BOUNCE; 
         soundBounce();
       }
 
-      // Отскок от платформ
       for (let p of platforms) {
         const dx = ball.x - p.x;
         const dy = ball.y - p.y;
@@ -1124,12 +1122,11 @@
               updateUserData(currentUser);
             }
           }
-          ball.vx *= 0.998;
-          ball.vy *= 0.998;
+          ball.vx *= 0.999;
+          ball.vy *= 0.999;
         }
       }
       
-      // Коллизия с перегородками
       for (let wall of binWalls) {
         checkWallCollision(wall);
       }
@@ -1138,17 +1135,15 @@
       
       updateUI();
 
-      // Достигли низа
       if (ball.y + BALL_RADIUS > canvas.height - 30 && ball.y < canvas.height) {
         ballInBin = true;
         ballBinX = ball.x;
         ballBinY = canvas.height - 30;
-        binTimer = 60; // 1 секунда при 60 FPS
+        binTimer = 60;
         ball.active = false;
         soundBin();
       }
       
-      // Шар улетел за пределы
       if (ball.y > canvas.height + 100 || ball.y < -100) { 
         resetBall(); 
         gameActive = false; 
@@ -1182,7 +1177,6 @@
         if (s.type === 'teleport') {
           if (usedTeleports.includes(s.id)) continue;
           
-          // Ворота
           ctx.strokeStyle = s.color;
           ctx.lineWidth = 3;
           ctx.beginPath();
@@ -1195,7 +1189,7 @@
           ctx.fillStyle = s.color;
           ctx.font = 'bold 8px sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('⏩', s.x, s.y + 3);
+          ctx.fillText('⏫', s.x, s.y + 3);
         }
         
         if (s.type === 'gravity') {
@@ -1214,11 +1208,9 @@
     function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Фон
       ctx.fillStyle = '#000020';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Верхняя стенка
       ctx.strokeStyle = '#4488cc';
       ctx.lineWidth = 3;
       ctx.beginPath();
@@ -1227,7 +1219,6 @@
       ctx.stroke();
       ctx.lineWidth = 1;
       
-      // Маятник
       if (!ball.active && !gameActive && !waitingForResultClose) {
         swingAngle += swingSpeed;
         if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
@@ -1251,10 +1242,8 @@
         ctx.stroke();
       }
 
-      // Специальные элементы
       drawSpecials();
 
-      // Платформы
       for (let p of platforms) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, 2*Math.PI);
@@ -1262,7 +1251,6 @@
         ctx.fill();
       }
 
-      // Нижние ячейки
       const binWidth = canvas.width / binCount;
       const binY = canvas.height - 30;
       for (let i = 0; i < binCount; i++) {
@@ -1282,7 +1270,6 @@
         ctx.fillText(isNegative ? '−1' : `x${mult}`, x+binWidth/2, binY+19);
       }
 
-      // Перегородки
       ctx.strokeStyle = '#4488cc';
       ctx.lineWidth = 2;
       for (let wall of binWalls) {
@@ -1293,7 +1280,6 @@
       }
       ctx.lineWidth = 1;
 
-      // Активный шар
       if (ball.active) {
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
@@ -1304,7 +1290,6 @@
         ctx.stroke();
       }
       
-      // Шар в ячейке
       if (ballInBin) {
         ctx.beginPath();
         ctx.arc(ballBinX, ballBinY + 15, BALL_RADIUS, 0, 2*Math.PI);
