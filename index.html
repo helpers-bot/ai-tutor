@@ -14,14 +14,17 @@
       padding: 0;
       box-sizing: border-box;
     }
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
     body {
       background: radial-gradient(ellipse at center, #0a0a2e 0%, #000010 100%);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
       touch-action: pan-x pan-y;
       font-size: 0.85rem;
       color: #fff;
@@ -49,19 +52,17 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 480px;
       height: 100vh;
-      max-height: 820px;
+      height: 100dvh;
+      max-width: 500px;
       background: linear-gradient(180deg, rgba(0,20,60,0.9) 0%, rgba(0,10,40,0.95) 100%);
       backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 12px 12px 15px;
+      padding: 8px 10px 10px;
       box-shadow: 0 0 40px rgba(0,100,255,0.3), inset 0 1px 1px rgba(255,255,255,0.1);
       display: flex;
       flex-direction: column;
       align-items: center;
       border: 2px solid rgba(0,150,255,0.4);
-      margin: auto;
       transition: transform 0.1s ease;
     }
     .shake-active {
@@ -77,13 +78,12 @@
     canvas {
       display: block;
       width: 100%;
-      aspect-ratio: 1 / 1;
-      max-height: 58vh;
+      flex: 1;
+      min-height: 0;
       background: radial-gradient(circle at 30% 30%, #001a4d, #000020);
-      border-radius: 16px;
+      border-radius: 12px;
       box-shadow: inset 0 0 50px rgba(0,100,255,0.4), 0 0 30px rgba(0,150,255,0.3);
       touch-action: none;
-      flex-shrink: 1;
       border: 2px solid #0066cc;
     }
     .top-bar {
@@ -91,18 +91,19 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 8px;
-      gap: 8px;
+      margin-bottom: 6px;
+      gap: 6px;
+      flex-shrink: 0;
     }
     .stars-box {
       background: linear-gradient(180deg, #1a3a6a, #0a1a3a);
       border-radius: 20px;
-      padding: 6px 14px;
+      padding: 5px 12px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       font-weight: bold;
-      font-size: 1.2rem;
+      font-size: 1rem;
       box-shadow: 0 3px 0 #050a1a, 0 0 15px rgba(255,200,0,0.3);
       border: 1px solid #ffd700;
       color: #ffd700;
@@ -110,42 +111,21 @@
     .map-indicator {
       background: linear-gradient(180deg, #1a3a6a, #0a1a3a);
       border-radius: 20px;
-      padding: 6px 14px;
+      padding: 5px 12px;
       font-weight: bold;
-      font-size: 0.9rem;
+      font-size: 0.8rem;
       box-shadow: 0 3px 0 #050a1a;
       border: 1px solid #0066cc;
       color: #66ccff;
-    }
-    .panel {
-      width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      margin: 8px 0;
-    }
-    .ball-selector {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(0,40,80,0.6);
-      border-radius: 20px;
-      padding: 5px 14px;
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(100,180,255,0.3);
-      font-size: 0.85rem;
-      cursor: pointer;
     }
     button {
       background: linear-gradient(180deg, #3388cc 0%, #004488 100%);
       border: none;
       color: #fff;
       font-weight: bold;
-      border-radius: 20px;
-      padding: 10px 14px;
-      font-size: 0.8rem;
+      border-radius: 18px;
+      padding: 8px 12px;
+      font-size: 0.75rem;
       cursor: pointer;
       transition: all 0.2s ease;
       box-shadow: 0 4px 0 #002244, 0 0 10px rgba(0,150,255,0.3);
@@ -168,16 +148,16 @@
       pointer-events: none;
     }
     .big-btn {
-      padding: 12px 20px;
-      font-size: 0.95rem;
-      border-radius: 24px;
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      border-radius: 22px;
       box-shadow: 0 5px 0 #002244, 0 0 15px rgba(0,150,255,0.4);
       background: linear-gradient(180deg, #44aaff 0%, #0066cc 100%);
     }
     .small-btn {
-      padding: 8px 12px;
-      font-size: 0.75rem;
-      border-radius: 16px;
+      padding: 7px 10px;
+      font-size: 0.7rem;
+      border-radius: 14px;
     }
     .maps-btn {
       background: linear-gradient(180deg, #9955cc 0%, #5522aa 100%);
@@ -186,10 +166,10 @@
     }
     .user-greeting {
       background: rgba(0,100,200,0.2);
-      padding: 5px 14px;
-      border-radius: 16px;
+      padding: 5px 12px;
+      border-radius: 14px;
       font-weight: 600;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       backdrop-filter: blur(4px);
       border: 1px solid rgba(100,180,255,0.3);
     }
@@ -213,28 +193,28 @@
     .modal-content {
       background: linear-gradient(180deg, #0a1a3a, #051030);
       padding: 20px;
-      border-radius: 24px;
+      border-radius: 20px;
       width: 90%;
-      max-width: 440px;
+      max-width: 420px;
       border: 2px solid #0066cc;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       max-height: 85vh;
       overflow-y: auto;
       box-shadow: 0 0 40px rgba(0,100,255,0.5);
     }
     .result-content {
       background: linear-gradient(135deg, #0a1a3a, #102050);
-      padding: 25px 20px;
-      border-radius: 24px;
+      padding: 20px;
+      border-radius: 20px;
       width: 90%;
       max-width: 380px;
       border: 2px solid #66ccff;
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      text-align: center;
+      gap: 12px;
+      text-align: left;
       box-shadow: 0 0 40px rgba(100,200,255,0.4);
       animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
     }
@@ -242,19 +222,37 @@
       0% { transform: scale(0.8); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .result-row:last-child {
+      border-bottom: none;
+    }
+    .result-label {
+      color: #88aacc;
+      font-size: 0.85rem;
+    }
+    .result-value {
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
     .maps-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
     }
     .map-card {
       background: linear-gradient(180deg, #0d2040, #081530);
-      border-radius: 16px;
-      padding: 12px 8px;
+      border-radius: 14px;
+      padding: 10px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: 0.2s;
       border: 2px solid #1a3a6a;
       cursor: pointer;
@@ -274,31 +272,25 @@
       box-shadow: 0 0 25px rgba(255,200,0,0.4);
     }
     .map-icon {
-      font-size: 2rem;
+      font-size: 1.8rem;
     }
     .map-name {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: bold;
       text-align: center;
     }
     .map-price {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       color: #ffd700;
-    }
-    .lock-icon {
-      position: absolute;
-      top: 6px;
-      right: 6px;
-      font-size: 0.9rem;
     }
     .shop-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-      gap: 10px;
+      gap: 8px;
     }
     .shop-item {
       background: linear-gradient(180deg, #0d2040, #081530);
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 10px 6px;
       display: flex;
       flex-direction: column;
@@ -311,13 +303,17 @@
       border-color: #ffd700;
       transform: scale(1.02);
     }
+    .shop-item.selected {
+      border-color: #44ff44;
+      box-shadow: 0 0 15px rgba(68,255,68,0.3);
+    }
     .ball-preview {
-      font-size: 1.8rem;
-      filter: drop-shadow(0 4px 4px black);
+      font-size: 1.6rem;
+      filter: drop-shadow(0 3px 3px black);
     }
     input {
-      padding: 10px 16px;
-      border-radius: 20px;
+      padding: 10px 14px;
+      border-radius: 18px;
       border: none;
       background: rgba(255,255,255,0.1);
       color: white;
@@ -331,10 +327,12 @@
     }
     .action-row {
       display: flex;
-      gap: 6px;
+      gap: 5px;
       justify-content: center;
       flex-wrap: wrap;
       align-items: center;
+      flex-shrink: 0;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -348,19 +346,13 @@
     <div class="stars-box">⭐ <span id="balanceDisplay">100</span></div>
   </div>
   
-  <canvas id="gameCanvas" width="440" height="440"></canvas>
-  
-  <div class="panel">
-    <div class="ball-selector" id="ballSelector" title="Нажмите для смены шара">
-      <span id="currentBallEmoji">⚪</span>
-    </div>
-  </div>
+  <canvas id="gameCanvas" width="440" height="700"></canvas>
   
   <div class="action-row">
     <button id="dropButton" class="big-btn">🚀 Запуск</button>
     <button id="shakeButton" class="big-btn">🌌 Толчок</button>
   </div>
-  <div class="action-row" style="margin-top: 4px;">
+  <div class="action-row">
     <button id="mapsButton" class="maps-btn small-btn">🗺️ Карты</button>
     <button id="shopButton" class="small-btn">🛒 Магазин</button>
     <button id="profileButton" class="small-btn">👤 Профиль</button>
@@ -386,6 +378,7 @@
 <div id="shopModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="color:#ffd700; text-align:center;">🛒 Магазин шариков</h2>
+    <p style="text-align:center; font-size:0.8rem; color:#88aacc;">Выбран: <span id="shopSelectedBall" style="color:#ffd700;"></span></p>
     <div id="shopItemsContainer" class="shop-grid"></div>
     <button id="closeShopBtn" style="align-self: center;">Закрыть</button>
   </div>
@@ -452,6 +445,15 @@
       playTone(600, 'triangle', 0.06, 0.06);
     }
 
+    function soundBumper() {
+      playTone(800, 'square', 0.08, 0.1);
+    }
+
+    function soundTeleport() {
+      playTone(1000, 'sine', 0.15, 0.2);
+      setTimeout(() => playTone(1500, 'sine', 0.15, 0.2), 0.1);
+    }
+
     function soundWin(multiplier) {
       if (multiplier >= 5) {
         playTone(523, 'square', 0.12, 0.2);
@@ -476,7 +478,7 @@
       setTimeout(() => playTone(800, 'square', 0.15, 0.2), 0.2);
     }
 
-    // ========== ГЕНЕРАЦИЯ ЗВЁЗД НА ФОНЕ ==========
+    // ========== ГЕНЕРАЦИЯ ЗВЁЗД ==========
     function createStars() {
       const container = document.getElementById('starsBg');
       container.innerHTML = '';
@@ -497,11 +499,11 @@
 
     // ========== КАРТЫ ==========
     const maps = [
-      { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, desc: 'Стандартная карта', specials: [] },
-      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 200, desc: '+10% к множителям', specials: ['bumper'] },
-      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 500, desc: '+20% к множителям', specials: ['bumper', 'blackhole'] },
-      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 1000, desc: '+35% к множителям', specials: ['bumper', 'blackhole', 'portal'] },
-      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 2000, desc: '+50% к множителям', specials: ['bumper', 'blackhole', 'portal', 'magnet'] }
+      { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, desc: 'Стандартная', specials: [] },
+      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 200, desc: '+10% множители', specials: ['bumper'] },
+      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 500, desc: '+20% множители', specials: ['bumper', 'teleport'] },
+      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 1000, desc: '+35% множители', specials: ['bumper', 'teleport', 'gravity'] },
+      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 2000, desc: '+50% множители', specials: ['bumper', 'teleport', 'gravity', 'doublebumper'] }
     ];
 
     // ========== БАЗА ДАННЫХ ==========
@@ -530,6 +532,8 @@
           }
           if (!user.unlockedMaps) user.unlockedMaps = [1];
           if (!user.currentMapId) user.currentMapId = 1;
+          if (!user.selectedBall) user.selectedBall = 1;
+          if (!user.ownedBalls) user.ownedBalls = [1];
           return user;
         }
       }
@@ -566,75 +570,82 @@
     // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const GRAVITY = 0.22;
+
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const rect = container.getBoundingClientRect();
+      const w = rect.width - 20;
+      const h = rect.height - 120;
+      canvas.width = Math.floor(w);
+      canvas.height = Math.floor(Math.max(h, 400));
+    }
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      buildAll();
+    });
+
+    const GRAVITY = 0.18;
     const BOUNCE = 0.5;
-    const PLATFORM_RADIUS = 5.2;
-    const BALL_RADIUS = 8;
+    const PLATFORM_RADIUS = 4.5;
+    const BALL_RADIUS = 7;
 
     let platforms = [];
-    const rows = 7;
-    const startY = 105;
-    const rowSpacing = 35;
-    const colSpacing = 32;
-    const colBaseX = 220;
+    let specials = [];
+    let binWalls = [];
+
+    let rows = 10;
+    let startY = 80;
+    let rowSpacing = 38;
+    const colSpacing = 30;
+    let colBaseX = 220;
 
     let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-    const binCount = 19;
-
-    let binWalls = [];
-    let specials = [];
+    let binCount = 19;
 
     let ball = {
-      x: 220, y: 65, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
+      x: 220, y: 50, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff'
     };
     let gameActive = false;
     let swingAngle = 0;
     let swingSpeed = 0.04;
-    const stringAnchorX = 220;
-    const stringAnchorY = 18;
-    const stringLength = 48;
+    let stringAnchorX = 220;
+    let stringAnchorY = 12;
+    let stringLength = 40;
 
     let lastBounceTime = 0;
-    let bounceCooldown = 80;
+    let bounceCooldown = 60;
     let particles = [];
 
-    // ========== ЦВЕТА ШАРОВ ==========
+    // Телепорты — пары для симметрии
+    let teleportPairs = [];
+
     function getBallColor(value) {
       const colors = {
-        1: '#44aaff',
-        2: '#4488ff',
-        3: '#44cc44',
-        4: '#ffdd44',
-        5: '#ff9944',
-        6: '#ff4444',
-        7: '#cc44ff',
-        8: '#aa7744',
-        9: '#222222',
-        10: '#ff44ff'
+        1: '#44aaff', 2: '#4488ff', 3: '#44cc44', 4: '#ffdd44', 5: '#ff9944',
+        6: '#ff4444', 7: '#cc44ff', 8: '#aa7744', 9: '#222222', 10: '#ff44ff'
       };
       return colors[value] || '#44aaff';
     }
 
     function getBallGlow(value) {
       const glows = {
-        1: '#66ccff',
-        2: '#6688ff',
-        3: '#66ee66',
-        4: '#ffee66',
-        5: '#ffbb66',
-        6: '#ff6666',
-        7: '#ee66ff',
-        8: '#cc9966',
-        9: '#666666',
-        10: '#ff66ff'
+        1: '#66ccff', 2: '#6688ff', 3: '#66ee66', 4: '#ffee66', 5: '#ffbb66',
+        6: '#ff6666', 7: '#ee66ff', 8: '#cc9966', 9: '#666666', 10: '#ff66ff'
       };
       return glows[value] || '#66ccff';
     }
 
-    // ========== UI ЭЛЕМЕНТЫ ==========
+    function getBallEmoji(value) {
+      const map = {
+        1: '⚪', 2: '🔵', 3: '🟢', 4: '🟡', 5: '🟠',
+        6: '🔴', 7: '🟣', 8: '🟤', 9: '⚫', 10: '💎'
+      };
+      return map[value] || '⭐';
+    }
+
+    // ========== UI ==========
     const balanceSpan = document.getElementById('balanceDisplay');
-    const currentBallValueSpan = document.getElementById('currentBallValue');
-    const currentBallEmoji = document.getElementById('currentBallEmoji');
     const userGreeting = document.getElementById('userGreeting');
     const mapIndicator = document.getElementById('mapIndicator');
     const dropButton = document.getElementById('dropButton');
@@ -644,7 +655,6 @@
     const gameContainer = document.getElementById('gameContainer');
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
-    const ballSelector = document.getElementById('ballSelector');
 
     function getCurrentMap() {
       return maps.find(m => m.id === currentMapId) || maps[0];
@@ -657,6 +667,20 @@
         if (m === -1) return -1;
         return Math.round((m * (1 + bonus)) * 10) / 10;
       });
+    }
+
+    function buildAll() {
+      colBaseX = canvas.width / 2;
+      stringAnchorX = canvas.width / 2;
+      startY = canvas.height * 0.12;
+      rowSpacing = (canvas.height - startY - 50) / (rows + 1);
+      stringLength = startY - 20;
+      
+      updateMultipliers();
+      buildPlatforms();
+      buildSpecials();
+      buildBinWalls();
+      resetBall();
     }
 
     function buildPlatforms() {
@@ -692,76 +716,79 @@
 
     function buildSpecials() {
       specials = [];
+      teleportPairs = [];
       const mapConfig = getCurrentMap();
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
       
       if (mapConfig.specials.includes('bumper')) {
-        // Батуты — большие круглые объекты, которые сильно отталкивают
-        const bumperCount = mapConfig.id >= 4 ? 4 : 2;
-        for (let i = 0; i < bumperCount; i++) {
+        // Батуты — симметрично по бокам на разной высоте
+        const count = mapConfig.id >= 4 ? 3 : 2;
+        for (let i = 0; i < count; i++) {
+          const y = startY + rowSpacing * (2 + i * 3);
+          const offsetX = w * 0.2 + i * 15;
           specials.push({
-            x: 60 + Math.random() * 320,
-            y: 140 + Math.random() * 180,
-            radius: 10 + Math.random() * 6,
-            type: 'bumper',
-            color: '#ff4466',
-            glow: '#ff6688',
-            bounceForce: 1.8
+            x: cx - offsetX, y: y, radius: 12, type: 'bumper',
+            color: '#ff4466', glow: '#ff6688', bounceForce: 2.2
+          });
+          specials.push({
+            x: cx + offsetX, y: y, radius: 12, type: 'bumper',
+            color: '#ff4466', glow: '#ff6688', bounceForce: 2.2
           });
         }
       }
       
-      if (mapConfig.specials.includes('blackhole')) {
-        // Чёрные дыры — притягивают шар
-        const bhCount = mapConfig.id >= 5 ? 3 : 1;
-        for (let i = 0; i < bhCount; i++) {
-          specials.push({
-            x: 80 + Math.random() * 280,
-            y: 150 + Math.random() * 150,
-            radius: 12,
-            type: 'blackhole',
-            color: '#000000',
-            glow: '#6600cc',
-            pullForce: 0.08
-          });
+      if (mapConfig.specials.includes('doublebumper')) {
+        // Двойные батуты — мощнее
+        const y = startY + rowSpacing * 5;
+        specials.push({
+          x: cx - w * 0.25, y: y, radius: 14, type: 'bumper',
+          color: '#ff0000', glow: '#ff4444', bounceForce: 3.0
+        });
+        specials.push({
+          x: cx + w * 0.25, y: y, radius: 14, type: 'bumper',
+          color: '#ff0000', glow: '#ff4444', bounceForce: 3.0
+        });
+      }
+      
+      if (mapConfig.specials.includes('teleport')) {
+        // Телепорты — парами, телепортируют наверх
+        const pairCount = mapConfig.id >= 5 ? 2 : 1;
+        for (let p = 0; p < pairCount; p++) {
+          const y1 = startY + rowSpacing * (4 + p * 3);
+          const y2 = startY + rowSpacing * (7 + p);
+          const pair = {
+            id: p,
+            portal1: {
+              x: cx - w * 0.3, y: Math.min(y1, h - 80), radius: 10,
+              type: 'teleport', color: '#00ff88', glow: '#00ffaa', targetIndex: -1
+            },
+            portal2: {
+              x: cx + w * 0.3, y: Math.min(y2, h - 80), radius: 10,
+              type: 'teleport', color: '#ff8800', glow: '#ffaa00', targetIndex: -1
+            }
+          };
+          // Телепорт 1 отправляет на самый верх слева
+          pair.portal1.targetX = cx - w * 0.15;
+          pair.portal1.targetY = startY - 10;
+          // Телепорт 2 отправляет на самый верх справа
+          pair.portal2.targetX = cx + w * 0.15;
+          pair.portal2.targetY = startY - 10;
+          
+          specials.push(pair.portal1);
+          specials.push(pair.portal2);
+          teleportPairs.push(pair);
         }
       }
       
-      if (mapConfig.specials.includes('portal')) {
-        // Порталы — телепортируют шар
-        const p1 = {
-          x: 70 + Math.random() * 140,
-          y: 140 + Math.random() * 140,
-          radius: 9,
-          type: 'portal',
-          color: '#00ff88',
-          glow: '#00ffaa',
-          pairIndex: 0
-        };
-        const p2 = {
-          x: 250 + Math.random() * 120,
-          y: 150 + Math.random() * 130,
-          radius: 9,
-          type: 'portal',
-          color: '#ff8800',
-          glow: '#ffaa00',
-          pairIndex: 0
-        };
-        specials.push(p1, p2);
-      }
-      
-      if (mapConfig.specials.includes('magnet')) {
-        // Магниты — притягивают шар к себе
-        for (let i = 0; i < 2; i++) {
-          specials.push({
-            x: 100 + i * 200,
-            y: 120 + Math.random() * 100,
-            radius: 11,
-            type: 'magnet',
-            color: '#ff4444',
-            glow: '#ff6666',
-            pullForce: 0.12
-          });
-        }
+      if (mapConfig.specials.includes('gravity')) {
+        // Гравитационные колодцы — притягивают и закручивают
+        const y = startY + rowSpacing * 6;
+        specials.push({
+          x: cx, y: y, radius: 16, type: 'gravity',
+          color: '#6600cc', glow: '#9944ff', pullForce: 0.15
+        });
       }
     }
 
@@ -780,17 +807,6 @@
       }
     }
 
-    function initMap() {
-      updateMultipliers();
-      buildPlatforms();
-      buildSpecials();
-      buildBinWalls();
-      resetBall();
-      if (currentUser) {
-        mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
-      }
-    }
-
     function resetBall() {
       ball.active = false;
       ball.x = stringAnchorX;
@@ -806,24 +822,14 @@
       if (!currentUser) {
         balanceSpan.textContent = '0';
         userGreeting.textContent = '👨‍🚀 Гость';
-        currentBallEmoji.textContent = '⚪';
         ball.color = getBallColor(1);
         mapIndicator.textContent = '🌍 Карта 1';
         return;
       }
       balanceSpan.textContent = Math.floor(currentUser.balance);
       userGreeting.textContent = `👨‍🚀 ${currentUser.name}`;
-      currentBallEmoji.textContent = getBallEmoji(currentUser.selectedBall);
       ball.color = getBallColor(currentUser.selectedBall);
       mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
-    }
-
-    function getBallEmoji(value) {
-      const map = {
-        1: '⚪', 2: '🔵', 3: '🟢', 4: '🟡', 5: '🟠',
-        6: '🔴', 7: '🟣', 8: '🟤', 9: '⚫', 10: '💎'
-      };
-      return map[value] || '⭐';
     }
 
     function spawnParticles(x, y, count, color) {
@@ -863,22 +869,37 @@
     }
 
     function showResult(betValue, multiplier, winnings, oldBalance, newBalance) {
-      const netProfit = winnings;
+      const ballEmoji = getBallEmoji(currentUser ? currentUser.selectedBall : 1);
       
       resultContent.innerHTML = `
-        <h2 style="color: #66ccff; margin: 0; font-size: 1.1rem;">Результат</h2>
-        <div style="background: rgba(0,0,0,0.4); border-radius: 16px; padding: 16px;">
-          <p style="font-size: 0.9rem;">Множитель ячейки: <strong style="color: #ffd700;">x${multiplier}</strong></p>
-          <p style="font-size: 0.9rem;">Баланс был: <strong>${oldBalance} ⭐</strong></p>
-          <p style="font-size: 0.9rem;">Баланс стал: <strong>${newBalance} ⭐</strong></p>
-          <p style="font-size: 0.9rem; color: ${netProfit >= 0 ? '#4caf50' : '#f44336'};">
-            Чистый результат: <strong>${netProfit >= 0 ? '+' : ''}${netProfit} ⭐</strong>
-          </p>
+        <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">📊 Результат броска</h3>
+        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;">
+          <div class="result-row">
+            <span class="result-label">🎯 Шар</span>
+            <span class="result-value">${ballEmoji} (ставка ${betValue} ⭐)</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">✖️ Множитель</span>
+            <span class="result-value" style="color: #ffd700;">x${multiplier}</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">💼 Было</span>
+            <span class="result-value">${oldBalance} ⭐</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">💼 Стало</span>
+            <span class="result-value">${newBalance} ⭐</span>
+          </div>
+          <div class="result-row">
+            <span class="result-label">📈 Итог</span>
+            <span class="result-value" style="color: ${winnings >= 0 ? '#4caf50' : '#f44336'}; font-size: 1rem;">
+              ${winnings >= 0 ? '+' : ''}${winnings} ⭐
+            </span>
+          </div>
         </div>
         <button onclick="document.getElementById('resultModal').classList.add('hidden')" style="align-self: center;">Ок</button>
       `;
       resultModal.classList.remove('hidden');
-      
       soundWin(multiplier);
     }
 
@@ -899,8 +920,8 @@
       gameActive = true;
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
-      ball.vx = Math.sin(swingAngle) * 2.2;
-      ball.vy = 0.9;
+      ball.vx = Math.sin(swingAngle) * 2;
+      ball.vy = 0.8;
       
       spawnParticles(ball.x, ball.y, 8, ball.color);
       soundDrop();
@@ -924,10 +945,8 @@
       if (dist < BALL_RADIUS && dist > 0.001) {
         const nx = distX / dist;
         const ny = distY / dist;
-        
         ball.x += nx * (BALL_RADIUS - dist);
         ball.y += ny * (BALL_RADIUS - dist);
-        
         const vn = ball.vx * nx + ball.vy * ny;
         if (vn < 0) {
           ball.vx -= (1 + BOUNCE) * vn * nx;
@@ -955,55 +974,39 @@
               ball.vx -= (1 + s.bounceForce) * vn * nx;
               ball.vy -= (1 + s.bounceForce) * vn * ny;
             }
-            ball.vx += nx * 3;
-            ball.vy += ny * 3;
-            spawnParticles(s.x, s.y, 8, s.color);
-            soundBounce();
+            ball.vy -= s.bounceForce * 2;
+            spawnParticles(s.x, s.y, 10, s.color);
+            soundBumper();
           }
         }
         
-        if (s.type === 'blackhole') {
-          const influenceRadius = 60;
-          if (dist < influenceRadius && dist > 0.001) {
-            const force = s.pullForce * (1 - dist / influenceRadius);
-            ball.vx -= (dx / dist) * force;
-            ball.vy -= (dy / dist) * force;
-            if (dist < BALL_RADIUS + s.radius) {
-              ball.vx += (Math.random() - 0.5) * 6;
-              ball.vy = -3 - Math.random() * 4;
-              spawnParticles(s.x, s.y, 10, '#6600cc');
-              soundBounce();
-            }
-          }
-        }
-        
-        if (s.type === 'portal') {
+        if (s.type === 'teleport') {
           const minDist = BALL_RADIUS + s.radius;
           if (dist < minDist) {
-            // Найти парный портал
-            const pair = specials.find(sp => sp.type === 'portal' && sp !== s && sp.pairIndex === s.pairIndex);
-            if (pair) {
-              ball.x = pair.x;
-              ball.y = pair.y;
-              ball.vx = (Math.random() - 0.5) * 4;
-              ball.vy = -1 - Math.random() * 3;
-              spawnParticles(s.x, s.y, 12, s.color);
-              spawnParticles(pair.x, pair.y, 12, pair.color);
-              soundBounce();
-            }
+            // Телепорт наверх
+            ball.x = s.targetX;
+            ball.y = s.targetY;
+            ball.vx = (Math.random() - 0.5) * 3;
+            ball.vy = 0.5;
+            spawnParticles(s.x, s.y, 15, s.color);
+            spawnParticles(s.targetX, s.targetY, 15, s.glow);
+            soundTeleport();
           }
         }
         
-        if (s.type === 'magnet') {
-          const influenceRadius = 80;
+        if (s.type === 'gravity') {
+          const influenceRadius = 100;
           if (dist < influenceRadius && dist > 0.001) {
             const force = s.pullForce * (1 - dist / influenceRadius);
             ball.vx += (dx / dist) * force;
             ball.vy += (dy / dist) * force;
+            // Закручивание
+            ball.vx += (-dy / dist) * force * 0.5;
+            ball.vy += (dx / dist) * force * 0.5;
             if (dist < BALL_RADIUS + s.radius) {
-              ball.vx += (Math.random() - 0.5) * 5;
-              ball.vy = -2 - Math.random() * 3;
-              spawnParticles(s.x, s.y, 6, s.color);
+              ball.vx += (Math.random() - 0.5) * 8;
+              ball.vy = -5 - Math.random() * 4;
+              spawnParticles(s.x, s.y, 12, '#9944ff');
               soundBounce();
             }
           }
@@ -1037,14 +1040,13 @@
             ball.vx -= (1+BOUNCE)*vn*nx;
             ball.vy -= (1+BOUNCE)*vn*ny;
             bounced = true;
-            spawnParticles(p.x, p.y, 3, p.color1);
+            spawnParticles(p.x, p.y, 2, p.color1);
           }
           ball.vx *= 0.998;
           ball.vy *= 0.998;
         }
       }
       
-      // Специальные объекты
       applySpecialEffects();
       
       for (let wall of binWalls) {
@@ -1068,9 +1070,9 @@
         const oldBalance = currentUser ? currentUser.balance : 0;
         let winnings;
         if (multiplier === -1) {
-          winnings = -ball.value; // Отнимаем стоимость шара
+          winnings = -ball.value;
         } else {
-          winnings = Math.floor(ball.value * multiplier) - ball.value; // Чистый выигрыш (вычитаем стоимость)
+          winnings = Math.floor(ball.value * multiplier) - ball.value;
         }
         
         if (currentUser) {
@@ -1084,7 +1086,7 @@
         
         const bx = binIndex * binWidth + binWidth / 2;
         const by = canvas.height - 15;
-        spawnParticles(bx, by, 10, multiplier >= 0 ? '#ffd700' : '#ff4444');
+        spawnParticles(bx, by, 10, winnings >= 0 ? '#ffd700' : '#ff4444');
         
         gameActive = false;
         ball.active = false;
@@ -1106,12 +1108,12 @@
     function drawSpecials() {
       for (let s of specials) {
         ctx.shadowColor = s.glow;
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 12;
         
         if (s.type === 'bumper') {
-          const grad = ctx.createRadialGradient(s.x-2, s.y-2, 1, s.x, s.y, s.radius+3);
+          const grad = ctx.createRadialGradient(s.x-2, s.y-2, 1, s.x, s.y, s.radius+2);
           grad.addColorStop(0, '#ffffff');
-          grad.addColorStop(0.4, s.color);
+          grad.addColorStop(0.3, s.color);
           grad.addColorStop(1, '#880022');
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
@@ -1121,36 +1123,16 @@
           ctx.lineWidth = 2;
           ctx.stroke();
           ctx.lineWidth = 1;
-          // Рисунок звёздочки на батуте
           ctx.fillStyle = '#ffffff';
-          ctx.font = `${s.radius}px sans-serif`;
+          ctx.font = `bold ${s.radius * 0.8}px sans-serif`;
           ctx.textAlign = 'center';
-          ctx.fillText('⭐', s.x, s.y + s.radius * 0.35);
+          ctx.fillText('↑', s.x, s.y + s.radius * 0.3);
         }
         
-        if (s.type === 'blackhole') {
-          const grad = ctx.createRadialGradient(s.x, s.y, 2, s.x, s.y, s.radius + 5);
-          grad.addColorStop(0, '#000000');
-          grad.addColorStop(0.5, '#330066');
-          grad.addColorStop(1, 'rgba(102,0,204,0)');
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius + 5, 0, Math.PI * 2);
-          ctx.fillStyle = grad;
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-          ctx.fillStyle = '#000000';
-          ctx.fill();
-          ctx.strokeStyle = '#6600cc';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.lineWidth = 1;
-        }
-        
-        if (s.type === 'portal') {
+        if (s.type === 'teleport') {
           const grad = ctx.createRadialGradient(s.x, s.y, 1, s.x, s.y, s.radius);
           grad.addColorStop(0, '#ffffff');
-          grad.addColorStop(0.5, s.color);
+          grad.addColorStop(0.4, s.color);
           grad.addColorStop(1, 'rgba(0,0,0,0)');
           ctx.beginPath();
           ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
@@ -1164,8 +1146,8 @@
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 1;
           ctx.beginPath();
-          for (let a = 0; a < Math.PI * 4; a += 0.2) {
-            const r = s.radius * 0.3 + a * 0.3;
+          for (let a = 0; a < Math.PI * 4; a += 0.15) {
+            const r = s.radius * 0.2 + a * 0.3;
             const px = s.x + Math.cos(a) * r;
             const py = s.y + Math.sin(a) * r;
             if (a === 0) ctx.moveTo(px, py);
@@ -1175,24 +1157,23 @@
           ctx.lineWidth = 1;
         }
         
-        if (s.type === 'magnet') {
-          const grad = ctx.createRadialGradient(s.x-1, s.y-1, 2, s.x, s.y, s.radius);
-          grad.addColorStop(0, '#ffffff');
-          grad.addColorStop(0.3, s.color);
-          grad.addColorStop(1, '#880000');
+        if (s.type === 'gravity') {
+          const grad = ctx.createRadialGradient(s.x, s.y, 2, s.x, s.y, s.radius + 8);
+          grad.addColorStop(0, '#000000');
+          grad.addColorStop(0.3, '#330066');
+          grad.addColorStop(1, 'rgba(102,0,204,0)');
           ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.arc(s.x, s.y, s.radius + 8, 0, Math.PI * 2);
           ctx.fillStyle = grad;
           ctx.fill();
-          ctx.strokeStyle = '#ff8888';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fillStyle = '#000000';
+          ctx.fill();
+          ctx.strokeStyle = '#9944ff';
           ctx.lineWidth = 2;
           ctx.stroke();
           ctx.lineWidth = 1;
-          // Буква N
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 12px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('N', s.x, s.y + 4);
         }
         
         ctx.shadowBlur = 0;
@@ -1211,7 +1192,7 @@
         5: ['#000010', '#000005']
       };
       const bgColors = mapColors[currentMapId] || mapColors[1];
-      const bgGrad = ctx.createRadialGradient(220, 220, 50, 220, 220, 350);
+      const bgGrad = ctx.createRadialGradient(colBaseX, canvas.height * 0.4, 30, colBaseX, canvas.height * 0.4, canvas.height);
       bgGrad.addColorStop(0, bgColors[0]);
       bgGrad.addColorStop(1, bgColors[1]);
       ctx.fillStyle = bgGrad;
@@ -1243,30 +1224,27 @@
         ctx.lineWidth = 1;
       }
 
-      // Специальные объекты
       drawSpecials();
 
-      // Платформы
       for (let p of platforms) {
         ctx.shadowColor = p.color1;
-        ctx.shadowBlur = 8;
+        ctx.shadowBlur = 6;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, 2*Math.PI);
-        const grad = ctx.createRadialGradient(p.x-1, p.y-1, 1, p.x, p.y, p.radius+2);
+        const grad = ctx.createRadialGradient(p.x-1, p.y-1, 1, p.x, p.y, p.radius+1);
         grad.addColorStop(0, '#ffffff');
         grad.addColorStop(0.5, p.color1);
         grad.addColorStop(1, p.color2);
         ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-        ctx.lineWidth = 0.8;
+        ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+        ctx.lineWidth = 0.7;
         ctx.stroke();
         ctx.lineWidth = 1;
       }
       ctx.shadowBlur = 0;
       ctx.shadowColor = 'transparent';
 
-      // Ячейки
       const binWidth = canvas.width / binCount;
       const binY = canvas.height - 30;
       for (let i = 0; i < binCount; i++) {
@@ -1279,7 +1257,7 @@
         ctx.strokeStyle = isNegative ? '#ff4444' : '#3399ff';
         ctx.lineWidth = 1.5;
         ctx.shadowColor = isNegative ? '#ff4444' : '#3399ff';
-        ctx.shadowBlur = 4;
+        ctx.shadowBlur = 3;
         ctx.strokeRect(x, binY, binWidth, 30);
         ctx.shadowBlur = 0;
         ctx.lineWidth = 1;
@@ -1290,11 +1268,10 @@
         ctx.fillText(isNegative ? '−1' : `x${mult}`, x+binWidth/2, binY+19);
       }
 
-      // Стенки
       ctx.strokeStyle = '#2266cc';
       ctx.lineWidth = 2;
       ctx.shadowColor = '#4488ff';
-      ctx.shadowBlur = 5;
+      ctx.shadowBlur = 4;
       for (let wall of binWalls) {
         ctx.beginPath();
         ctx.moveTo(wall.x1, wall.y1);
@@ -1312,24 +1289,22 @@
       ctx.stroke();
       ctx.lineWidth = 1;
 
-      // Частицы
       drawParticles();
 
-      // Активный шар
       if (ball.active) {
         ctx.shadowColor = getBallGlow(currentUser ? currentUser.selectedBall : 1);
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 12;
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
         const ballColor = ball.color;
-        const grad = ctx.createRadialGradient(ball.x-3, ball.y-3, 2, ball.x, ball.y, BALL_RADIUS+3);
+        const grad = ctx.createRadialGradient(ball.x-2, ball.y-2, 2, ball.x, ball.y, BALL_RADIUS+2);
         grad.addColorStop(0,'#ffffff');
         grad.addColorStop(0.3, ballColor);
         grad.addColorStop(1, '#001133');
         ctx.fillStyle = grad;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
         ctx.lineWidth = 1;
         ctx.shadowBlur = 0;
@@ -1352,7 +1327,7 @@
         gameContainer.classList.remove('shake-active');
       }, 800);
       if (ball.active && gameActive) {
-        ball.vx += (Math.random() - 0.5) * 4;
+        ball.vx += (Math.random() - 0.5) * 5;
         ball.vy += (Math.random() - 0.2) * 3;
         spawnParticles(ball.x, ball.y, 5, '#ff8800');
       }
@@ -1375,10 +1350,10 @@
         card.innerHTML = `
           <div class="map-icon">${map.icon}</div>
           <div class="map-name">${map.name}</div>
-          <div style="font-size:0.7rem; color:#88aacc;">${map.desc}</div>
+          <div style="font-size:0.65rem; color:#88aacc;">${map.desc}</div>
           ${unlocked 
-            ? (isActive ? '<div style="color:#ffd700; font-size:0.7rem;">✅ Активна</div>' : '<button class="selectMapBtn" data-map="'+map.id+'" style="font-size:0.7rem; padding:4px 10px;">Выбрать</button>')
-            : `<div class="map-price">🔒 ${map.price} ⭐</div><button class="buyMapBtn" data-map="${map.id}" style="font-size:0.7rem; padding:4px 10px;">Купить</button>`
+            ? (isActive ? '<div style="color:#ffd700; font-size:0.65rem;">✅ Активна</div>' : '<button class="selectMapBtn" data-map="'+map.id+'" style="font-size:0.65rem; padding:4px 8px;">Выбрать</button>')
+            : `<div class="map-price">🔒 ${map.price} ⭐</div><button class="buyMapBtn" data-map="${map.id}" style="font-size:0.65rem; padding:4px 8px;">Купить</button>`
           }
         `;
         
@@ -1442,7 +1417,7 @@
         currentUser.currentMapId = mapId;
         updateUserData(currentUser);
       }
-      initMap();
+      buildAll();
       updateUI();
       document.getElementById('mapsModal').classList.add('hidden');
     }
@@ -1451,23 +1426,43 @@
       initAudio();
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
       const container = document.getElementById('shopItemsContainer');
+      const selectedSpan = document.getElementById('shopSelectedBall');
+      selectedSpan.textContent = `${getBallEmoji(currentUser.selectedBall)} (${currentUser.selectedBall} очк.)`;
+      
       container.innerHTML = '';
-      for (let val = 2; val <= 10; val++) {
-        const price = val * 22;
+      for (let val = 1; val <= 10; val++) {
+        const price = val === 1 ? 0 : val * 22;
         const owned = currentUser.ownedBalls.includes(val);
+        const isSelected = currentUser.selectedBall === val;
         const div = document.createElement('div');
         div.className = 'shop-item';
+        if (isSelected) div.classList.add('selected');
+        
         div.innerHTML = `
           <div class="ball-preview" style="color:${getBallColor(val)}; filter: drop-shadow(0 0 6px ${getBallGlow(val)});">${getBallEmoji(val)}</div>
-          <div style="font-size:0.8rem;"><strong>${val} очков</strong></div>
-          <div style="font-size:0.7rem;">${owned ? '✅ Куплен' : `⭐ ${price}`}</div>
-          ${!owned ? `<button class="buyBallBtn" data-value="${val}" style="font-size:0.7rem; padding:4px 10px;">Купить</button>` : `<button disabled style="font-size:0.7rem; padding:4px 10px;">✓</button>`}
+          <div style="font-size:0.75rem;"><strong>${val} очк.</strong></div>
+          <div style="font-size:0.65rem;">${owned ? '✅' : `⭐ ${price}`}</div>
+          ${!owned && val > 1 ? `<button class="buyBallBtn" data-value="${val}" style="font-size:0.65rem; padding:3px 8px;">Купить</button>` : ''}
+          ${owned && !isSelected ? `<button class="selectBallBtn" data-value="${val}" style="font-size:0.65rem; padding:3px 8px; background: linear-gradient(180deg, #44cc44, #228822);">Выбрать</button>` : ''}
+          ${isSelected ? '<span style="font-size:0.65rem; color:#44ff44;">Выбран</span>' : ''}
         `;
         container.appendChild(div);
       }
+      
       document.querySelectorAll('.buyBallBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => buyBall(parseInt(e.target.getAttribute('data-value'))));
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          buyBall(parseInt(e.target.getAttribute('data-value')));
+        });
       });
+      
+      document.querySelectorAll('.selectBallBtn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          selectBall(parseInt(e.target.getAttribute('data-value')));
+        });
+      });
+      
       document.getElementById('shopModal').classList.remove('hidden');
     }
 
@@ -1480,6 +1475,7 @@
       currentUser.balance -= price;
       currentUser.ownedBalls.push(value);
       currentUser.ownedBalls.sort((a,b)=>a-b);
+      currentUser.selectedBall = value;
       updateUserData(currentUser);
       updateUI();
       soundBuy();
@@ -1488,10 +1484,11 @@
 
     function selectBall(value) {
       if (!currentUser) return;
-      if (!currentUser.ownedBalls.includes(value)) { alert('Купите этот шарик в магазине!'); return; }
+      if (!currentUser.ownedBalls.includes(value)) return;
       currentUser.selectedBall = value;
       updateUserData(currentUser);
       updateUI();
+      openShop();
     }
 
     function showProfile() {
@@ -1509,7 +1506,7 @@
       currentUser = user;
       if (user.currentMapId) currentMapId = user.currentMapId;
       authModal.classList.add('hidden');
-      initMap();
+      buildAll();
       updateUI();
       resetBall();
       
@@ -1524,7 +1521,7 @@
       currentUser = null;
       currentMapId = 1;
       authModal.classList.remove('hidden');
-      initMap();
+      buildAll();
       resetBall();
       updateUI();
     }
@@ -1537,7 +1534,7 @@
           currentUser = users[savedId];
           if (currentUser.currentMapId) currentMapId = currentUser.currentMapId;
           authModal.classList.add('hidden');
-          initMap();
+          buildAll();
           updateUI();
           return;
         }
@@ -1545,7 +1542,7 @@
       authModal.classList.remove('hidden');
     }
 
-    // ========== ОБРАБОТЧИКИ СОБЫТИЙ ==========
+    // ========== ОБРАБОТЧИКИ ==========
     dropButton.addEventListener('click', dropBall);
     document.getElementById('shopButton').addEventListener('click', openShop);
     document.getElementById('mapsButton').addEventListener('click', openMaps);
@@ -1562,14 +1559,6 @@
     });
     usernameInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') loginBtn.click(); });
 
-    ballSelector.addEventListener('click', ()=>{
-      if(!currentUser) return;
-      const balls = currentUser.ownedBalls;
-      if(balls.length<=1) { alert('Купите новые шарики в магазине.'); return; }
-      const idx = balls.indexOf(currentUser.selectedBall);
-      selectBall(balls[(idx+1)%balls.length]);
-    });
-
     resultModal.addEventListener('click', (e) => {
       if (e.target === resultModal) {
         resultModal.classList.add('hidden');
@@ -1580,8 +1569,13 @@
       if(currentUser) localStorage.setItem('space_pinball_current_id', currentUser.id);
     });
 
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      buildAll();
+    });
+
     // ========== ЗАПУСК ==========
-    initMap();
+    buildAll();
     checkSavedSession();
     gameLoop();
     updateUI();
