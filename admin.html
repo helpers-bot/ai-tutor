@@ -20,70 +20,70 @@
     }
     
     .sidebar {
-      width: 320px;
-      min-width: 320px;
+      width: 300px;
+      min-width: 300px;
       background: #111133;
-      padding: 15px;
+      padding: 12px;
       overflow-y: auto;
       border-right: 2px solid #3333aa;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
     }
     
     .sidebar h2 {
       color: #ffd700;
       text-align: center;
-      font-size: 1.2rem;
-      margin-bottom: 5px;
+      font-size: 1.1rem;
+      margin-bottom: 3px;
     }
     
     .section {
       background: #1a1a3a;
       border-radius: 10px;
-      padding: 12px;
+      padding: 10px;
       border: 1px solid #333366;
     }
     
     .section h3 {
       color: #66ccff;
-      font-size: 0.9rem;
-      margin-bottom: 8px;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
     }
     
     label {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #aaaacc;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
     }
     
     input, select, textarea {
       width: 100%;
-      padding: 8px;
+      padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid #444488;
       background: #0a0a22;
       color: #fff;
-      font-size: 0.85rem;
-      margin-bottom: 8px;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
     }
     
     input[type="range"] {
       padding: 0;
-      height: 20px;
+      height: 18px;
     }
     
     button {
-      padding: 10px 15px;
+      padding: 8px 12px;
       border-radius: 8px;
       border: none;
       cursor: pointer;
       font-weight: bold;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       transition: all 0.2s;
       width: 100%;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     
     button:hover {
@@ -91,46 +91,26 @@
       opacity: 0.9;
     }
     
-    .btn-primary {
-      background: linear-gradient(180deg, #4488ff, #2266cc);
-      color: #fff;
-    }
-    
-    .btn-success {
-      background: linear-gradient(180deg, #44cc44, #228822);
-      color: #fff;
-    }
-    
-    .btn-danger {
-      background: linear-gradient(180deg, #ff4444, #cc2222);
-      color: #fff;
-    }
-    
-    .btn-warning {
-      background: linear-gradient(180deg, #ffaa44, #cc7722);
-      color: #fff;
-    }
-    
-    .btn-info {
-      background: linear-gradient(180deg, #aa44ff, #6622cc);
-      color: #fff;
-    }
-    
+    .btn-primary { background: linear-gradient(180deg, #4488ff, #2266cc); color: #fff; }
+    .btn-success { background: linear-gradient(180deg, #44cc44, #228822); color: #fff; }
+    .btn-danger { background: linear-gradient(180deg, #ff4444, #cc2222); color: #fff; }
+    .btn-warning { background: linear-gradient(180deg, #ffaa44, #cc7722); color: #fff; }
+    .btn-info { background: linear-gradient(180deg, #aa44ff, #6622cc); color: #fff; }
     .btn-small {
-      padding: 5px 10px;
+      padding: 5px 8px;
       font-size: 0.7rem;
       width: auto;
     }
     
     .btn-group {
       display: flex;
-      gap: 5px;
+      gap: 4px;
       flex-wrap: wrap;
     }
     
     .btn-group button {
       flex: 1;
-      min-width: 70px;
+      min-width: 60px;
     }
     
     .main-area {
@@ -142,10 +122,10 @@
     
     .toolbar {
       background: #111133;
-      padding: 10px 15px;
+      padding: 8px 12px;
       border-bottom: 2px solid #3333aa;
       display: flex;
-      gap: 10px;
+      gap: 8px;
       align-items: center;
       flex-wrap: wrap;
     }
@@ -156,7 +136,7 @@
     }
     
     .toolbar .info {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: #aaaacc;
       margin-left: auto;
     }
@@ -167,53 +147,35 @@
       cursor: crosshair;
     }
     
-    .tooltip {
-      position: absolute;
-      background: rgba(0,0,0,0.9);
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      pointer-events: none;
-      z-index: 100;
-      border: 1px solid #6666aa;
-      display: none;
-    }
-    
     .map-list {
-      max-height: 200px;
+      max-height: 180px;
       overflow-y: auto;
     }
     
     .map-item {
       background: #1a1a3a;
-      padding: 8px;
+      padding: 6px;
       border-radius: 6px;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
       cursor: pointer;
       border: 2px solid transparent;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     
-    .map-item:hover {
-      border-color: #4488ff;
-    }
-    
-    .map-item.active {
-      border-color: #ffd700;
-      background: #222244;
-    }
+    .map-item:hover { border-color: #4488ff; }
+    .map-item.active { border-color: #ffd700; background: #222244; }
     
     .map-item .delete-map {
       background: #ff4444;
       color: #fff;
       border: none;
       border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      font-size: 0.7rem;
+      width: 20px;
+      height: 20px;
+      font-size: 0.65rem;
       cursor: pointer;
       padding: 0;
       display: flex;
@@ -224,11 +186,11 @@
     .obstacle-palette {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
+      gap: 4px;
     }
     
     .obstacle-btn {
-      padding: 8px;
+      padding: 6px;
       border-radius: 6px;
       border: 2px solid transparent;
       cursor: pointer;
@@ -239,56 +201,46 @@
       color: #fff;
     }
     
-    .obstacle-btn:hover {
-      border-color: #ffd700;
-    }
-    
-    .obstacle-btn.selected {
-      border-color: #44ff44;
-      background: #223322;
-      box-shadow: 0 0 10px rgba(68,255,68,0.3);
-    }
+    .obstacle-btn:hover { border-color: #ffd700; }
+    .obstacle-btn.selected { border-color: #44ff44; background: #223322; }
     
     .coords-display {
       font-family: monospace;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #88ff88;
     }
     
     .obstacle-list {
-      max-height: 300px;
+      max-height: 250px;
       overflow-y: auto;
     }
     
     .obstacle-item {
       background: #1a1a3a;
-      padding: 6px 8px;
+      padding: 4px 6px;
       border-radius: 4px;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
       font-size: 0.7rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border: 1px solid #333366;
+      cursor: pointer;
     }
     
-    .obstacle-item:hover {
-      background: #222244;
-    }
+    .obstacle-item:hover { background: #222244; }
+    .obstacle-item.selected-item { border-color: #ffd700 !important; background: #222244; }
     
     .obstacle-item .remove-obs {
       background: #ff4444;
       color: #fff;
       border: none;
       border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 0.6rem;
+      width: 16px;
+      height: 16px;
+      font-size: 0.55rem;
       cursor: pointer;
       padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     
     .modal-overlay {
@@ -306,23 +258,22 @@
     
     .modal {
       background: #111133;
-      padding: 20px;
+      padding: 16px;
       border-radius: 12px;
       border: 2px solid #4488ff;
-      max-width: 500px;
+      max-width: 450px;
       width: 90%;
       max-height: 80vh;
       overflow-y: auto;
     }
     
-    .modal h3 {
-      color: #ffd700;
-      margin-bottom: 10px;
-      text-align: center;
-    }
+    .modal h3 { color: #ffd700; margin-bottom: 8px; text-align: center; font-size: 0.95rem; }
+    .hidden { display: none !important; }
     
-    .hidden {
-      display: none !important;
+    .help-text {
+      font-size: 0.7rem;
+      color: #88aacc;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -346,11 +297,13 @@
   <div class="section">
     <h3>⚙️ Параметры карты</h3>
     <label>Название:</label>
-    <input type="text" id="mapName" value="Новая карта" placeholder="Название карты">
+    <input type="text" id="mapName" value="Новая карта">
     
     <label>Длина трассы (пиксели):</label>
-    <input type="number" id="trackLength" value="3500" min="1000" max="10000" step="100">
-    <input type="range" id="trackLengthRange" value="3500" min="1000" max="10000" step="100" oninput="syncRange('trackLength', this.value)">
+    <div style="display:flex;gap:4px;">
+      <input type="number" id="trackLength" value="3500" min="1000" max="10000" step="100" style="flex:1;">
+      <span style="font-size:0.7rem;color:#aaa;align-self:center;">px</span>
+    </div>
     
     <label>Количество шаров:</label>
     <select id="ballCount">
@@ -366,27 +319,23 @@
     
     <label>Цвет фона:</label>
     <input type="color" id="bgColor" value="#000015">
-    
-    <label>Ширина трассы (пиксели):</label>
-    <input type="number" id="trackWidth" value="440" min="300" max="600" step="10">
   </div>
   
   <!-- Палитра препятствий -->
   <div class="section">
-    <h3>🎯 Инструменты</h3>
+    <h3>🎯 Инструменты (клавиши 1-7)</h3>
     <div class="obstacle-palette" id="obstaclePalette">
-      <button class="obstacle-btn" data-type="pin" style="border-color:#f4d03f;">📌 Пин</button>
-      <button class="obstacle-btn" data-type="bumper" style="border-color:#ff4466;">🔼 Батут</button>
-      <button class="obstacle-btn" data-type="funnel" style="border-color:#8844ff;">🌀 Воронка</button>
-      <button class="obstacle-btn selected" data-type="wall" style="border-color:#888888;">🧱 Стена</button>
-      <button class="obstacle-btn" data-type="tunnel" style="border-color:#666666;">🕳️ Туннель</button>
-      <button class="obstacle-btn" data-type="spinner" style="border-color:#ff8800;">⚙️ Спиннер</button>
+      <button class="obstacle-btn" data-type="pin" style="border-color:#f4d03f;">1📌 Пин</button>
+      <button class="obstacle-btn" data-type="bumper" style="border-color:#ff4466;">2🔼 Батут</button>
+      <button class="obstacle-btn" data-type="funnel" style="border-color:#8844ff;">3🌀 Воронка</button>
+      <button class="obstacle-btn selected" data-type="wall_gap" style="border-color:#888888;">4🧱 Стена</button>
+      <button class="obstacle-btn" data-type="wall_angled" style="border-color:#ff6644;">5📐 Стена°</button>
+      <button class="obstacle-btn" data-type="tunnel" style="border-color:#666666;">6🕳️ Туннель</button>
     </div>
-    <button class="btn-danger btn-small" onclick="setTool('delete')" id="deleteTool">🗑️ Удаление</button>
-    <button class="btn-info btn-small" onclick="setTool('select')" id="selectTool">👆 Выбор</button>
+    <button class="btn-danger btn-small" onclick="setTool('delete')" id="deleteTool" style="margin-top:4px;">🗑️ Удаление (Del)</button>
   </div>
   
-  <!-- Свойства выбранного препятствия -->
+  <!-- Свойства выбранного -->
   <div class="section hidden" id="propsPanel">
     <h3>🔧 Свойства</h3>
     <div id="propsContent"></div>
@@ -404,7 +353,8 @@
     <h3>📤 Экспорт / Импорт</h3>
     <button class="btn-info btn-small" onclick="exportJSON()">📋 Копировать JSON</button>
     <button class="btn-warning btn-small" onclick="importJSON()">📥 Импорт JSON</button>
-    <button class="btn-success btn-small" onclick="testMap()">▶ Тестировать</button>
+    <button class="btn-success btn-small" onclick="saveForGame()">🎮 Сохранить для игры</button>
+    <p class="help-text">Кнопка "Сохранить для игры" делает карту доступной в основной игре</p>
   </div>
 </div>
 
@@ -412,22 +362,18 @@
 <div class="main-area">
   <div class="toolbar">
     <span style="color:#ffd700; font-weight:bold;">🗺️ Редактор карт</span>
-    <button class="btn-primary btn-small" onclick="zoomIn()">🔍 +</button>
-    <button class="btn-primary btn-small" onclick="zoomOut()">🔍 -</button>
-    <button class="btn-primary btn-small" onclick="resetZoom()">↺ Сброс</button>
-    <span class="info">Масштаб: <span id="zoomLevel">1.0</span>x</span>
+    <button class="btn-primary btn-small" onclick="zoomToFit()">🔍 Обзор</button>
     <span class="info coords-display" id="mouseCoords">X: 0, Y: 0</span>
     <span class="info" id="selectedInfo"></span>
   </div>
   <canvas id="editorCanvas"></canvas>
-  <div class="tooltip" id="tooltip"></div>
 </div>
 
 <!-- Модальное окно импорта -->
 <div class="modal-overlay hidden" id="importModal">
   <div class="modal">
     <h3>📥 Импорт JSON</h3>
-    <textarea id="importJSONText" rows="10" placeholder="Вставьте JSON код карты..."></textarea>
+    <textarea id="importJSONText" rows="8" placeholder="Вставьте JSON код карты..."></textarea>
     <div class="btn-group">
       <button class="btn-success" onclick="doImport()">✅ Импортировать</button>
       <button class="btn-danger" onclick="closeImport()">❌ Отмена</button>
@@ -440,19 +386,17 @@
     const canvas = document.getElementById('editorCanvas');
     const ctx = canvas.getContext('2d');
     
-    // Состояние редактора
-    let currentTool = 'wall';
+    let currentTool = 'wall_gap';
     let selectedObstacle = null;
-    let zoom = 1.0;
-    let panX = 0;
-    let panY = 0;
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-    let mouseX = 0;
-    let mouseY = 0;
+    let viewX = 0;
+    let viewY = 0;
+    let viewScale = 1;
+    let isPanning = false;
+    let panStartX = 0;
+    let panStartY = 0;
+    let panStartViewX = 0;
+    let panStartViewY = 0;
     
-    // Данные карты
     let mapData = {
       name: 'Новая карта',
       trackLength: 3500,
@@ -466,17 +410,11 @@
     
     let savedMaps = [];
     
-    // Загрузка сохранённых карт
     function loadSavedMaps() {
-      const data = localStorage.getItem('admin_maps');
+      const data = localStorage.getItem('admin_maps_v2');
       savedMaps = data ? JSON.parse(data) : [];
       if (savedMaps.length === 0) {
-        // Создаём демо-карту
-        savedMaps = [{
-          ...mapData,
-          name: 'Демо карта',
-          obstacles: generateDemoObstacles()
-        }];
+        savedMaps = [{ ...mapData, name: 'Демо карта', obstacles: generateDemoObstacles() }];
         saveAllMaps();
       }
       renderMapList();
@@ -486,7 +424,7 @@
     }
     
     function saveAllMaps() {
-      localStorage.setItem('admin_maps', JSON.stringify(savedMaps));
+      localStorage.setItem('admin_maps_v2', JSON.stringify(savedMaps));
     }
     
     function generateDemoObstacles() {
@@ -495,23 +433,23 @@
       const len = mapData.trackLength;
       const cx = w / 2;
       
-      for (let y = 100; y < len - 200; y += 60 + Math.random() * 80) {
-        const type = ['pin', 'bumper', 'funnel', 'wall', 'spinner'][Math.floor(Math.random() * 5)];
+      for (let y = 100; y < len - 200; y += 50 + Math.random() * 70) {
+        const type = ['pin', 'bumper', 'funnel', 'wall_gap', 'wall_angled'][Math.floor(Math.random() * 5)];
         
         if (type === 'pin') {
-          const count = 3 + Math.floor(Math.random() * 4);
+          const count = 3 + Math.floor(Math.random() * 3);
           for (let i = 0; i < count; i++) {
-            obs.push({ x: 30 + Math.random() * (w - 60), y: y + Math.random() * 20, radius: 4, type: 'pin', color: '#f4d03f' });
+            obs.push({ x: 30 + Math.random() * (w - 60), y: y + Math.random() * 15, radius: 4, type: 'pin', color: '#f4d03f' });
           }
         } else if (type === 'bumper') {
-          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.6, y: y, width: 50, height: 6, type: 'bumper', color: '#ff4466', force: 4 });
+          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.5, y: y, width: 50, height: 6, type: 'bumper', color: '#ff4466', force: 4 });
         } else if (type === 'funnel') {
-          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.4, y: y, radius: 25, type: 'funnel', color: '#8844ff' });
-        } else if (type === 'wall') {
+          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.3, y: y, radius: 25, type: 'funnel', color: '#8844ff' });
+        } else if (type === 'wall_gap') {
           const gapX = 40 + Math.random() * (w - 80);
           obs.push({ x: gapX, y: y, width: 50, type: 'wall_gap', color: '#888888' });
-        } else if (type === 'spinner') {
-          obs.push({ x: cx, y: y, radius: 20, type: 'spinner', color: '#ff8800', speed: 0.04 });
+        } else if (type === 'wall_angled') {
+          obs.push({ x: cx + (Math.random() - 0.5) * w * 0.4, y: y, width: 60, angle: Math.floor(Math.random() * 12) * 15, type: 'wall_angled', color: '#ff6644' });
         }
       }
       return obs;
@@ -521,7 +459,7 @@
       const list = document.getElementById('mapList');
       list.innerHTML = savedMaps.map(m => `
         <div class="map-item ${m.id === mapData.id ? 'active' : ''}" onclick="loadMap('${m.id}')">
-          <span>${m.name} (${m.obstacles.length} об.)</span>
+          <span>${m.name} (${m.obstacles.length})</span>
           <button class="delete-map" onclick="event.stopPropagation(); deleteMap('${m.id}')">×</button>
         </div>
       `).join('');
@@ -539,6 +477,9 @@
         id: Date.now().toString()
       };
       selectedObstacle = null;
+      viewX = 0;
+      viewY = 0;
+      viewScale = 1;
       updateUI();
       renderMapList();
     };
@@ -546,29 +487,55 @@
     window.saveMap = function() {
       mapData.name = document.getElementById('mapName').value;
       mapData.trackLength = parseInt(document.getElementById('trackLength').value);
-      mapData.trackWidth = parseInt(document.getElementById('trackWidth').value);
       mapData.ballCount = parseInt(document.getElementById('ballCount').value);
       mapData.gravity = parseFloat(document.getElementById('gravity').value);
       mapData.bgColor = document.getElementById('bgColor').value;
       
       const idx = savedMaps.findIndex(m => m.id === mapData.id);
       if (idx >= 0) {
-        savedMaps[idx] = { ...mapData };
+        savedMaps[idx] = JSON.parse(JSON.stringify(mapData));
       } else {
-        savedMaps.push({ ...mapData });
+        savedMaps.push(JSON.parse(JSON.stringify(mapData)));
       }
       saveAllMaps();
       renderMapList();
-      alert('✅ Карта сохранена!');
+      alert('✅ Карта сохранена в админ-панели!');
+    };
+    
+    window.saveForGame = function() {
+      mapData.name = document.getElementById('mapName').value;
+      mapData.trackLength = parseInt(document.getElementById('trackLength').value);
+      mapData.ballCount = parseInt(document.getElementById('ballCount').value);
+      mapData.gravity = parseFloat(document.getElementById('gravity').value);
+      mapData.bgColor = document.getElementById('bgColor').value;
+      
+      // Сохраняем в админские карты
+      const idx = savedMaps.findIndex(m => m.id === mapData.id);
+      if (idx >= 0) {
+        savedMaps[idx] = JSON.parse(JSON.stringify(mapData));
+      } else {
+        savedMaps.push(JSON.parse(JSON.stringify(mapData)));
+      }
+      saveAllMaps();
+      
+      // Сохраняем ВСЕ карты для игры
+      localStorage.setItem('game_maps', JSON.stringify(savedMaps));
+      
+      renderMapList();
+      alert('✅ Карта сохранена и готова к использованию в игре!\n\nВ игре откройте "Карты" и выберите эту карту.');
     };
     
     window.loadMap = function(id) {
       const map = savedMaps.find(m => m.id === id);
       if (map) {
-        mapData = { ...map, obstacles: map.obstacles.map(o => ({...o})) };
+        mapData = JSON.parse(JSON.stringify(map));
         selectedObstacle = null;
+        viewX = 0;
+        viewY = 0;
+        viewScale = 1;
         updateUI();
         renderMapList();
+        zoomToFit();
       }
     };
     
@@ -576,6 +543,7 @@
       if (confirm('Удалить карту?')) {
         savedMaps = savedMaps.filter(m => m.id !== id);
         saveAllMaps();
+        localStorage.setItem('game_maps', JSON.stringify(savedMaps));
         if (mapData.id === id && savedMaps.length > 0) {
           loadMap(savedMaps[0].id);
         } else if (savedMaps.length === 0) {
@@ -588,30 +556,27 @@
     function updateUI() {
       document.getElementById('mapName').value = mapData.name;
       document.getElementById('trackLength').value = mapData.trackLength;
-      document.getElementById('trackLengthRange').value = mapData.trackLength;
-      document.getElementById('trackWidth').value = mapData.trackWidth;
       document.getElementById('ballCount').value = mapData.ballCount;
       document.getElementById('gravity').value = mapData.gravity;
       document.getElementById('bgColor').value = mapData.bgColor;
       document.getElementById('obsCount').textContent = mapData.obstacles.length;
       renderObstacleList();
       updatePropsPanel();
-      resizeCanvas();
       draw();
     }
     
     function renderObstacleList() {
       const list = document.getElementById('obstacleList');
       list.innerHTML = mapData.obstacles.map((o, i) => `
-        <div class="obstacle-item" onclick="selectObstacle(${i})" style="${selectedObstacle === i ? 'border-color:#ffd700;' : ''}">
-          <span>${getObsIcon(o.type)} ${o.type} (${Math.round(o.x)}, ${Math.round(o.y)})</span>
+        <div class="obstacle-item ${i === selectedObstacle ? 'selected-item' : ''}" onclick="selectObstacle(${i})">
+          <span>${getObsIcon(o.type)} ${o.type.replace('_',' ')} (${Math.round(o.x)}, ${Math.round(o.y)})${o.angle !== undefined ? ' '+o.angle+'°' : ''}</span>
           <button class="remove-obs" onclick="event.stopPropagation(); removeObstacle(${i})">×</button>
         </div>
       `).join('');
     }
     
     function getObsIcon(type) {
-      const icons = { pin: '📌', bumper: '🔼', funnel: '🌀', wall_gap: '🧱', wall_seg: '🧱', tunnel: '🕳️', spinner: '⚙️' };
+      const icons = { pin: '📌', bumper: '🔼', funnel: '🌀', wall_gap: '🧱', wall_angled: '📐', wall_seg: '🧱', tunnel: '🕳️', spinner: '⚙️' };
       return icons[type] || '❓';
     }
     
@@ -646,19 +611,36 @@
       if (selectedObstacle !== null && mapData.obstacles[selectedObstacle]) {
         panel.classList.remove('hidden');
         const o = mapData.obstacles[selectedObstacle];
-        content.innerHTML = `
-          <label>Тип: <strong>${o.type}</strong></label>
+        let html = `
+          <label>Тип: <strong>${o.type.replace('_',' ')}</strong></label>
           <label>X:</label>
           <input type="number" value="${Math.round(o.x)}" onchange="updateProp('x', parseInt(this.value))">
           <label>Y:</label>
           <input type="number" value="${Math.round(o.y)}" onchange="updateProp('y', parseInt(this.value))">
-          ${o.radius !== undefined ? `<label>Радиус:</label><input type="number" value="${o.radius}" onchange="updateProp('radius', parseInt(this.value))">` : ''}
-          ${o.width !== undefined ? `<label>Ширина:</label><input type="number" value="${o.width}" onchange="updateProp('width', parseInt(this.value))">` : ''}
-          ${o.force !== undefined ? `<label>Сила:</label><input type="number" value="${o.force}" step="0.1" onchange="updateProp('force', parseFloat(this.value))">` : ''}
-          ${o.speed !== undefined ? `<label>Скорость:</label><input type="number" value="${o.speed}" step="0.01" onchange="updateProp('speed', parseFloat(this.value))">` : ''}
-          <label>Цвет:</label>
-          <input type="color" value="${o.color || '#ffffff'}" onchange="updateProp('color', this.value)">
         `;
+        
+        if (o.type === 'wall_angled') {
+          html += `
+            <label>Угол (градусы):</label>
+            <input type="number" value="${o.angle || 0}" min="0" max="345" step="15" onchange="updateProp('angle', parseInt(this.value))">
+            <input type="range" value="${o.angle || 0}" min="0" max="345" step="15" oninput="updateProp('angle', parseInt(this.value))">
+            <label>Длина:</label>
+            <input type="number" value="${o.width || 60}" onchange="updateProp('width', parseInt(this.value))">
+          `;
+        } else if (o.radius !== undefined) {
+          html += `<label>Радиус:</label><input type="number" value="${o.radius}" onchange="updateProp('radius', parseInt(this.value))">`;
+        }
+        
+        if (o.width !== undefined && o.type !== 'wall_angled') {
+          html += `<label>Ширина:</label><input type="number" value="${o.width}" onchange="updateProp('width', parseInt(this.value))">`;
+        }
+        if (o.force !== undefined) {
+          html += `<label>Сила:</label><input type="number" value="${o.force}" step="0.1" onchange="updateProp('force', parseFloat(this.value))">`;
+        }
+        
+        html += `<label>Цвет:</label><input type="color" value="${o.color || '#ffffff'}" onchange="updateProp('color', this.value)">`;
+        
+        content.innerHTML = html;
       } else {
         panel.classList.add('hidden');
         content.innerHTML = '';
@@ -668,93 +650,92 @@
     window.updateProp = function(prop, value) {
       if (selectedObstacle !== null && mapData.obstacles[selectedObstacle]) {
         mapData.obstacles[selectedObstacle][prop] = value;
+        updateUI();
         draw();
       }
-    };
-    
-    window.syncRange = function(inputId, value) {
-      document.getElementById(inputId).value = value;
-      mapData.trackLength = parseInt(value);
-      resizeCanvas();
-      draw();
     };
     
     window.setTool = function(tool) {
       currentTool = tool;
       document.querySelectorAll('.obstacle-btn').forEach(b => b.classList.remove('selected'));
       document.getElementById('deleteTool').style.borderColor = tool === 'delete' ? '#ff4444' : '';
-      document.getElementById('selectTool').style.borderColor = tool === 'select' ? '#44ff44' : '';
       
-      if (tool !== 'delete' && tool !== 'select') {
+      if (tool !== 'delete') {
         const btn = document.querySelector(`[data-type="${tool}"]`);
         if (btn) btn.classList.add('selected');
       }
     };
     
-    // Инициализация палитры
+    // Палитра
     document.querySelectorAll('.obstacle-btn').forEach(btn => {
       btn.addEventListener('click', () => setTool(btn.dataset.type));
     });
     
-    // Canvas размеры
     function resizeCanvas() {
       const rect = canvas.parentElement.getBoundingClientRect();
       canvas.width = rect.width;
-      canvas.height = rect.height - 50;
+      canvas.height = rect.height;
     }
     
-    // Преобразование координат
     function screenToWorld(sx, sy) {
-      const cx = canvas.width / 2;
-      const cy = 50;
       return {
-        x: (sx - cx) / zoom + mapData.trackWidth / 2 - panX,
-        y: (sy - cy) / zoom - panY
+        x: (sx - viewX) / viewScale,
+        y: (sy - viewY) / viewScale
       };
     }
     
     function worldToScreen(wx, wy) {
-      const cx = canvas.width / 2;
-      const cy = 50;
       return {
-        x: (wx - mapData.trackWidth / 2 + panX) * zoom + cx,
-        y: (wy + panY) * zoom + cy
+        x: wx * viewScale + viewX,
+        y: wy * viewScale + viewY
       };
     }
     
-    // Отрисовка
+    window.zoomToFit = function() {
+      const totalHeight = mapData.trackLength + 50;
+      const totalWidth = mapData.trackWidth + 20;
+      const scaleX = canvas.width / totalWidth;
+      const scaleY = canvas.height / totalHeight;
+      viewScale = Math.min(scaleX, scaleY) * 0.9;
+      viewX = (canvas.width - mapData.trackWidth * viewScale) / 2;
+      viewY = (canvas.height - mapData.trackLength * viewScale) / 2;
+      draw();
+    };
+    
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       // Фон
-      ctx.fillStyle = mapData.bgColor;
+      ctx.fillStyle = '#0a0a1a';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       // Трасса
-      const topLeft = worldToScreen(0, 0);
-      const bottomRight = worldToScreen(mapData.trackWidth, mapData.trackLength);
+      const tl = worldToScreen(0, 0);
+      const br = worldToScreen(mapData.trackWidth, mapData.trackLength);
       
-      ctx.fillStyle = '#111122';
-      ctx.fillRect(topLeft.x, topLeft.y, bottomRight.x - topLeft.x, bottomRight.y - topLeft.y);
+      ctx.fillStyle = mapData.bgColor;
+      ctx.fillRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
       
-      // Стены
-      ctx.strokeStyle = '#3333aa';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(topLeft.x, topLeft.y);
-      ctx.lineTo(topLeft.x, bottomRight.y);
-      ctx.moveTo(bottomRight.x, topLeft.y);
-      ctx.lineTo(bottomRight.x, bottomRight.y);
-      ctx.stroke();
+      // Границы трассы
+      ctx.strokeStyle = '#3355aa';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
       
       // Сетка
-      ctx.strokeStyle = '#1a1a33';
-      ctx.lineWidth = 1;
-      for (let y = 0; y < mapData.trackLength; y += 100) {
+      ctx.strokeStyle = '#1a1a30';
+      ctx.lineWidth = 0.5;
+      for (let y = 0; y < mapData.trackLength; y += 50) {
         const sy = worldToScreen(0, y).y;
         ctx.beginPath();
-        ctx.moveTo(topLeft.x, sy);
-        ctx.lineTo(bottomRight.x, sy);
+        ctx.moveTo(tl.x, sy);
+        ctx.lineTo(br.x, sy);
+        ctx.stroke();
+      }
+      for (let x = 0; x < mapData.trackWidth; x += 50) {
+        const sx = worldToScreen(x, 0).x;
+        ctx.beginPath();
+        ctx.moveTo(sx, tl.y);
+        ctx.lineTo(sx, br.y);
         ctx.stroke();
       }
       
@@ -765,63 +746,101 @@
         
         if (o.type === 'pin') {
           ctx.beginPath();
-          ctx.arc(pos.x, pos.y, o.radius * zoom, 0, Math.PI * 2);
+          ctx.arc(pos.x, pos.y, o.radius * viewScale, 0, Math.PI * 2);
           ctx.fillStyle = o.color;
           ctx.fill();
-          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
-          ctx.lineWidth = isSelected ? 3 : 1;
-          ctx.stroke();
+          if (isSelected) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+          }
         } else if (o.type === 'bumper') {
           ctx.fillStyle = o.color;
-          ctx.fillRect(pos.x - o.width/2 * zoom, pos.y - o.height/2 * zoom, o.width * zoom, o.height * zoom);
-          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
-          ctx.lineWidth = isSelected ? 3 : 1;
-          ctx.strokeRect(pos.x - o.width/2 * zoom, pos.y - o.height/2 * zoom, o.width * zoom, o.height * zoom);
+          ctx.fillRect(pos.x - o.width/2 * viewScale, pos.y - o.height/2 * viewScale, o.width * viewScale, o.height * viewScale);
+          if (isSelected) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(pos.x - o.width/2 * viewScale, pos.y - o.height/2 * viewScale, o.width * viewScale, o.height * viewScale);
+          }
         } else if (o.type === 'funnel') {
           ctx.beginPath();
-          ctx.arc(pos.x, pos.y, o.radius * zoom, 0, Math.PI * 2);
+          ctx.arc(pos.x, pos.y, o.radius * viewScale, 0, Math.PI * 2);
           ctx.strokeStyle = isSelected ? '#ffd700' : o.color;
-          ctx.lineWidth = isSelected ? 4 : 3;
+          ctx.lineWidth = isSelected ? 3 : 2;
           ctx.stroke();
         } else if (o.type === 'wall_gap') {
           ctx.fillStyle = o.color;
           const wy = pos.y;
-          ctx.fillRect(topLeft.x, wy - 2 * zoom, (pos.x - o.width/2 * zoom) - topLeft.x, 4 * zoom);
-          ctx.fillRect(pos.x + o.width/2 * zoom, wy - 2 * zoom, bottomRight.x - (pos.x + o.width/2 * zoom), 4 * zoom);
-          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
-          ctx.lineWidth = isSelected ? 3 : 1;
-          ctx.strokeRect(pos.x - o.width/2 * zoom, wy - 4 * zoom, o.width * zoom, 8 * zoom);
+          ctx.fillRect(tl.x, wy - 2 * viewScale, pos.x - o.width/2 * viewScale - tl.x, 4 * viewScale);
+          ctx.fillRect(pos.x + o.width/2 * viewScale, wy - 2 * viewScale, br.x - pos.x - o.width/2 * viewScale, 4 * viewScale);
+          if (isSelected) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 2]);
+            ctx.strokeRect(pos.x - o.width/2 * viewScale, wy - 6 * viewScale, o.width * viewScale, 12 * viewScale);
+            ctx.setLineDash([]);
+          }
+        } else if (o.type === 'wall_angled') {
+          ctx.save();
+          ctx.translate(pos.x, pos.y);
+          ctx.rotate((o.angle || 0) * Math.PI / 180);
+          
+          ctx.fillStyle = o.color;
+          ctx.fillRect(-o.width/2 * viewScale, -3 * viewScale, o.width * viewScale, 6 * viewScale);
+          
+          if (isSelected) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-o.width/2 * viewScale, -3 * viewScale, o.width * viewScale, 6 * viewScale);
+          }
+          
+          // Стрелка направления
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.moveTo(o.width/2 * viewScale, 0);
+          ctx.lineTo(o.width/2 * viewScale - 8, -5);
+          ctx.lineTo(o.width/2 * viewScale - 8, 5);
+          ctx.fill();
+          
+          ctx.restore();
         } else if (o.type === 'wall_seg') {
           ctx.fillStyle = o.color;
-          ctx.fillRect(pos.x - o.width/2 * zoom, pos.y - o.height/2 * zoom, o.width * zoom, o.height * zoom);
+          ctx.fillRect(pos.x - o.width/2 * viewScale, pos.y - o.height/2 * viewScale, o.width * viewScale, o.height * viewScale);
+          if (isSelected) {
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(pos.x - o.width/2 * viewScale, pos.y - o.height/2 * viewScale, o.width * viewScale, o.height * viewScale);
+          }
         } else if (o.type === 'spinner') {
           ctx.save();
           ctx.translate(pos.x, pos.y);
           ctx.fillStyle = o.color;
-          ctx.fillRect(-o.radius * zoom, -2 * zoom, o.radius * 2 * zoom, 4 * zoom);
-          ctx.fillRect(-2 * zoom, -o.radius * zoom, 4 * zoom, o.radius * 2 * zoom);
-          ctx.strokeStyle = isSelected ? '#ffd700' : '#fff';
-          ctx.strokeRect(-o.radius * zoom, -2 * zoom, o.radius * 2 * zoom, 4 * zoom);
+          ctx.fillRect(-o.radius * viewScale, -2 * viewScale, o.radius * 2 * viewScale, 4 * viewScale);
+          ctx.fillRect(-2 * viewScale, -o.radius * viewScale, 4 * viewScale, o.radius * 2 * viewScale);
           ctx.restore();
         }
         
         // Номер
         ctx.fillStyle = '#fff';
-        ctx.font = `${10 * zoom}px sans-serif`;
+        ctx.font = `${Math.max(8, 10 * viewScale)}px sans-serif`;
         ctx.textAlign = 'center';
-        ctx.fillText(i, pos.x, pos.y - 12 * zoom);
+        ctx.fillText(i, pos.x, pos.y - 10 * viewScale);
       });
       
       // Финиш
       const finishPos = worldToScreen(0, mapData.trackLength);
       ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 3;
-      ctx.setLineDash([10, 5]);
+      ctx.lineWidth = 2;
+      ctx.setLineDash([8, 4]);
       ctx.beginPath();
-      ctx.moveTo(topLeft.x, finishPos.y);
-      ctx.lineTo(bottomRight.x, finishPos.y);
+      ctx.moveTo(tl.x, finishPos.y);
+      ctx.lineTo(br.x, finishPos.y);
       ctx.stroke();
       ctx.setLineDash([]);
+      ctx.fillStyle = '#ffd700';
+      ctx.font = `${Math.max(10, 14 * viewScale)}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText('🏁 ФИНИШ', mapData.trackWidth/2 * viewScale + viewX, finishPos.y - 10);
     }
     
     // Обработчики мыши
@@ -829,45 +848,29 @@
       const rect = canvas.getBoundingClientRect();
       const sx = e.clientX - rect.left;
       const sy = e.clientY - rect.top;
-      const world = screenToWorld(sx, sy);
       
-      if (e.button === 1 || (e.button === 0 && e.shiftKey)) {
-        // Средняя кнопка или Shift+ЛКМ — панорамирование
-        isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
+      if (e.button === 1 || e.altKey) {
+        isPanning = true;
+        panStartX = e.clientX;
+        panStartY = e.clientY;
+        panStartViewX = viewX;
+        panStartViewY = viewY;
+        canvas.style.cursor = 'grabbing';
         return;
       }
       
+      const world = screenToWorld(sx, sy);
+      
       if (currentTool === 'delete') {
-        // Удаление ближайшего препятствия
         let closest = null;
-        let minDist = 20 / zoom;
+        let minDist = 30 / viewScale;
         mapData.obstacles.forEach((o, i) => {
           const dist = Math.sqrt((o.x - world.x) ** 2 + (o.y - world.y) ** 2);
-          if (dist < minDist) {
-            minDist = dist;
-            closest = i;
-          }
+          if (dist < minDist) { minDist = dist; closest = i; }
         });
-        if (closest !== null) {
-          removeObstacle(closest);
-        }
-      } else if (currentTool === 'select') {
-        let closest = null;
-        let minDist = 30 / zoom;
-        mapData.obstacles.forEach((o, i) => {
-          const dist = Math.sqrt((o.x - world.x) ** 2 + (o.y - world.y) ** 2);
-          if (dist < minDist) {
-            minDist = dist;
-            closest = i;
-          }
-        });
-        selectedObstacle = closest;
-        updateUI();
-        draw();
+        if (closest !== null) removeObstacle(closest);
       } else {
-        // Добавление препятствия
+        // Создание препятствия
         const newObs = createObstacle(currentTool, world.x, world.y);
         mapData.obstacles.push(newObs);
         selectedObstacle = mapData.obstacles.length - 1;
@@ -882,29 +885,38 @@
       const sy = e.clientY - rect.top;
       const world = screenToWorld(sx, sy);
       
-      mouseX = world.x;
-      mouseY = world.y;
+      document.getElementById('mouseCoords').textContent = `X: ${Math.round(world.x)}, Y: ${Math.round(world.y)} | Масштаб: ${viewScale.toFixed(2)}x`;
       
-      document.getElementById('mouseCoords').textContent = `X: ${Math.round(world.x)}, Y: ${Math.round(world.y)}`;
-      
-      if (isDragging) {
-        panX += (e.clientX - dragStartX) / zoom;
-        panY += (e.clientY - dragStartY) / zoom;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
+      if (isPanning) {
+        viewX = panStartViewX + (e.clientX - panStartX);
+        viewY = panStartViewY + (e.clientY - panStartY);
         draw();
       }
     });
     
     canvas.addEventListener('mouseup', () => {
-      isDragging = false;
+      isPanning = false;
+      canvas.style.cursor = 'crosshair';
     });
     
     canvas.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
-      zoom = Math.max(0.2, Math.min(3, zoom * zoomFactor));
-      document.getElementById('zoomLevel').textContent = zoom.toFixed(1);
+      
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      
+      const worldBefore = screenToWorld(mx, my);
+      
+      const zoomFactor = e.deltaY > 0 ? 0.85 : 1.18;
+      const newScale = Math.max(0.1, Math.min(5, viewScale * zoomFactor));
+      
+      viewScale = newScale;
+      
+      const worldAfter = screenToWorld(mx, my);
+      viewX += (worldAfter.x - worldBefore.x) * viewScale;
+      viewY += (worldAfter.y - worldBefore.y) * viewScale;
+      
       draw();
     });
     
@@ -914,16 +926,15 @@
       const world = screenToWorld(e.clientX - rect.left, e.clientY - rect.top);
       
       let closest = null;
-      let minDist = 30 / zoom;
+      let minDist = 30 / viewScale;
       mapData.obstacles.forEach((o, i) => {
         const dist = Math.sqrt((o.x - world.x) ** 2 + (o.y - world.y) ** 2);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = i;
-        }
+        if (dist < minDist) { minDist = dist; closest = i; }
       });
       if (closest !== null) {
-        removeObstacle(closest);
+        selectedObstacle = closest;
+        updateUI();
+        draw();
       }
     });
     
@@ -933,34 +944,28 @@
         case 'pin': return { ...base, type: 'pin', radius: 4, color: '#f4d03f' };
         case 'bumper': return { ...base, type: 'bumper', width: 50, height: 6, color: '#ff4466', force: 4 };
         case 'funnel': return { ...base, type: 'funnel', radius: 25, color: '#8844ff' };
-        case 'wall': return { ...base, type: 'wall_gap', width: 50, color: '#888888' };
+        case 'wall_gap': return { ...base, type: 'wall_gap', width: 50, color: '#888888' };
+        case 'wall_angled': return { ...base, type: 'wall_angled', width: 60, angle: 0, color: '#ff6644' };
         case 'tunnel': return { ...base, type: 'wall_seg', width: 8, height: 14, color: '#666666' };
-        case 'spinner': return { ...base, type: 'spinner', radius: 20, color: '#ff8800', speed: 0.04 };
         default: return { ...base, type: 'pin', radius: 4, color: '#f4d03f' };
       }
     }
     
-    window.zoomIn = function() { zoom = Math.min(3, zoom * 1.2); document.getElementById('zoomLevel').textContent = zoom.toFixed(1); draw(); };
-    window.zoomOut = function() { zoom = Math.max(0.2, zoom * 0.8); document.getElementById('zoomLevel').textContent = zoom.toFixed(1); draw(); };
-    window.resetZoom = function() { zoom = 1; panX = 0; panY = 0; document.getElementById('zoomLevel').textContent = '1.0'; draw(); };
-    
     window.exportJSON = function() {
       mapData.name = document.getElementById('mapName').value;
       mapData.trackLength = parseInt(document.getElementById('trackLength').value);
-      mapData.trackWidth = parseInt(document.getElementById('trackWidth').value);
       
       const json = JSON.stringify(mapData, null, 2);
       navigator.clipboard.writeText(json).then(() => {
         alert('✅ JSON скопирован в буфер обмена!');
       }).catch(() => {
-        // Fallback
         const ta = document.createElement('textarea');
         ta.value = json;
         document.body.appendChild(ta);
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        alert('✅ JSON скопирован в буфер обмена!');
+        alert('✅ JSON скопирован!');
       });
     };
     
@@ -974,9 +979,13 @@
         if (json.obstacles && Array.isArray(json.obstacles)) {
           mapData = { ...json, id: Date.now().toString() };
           selectedObstacle = null;
+          viewX = 0;
+          viewY = 0;
+          viewScale = 1;
           updateUI();
           renderMapList();
           document.getElementById('importModal').classList.add('hidden');
+          zoomToFit();
           alert('✅ Карта импортирована!');
         } else {
           alert('❌ Неверный формат JSON!');
@@ -990,26 +999,26 @@
       document.getElementById('importModal').classList.add('hidden');
     };
     
-    window.testMap = function() {
-      mapData.name = document.getElementById('mapName').value;
-      mapData.trackLength = parseInt(document.getElementById('trackLength').value);
-      
-      const json = JSON.stringify(mapData);
-      localStorage.setItem('test_map', json);
-      
-      const url = window.location.href.replace(/\/[^\/]*$/, '/') + '?test=true';
-      window.open(url, '_blank');
-    };
-    
     // Горячие клавиши
     document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      const tools = ['pin', 'bumper', 'funnel', 'wall_gap', 'wall_angled', 'tunnel', 'delete'];
+      if (e.key >= '1' && e.key <= '7') {
+        const tool = tools[parseInt(e.key) - 1];
+        if (tool === 'delete') setTool('delete');
+        else setTool(tool);
+      }
+      
       if (e.key === 'Delete' && selectedObstacle !== null) {
         removeObstacle(selectedObstacle);
       }
+      
       if (e.ctrlKey && e.key === 's') {
         e.preventDefault();
         window.saveMap();
       }
+      
       if (e.ctrlKey && e.key === 'z') {
         e.preventDefault();
         if (mapData.obstacles.length > 0) {
@@ -1019,18 +1028,13 @@
           draw();
         }
       }
-      // Переключение инструментов цифрами
-      const tools = ['pin', 'bumper', 'funnel', 'wall', 'tunnel', 'spinner'];
-      if (e.key >= '1' && e.key <= '6') {
-        setTool(tools[parseInt(e.key) - 1]);
-      }
     });
     
     // Инициализация
     resizeCanvas();
     loadSavedMaps();
     updateUI();
-    draw();
+    zoomToFit();
     
     window.addEventListener('resize', () => {
       resizeCanvas();
