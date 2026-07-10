@@ -276,9 +276,8 @@
       cursor: pointer;
       font-size: 0.7rem;
     }
-    .map-card.locked {
-      opacity: 0.6;
-      cursor: not-allowed;
+    .map-card:hover {
+      border-color: #4488ff;
     }
     .map-card.active {
       border-color: #ffd700;
@@ -290,10 +289,6 @@
       font-size: 0.7rem;
       font-weight: bold;
       text-align: center;
-    }
-    .map-price {
-      font-size: 0.6rem;
-      color: #ffd700;
     }
   </style>
 </head>
@@ -323,7 +318,7 @@
   </div>
 </div>
 
-<!-- Модальное окно выбора шара и ставки -->
+<!-- Модальные окна -->
 <div id="betModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🎯 Выберите шар</h2>
@@ -341,7 +336,6 @@
   </div>
 </div>
 
-<!-- Модальное окно старта -->
 <div id="startModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🚀 Готовы к гонке?</h2>
@@ -354,12 +348,10 @@
   </div>
 </div>
 
-<!-- Окно результата -->
 <div id="resultModal" class="modal hidden">
   <div class="result-content" id="resultContent"></div>
 </div>
 
-<!-- Авторизация -->
 <div id="authModal" class="modal">
   <div class="modal-content">
     <h2 style="font-size:1rem;">🔐 Вход в космопорт</h2>
@@ -369,7 +361,6 @@
   </div>
 </div>
 
-<!-- Карты -->
 <div id="mapsModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="color:#ffd700; text-align:center; font-size:1rem;">🗺️ Карты миссий</h2>
@@ -379,7 +370,6 @@
   </div>
 </div>
 
-<!-- Профиль -->
 <div id="profileModal" class="modal hidden">
   <div class="modal-content">
     <h2 style="font-size:1rem;">👤 Профиль пилота</h2>
@@ -403,7 +393,7 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
     }
 
-    function playSound(freq, type, duration, vol = 0.08) {
+    function playSound(freq, type, duration, vol = 0.06) {
       if (!audioCtx) return;
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -417,12 +407,12 @@
       osc.stop(audioCtx.currentTime + duration);
     }
 
-    function soundBounce() { playSound(300 + Math.random() * 300, 'triangle', 0.06, 0.05); }
-    function soundBumper() { playSound(500, 'square', 0.08, 0.07); }
-    function soundFinish() { playSound(600, 'triangle', 0.3, 0.15); setTimeout(() => playSound(800, 'triangle', 0.3, 0.15), 0.1); }
+    function soundBounce() { playSound(200 + Math.random() * 200, 'triangle', 0.05, 0.04); }
+    function soundBumper() { playSound(400, 'triangle', 0.06, 0.05); }
+    function soundFinish() { playSound(500, 'triangle', 0.2, 0.1); setTimeout(() => playSound(700, 'triangle', 0.2, 0.1), 0.08); }
 
     // ========== БАЗА ДАННЫХ ==========
-    const STORAGE_KEY = 'space_pinball_race_db_v2';
+    const STORAGE_KEY = 'space_pinball_race_db_v3';
     let currentUser = null;
 
     function loadUsers() { const data = localStorage.getItem(STORAGE_KEY); return data ? JSON.parse(data) : {}; }
@@ -448,14 +438,53 @@
     }
     function updateUserData(u) { const users = loadUsers(); if (users[u.id]) { users[u.id] = u; saveUsers(users); currentUser = u; } }
 
-    // ========== КАРТЫ ==========
-    const maps = [
-      { id: 1, name: 'Классика', icon: '🌍', expCost: 0 },
-      { id: 2, name: 'Хаос', icon: '🔥', expCost: 100 },
-      { id: 3, name: 'Бездна', icon: '🕳️', expCost: 250 }
-    ];
+    // ========== ЗАГРУЗКА КАРТ ИЗ АДМИН-ПАНЕЛИ ==========
+    function loadGameMaps() {
+      const data = localStorage.getItem('game_maps');
+      if (data) {
+        try {
+          const maps = JSON.parse(data);
+          if (Array.isArray(maps) && maps.length > 0) {
+            return maps.map((m, i) => ({
+              id: m.id || 'map_' + i,
+              name: m.name || 'Карта ' + (i + 1),
+              icon: '🗺️',
+              expCost: 0,
+              trackLength: m.trackLength || 3500,
+              trackWidth: m.trackWidth || 440,
+              ballCount: m.ballCount || 6,
+              gravity: m.gravity || 0.08,
+              bgColor: m.bgColor || '#000015',
+              obstacles: m.obstacles || []
+            }));
+          }
+        } catch (e) {
+          console.error('Ошибка загрузки карт:', e);
+        }
+      }
+      // Если нет карт из админ-панели, создаём одну базовую
+      return [{
+        id: 'default',
+        name: 'Базовая карта',
+        icon: '🌍',
+        expCost: 0,
+        trackLength: 3500,
+        trackWidth: 440,
+        ballCount: 6,
+        gravity: 0.08,
+        bgColor: '#000015',
+        obstacles: []
+      }];
+    }
 
-    function getCurrentMap() { return maps.find(m => m.id === (currentUser ? currentUser.currentMapId : 1)) || maps[0]; }
+    let gameMaps = loadGameMaps();
+
+    function getCurrentMap() {
+      const id = currentUser ? currentUser.currentMapId : 1;
+      // Ищем по ID или используем первую карту
+      const found = gameMaps.find(m => m.id === id);
+      return found || gameMaps[0];
+    }
 
     // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
     const canvas = document.getElementById('gameCanvas');
@@ -470,11 +499,11 @@
     resizeCanvas();
     window.addEventListener('resize', () => { resizeCanvas(); buildTrack(); });
 
-    const GRAVITY = 0.15;
-    const BALL_RADIUS = 6;
-    const BALL_COLORS = ['#ff4444', '#44aaff', '#44ff44', '#ffdd44', '#ff44ff', '#ff8844'];
+    const GRAVITY = 0.08;
+    const BOUNCE = 0.3;
+    const BALL_RADIUS = 12;
+    const BALL_COLORS = ['#ff6666', '#66bbff', '#66ff66', '#ffee66', '#ff66ff', '#ffaa66'];
     const BALL_NAMES = ['Красный', 'Синий', 'Зелёный', 'Жёлтый', 'Розовый', 'Оранжевый'];
-    const OBSTACLE_TYPES = ['pin', 'bumper', 'funnel', 'tunnel', 'spinner', 'wall'];
 
     let trackLength = 3500;
     let trackWidth = 0;
@@ -490,56 +519,49 @@
     let shakeActive = false;
     let shakeTimer = 0;
     let sessionExp = 0;
+    let currentGravity = GRAVITY;
 
     function buildTrack() {
-      trackWidth = canvas.width;
+      const map = getCurrentMap();
+      trackWidth = map.trackWidth || canvas.width;
+      trackLength = map.trackLength || 3500;
+      currentGravity = map.gravity || GRAVITY;
       finishLine = trackLength - 100;
-      obstacles = [];
       
-      for (let y = 100; y < trackLength - 200; y += 40 + Math.random() * 60) {
-        const type = OBSTACLE_TYPES[Math.floor(Math.random() * OBSTACLE_TYPES.length)];
-        const cx = trackWidth / 2;
-        
-        if (type === 'pin') {
-          const count = 3 + Math.floor(Math.random() * 4);
-          for (let i = 0; i < count; i++) {
-            const px = 30 + Math.random() * (trackWidth - 60);
-            obstacles.push({ x: px, y: y + Math.random() * 20, radius: 4, type: 'pin', color: '#f4d03f' });
-          }
-        } else if (type === 'bumper') {
-          const bw = 40 + Math.random() * 30;
-          obstacles.push({ x: cx + (Math.random() - 0.5) * trackWidth * 0.6, y: y, width: bw, height: 6, type: 'bumper', color: '#ff4466', force: 4 });
-        } else if (type === 'funnel') {
-          obstacles.push({ x: cx + (Math.random() - 0.5) * trackWidth * 0.4, y: y, radius: 25, type: 'funnel', color: '#8844ff', spin: 0 });
-        } else if (type === 'tunnel') {
-          const tunnelY = y;
-          for (let ty = 0; ty < 150; ty += 15) {
-            obstacles.push({ x: 15, y: tunnelY + ty, width: 8, height: 14, type: 'wall_seg', color: '#666666' });
-            obstacles.push({ x: trackWidth - 15, y: tunnelY + ty, width: 8, height: 14, type: 'wall_seg', color: '#666666' });
-          }
-        } else if (type === 'spinner') {
-          obstacles.push({ x: cx, y: y, radius: 20, type: 'spinner', color: '#ff8800', angle: Math.random() * Math.PI * 2, speed: 0.03 + Math.random() * 0.05 });
-        } else if (type === 'wall') {
-          const gapX = 40 + Math.random() * (trackWidth - 80);
-          obstacles.push({ x: gapX, y: y, width: 50, type: 'wall_gap', color: '#888888' });
-        }
+      // Используем препятствия из карты
+      obstacles = [];
+      if (map.obstacles && Array.isArray(map.obstacles)) {
+        obstacles = map.obstacles.map(o => ({ ...o }));
       }
       
-      obstacles.push({ y: finishLine, type: 'finish' });
+      // Добавляем финиш если его нет
+      const hasFinish = obstacles.some(o => o.type === 'finish');
+      if (!hasFinish) {
+        obstacles.push({ y: finishLine, type: 'finish' });
+      }
+      
+      canvas.style.background = map.bgColor || '#000015';
     }
 
     function initBalls() {
+      const map = getCurrentMap();
+      const ballCount = map.ballCount || 6;
       balls = [];
-      for (let i = 0; i < 6; i++) {
+      
+      // Центрируем шары
+      const spacing = Math.min(20, (trackWidth - 40) / ballCount);
+      const startX = trackWidth / 2 - (ballCount - 1) * spacing / 2;
+      
+      for (let i = 0; i < ballCount; i++) {
         balls.push({
-          x: trackWidth / 2 + (i - 2.5) * 15,
+          x: startX + i * spacing,
           y: 30,
           vx: 0,
           vy: 0,
           active: true,
           finished: false,
           finishPos: 0,
-          color: BALL_COLORS[i],
+          color: BALL_COLORS[i % BALL_COLORS.length],
           index: i
         });
       }
@@ -557,14 +579,14 @@
         document.getElementById('balanceDisplay').textContent = '0';
         document.getElementById('expDisplay').textContent = '0';
         document.getElementById('userGreeting').textContent = '👨‍🚀 Гость';
-        document.getElementById('mapIndicator').textContent = '🌍 Карта 1';
+        document.getElementById('mapIndicator').textContent = '🗺️ Карта';
         return;
       }
       document.getElementById('balanceDisplay').textContent = Math.floor(currentUser.balance);
       document.getElementById('expDisplay').textContent = Math.floor(currentUser.exp);
       document.getElementById('userGreeting').textContent = `👨‍🚀 ${currentUser.name}`;
       const cm = getCurrentMap();
-      document.getElementById('mapIndicator').textContent = `${cm.icon} ${cm.name}`;
+      document.getElementById('mapIndicator').textContent = `${cm.icon || '🗺️'} ${cm.name}`;
     }
 
     function applyPhysics() {
@@ -581,36 +603,47 @@
         if (!b.active || b.finished) continue;
         allFinished = false;
         
-        b.vy += GRAVITY;
+        b.vy += currentGravity;
         b.x += b.vx;
         b.y += b.vy;
         
         if (shakeActive) {
-          b.vx += (Math.random() - 0.5) * 1.5;
-          b.vy += (Math.random() - 0.5) * 1.5;
+          b.vx += (Math.random() - 0.5) * 0.8;
+          b.vy += (Math.random() - 0.5) * 0.8;
         }
         
-        if (b.x - BALL_RADIUS < 5) { b.x = BALL_RADIUS + 5; b.vx = Math.abs(b.vx) * 0.5; }
-        if (b.x + BALL_RADIUS > trackWidth - 5) { b.x = trackWidth - BALL_RADIUS - 5; b.vx = -Math.abs(b.vx) * 0.5; }
+        // Мягкие стенки
+        if (b.x - BALL_RADIUS < 5) { 
+          b.x = BALL_RADIUS + 5; 
+          b.vx = Math.abs(b.vx) * BOUNCE; 
+          soundBounce();
+        }
+        if (b.x + BALL_RADIUS > trackWidth - 5) { 
+          b.x = trackWidth - BALL_RADIUS - 5; 
+          b.vx = -Math.abs(b.vx) * BOUNCE; 
+          soundBounce();
+        }
         
+        // Препятствия
         for (let obs of obstacles) {
           if (obs.type === 'pin') {
             const dx = b.x - obs.x;
             const dy = b.y - obs.y;
             const dist = Math.sqrt(dx*dx+dy*dy);
-            if (dist < BALL_RADIUS + obs.radius) {
+            if (dist < BALL_RADIUS + (obs.radius || 4)) {
               const nx = dx/dist, ny = dy/dist;
-              b.x += nx * (BALL_RADIUS + obs.radius - dist);
-              b.y += ny * (BALL_RADIUS + obs.radius - dist);
+              b.x += nx * (BALL_RADIUS + (obs.radius || 4) - dist);
+              b.y += ny * (BALL_RADIUS + (obs.radius || 4) - dist);
               const vn = b.vx*nx + b.vy*ny;
-              if (vn < 0) { b.vx -= 1.5*vn*nx; b.vy -= 1.5*vn*ny; }
+              if (vn < 0) { b.vx -= 1.2*vn*nx; b.vy -= 1.2*vn*ny; }
+              soundBounce();
               if (currentUser) { currentUser.exp += 1; sessionExp += 1; updateUserData(currentUser); }
             }
           } else if (obs.type === 'bumper') {
             if (b.x > obs.x - obs.width/2 - BALL_RADIUS && b.x < obs.x + obs.width/2 + BALL_RADIUS &&
                 b.y > obs.y - obs.height/2 - BALL_RADIUS && b.y < obs.y + obs.height/2 + BALL_RADIUS) {
-              b.vy = -Math.abs(b.vy) * obs.force - 3;
-              b.vx += (Math.random() - 0.5) * 3;
+              b.vy = -Math.abs(b.vy) * (obs.force || 2.5) - 2;
+              b.vx += (Math.random() - 0.5) * 2;
               soundBumper();
               if (currentUser) { currentUser.exp += 1; sessionExp += 1; updateUserData(currentUser); }
             }
@@ -618,40 +651,71 @@
             const dx = b.x - obs.x;
             const dy = b.y - obs.y;
             const dist = Math.sqrt(dx*dx+dy*dy);
-            if (dist < obs.radius && dist > 5) {
-              const force = 0.15;
+            if (dist < (obs.radius || 25) && dist > 5) {
+              const force = 0.08;
               b.vx += (-dy / dist) * force;
               b.vy += (dx / dist) * force;
-              obs.spin = (obs.spin || 0) + 0.05;
+              obs.spin = (obs.spin || 0) + 0.03;
             }
           } else if (obs.type === 'wall_seg') {
             if (b.x > obs.x - obs.width/2 - BALL_RADIUS && b.x < obs.x + obs.width/2 + BALL_RADIUS &&
                 b.y > obs.y - obs.height/2 - BALL_RADIUS && b.y < obs.y + obs.height/2 + BALL_RADIUS) {
-              if (b.x < obs.x) { b.x = obs.x - obs.width/2 - BALL_RADIUS; b.vx = -Math.abs(b.vx) * 0.5; }
-              else { b.x = obs.x + obs.width/2 + BALL_RADIUS; b.vx = Math.abs(b.vx) * 0.5; }
+              if (b.x < obs.x) { b.x = obs.x - obs.width/2 - BALL_RADIUS; b.vx = -Math.abs(b.vx) * BOUNCE; }
+              else { b.x = obs.x + obs.width/2 + BALL_RADIUS; b.vx = Math.abs(b.vx) * BOUNCE; }
+              soundBounce();
+            }
+          } else if (obs.type === 'wall_gap') {
+            if (Math.abs(b.y - obs.y) < BALL_RADIUS + 3) {
+              if (b.x < obs.x - obs.width/2 || b.x > obs.x + obs.width/2) {
+                b.vy = Math.abs(b.vy) * BOUNCE;
+                b.y = obs.y - BALL_RADIUS - 3;
+                soundBounce();
+              }
+            }
+          } else if (obs.type === 'wall_angled') {
+            const angle = (obs.angle || 0) * Math.PI / 180;
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            
+            const dx = b.x - obs.x;
+            const dy = b.y - obs.y;
+            
+            const localX = dx * cos + dy * sin;
+            const localY = -dx * sin + dy * cos;
+            
+            const halfW = obs.width / 2;
+            const halfH = 3;
+            
+            if (Math.abs(localX) < halfW + BALL_RADIUS && Math.abs(localY) < halfH + BALL_RADIUS) {
+              if (localY > 0) {
+                b.x -= -sin * (halfH + BALL_RADIUS - localY);
+                b.y -= cos * (halfH + BALL_RADIUS - localY);
+                const vn = b.vx * (-sin) + b.vy * cos;
+                if (vn < 0) { b.vx -= 1.2 * vn * (-sin); b.vy -= 1.2 * vn * cos; }
+              } else {
+                b.x -= -sin * (-halfH - BALL_RADIUS - localY);
+                b.y -= cos * (-halfH - BALL_RADIUS - localY);
+                const vn = b.vx * (-sin) + b.vy * cos;
+                if (vn > 0) { b.vx -= 1.2 * vn * (-sin); b.vy -= 1.2 * vn * cos; }
+              }
+              soundBounce();
             }
           } else if (obs.type === 'spinner') {
             const dx = b.x - obs.x;
             const dy = b.y - obs.y;
             const dist = Math.sqrt(dx*dx+dy*dy);
-            if (dist < BALL_RADIUS + obs.radius) {
-              obs.angle += obs.speed;
-              const fx = Math.cos(obs.angle) * 2;
-              const fy = Math.sin(obs.angle) * 2;
+            if (dist < BALL_RADIUS + (obs.radius || 20)) {
+              obs.angle = (obs.angle || 0) + (obs.speed || 0.04);
+              const fx = Math.cos(obs.angle) * 1;
+              const fy = Math.sin(obs.angle) * 1;
               b.vx += fx;
               b.vy += fy;
               if (currentUser) { currentUser.exp += 1; sessionExp += 1; updateUserData(currentUser); }
             }
-          } else if (obs.type === 'wall_gap') {
-            if (Math.abs(b.y - obs.y) < BALL_RADIUS + 3) {
-              if (b.x < obs.x - obs.width/2 || b.x > obs.x + obs.width/2) {
-                b.vy = Math.abs(b.vy) * 0.5;
-                b.y = obs.y - BALL_RADIUS - 3;
-              }
-            }
           }
         }
         
+        // Финиш
         if (b.y >= finishLine && !b.finished) {
           b.finished = true;
           b.finishPos = finishOrder.length + 1;
@@ -659,21 +723,22 @@
           soundFinish();
         }
         
-        b.vx *= 0.998;
-        b.vy *= 0.998;
+        // Очень мягкое трение
+        b.vx *= 0.999;
+        b.vy *= 0.999;
       }
       
       const selectedBall = balls[selectedBallIndex];
       if (selectedBall && selectedBall.active) {
         const targetY = selectedBall.y - canvas.height * 0.4;
-        cameraY += (targetY - cameraY) * 0.1;
+        cameraY += (targetY - cameraY) * 0.08;
         if (cameraY < 0) cameraY = 0;
         if (cameraY > trackLength - canvas.height) cameraY = trackLength - canvas.height;
       }
       
       updateRacePosition();
       
-      if (allFinished || finishOrder.length >= 6) {
+      if (allFinished || finishOrder.length >= balls.length) {
         endRace();
       }
       
@@ -701,6 +766,7 @@
       document.getElementById('raceInfo').classList.add('hidden');
       
       const selectedPos = balls[selectedBallIndex].finishPos || finishOrder.indexOf(selectedBallIndex) + 1;
+      const totalBalls = balls.length;
       
       let multiplier = 0;
       let winnings = 0;
@@ -709,8 +775,7 @@
       else if (selectedPos === 2) { multiplier = 2; winnings = betAmount * 2; }
       else if (selectedPos === 3) { multiplier = 1; winnings = betAmount; }
       else if (selectedPos === 4) { multiplier = 0.5; winnings = -Math.floor(betAmount * 0.5); }
-      else if (selectedPos === 5) { multiplier = 0; winnings = -betAmount; }
-      else if (selectedPos === 6) { multiplier = -0.5; winnings = -Math.floor(betAmount * 1.5); }
+      else if (selectedPos >= 5) { multiplier = 0; winnings = -betAmount; }
       
       const oldBalance = currentUser ? currentUser.balance : 0;
       if (currentUser) {
@@ -720,16 +785,16 @@
       const newBalance = currentUser ? currentUser.balance : 0;
       
       const resultDiv = document.getElementById('resultContent');
-      const positions = ['', '🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
+      const positions = ['', '🥇', '🥈', '🥉'];
       let orderHTML = finishOrder.map((idx, i) => 
-        `<div style="color:${BALL_COLORS[idx]}; margin: 2px 0; font-size:0.8rem;">${positions[i+1]} ${BALL_NAMES[idx]}</div>`
+        `<div style="color:${BALL_COLORS[idx % BALL_COLORS.length]}; margin: 2px 0; font-size:0.8rem;">${positions[i+1] || (i+1)+'️⃣'} ${BALL_NAMES[idx % BALL_NAMES.length]}</div>`
       ).join('');
       
       resultDiv.innerHTML = `
         <h3 style="color:#66ccff; text-align:center; font-size:0.95rem;">🏁 Результаты гонки</h3>
         <div style="background:rgba(0,0,0,0.3); border-radius:12px; padding:10px;">
           <div style="margin-bottom:8px;">${orderHTML}</div>
-          <div class="result-row"><span class="result-label">Ваш шар</span><span class="result-value" style="color:${BALL_COLORS[selectedBallIndex]};">${BALL_NAMES[selectedBallIndex]} — ${positions[selectedPos]} место</span></div>
+          <div class="result-row"><span class="result-label">Ваш шар</span><span class="result-value" style="color:${BALL_COLORS[selectedBallIndex % BALL_COLORS.length]};">${BALL_NAMES[selectedBallIndex % BALL_NAMES.length]} — ${selectedPos} место</span></div>
           <div class="result-row"><span class="result-label">Ставка</span><span class="result-value">⭐ ${betAmount}</span></div>
           <div class="result-row"><span class="result-label">Множитель</span><span class="result-value" style="color:#ffd700;">x${multiplier}</span></div>
           <div class="result-row"><span class="result-label">Выигрыш</span><span class="result-value" style="color:${winnings>=0?'#4caf50':'#f44336'};">${winnings>=0?'+':''}${winnings} ⭐</span></div>
@@ -745,6 +810,7 @@
     }
 
     function resetGame() {
+      gameMaps = loadGameMaps();
       initBalls();
       buildTrack();
       document.getElementById('shakeButton').disabled = true;
@@ -756,7 +822,8 @@
     function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      ctx.fillStyle = '#000015';
+      const map = getCurrentMap();
+      ctx.fillStyle = map.bgColor || '#000015';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
       ctx.fillStyle = '#1a1a3a';
@@ -771,37 +838,44 @@
         
         if (obs.type === 'pin') {
           ctx.beginPath();
-          ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI*2);
-          ctx.fillStyle = obs.color;
+          ctx.arc(obs.x, obs.y, obs.radius || 4, 0, Math.PI*2);
+          ctx.fillStyle = obs.color || '#f4d03f';
           ctx.fill();
         } else if (obs.type === 'bumper') {
-          ctx.fillStyle = obs.color;
-          ctx.fillRect(obs.x - obs.width/2, obs.y - obs.height/2, obs.width, obs.height);
+          ctx.fillStyle = obs.color || '#ff4466';
+          ctx.fillRect(obs.x - obs.width/2, obs.y - obs.height/2, obs.width, obs.height || 6);
           ctx.fillStyle = '#fff';
           ctx.font = '9px sans-serif';
           ctx.textAlign = 'center';
           ctx.fillText('▲▲▲', obs.x, obs.y + 4);
         } else if (obs.type === 'funnel') {
           ctx.beginPath();
-          ctx.arc(obs.x, obs.y, obs.radius, 0, Math.PI*2);
-          ctx.strokeStyle = obs.color;
+          ctx.arc(obs.x, obs.y, obs.radius || 25, 0, Math.PI*2);
+          ctx.strokeStyle = obs.color || '#8844ff';
           ctx.lineWidth = 2;
           ctx.stroke();
         } else if (obs.type === 'wall_seg') {
-          ctx.fillStyle = obs.color;
-          ctx.fillRect(obs.x - obs.width/2, obs.y - obs.height/2, obs.width, obs.height);
+          ctx.fillStyle = obs.color || '#666666';
+          ctx.fillRect(obs.x - obs.width/2, obs.y - obs.height/2, obs.width, obs.height || 14);
+        } else if (obs.type === 'wall_gap') {
+          ctx.fillStyle = obs.color || '#888888';
+          ctx.fillRect(0, obs.y - 2, obs.x - obs.width/2, 4);
+          ctx.fillRect(obs.x + obs.width/2, obs.y - 2, trackWidth - obs.x - obs.width/2, 4);
+        } else if (obs.type === 'wall_angled') {
+          ctx.save();
+          ctx.translate(obs.x, obs.y);
+          ctx.rotate((obs.angle || 0) * Math.PI / 180);
+          ctx.fillStyle = obs.color || '#ff6644';
+          ctx.fillRect(-obs.width/2, -3, obs.width, 6);
+          ctx.restore();
         } else if (obs.type === 'spinner') {
           ctx.save();
           ctx.translate(obs.x, obs.y);
-          ctx.rotate(obs.angle);
-          ctx.fillStyle = obs.color;
-          ctx.fillRect(-obs.radius, -2, obs.radius*2, 4);
-          ctx.fillRect(-2, -obs.radius, 4, obs.radius*2);
+          ctx.rotate(obs.angle || 0);
+          ctx.fillStyle = obs.color || '#ff8800';
+          ctx.fillRect(-(obs.radius || 20), -2, (obs.radius || 20)*2, 4);
+          ctx.fillRect(-2, -(obs.radius || 20), 4, (obs.radius || 20)*2);
           ctx.restore();
-        } else if (obs.type === 'wall_gap') {
-          ctx.fillStyle = obs.color;
-          ctx.fillRect(0, obs.y - 2, obs.x - obs.width/2, 4);
-          ctx.fillRect(obs.x + obs.width/2, obs.y - 2, trackWidth - obs.x - obs.width/2, 4);
         } else if (obs.type === 'finish') {
           for (let fx = 0; fx < trackWidth; fx += 16) {
             ctx.fillStyle = (Math.floor(fx/16) % 2 === 0) ? '#000' : '#ffd700';
@@ -814,20 +888,29 @@
         if (!b.active) continue;
         if (b.y < cameraY - 50 || b.y > cameraY + canvas.height + 50) continue;
         
+        // Большой мягкий шар
         ctx.beginPath();
         ctx.arc(b.x, b.y, BALL_RADIUS, 0, Math.PI*2);
-        ctx.fillStyle = b.color;
+        
+        // Градиент для мягкости
+        const grad = ctx.createRadialGradient(b.x - 3, b.y - 3, BALL_RADIUS * 0.2, b.x, b.y, BALL_RADIUS);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.4, b.color);
+        grad.addColorStop(1, '#000033');
+        ctx.fillStyle = grad;
         ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
+        
+        ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+        ctx.lineWidth = 1.5;
         ctx.stroke();
         
+        // Подсветка выбранного шара
         if (b.index === selectedBallIndex) {
           ctx.beginPath();
-          ctx.arc(b.x, b.y, BALL_RADIUS + 3, 0, Math.PI*2);
+          ctx.arc(b.x, b.y, BALL_RADIUS + 4, 0, Math.PI*2);
           ctx.strokeStyle = '#ffd700';
           ctx.lineWidth = 2;
-          ctx.setLineDash([3, 3]);
+          ctx.setLineDash([4, 4]);
           ctx.stroke();
           ctx.setLineDash([]);
         }
@@ -866,13 +949,16 @@
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
       initAudio();
       
+      const map = getCurrentMap();
+      const ballCount = map.ballCount || 6;
+      
       const selection = document.getElementById('ballSelection');
       selection.innerHTML = '';
-      for (let i = 0; i < 6; i++) {
+      for (let i = 0; i < ballCount; i++) {
         const div = document.createElement('div');
         div.className = 'ball-select-item';
         if (i === selectedBallIndex) div.classList.add('selected');
-        div.style.backgroundColor = BALL_COLORS[i];
+        div.style.backgroundColor = BALL_COLORS[i % BALL_COLORS.length];
         div.textContent = i + 1;
         div.addEventListener('click', () => {
           selectedBallIndex = i;
@@ -893,66 +979,43 @@
       document.getElementById('profileId').textContent = currentUser.id;
       document.getElementById('profileBalance').textContent = Math.floor(currentUser.balance);
       document.getElementById('profileExp').textContent = Math.floor(currentUser.exp);
-      document.getElementById('profileMaps').textContent = `${currentUser.unlockedMaps ? currentUser.unlockedMaps.length : 1} / ${maps.length}`;
+      document.getElementById('profileMaps').textContent = `${gameMaps.length} карт`;
       document.getElementById('profileModal').classList.remove('hidden');
     }
 
     function openMaps() {
       if (!currentUser) { alert('Войдите в аккаунт'); return; }
+      gameMaps = loadGameMaps();
+      
       const container = document.getElementById('mapsContainer');
       document.getElementById('mapsExpDisplay').textContent = Math.floor(currentUser.exp);
       container.innerHTML = '';
       
-      maps.forEach(map => {
-        const unlocked = currentUser.unlockedMaps ? currentUser.unlockedMaps.includes(map.id) : map.id === 1;
-        const isActive = map.id === currentUser.currentMapId;
+      gameMaps.forEach(map => {
+        const isActive = map.id === (currentUser.currentMapId || gameMaps[0].id);
         const card = document.createElement('div');
         card.className = 'map-card';
-        if (!unlocked) card.classList.add('locked');
         if (isActive) card.classList.add('active');
         
-        const costText = map.expCost > 0 ? `✨ ${map.expCost}` : 'Бесплатно';
-        
         card.innerHTML = `
-          <div class="map-icon">${map.icon}</div>
+          <div class="map-icon">${map.icon || '🗺️'}</div>
           <div class="map-name">${map.name}</div>
-          ${unlocked 
-            ? (isActive ? '<div style="color:#ffd700; font-size:0.6rem;">✅ Активна</div>' : '<button class="selectMapBtn" data-map="'+map.id+'" style="font-size:0.6rem; padding:3px 6px;">Выбрать</button>')
-            : `<div class="map-price">🔒 ${costText}</div><button class="buyMapBtn" data-map="${map.id}" style="font-size:0.6rem; padding:3px 6px;">Открыть</button>`
-          }
+          <div style="font-size:0.6rem; color:#88aacc;">${map.obstacles ? map.obstacles.length : 0} преп.</div>
+          ${isActive ? '<div style="color:#ffd700; font-size:0.6rem;">✅ Активна</div>' : '<button class="selectMapBtn" style="font-size:0.6rem; padding:3px 6px;">Выбрать</button>'}
         `;
         
-        container.appendChild(card);
-      });
-      
-      document.querySelectorAll('.buyMapBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const mapId = parseInt(e.target.getAttribute('data-map'));
-          const map = maps.find(m => m.id === mapId);
-          if (map && currentUser.exp >= map.expCost) {
-            currentUser.exp -= map.expCost;
-            if (!currentUser.unlockedMaps) currentUser.unlockedMaps = [1];
-            currentUser.unlockedMaps.push(mapId);
-            currentUser.currentMapId = mapId;
+        if (!isActive) {
+          card.addEventListener('click', () => {
+            currentUser.currentMapId = map.id;
             updateUserData(currentUser);
             updateUI();
+            buildTrack();
+            initBalls();
             openMaps();
-          } else {
-            alert('Недостаточно опыта!');
-          }
-        });
-      });
-      
-      document.querySelectorAll('.selectMapBtn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const mapId = parseInt(e.target.getAttribute('data-map'));
-          currentUser.currentMapId = mapId;
-          updateUserData(currentUser);
-          updateUI();
-          openMaps();
-        });
+          });
+        }
+        
+        container.appendChild(card);
       });
       
       document.getElementById('mapsModal').classList.remove('hidden');
@@ -962,6 +1025,9 @@
       const user = getOrCreateUser(name);
       if (!user) { alert('Введите имя'); return; }
       currentUser = user;
+      if (!currentUser.currentMapId || !gameMaps.find(m => m.id === currentUser.currentMapId)) {
+        currentUser.currentMapId = gameMaps[0].id;
+      }
       document.getElementById('authModal').classList.add('hidden');
       initBalls();
       buildTrack();
@@ -1006,8 +1072,8 @@
         return;
       }
       document.getElementById('betModal').classList.add('hidden');
-      document.getElementById('startBallInfo').textContent = BALL_NAMES[selectedBallIndex];
-      document.getElementById('startBallInfo').style.color = BALL_COLORS[selectedBallIndex];
+      document.getElementById('startBallInfo').textContent = BALL_NAMES[selectedBallIndex % BALL_NAMES.length];
+      document.getElementById('startBallInfo').style.color = BALL_COLORS[selectedBallIndex % BALL_COLORS.length];
       document.getElementById('startBetInfo').textContent = betAmount;
       document.getElementById('startModal').classList.remove('hidden');
     });
@@ -1043,11 +1109,14 @@
     // ========== ИНИЦИАЛИЗАЦИЯ ==========
     document.getElementById('shakeButton').disabled = true;
 
-    const savedId = localStorage.getItem('space_pinball_race_current');
+    const savedId = localStorage.getItem('space_pinball_race_current_v3');
     if (savedId) {
       const users = loadUsers();
       if (users[savedId]) {
         currentUser = users[savedId];
+        if (!currentUser.currentMapId || !gameMaps.find(m => m.id === currentUser.currentMapId)) {
+          currentUser.currentMapId = gameMaps[0].id;
+        }
         document.getElementById('authModal').classList.add('hidden');
       } else {
         document.getElementById('authModal').classList.remove('hidden');
@@ -1057,7 +1126,7 @@
     }
 
     window.addEventListener('beforeunload', () => {
-      if (currentUser) localStorage.setItem('space_pinball_race_current', currentUser.id);
+      if (currentUser) localStorage.setItem('space_pinball_race_current_v3', currentUser.id);
     });
 
     initBalls();
