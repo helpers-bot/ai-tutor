@@ -348,7 +348,7 @@
 
 <script>
   (function() {
-    // ========== ЗВУКИ (ФОНОВЫЙ ШУМ УБРАН, МУЗЫКА ОТКЛЮЧЕНА) ==========
+    // ========== ЗВУКИ ==========
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
@@ -465,8 +465,8 @@
       { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, expCost: 0, desc: 'Стандартная', specials: [] },
       { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 0, expCost: 2000, desc: '+10% множители', specials: ['bumper'] },
       { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 0, expCost: 5000, desc: '+20% множители', specials: ['bumper', 'teleport'] },
-      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 10000, desc: '+35% множители', specials: ['bumper', 'teleport', 'gravity'] },
-      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 20000, desc: '+50% множители', specials: ['bumper', 'teleport', 'gravity', 'doublebumper'] }
+      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 10000, desc: '+35% множители', specials: ['bumper', 'teleport', 'blackhole'] },
+      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 20000, desc: '+50% множители', specials: ['bumper', 'teleport', 'blackhole', 'doublebumper'] }
     ];
 
     // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
@@ -532,6 +532,9 @@
     let bonusTotalWinnings = 0;
     let bonusGameEndDelay = 0;
     let normalGameEndDelay = 0;
+    
+    // Анимация чёрной дыры
+    let blackHoleAngle = 0;
 
     function getBallColor(value) {
       const colors = {
@@ -649,7 +652,7 @@
             type: 'bumper',
             color: '#ff4466',
             bounceForce: 2.5,
-            id: i
+            id: 'bumper_' + i
           });
         }
       }
@@ -667,7 +670,7 @@
           type: 'bumper',
           color: '#ff0044',
           bounceForce: 3.2,
-          id: specials.length
+          id: 'bumper_' + specials.length
         });
         specials.push({
           x: cx + w * 0.2,
@@ -677,7 +680,7 @@
           type: 'bumper',
           color: '#ff0044',
           bounceForce: 3.2,
-          id: specials.length
+          id: 'bumper_' + specials.length
         });
       }
       
@@ -688,16 +691,16 @@
           const y1 = startY + rows_pos[0] * rowSpacing;
           const y2 = startY + rows_pos[1] * rowSpacing;
           
-          const teleportId = specials.length;
+          const teleportId = 'teleport_' + specials.length;
           specials.push({
             x: cx - w * 0.25,
             y: Math.min(y1, h - 90),
             radius: 12,
             type: 'teleport',
             color: '#00ff88',
-            targetX: stringAnchorX,
-            targetY: startY - 5,
-            pairId: teleportId + 1
+            targetX: cx + w * 0.25,
+            targetY: Math.min(y2, h - 90),
+            pairId: teleportId + '_pair'
           });
           specials.push({
             x: cx + w * 0.25,
@@ -705,23 +708,25 @@
             radius: 12,
             type: 'teleport',
             color: '#ff8800',
-            targetX: stringAnchorX,
-            targetY: startY - 5,
+            targetX: cx - w * 0.25,
+            targetY: Math.min(y1, h - 90),
             pairId: teleportId
           });
         }
       }
       
-      if (mapConfig.specials.includes('gravity')) {
+      if (mapConfig.specials.includes('blackhole')) {
         const r = Math.floor(Math.random() * (rows - 6)) + 3;
         const y = startY + r * rowSpacing;
         specials.push({
           x: cx,
           y: y,
-          radius: 14,
-          type: 'gravity',
+          radius: 18,
+          type: 'blackhole',
           color: '#6600cc',
-          pullForce: 0.08
+          pullForce: 0.15,
+          targetX: stringAnchorX,
+          targetY: startY - 5
         });
       }
     }
@@ -740,7 +745,6 @@
       const w = canvas.width;
       const margin = 10;
       
-      // Основные препятствия, расширенные до краёв (исключаем последний ряд)
       for (let r = 0; r < rows - 1; r++) {
         const y = startY + r * rowSpacing;
         if (y < startY + 10) continue;
@@ -757,15 +761,13 @@
           
           let overlapped = false;
           for (let s of specials) {
-            if (usedTeleports.includes(s.id) || usedBumpers.includes(s.id)) continue;
-            
             if (s.type === 'bumper') {
               if (Math.abs(px - s.x) < s.width / 2 + PLATFORM_RADIUS + 3 && 
                   Math.abs(y - s.y) < s.height / 2 + PLATFORM_RADIUS + 3) {
                 overlapped = true;
                 break;
               }
-            } else if (s.type === 'teleport' || s.type === 'gravity') {
+            } else if (s.type === 'teleport' || s.type === 'blackhole') {
               const dx = px - s.x;
               const dy = y - s.y;
               if (Math.sqrt(dx*dx+dy*dy) < s.radius + PLATFORM_RADIUS + 5) {
@@ -947,7 +949,6 @@
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
       if (gameActive || ball.active || waitingForResultClose || bonusActive) return;
       
-      // Имитация просмотра рекламы
       alert('📺 Смотрим рекламу...\n🎁 Получено 5 шаров!');
       
       bonusActive = true;
@@ -961,7 +962,6 @@
       const ballValue = currentUser.selectedBall;
       const ballColor = getBallColor(ballValue);
       
-      // Создаем 5 шаров
       bonusBalls = [];
       for (let i = 0; i < 5; i++) {
         const angle = (i / 5) * Math.PI * 2 + swingAngle;
@@ -977,8 +977,6 @@
           value: ballValue,
           color: ballColor,
           inBin: false,
-          binX: 0,
-          binY: 0,
           binTimer: 0,
           finished: false,
           winnings: 0,
@@ -987,7 +985,6 @@
         });
       }
       
-      // Основной шар тоже активен
       ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
       ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
       ball.vx = Math.sin(swingAngle) * 1.2;
@@ -1031,8 +1028,6 @@
     }
 
     function checkBumperCollisionForBall(b, bumper) {
-      if (usedBumpers.includes(bumper.id)) return false;
-      
       const halfW = bumper.width / 2;
       const halfH = bumper.height / 2;
       
@@ -1057,7 +1052,6 @@
           b.vy = -Math.abs(b.vy) * bumper.bounceForce - 3;
           b.vx += (Math.random() - 0.5) * 3;
           
-          usedBumpers.push(bumper.id);
           soundBumper();
           
           if (currentUser) {
@@ -1170,7 +1164,6 @@
         }
       }
       
-      // Коллизия со стенками корзины - физика продолжает работать
       for (let wall of binWalls) {
         checkWallCollisionForBall(b, wall);
       }
@@ -1182,8 +1175,6 @@
         }
         
         if (s.type === 'teleport') {
-          if (usedTeleports.includes(s.id) || usedTeleports.includes(s.pairId)) continue;
-          
           const dx = b.x - s.x;
           const dy = b.y - s.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1191,11 +1182,9 @@
           if (dist < minDist) {
             b.x = s.targetX;
             b.y = s.targetY;
-            b.vx = (Math.random() - 0.5) * 1;
+            b.vx = (Math.random() - 0.5) * 2;
             b.vy = 0.5;
             
-            usedTeleports.push(s.id);
-            usedTeleports.push(s.pairId);
             soundTeleport();
             
             if (currentUser) {
@@ -1206,17 +1195,34 @@
           }
         }
         
-        if (s.type === 'gravity') {
+        if (s.type === 'blackhole') {
           const dx = b.x - s.x;
           const dy = b.y - s.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          const influenceRadius = 80;
+          const influenceRadius = 100;
+          const captureRadius = s.radius + BALL_RADIUS;
+          
           if (dist < influenceRadius && dist > 0.001) {
+            // Притяжение к чёрной дыре
             const force = s.pullForce * (1 - dist / influenceRadius);
-            b.vx += (dx / dist) * force;
-            b.vy += (dy / dist) * force;
-            b.vx += (-dy / dist) * force * 0.3;
-            b.vy += (dx / dist) * force * 0.3;
+            b.vx -= (dx / dist) * force;
+            b.vy -= (dy / dist) * force;
+            
+            // Если шар достаточно близко - засасывает и выбрасывает сверху
+            if (dist < captureRadius) {
+              b.x = s.targetX;
+              b.y = s.targetY;
+              b.vx = (Math.random() - 0.5) * 3;
+              b.vy = 0.5;
+              
+              soundTeleport();
+              
+              if (currentUser) {
+                currentUser.exp += 3;
+                sessionExp += 3;
+                updateUserData(currentUser);
+              }
+            }
           }
         }
       }
@@ -1241,18 +1247,6 @@
       ball.vy = 0.6;
       
       soundDrop();
-    }
-
-    function checkWallCollision(wall) {
-      return checkWallCollisionForBall(ball, wall);
-    }
-
-    function checkBumperCollision(bumper) {
-      return checkBumperCollisionForBall(ball, bumper);
-    }
-
-    function applySpecialEffects() {
-      applyPhysicsToBall(ball);
     }
 
     function allBallsFinished() {
@@ -1311,13 +1305,13 @@
     function applyPhysics() {
       if (!gameActive) return;
       
-      // Обработка основного шара в корзине (обычный режим) с задержкой 0.5 сек
+      // Обработка основного шара в корзине (обычный режим)
       if (ballInBin && !bonusActive) {
         applyPhysicsToBall(ball);
         
         if (ball.y > canvas.height + 30) {
           normalGameEndDelay++;
-          if (normalGameEndDelay > 30) { // ~0.5 сек при 60fps
+          if (normalGameEndDelay > 30) {
             const binWidth = canvas.width / binCount;
             let binIndex = Math.floor(ball.x / binWidth);
             if (binIndex < 0) binIndex = 0;
@@ -1362,7 +1356,6 @@
           if (b.finished) continue;
           allFinished = false;
           
-          // Шар в корзине продолжает двигаться
           if (b.inBin && !b.settled) {
             applyPhysicsToBall(b);
             
@@ -1379,7 +1372,6 @@
             applyPhysicsToBall(b);
           }
           
-          // Шар попадает в зону корзины, но продолжает двигаться
           if (b.active && b.y + BALL_RADIUS >= canvas.height - 30 && b.y < canvas.height + 50) {
             b.inBin = true;
             b.binTimer = 0;
@@ -1395,17 +1387,14 @@
           }
         }
         
-        // Основной шар тоже падает
         if (ball.active) {
           applyPhysicsToBall(ball);
         }
         
-        // Основной шар в корзине продолжает двигаться
         if (ball.active && ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
           ballInBin = true;
         }
         
-        // Обработка основного шара в корзине в бонусном режиме
         if (ballInBin && !ball.settled) {
           if (ball.y > canvas.height + 30) {
             ball.binTimer = (ball.binTimer || 0) + 1;
@@ -1442,11 +1431,10 @@
           }
         }
         
-        // Проверка завершения всех шаров с задержкой 0.5 сек
         const allBonusSettled = bonusBalls.every(b => b.finished);
         if (allBonusSettled && (!ball.active || ball.settled)) {
           bonusGameEndDelay++;
-          if (bonusGameEndDelay > 30) { // ~0.5 сек задержка
+          if (bonusGameEndDelay > 30) {
             endBonusGame();
           }
         }
@@ -1462,7 +1450,6 @@
       
       updateUI();
 
-      // Шар падает в корзину, но продолжает двигаться
       if (ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
         ballInBin = true;
       }
@@ -1474,10 +1461,10 @@
     }
 
     function drawSpecials() {
+      blackHoleAngle += 0.05;
+      
       for (let s of specials) {
         if (s.type === 'bumper') {
-          if (usedBumpers.includes(s.id)) continue;
-          
           const halfW = s.width / 2;
           const halfH = s.height / 2;
           
@@ -1498,16 +1485,29 @@
         }
         
         if (s.type === 'teleport') {
-          if (usedTeleports.includes(s.id)) continue;
+          // Анимированный телепорт
+          const pulse = Math.sin(blackHoleAngle * 3) * 0.3 + 0.7;
           
           ctx.strokeStyle = s.color;
-          ctx.lineWidth = 3;
+          ctx.lineWidth = 3 * pulse;
           ctx.beginPath();
           ctx.moveTo(s.x - s.radius, s.y - s.radius);
           ctx.lineTo(s.x - s.radius, s.y + s.radius);
           ctx.moveTo(s.x + s.radius, s.y - s.radius);
           ctx.lineTo(s.x + s.radius, s.y + s.radius);
           ctx.stroke();
+          ctx.lineWidth = 1;
+          
+          // Мерцающие частицы вокруг
+          for (let i = 0; i < 4; i++) {
+            const angle = blackHoleAngle * 2 + (i * Math.PI / 2);
+            const px = s.x + Math.cos(angle) * s.radius * 1.2;
+            const py = s.y + Math.sin(angle) * s.radius * 1.2;
+            ctx.fillStyle = s.color;
+            ctx.beginPath();
+            ctx.arc(px, py, 2, 0, Math.PI * 2);
+            ctx.fill();
+          }
           
           ctx.fillStyle = s.color;
           ctx.font = 'bold 8px sans-serif';
@@ -1515,15 +1515,65 @@
           ctx.fillText('⏫', s.x, s.y + 3);
         }
         
-        if (s.type === 'gravity') {
+        if (s.type === 'blackhole') {
+          // Анимированная чёрная дыра
+          const pulse = Math.sin(blackHoleAngle * 2) * 0.2 + 0.8;
+          
+          // Внешнее свечение
+          for (let i = 3; i >= 0; i--) {
+            const r = s.radius + i * 8;
+            const alpha = 0.15 - i * 0.03;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, r * pulse, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(100, 0, 200, ${alpha})`;
+            ctx.fill();
+          }
+          
+          // Спиральные рукава
+          ctx.strokeStyle = '#8844cc';
+          ctx.lineWidth = 1.5;
+          for (let i = 0; i < 3; i++) {
+            const startAngle = blackHoleAngle + (i * Math.PI * 2 / 3);
+            ctx.beginPath();
+            for (let a = 0; a < Math.PI * 2; a += 0.1) {
+              const r = s.radius * (0.2 + a / (Math.PI * 2) * 1.8);
+              const x = s.x + Math.cos(a + startAngle) * r * pulse;
+              const y = s.y + Math.sin(a + startAngle) * r * pulse;
+              if (a === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          }
+          ctx.lineWidth = 1;
+          
+          // Центральный круг
           ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-          ctx.fillStyle = '#000000';
+          ctx.arc(s.x, s.y, s.radius * 0.6, 0, Math.PI * 2);
+          const gradient = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.radius * 0.6);
+          gradient.addColorStop(0, '#000000');
+          gradient.addColorStop(1, '#440088');
+          ctx.fillStyle = gradient;
           ctx.fill();
-          ctx.strokeStyle = s.color;
+          
+          // Кольцо горизонта событий
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius * 0.7, 0, Math.PI * 2);
+          ctx.strokeStyle = '#9944ff';
           ctx.lineWidth = 2;
           ctx.stroke();
           ctx.lineWidth = 1;
+          
+          // Частицы вокруг дыры
+          for (let i = 0; i < 8; i++) {
+            const angle = blackHoleAngle * 3 + (i * Math.PI / 4);
+            const r = s.radius * 1.5 * (0.8 + Math.sin(blackHoleAngle * 5 + i) * 0.2);
+            const px = s.x + Math.cos(angle) * r;
+            const py = s.y + Math.sin(angle) * r;
+            ctx.fillStyle = '#cc88ff';
+            ctx.beginPath();
+            ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
       }
     }
@@ -1542,7 +1592,7 @@
       ctx.stroke();
       ctx.lineWidth = 1;
       
-      // Рисуем бонусные шары на веревке
+      // Рисуем маятник
       if (!ball.active && !gameActive && !waitingForResultClose && !bonusActive) {
         swingAngle += swingSpeed;
         if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
