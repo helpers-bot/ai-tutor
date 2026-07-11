@@ -484,19 +484,21 @@
       buildAll();
     });
 
-    const GRAVITY = 0.12;
-    const BOUNCE = 0.35;
+    const GRAVITY = 0.25;
+    const BOUNCE = 0.3;
     const BALL_RADIUS = 7;
     const PLATFORM_RADIUS = 3;
 
     let platforms = [];
     let gameActive = false;
     let balls = [];
-    let finishLine = 0;
+    let finishY = 0;
     let betAmount = 0;
     let selectedBetBall = 1;
     let raceResults = [];
     let totalWinnings = 0;
+    let cameraY = 0;
+    let worldHeight = 0;
 
     function getBallColor(value) {
       const colors = {
@@ -537,7 +539,9 @@
 
     function buildAll() {
       platforms = [];
-      finishLine = canvas.height - 30;
+      worldHeight = canvas.height * 6; // Длинная трасса
+      finishY = worldHeight - 50;
+      cameraY = 0;
       buildTrack();
       resetBalls();
     }
@@ -545,89 +549,176 @@
     function buildTrack() {
       platforms = [];
       const w = canvas.width;
-      const h = canvas.height;
-      const cx = w / 2;
       const margin = 15;
+      let y = canvas.height * 0.1;
       
-      // Создаем полукруглую дорожку из платформ
-      for (let row = 0; row < 18; row++) {
-        const y = canvas.height * 0.12 + row * ((finishLine - canvas.height * 0.12) / 20);
-        if (y > finishLine - 30) continue;
-        
-        // Левая стена
+      // Начальные веревки для шаров
+      for (let i = 0; i < 6; i++) {
         platforms.push({
-          x: margin + 12,
-          y: y,
-          radius: PLATFORM_RADIUS + 2,
-          color1: '#4488cc',
-          type: 'wall'
+          x: w * 0.1 + i * (w * 0.8 / 5),
+          y: 5,
+          radius: 2,
+          color1: '#666688',
+          type: 'rope_anchor'
         });
+      }
+      
+      // Генерируем длинную трассу
+      while (y < finishY - 200) {
+        const segmentType = Math.floor(Math.random() * 4);
         
-        // Правая стена
-        platforms.push({
-          x: w - margin - 12,
-          y: y,
-          radius: PLATFORM_RADIUS + 2,
-          color1: '#4488cc',
-          type: 'wall'
-        });
+        switch(segmentType) {
+          case 0: // Полукруглая дорожка
+            y = buildCurvedTrack(y, w, margin);
+            break;
+          case 1: // Наклонная дорожка
+            y = buildSlopedTrack(y, w, margin);
+            break;
+          case 2: // Батут
+            y = buildTrampoline(y, w, margin);
+            break;
+          case 3: // Зигзаг
+            y = buildZigzagTrack(y, w, margin);
+            break;
+        }
         
-        // Платформы на дорожке (полукругом)
-        const progress = row / 18;
-        const curveOffset = Math.sin(progress * Math.PI) * w * 0.3;
+        if (y > finishY - 200) break;
+      }
+      
+      // Финишная линия
+      platforms.push({
+        x: w/2,
+        y: finishY,
+        radius: 5,
+        color1: '#ffd700',
+        type: 'finish'
+      });
+    }
+
+    function buildCurvedTrack(startY, w, margin) {
+      const segmentLength = 200 + Math.random() * 200;
+      const endY = startY + segmentLength;
+      const cx = w/2 + (Math.random() - 0.5) * w * 0.4;
+      
+      for (let y = startY; y < endY; y += 12) {
+        const progress = (y - startY) / segmentLength;
+        const curveX = Math.sin(progress * Math.PI * 2) * w * 0.3;
+        const x = cx + curveX;
         
+        // Основная дорожка
         for (let i = -2; i <= 2; i++) {
-          if (i === 0 && row % 3 !== 0) continue;
-          const px = cx + i * (w * 0.12) + (row % 2 === 0 ? curveOffset * 0.5 : -curveOffset * 0.5);
-          if (px > margin + 25 && px < w - margin - 25) {
+          const px = x + i * 22;
+          if (px > margin + 15 && px < w - margin - 15) {
             platforms.push({
               x: px,
               y: y,
               radius: PLATFORM_RADIUS,
-              color1: row % 2 === 0 ? '#f4d03f' : '#e67e22',
+              color1: i === 0 ? '#ff6644' : '#f4d03f',
               type: 'track'
             });
           }
         }
+        
+        // Боковые стенки
+        platforms.push({ x: x - w * 0.35, y: y, radius: PLATFORM_RADIUS + 1, color1: '#4488cc', type: 'wall' });
+        platforms.push({ x: x + w * 0.35, y: y, radius: PLATFORM_RADIUS + 1, color1: '#4488cc', type: 'wall' });
       }
       
-      // Добавляем несколько случайных препятствий
-      for (let i = 0; i < 8; i++) {
-        const y = canvas.height * 0.15 + Math.random() * (finishLine - canvas.height * 0.15 - 50);
-        const x = margin + 30 + Math.random() * (w - margin * 2 - 60);
+      return endY;
+    }
+
+    function buildSlopedTrack(startY, w, margin) {
+      const segmentLength = 250 + Math.random() * 200;
+      const endY = startY + segmentLength;
+      const startX = margin + 50 + Math.random() * (w - margin * 2 - 100);
+      const endX = margin + 50 + Math.random() * (w - margin * 2 - 100);
+      
+      for (let y = startY; y < endY; y += 10) {
+        const progress = (y - startY) / segmentLength;
+        const x = startX + (endX - startX) * progress;
         
-        // Проверяем, нет ли рядом других платформ
-        let tooClose = false;
-        for (let p of platforms) {
-          const dx = p.x - x;
-          const dy = p.y - y;
-          if (Math.sqrt(dx*dx+dy*dy) < 25) {
-            tooClose = true;
-            break;
+        // Наклонная дорожка
+        for (let i = -2; i <= 2; i++) {
+          const px = x + i * 20;
+          if (px > margin + 10 && px < w - margin - 10) {
+            platforms.push({
+              x: px,
+              y: y,
+              radius: PLATFORM_RADIUS,
+              color1: '#e67e22',
+              type: 'track'
+            });
           }
         }
-        if (!tooClose) {
-          platforms.push({
-            x: x,
-            y: y,
-            radius: PLATFORM_RADIUS + 4,
-            color1: '#ff6644',
-            type: 'obstacle'
-          });
-        }
+        
+        // Боковые стенки
+        platforms.push({ x: x - 70, y: y, radius: PLATFORM_RADIUS + 1, color1: '#4488cc', type: 'wall' });
+        platforms.push({ x: x + 70, y: y, radius: PLATFORM_RADIUS + 1, color1: '#4488cc', type: 'wall' });
       }
+      
+      return endY;
+    }
+
+    function buildTrampoline(startY, w, margin) {
+      const trampY = startY + 50;
+      const trampWidth = 80 + Math.random() * 60;
+      const trampX = margin + 50 + Math.random() * (w - margin * 2 - 100);
+      
+      // Батут
+      for (let x = trampX - trampWidth/2; x <= trampX + trampWidth/2; x += 8) {
+        platforms.push({
+          x: x,
+          y: trampY,
+          radius: PLATFORM_RADIUS + 1,
+          color1: '#44ff44',
+          type: 'trampoline',
+          bounceForce: 4 + Math.random() * 2
+        });
+      }
+      
+      return startY + 150;
+    }
+
+    function buildZigzagTrack(startY, w, margin) {
+      const segmentLength = 300 + Math.random() * 200;
+      const endY = startY + segmentLength;
+      let currentX = w/2;
+      let direction = 1;
+      
+      for (let y = startY; y < endY; y += 15) {
+        if (Math.random() < 0.05) direction *= -1;
+        currentX += direction * 3;
+        currentX = Math.max(margin + 50, Math.min(w - margin - 50, currentX));
+        
+        for (let i = -1; i <= 1; i++) {
+          const px = currentX + i * 25;
+          if (px > margin + 10 && px < w - margin - 10) {
+            platforms.push({
+              x: px,
+              y: y,
+              radius: PLATFORM_RADIUS,
+              color1: '#ff9944',
+              type: 'track'
+            });
+          }
+        }
+        
+        platforms.push({ x: currentX - 60, y: y, radius: PLATFORM_RADIUS + 1, color1: '#4488cc', type: 'wall' });
+        platforms.push({ x: currentX + 60, y: y, radius: PLATFORM_RADIUS + 1, color1: '#4488cc', type: 'wall' });
+      }
+      
+      return endY;
     }
 
     function resetBalls() {
       balls = [];
       const w = canvas.width;
-      const startY = canvas.height * 0.08;
+      const startY = 25;
       const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffaa00', '#ff44ff', '#00ffff'];
       
       for (let i = 0; i < 6; i++) {
-        const x = w * 0.1 + i * (w * 0.8 / 5);
         balls.push({
-          x: x,
+          x: w * 0.1 + i * (w * 0.8 / 5),
           y: startY,
           vx: 0,
           vy: 0,
@@ -636,7 +727,7 @@
           finishTime: 0,
           value: i + 1,
           color: colors[i],
-          ropeX: x,
+          ropeX: w * 0.1 + i * (w * 0.8 / 5),
           ropeY: 5,
           ropeLength: startY - 10
         });
@@ -645,6 +736,7 @@
       gameActive = false;
       raceResults = [];
       totalWinnings = 0;
+      cameraY = 0;
     }
 
     function updateUI() {
@@ -709,19 +801,33 @@
       gameActive = true;
       raceResults = [];
       totalWinnings = 0;
+      cameraY = 0;
       
-      // Отпускаем все шары
       for (let b of balls) {
         b.active = true;
-        b.vy = 0.3;
-        b.vx = (Math.random() - 0.5) * 0.5;
+        b.vy = 0.5;
+        b.vx = (Math.random() - 0.5) * 1;
       }
       
       soundDrop();
     }
 
+    function updateCamera() {
+      if (!gameActive) return;
+      
+      // Находим шар пользователя
+      const userBall = balls.find(b => b.value === selectedBetBall);
+      if (userBall && !userBall.finished) {
+        const targetY = userBall.y - canvas.height * 0.4;
+        cameraY += (targetY - cameraY) * 0.1;
+        cameraY = Math.max(0, Math.min(worldHeight - canvas.height, cameraY));
+      }
+    }
+
     function applyPhysics() {
       if (!gameActive) return;
+      
+      updateCamera();
       
       let allFinished = true;
       
@@ -733,13 +839,14 @@
         b.x += b.vx;
         b.y += b.vy;
         
-        // Границы экрана
+        // Границы экрана (в мировых координатах)
         if (b.x - BALL_RADIUS < 5) { b.x = BALL_RADIUS + 5; b.vx = Math.abs(b.vx) * BOUNCE; }
         if (b.x + BALL_RADIUS > canvas.width - 5) { b.x = canvas.width - BALL_RADIUS - 5; b.vx = -Math.abs(b.vx) * BOUNCE; }
-        if (b.y - BALL_RADIUS < 5) { b.y = BALL_RADIUS + 5; b.vy = Math.abs(b.vy) * BOUNCE; }
         
         // Столкновения с платформами
         for (let p of platforms) {
+          if (p.type === 'rope_anchor') continue;
+          
           const dx = b.x - p.x;
           const dy = b.y - p.y;
           const dist = Math.sqrt(dx*dx+dy*dy);
@@ -750,9 +857,16 @@
             b.x += nx * (minDist - dist);
             b.y += ny * (minDist - dist);
             const vn = b.vx * nx + b.vy * ny;
+            
             if (vn < 0) {
-              b.vx -= (1+BOUNCE)*vn*nx;
-              b.vy -= (1+BOUNCE)*vn*ny;
+              if (p.type === 'trampoline') {
+                b.vx -= (1 + BOUNCE * 2) * vn * nx;
+                b.vy -= (1 + BOUNCE * 3) * vn * ny;
+                b.vy -= p.bounceForce;
+              } else {
+                b.vx -= (1+BOUNCE)*vn*nx;
+                b.vy -= (1+BOUNCE)*vn*ny;
+              }
               soundBounce();
             }
             b.vx *= 0.998;
@@ -787,10 +901,10 @@
         }
         
         // Проверка финиша
-        if (b.y >= finishLine && !b.finished) {
+        if (b.y >= finishY && !b.finished) {
           b.finished = true;
           b.finishTime = Date.now();
-          b.y = finishLine;
+          b.y = finishY;
           b.active = false;
           
           raceResults.push({
@@ -799,19 +913,9 @@
             position: raceResults.length + 1
           });
         }
-        
-        if (b.y > canvas.height + 50) {
-          b.finished = true;
-          b.active = false;
-        }
       }
       
-      // Проверка завершения гонки
-      if (raceResults.length === 6 && allFinished === false) {
-        allFinished = true;
-      }
-      
-      if (allFinished && raceResults.length > 0) {
+      if (raceResults.length === 6 || (allFinished && raceResults.length > 0)) {
         endRace();
       }
     }
@@ -819,7 +923,6 @@
     function endRace() {
       gameActive = false;
       
-      // Расчет выигрыша
       const selectedBall = raceResults.find(r => r.value === selectedBetBall);
       let winnings = 0;
       let multiplier = 0;
@@ -844,7 +947,6 @@
       updateUserData(currentUser);
       updateUI();
       
-      // Показать результаты
       let resultsHtml = '';
       const positions = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
       
@@ -904,37 +1006,55 @@
       ctx.fillStyle = '#000020';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
+      ctx.save();
+      ctx.translate(0, -cameraY);
+      
+      // Рисуем фон дорожки
+      ctx.fillStyle = '#0a0a2e';
+      ctx.fillRect(0, 0, canvas.width, worldHeight);
+      
       // Рисуем платформы
       for (let p of platforms) {
+        if (p.type === 'rope_anchor') continue;
+        
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, 2*Math.PI);
         ctx.fillStyle = p.color1;
         ctx.fill();
+        
         if (p.type === 'wall') {
           ctx.strokeStyle = '#66aaff';
           ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+        
+        if (p.type === 'trampoline') {
+          ctx.strokeStyle = '#88ff88';
+          ctx.lineWidth = 2;
           ctx.stroke();
         }
       }
       
       // Линия финиша
       ctx.strokeStyle = '#ffd700';
-      ctx.lineWidth = 2;
-      ctx.setLineDash([10, 5]);
+      ctx.lineWidth = 3;
+      ctx.setLineDash([15, 8]);
       ctx.beginPath();
-      ctx.moveTo(20, finishLine);
-      ctx.lineTo(canvas.width - 20, finishLine);
+      ctx.moveTo(20, finishY);
+      ctx.lineTo(canvas.width - 20, finishY);
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.lineWidth = 1;
       
       ctx.fillStyle = '#ffd700';
-      ctx.font = 'bold 10px sans-serif';
+      ctx.font = 'bold 14px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('🏁 ФИНИШ', canvas.width/2, finishLine - 5);
+      ctx.fillText('🏁 ФИНИШ', canvas.width/2, finishY - 10);
       
       // Рисуем шары
       for (let b of balls) {
+        if (b.finished) continue;
+        
         if (!gameActive) {
           // Веревки
           ctx.beginPath();
@@ -950,7 +1070,7 @@
         ctx.fillStyle = b.color;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 2;
         ctx.stroke();
         
         // Номер шара
@@ -960,13 +1080,34 @@
         ctx.fillText(b.value, b.x, b.y + 2);
       }
       
-      // Если гонка идет, показываем позиции
+      ctx.restore();
+      
+      // Интерфейс поверх
       if (gameActive && raceResults.length > 0) {
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(0, 0, canvas.width, 30);
+        
         ctx.fillStyle = '#ffd700';
-        ctx.font = 'bold 14px sans-serif';
+        ctx.font = 'bold 12px sans-serif';
         ctx.textAlign = 'center';
         const leaders = raceResults.slice(0, 3);
         ctx.fillText(`Лидируют: ${leaders.map(r => '#'+r.value).join(', ')}`, canvas.width/2, 20);
+      }
+      
+      // Индикатор прогресса
+      if (gameActive) {
+        const userBall = balls.find(b => b.value === selectedBetBall);
+        if (userBall) {
+          const progress = Math.min(1, Math.max(0, userBall.y / finishY));
+          ctx.fillStyle = 'rgba(0,0,0,0.5)';
+          ctx.fillRect(10, canvas.height - 25, canvas.width - 20, 15);
+          ctx.fillStyle = '#44ff44';
+          ctx.fillRect(10, canvas.height - 25, (canvas.width - 20) * progress, 15);
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(`${Math.floor(progress * 100)}%`, canvas.width/2, canvas.height - 13);
+        }
       }
     }
 
