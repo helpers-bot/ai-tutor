@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.2, user-scalable=yes, viewport-fit=cover">
-  <title>Space Pinball Cadet — 3D аркада</title>
+  <title>Space Pinball Cadet — 3D аркада с трассой</title>
   <style>
     * {
       margin: 0;
@@ -143,7 +143,10 @@
     }
     .modal {
       position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0,0,20,0.85);
       display: flex;
       justify-content: center;
@@ -283,9 +286,9 @@
     <div class="stars-box">⭐ <span id="balanceDisplay">100</span></div>
     <div class="map-indicator" id="mapIndicator">🌍 Карта 1</div>
   </div>
-  
+
   <canvas id="gameCanvas" width="440" height="700"></canvas>
-  
+
   <div class="action-row">
     <button id="dropButton" class="big-btn">🚀 Запуск</button>
   </div>
@@ -395,7 +398,7 @@
     }
 
     // ========== БАЗА ДАННЫХ ==========
-    const STORAGE_KEY = 'space_pinball_users_db_v5';
+    const STORAGE_KEY = 'space_pinball_users_db_v6';
     let currentUser = null;
     let currentMapId = 1;
 
@@ -410,9 +413,9 @@
       const users = loadUsers();
       const trimmed = name.trim().toLowerCase();
       if (!trimmed) return null;
-      
+
       const isCasper = trimmed === 'casper';
-      
+
       for (let [id, user] of Object.entries(users)) {
         if (user.name.toLowerCase() === trimmed) {
           if (isCasper && (!user.unlockedMaps || user.unlockedMaps.length < 5)) {
@@ -488,7 +491,7 @@
     const BOUNCE = 0.35;
     const BALL_RADIUS = 7;
 
-    let roadSegments = [];
+    let obstacles = []; // Препятствия
     let gameActive = false;
     let balls = [];
     let finishY = 0;
@@ -536,78 +539,103 @@
     }
 
     function buildAll() {
-      roadSegments = [];
+      obstacles = [];
       worldHeight = canvas.height * 10;
       finishY = worldHeight - 50;
       cameraY = 0;
-      buildRoad();
+      buildObstacles();
       resetBalls();
     }
 
-    function buildRoad() {
-      roadSegments = [];
+    function buildObstacles() {
+      obstacles = [];
       const w = canvas.width;
-      const margin = 20;
-      const roadWidth = w - margin * 2 - 20;
-      let currentY = 30;
-      let currentX = w / 2;
-      let currentAngle = 0;
-      
-      // Генерируем дорогу из сегментов
-      while (currentY < finishY - 100) {
-        const segmentType = Math.floor(Math.random() * 5);
-        let segmentLength;
-        let endAngle = currentAngle;
-        
-        switch(segmentType) {
-          case 0: // Прямой участок
-            segmentLength = 80 + Math.random() * 120;
+      const margin = 25;
+      const roadWidth = w - margin * 2;
+
+      // Создаем сегменты дороги с препятствиями
+      let currentY = 60;
+      const segmentHeight = 180;
+
+      while (currentY < finishY - 150) {
+        const segType = Math.floor(Math.random() * 6);
+        const centerX = w / 2 + (Math.random() - 0.5) * (roadWidth * 0.5);
+        const segWidth = roadWidth * (0.7 + Math.random() * 0.3);
+
+        switch (segType) {
+          case 0: // Стена с проходом
+            const gapY = currentY + 40 + Math.random() * 60;
+            const gapSize = 35 + Math.random() * 40;
+            obstacles.push({
+              type: 'wall',
+              x: centerX - segWidth/2,
+              y: currentY,
+              width: segWidth,
+              height: segmentHeight * 0.3,
+              gapY: gapY,
+              gapSize: gapSize,
+              color: '#cc3333'
+            });
             break;
-          case 1: // Плавный поворот налево
-            segmentLength = 60 + Math.random() * 100;
-            endAngle = currentAngle - (0.3 + Math.random() * 0.5);
+          case 1: // Двигающиеся шипы
+            obstacles.push({
+              type: 'spike',
+              x: centerX - segWidth/2 + 20,
+              y: currentY + 40,
+              width: segWidth - 40,
+              height: 15,
+              moveRange: 60,
+              speed: 0.4 + Math.random() * 0.6,
+              color: '#ff8800'
+            });
             break;
-          case 2: // Плавный поворот направо
-            segmentLength = 60 + Math.random() * 100;
-            endAngle = currentAngle + (0.3 + Math.random() * 0.5);
+          case 2: // Вращающиеся лопасти
+            obstacles.push({
+              type: 'blade',
+              cx: centerX,
+              cy: currentY + 70,
+              radius: 45 + Math.random() * 35,
+              speed: 0.02 + Math.random() * 0.04,
+              angle: Math.random() * Math.PI * 2,
+              color: '#ffaa00'
+            });
             break;
-          case 3: // S-образный изгиб
-            segmentLength = 100 + Math.random() * 150;
-            endAngle = currentAngle + (Math.random() - 0.5) * 1.2;
+          case 3: // Трамплин
+            obstacles.push({
+              type: 'trampoline',
+              x: centerX - 35,
+              y: currentY + 30,
+              width: 70,
+              height: 15,
+              force: 6 + Math.random() * 4,
+              color: '#44ff44'
+            });
             break;
-          case 4: // Батут
-            segmentLength = 30 + Math.random() * 40;
+          case 4: // Узкий коридор
+            obstacles.push({
+              type: 'corridor',
+              leftX: centerX - segWidth/2,
+              rightX: centerX + segWidth/2,
+              y: currentY + 20,
+              height: segmentHeight * 0.5,
+              innerWidth: 30 + Math.random() * 25,
+              color: '#6666ff'
+            });
+            break;
+          case 5: // Маятник
+            obstacles.push({
+              type: 'pendulum',
+              anchorX: centerX,
+              anchorY: currentY + 10,
+              length: 70 + Math.random() * 50,
+              angle: Math.random() * Math.PI * 2,
+              speed: 0.015 + Math.random() * 0.025,
+              ballRadius: 12,
+              color: '#ff44ff'
+            });
             break;
         }
-        
-        const startX = currentX;
-        const startY = currentY;
-        const endX = startX + Math.sin(currentAngle) * segmentLength;
-        const endY = startY + segmentLength * 0.7;
-        
-        roadSegments.push({
-          startX, startY,
-          endX, endY,
-          angle: currentAngle,
-          endAngle: endAngle,
-          type: segmentType === 4 ? 'trampoline' : 'road',
-          width: roadWidth,
-          bounceForce: segmentType === 4 ? 5 + Math.random() * 3 : 0
-        });
-        
-        currentX = endX;
-        currentY = endY;
-        currentAngle = endAngle;
-        
-        // Ограничиваем X
-        if (currentX < margin + roadWidth/2 + 10) {
-          currentX = margin + roadWidth/2 + 10;
-          currentAngle = Math.max(-0.5, currentAngle + 0.2);
-        }
-        if (currentX > w - margin - roadWidth/2 - 10) {
-          currentX = w - margin - roadWidth/2 - 10;
-          currentAngle = Math.min(0.5, currentAngle - 0.2);
-        }
+        currentY += segmentHeight;
       }
     }
 
@@ -616,10 +644,10 @@
       const w = canvas.width;
       const startY = 25;
       const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffaa00', '#ff44ff', '#00ffff'];
-      
+
       for (let i = 0; i < 6; i++) {
         balls.push({
-          x: w * 0.1 + i * (w * 0.8 / 5),
+          x: w * 0.15 + i * (w * 0.7 / 5),
           y: startY,
           vx: 0,
           vy: 0,
@@ -628,12 +656,12 @@
           finishTime: 0,
           value: i + 1,
           color: colors[i],
-          ropeX: w * 0.1 + i * (w * 0.8 / 5),
+          ropeX: w * 0.15 + i * (w * 0.7 / 5),
           ropeY: 5,
           ropeLength: startY - 10
         });
       }
-      
+
       gameActive = false;
       raceResults = [];
       cameraY = 0;
@@ -656,12 +684,12 @@
     function showBetModal() {
       if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
       if (gameActive) return;
-      
+
       document.getElementById('betBalance').textContent = formatNumber(currentUser.balance);
-      
+
       const ballSelection = document.getElementById('ballSelection');
       ballSelection.innerHTML = '';
-      
+
       for (let i = 1; i <= 6; i++) {
         const ballDiv = document.createElement('div');
         ballDiv.style.cssText = `
@@ -679,7 +707,7 @@
         });
         ballSelection.appendChild(ballDiv);
       }
-      
+
       document.getElementById('betInput').value = 1;
       betModal.classList.remove('hidden');
     }
@@ -688,10 +716,10 @@
       const bet = parseInt(document.getElementById('betInput').value);
       if (!bet || bet < 1) { alert('Введите корректную ставку!'); return; }
       if (bet > currentUser.balance) { alert('Недостаточно звёзд!'); return; }
-      
+
       betAmount = bet;
       betModal.classList.add('hidden');
-      
+
       startRace();
     }
 
@@ -700,19 +728,19 @@
       gameActive = true;
       raceResults = [];
       cameraY = 0;
-      
+
       for (let b of balls) {
         b.active = true;
         b.vy = 0.3;
         b.vx = (Math.random() - 0.5) * 0.5;
       }
-      
+
       soundDrop();
     }
 
     function updateCamera() {
       if (!gameActive) return;
-      
+
       const userBall = balls.find(b => b.value === selectedBetBall);
       if (userBall && !userBall.finished) {
         const targetY = userBall.y - canvas.height * 0.4;
@@ -721,80 +749,131 @@
       }
     }
 
-    function getRoadSurfaceAt(x, y) {
-      for (let seg of roadSegments) {
-        if (y < seg.startY || y > seg.endY + 30) continue;
-        
-        const progress = seg.endY !== seg.startY ? (y - seg.startY) / (seg.endY - seg.startY) : 0;
-        const clampedProgress = Math.max(0, Math.min(1, progress));
-        const centerX = seg.startX + (seg.endX - seg.startX) * clampedProgress;
-        const halfWidth = seg.width / 2;
-        
-        const distFromCenter = Math.abs(x - centerX);
-        if (distFromCenter < halfWidth) {
-          return {
-            centerX,
-            leftEdge: centerX - halfWidth,
-            rightEdge: centerX + halfWidth,
-            type: seg.type,
-            bounceForce: seg.bounceForce || 0
-          };
+    function checkObstacleCollisions(ball) {
+      for (let obs of obstacles) {
+        // Стена с проходом
+        if (obs.type === 'wall') {
+          if (ball.y + BALL_RADIUS > obs.y && ball.y - BALL_RADIUS < obs.y + obs.height) {
+            if (ball.x + BALL_RADIUS > obs.x && ball.x - BALL_RADIUS < obs.x + obs.width) {
+              // Проверяем, находится ли шар в проходе
+              const inGap = ball.y > obs.gapY && ball.y < obs.gapY + obs.gapSize;
+              if (!inGap) {
+                // Отталкиваем от стены
+                if (ball.x < obs.x + obs.width/2) {
+                  ball.x = obs.x - BALL_RADIUS;
+                  ball.vx = -Math.abs(ball.vx) * BOUNCE;
+                } else {
+                  ball.x = obs.x + obs.width + BALL_RADIUS;
+                  ball.vx = Math.abs(ball.vx) * BOUNCE;
+                }
+                soundBounce();
+              }
+            }
+          }
+        }
+
+        // Шипы
+        if (obs.type === 'spike') {
+          const spikeY = obs.y + Math.sin(Date.now() * 0.003 * obs.speed) * obs.moveRange;
+          if (ball.y + BALL_RADIUS > spikeY - obs.height/2 &&
+              ball.y - BALL_RADIUS < spikeY + obs.height/2 &&
+              ball.x + BALL_RADIUS > obs.x &&
+              ball.x - BALL_RADIUS < obs.x + obs.width) {
+            ball.vy = -4;
+            ball.vx += (Math.random() - 0.5) * 2;
+            soundBounce();
+          }
+        }
+
+        // Вращающиеся лопасти
+        if (obs.type === 'blade') {
+          obs.angle += obs.speed;
+          const bladeEndX = obs.cx + Math.cos(obs.angle) * obs.radius;
+          const bladeEndY = obs.cy + Math.sin(obs.angle) * obs.radius;
+          const dx = ball.x - bladeEndX;
+          const dy = ball.y - bladeEndY;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < BALL_RADIUS + 8) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            ball.vx += nx * 3;
+            ball.vy += ny * 3;
+            soundBounce();
+          }
+        }
+
+        // Трамплин
+        if (obs.type === 'trampoline') {
+          if (ball.y + BALL_RADIUS > obs.y &&
+              ball.y - BALL_RADIUS < obs.y + obs.height &&
+              ball.x + BALL_RADIUS > obs.x &&
+              ball.x - BALL_RADIUS < obs.x + obs.width &&
+              ball.vy > 0) {
+            ball.vy = -obs.force;
+            ball.vx += (Math.random() - 0.5) * 3;
+            soundBounce();
+          }
+        }
+
+        // Узкий коридор
+        if (obs.type === 'corridor') {
+          if (ball.y + BALL_RADIUS > obs.y && ball.y - BALL_RADIUS < obs.y + obs.height) {
+            const leftWall = obs.leftX + (obs.rightX - obs.leftX - obs.innerWidth) / 2;
+            const rightWall = leftWall + obs.innerWidth;
+            if (ball.x - BALL_RADIUS < leftWall) {
+              ball.x = leftWall + BALL_RADIUS;
+              ball.vx = Math.abs(ball.vx) * BOUNCE;
+              soundBounce();
+            }
+            if (ball.x + BALL_RADIUS > rightWall) {
+              ball.x = rightWall - BALL_RADIUS;
+              ball.vx = -Math.abs(ball.vx) * BOUNCE;
+              soundBounce();
+            }
+          }
+        }
+
+        // Маятник
+        if (obs.type === 'pendulum') {
+          obs.angle += obs.speed;
+          const bobX = obs.anchorX + Math.sin(obs.angle) * obs.length;
+          const bobY = obs.anchorY + Math.cos(obs.angle) * obs.length;
+          const dx = ball.x - bobX;
+          const dy = ball.y - bobY;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < BALL_RADIUS + obs.ballRadius) {
+            const nx = dx / dist;
+            const ny = dy / dist;
+            ball.vx += nx * 2;
+            ball.vy += ny * 2;
+            soundBounce();
+          }
         }
       }
-      return null;
     }
 
     function applyPhysics() {
       if (!gameActive) return;
-      
+
       updateCamera();
-      
+
       let allFinished = true;
-      
+
       for (let b of balls) {
         if (b.finished) continue;
         allFinished = false;
-        
+
         b.vy += GRAVITY;
         b.x += b.vx;
         b.y += b.vy;
-        
+
         // Границы экрана
         if (b.x - BALL_RADIUS < 5) { b.x = BALL_RADIUS + 5; b.vx = Math.abs(b.vx) * BOUNCE; soundBounce(); }
         if (b.x + BALL_RADIUS > canvas.width - 5) { b.x = canvas.width - BALL_RADIUS - 5; b.vx = -Math.abs(b.vx) * BOUNCE; soundBounce(); }
-        
-        // Проверка дороги
-        const surface = getRoadSurfaceAt(b.x, b.y);
-        if (surface) {
-          // Шар на дороге
-          if (b.x < surface.leftEdge + BALL_RADIUS) {
-            b.x = surface.leftEdge + BALL_RADIUS;
-            b.vx = Math.abs(b.vx) * BOUNCE;
-            soundBounce();
-          }
-          if (b.x > surface.rightEdge - BALL_RADIUS) {
-            b.x = surface.rightEdge - BALL_RADIUS;
-            b.vx = -Math.abs(b.vx) * BOUNCE;
-            soundBounce();
-          }
-          
-          // Батут
-          if (surface.type === 'trampoline' && b.vy > 0) {
-            b.vy = -surface.bounceForce;
-            b.vx += (Math.random() - 0.5) * 3;
-            soundBounce();
-          }
-          
-          // Трение о дорогу
-          b.vx *= 0.999;
-        }
-        
-        // Проверка низа дороги (шар не должен проваливаться сквозь дорогу)
-        const surfaceBelow = getRoadSurfaceAt(b.x, b.y + BALL_RADIUS);
-        if (surfaceBelow && b.vy > 0) {
-          b.y = Math.min(b.y, surfaceBelow.centerX ? b.y : b.y);
-        }
-        
+
+        // Проверка препятствий
+        checkObstacleCollisions(b);
+
         // Столкновения между шарами
         for (let other of balls) {
           if (other === b || other.finished) continue;
@@ -809,7 +888,7 @@
             b.y += ny * overlap * 0.5;
             other.x -= nx * overlap * 0.5;
             other.y -= ny * overlap * 0.5;
-            
+
             const vn = (b.vx - other.vx) * nx + (b.vy - other.vy) * ny;
             if (vn < 0) {
               b.vx -= vn * nx;
@@ -820,26 +899,26 @@
             }
           }
         }
-        
+
         // Проверка финиша
         if (b.y >= finishY && !b.finished) {
           b.finished = true;
           b.y = finishY;
           b.active = false;
-          
+
           raceResults.push({
             value: b.value,
             color: b.color,
             position: raceResults.length + 1
           });
         }
-        
+
         if (b.y > worldHeight + 50) {
           b.finished = true;
           b.active = false;
         }
       }
-      
+
       if (raceResults.length === 6 || (allFinished && raceResults.length > 0)) {
         endRace();
       }
@@ -847,11 +926,11 @@
 
     function endRace() {
       gameActive = false;
-      
+
       const selectedBall = raceResults.find(r => r.value === selectedBetBall);
       let winnings = 0;
       let multiplier = 0;
-      
+
       if (selectedBall) {
         switch(selectedBall.position) {
           case 1: multiplier = 6; break;
@@ -861,20 +940,20 @@
         }
         winnings = Math.floor(betAmount * multiplier);
       }
-      
+
       const oldBalance = currentUser.balance;
       currentUser.balance -= betAmount;
       currentUser.balance += winnings;
-      
+
       const expGain = Math.floor(betAmount * (1 + getCurrentMap().multiplierBonus));
       currentUser.exp += expGain;
-      
+
       updateUserData(currentUser);
       updateUI();
-      
+
       let resultsHtml = '';
       const positions = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
-      
+
       raceResults.forEach(r => {
         const isSelected = r.value === selectedBetBall;
         resultsHtml += `
@@ -886,7 +965,7 @@
           </div>
         `;
       });
-      
+
       resultContent.innerHTML = `
         <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">🏁 Результаты гонки</h3>
         <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;">
@@ -917,7 +996,7 @@
         <button id="closeResultBtn" style="align-self: center;">Ок</button>
       `;
       resultModal.classList.remove('hidden');
-      
+
       document.getElementById('closeResultBtn').addEventListener('click', () => {
         resultModal.classList.add('hidden');
         buildAll();
@@ -927,73 +1006,109 @@
 
     function drawScene() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       ctx.fillStyle = '#000020';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      
+
       ctx.save();
       ctx.translate(0, -cameraY);
-      
-      // Рисуем дорогу
-      for (let seg of roadSegments) {
-        const steps = Math.ceil((seg.endY - seg.startY) / 3);
-        
-        for (let i = 0; i < steps; i++) {
-          const t = i / steps;
-          const nextT = (i + 1) / steps;
-          
-          const x1 = seg.startX + (seg.endX - seg.startX) * t;
-          const y1 = seg.startY + (seg.endY - seg.startY) * t;
-          const x2 = seg.startX + (seg.endX - seg.startX) * nextT;
-          const y2 = seg.startY + (seg.endY - seg.startY) * nextT;
-          
-          const halfW = seg.width / 2;
-          const angle = Math.atan2(y2 - y1, x2 - x1);
-          const perpX = Math.cos(angle + Math.PI/2);
-          const perpY = Math.sin(angle + Math.PI/2);
-          
-          ctx.beginPath();
-          ctx.moveTo(x1 + perpX * halfW, y1 + perpY * halfW);
-          ctx.lineTo(x2 + perpX * halfW, y2 + perpY * halfW);
-          ctx.lineTo(x2 - perpX * halfW, y2 - perpY * halfW);
-          ctx.lineTo(x1 - perpX * halfW, y1 - perpY * halfW);
-          ctx.closePath();
-          
-          if (seg.type === 'trampoline') {
-            ctx.fillStyle = '#225522';
-            ctx.fill();
-            ctx.strokeStyle = '#44ff44';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-          } else {
-            ctx.fillStyle = '#1a1a3a';
-            ctx.fill();
-            ctx.strokeStyle = '#334466';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
+
+      // Рисуем фоновую дорогу (простую линию)
+      ctx.strokeStyle = '#1a1a4a';
+      ctx.lineWidth = canvas.width * 0.6;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width/2, 0);
+      ctx.lineTo(canvas.width/2, worldHeight);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+
+      // Рисуем препятствия
+      for (let obs of obstacles) {
+        ctx.fillStyle = obs.color;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+
+        if (obs.type === 'wall') {
+          // Верхняя часть стены
+          ctx.fillRect(obs.x, obs.y, obs.width, obs.gapY - obs.y);
+          ctx.strokeRect(obs.x, obs.y, obs.width, obs.gapY - obs.y);
+          // Нижняя часть стены
+          const bottomStart = obs.gapY + obs.gapSize;
+          ctx.fillRect(obs.x, bottomStart, obs.width, obs.y + obs.height - bottomStart);
+          ctx.strokeRect(obs.x, bottomStart, obs.width, obs.y + obs.height - bottomStart);
+          // Подсветка прохода
+          ctx.fillStyle = 'rgba(68, 255, 68, 0.3)';
+          ctx.fillRect(obs.x - 5, obs.gapY, obs.width + 10, obs.gapSize);
         }
-        
-        // Бордюры
-        const startAngle = Math.atan2(seg.endY - seg.startY, seg.endX - seg.startX);
-        const perpX = Math.cos(startAngle + Math.PI/2);
-        const perpY = Math.sin(startAngle + Math.PI/2);
-        const halfW = seg.width / 2;
-        
-        ctx.strokeStyle = '#ff6644';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(seg.startX + perpX * halfW, seg.startY + perpY * halfW);
-        ctx.lineTo(seg.endX + perpX * halfW, seg.endY + perpY * halfW);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(seg.startX - perpX * halfW, seg.startY - perpY * halfW);
-        ctx.lineTo(seg.endX - perpX * halfW, seg.endY - perpY * halfW);
-        ctx.stroke();
+
+        if (obs.type === 'spike') {
+          const spikeY = obs.y + Math.sin(Date.now() * 0.003 * obs.speed) * obs.moveRange;
+          ctx.fillStyle = obs.color;
+          ctx.beginPath();
+          for (let i = 0; i < obs.width; i += 15) {
+            ctx.moveTo(obs.x + i, spikeY);
+            ctx.lineTo(obs.x + i + 7, spikeY - 15);
+            ctx.lineTo(obs.x + i + 15, spikeY);
+          }
+          ctx.fill();
+        }
+
+        if (obs.type === 'blade') {
+          const bx = obs.cx + Math.cos(obs.angle) * obs.radius;
+          const by = obs.cy + Math.sin(obs.angle) * obs.radius;
+          ctx.strokeStyle = '#ffaa00';
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(obs.cx, obs.cy);
+          ctx.lineTo(bx, by);
+          ctx.stroke();
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(bx, by, 6, 0, Math.PI*2);
+          ctx.fill();
+        }
+
+        if (obs.type === 'trampoline') {
+          ctx.fillStyle = '#44ff44';
+          ctx.fillRect(obs.x, obs.y, obs.width, obs.height);
+          ctx.strokeStyle = '#ffffff';
+          ctx.strokeRect(obs.x, obs.y, obs.width, obs.height);
+          // Стрелки вверх
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText('⬆️', obs.x + obs.width/2, obs.y - 2);
+        }
+
+        if (obs.type === 'corridor') {
+          const leftWall = obs.leftX + (obs.rightX - obs.leftX - obs.innerWidth) / 2;
+          const rightWall = leftWall + obs.innerWidth;
+          ctx.fillStyle = '#4444aa';
+          ctx.fillRect(obs.leftX, obs.y, leftWall - obs.leftX, obs.height);
+          ctx.fillRect(rightWall, obs.y, obs.rightX - rightWall, obs.height);
+          ctx.strokeStyle = '#6666ff';
+          ctx.strokeRect(obs.leftX, obs.y, leftWall - obs.leftX, obs.height);
+          ctx.strokeRect(rightWall, obs.y, obs.rightX - rightWall, obs.height);
+        }
+
+        if (obs.type === 'pendulum') {
+          const bobX = obs.anchorX + Math.sin(obs.angle) * obs.length;
+          const bobY = obs.anchorY + Math.cos(obs.angle) * obs.length;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(obs.anchorX, obs.anchorY);
+          ctx.lineTo(bobX, bobY);
+          ctx.stroke();
+          ctx.fillStyle = obs.color;
+          ctx.beginPath();
+          ctx.arc(bobX, bobY, obs.ballRadius, 0, Math.PI*2);
+          ctx.fill();
+        }
+
         ctx.lineWidth = 1;
       }
-      
+
       // Финишная линия
       ctx.strokeStyle = '#ffd700';
       ctx.lineWidth = 4;
@@ -1004,16 +1119,16 @@
       ctx.stroke();
       ctx.setLineDash([]);
       ctx.lineWidth = 1;
-      
+
       ctx.fillStyle = '#ffd700';
       ctx.font = 'bold 16px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('🏁 ФИНИШ', canvas.width/2, finishY - 15);
-      
+
       // Рисуем шары
       for (let b of balls) {
         if (b.finished) continue;
-        
+
         if (!gameActive) {
           ctx.beginPath();
           ctx.moveTo(b.ropeX, b.ropeY);
@@ -1022,13 +1137,13 @@
           ctx.lineWidth = 1;
           ctx.stroke();
         }
-        
+
         // Тень
         ctx.beginPath();
         ctx.arc(b.x, b.y + 2, BALL_RADIUS, 0, 2*Math.PI);
         ctx.fillStyle = 'rgba(0,0,0,0.3)';
         ctx.fill();
-        
+
         // Шар
         ctx.beginPath();
         ctx.arc(b.x, b.y, BALL_RADIUS, 0, 2*Math.PI);
@@ -1041,16 +1156,16 @@
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
-        
+
         // Номер
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 8px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(b.value, b.x, b.y + 3);
       }
-      
+
       ctx.restore();
-      
+
       // Интерфейс
       if (gameActive) {
         // Прогресс
@@ -1066,7 +1181,7 @@
           ctx.textAlign = 'center';
           ctx.fillText(`${Math.floor(progress * 100)}%`, canvas.width/2, canvas.height - 15);
         }
-        
+
         // Лидеры
         if (raceResults.length > 0) {
           ctx.fillStyle = 'rgba(0,0,0,0.7)';
@@ -1093,7 +1208,7 @@
       const container = document.getElementById('mapsContainer');
       document.getElementById('mapsExpDisplay').textContent = formatNumber(currentUser.exp);
       container.innerHTML = '';
-      
+
       maps.forEach(map => {
         const unlocked = currentUser.unlockedMaps.includes(map.id);
         const isActive = map.id === currentMapId;
@@ -1101,43 +1216,43 @@
         card.className = 'map-card';
         if (!unlocked) card.classList.add('locked');
         if (isActive) card.classList.add('active');
-        
+
         const costText = map.expCost > 0 ? `✨ ${formatNumber(map.expCost)}` : 'Бесплатно';
-        
+
         card.innerHTML = `
           <div class="map-icon">${map.icon}</div>
           <div class="map-name">${map.name}</div>
           <div style="font-size:0.65rem; color:#88aacc;">${map.desc}</div>
-          ${unlocked 
+          ${unlocked
             ? (isActive ? '<div style="color:#ffd700; font-size:0.65rem;">✅ Активна</div>' : '<button class="selectMapBtn" data-map="'+map.id+'" style="font-size:0.65rem; padding:4px 8px;">Выбрать</button>')
             : `<div class="map-price">🔒 ${costText}</div><button class="buyMapBtn" data-map="${map.id}" style="font-size:0.65rem; padding:4px 8px;">Открыть</button>`
           }
         `;
-        
+
         if (unlocked && !isActive) {
           card.addEventListener('click', (e) => {
             if (e.target.tagName === 'BUTTON') return;
             selectMap(map.id);
           });
         }
-        
+
         container.appendChild(card);
       });
-      
+
       document.querySelectorAll('.buyMapBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           buyMap(parseInt(e.target.getAttribute('data-map')));
         });
       });
-      
+
       document.querySelectorAll('.selectMapBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           selectMap(parseInt(e.target.getAttribute('data-map')));
         });
       });
-      
+
       document.getElementById('mapsModal').classList.remove('hidden');
     }
 
@@ -1146,7 +1261,7 @@
       const map = maps.find(m => m.id === mapId);
       if (!map) return;
       if (currentUser.unlockedMaps.includes(mapId)) { alert('Карта уже открыта!'); return; }
-      
+
       if (currentUser.name.toLowerCase() === 'casper') {
         currentUser.unlockedMaps.push(mapId);
         updateUserData(currentUser);
@@ -1154,7 +1269,7 @@
         openMaps();
         return;
       }
-      
+
       if (currentUser.exp < map.expCost) { alert(`Недостаточно опыта! Нужно ✨ ${formatNumber(map.expCost)}`); return; }
       currentUser.exp -= map.expCost;
       currentUser.unlockedMaps.push(mapId);
@@ -1181,9 +1296,9 @@
       const container = document.getElementById('shopItemsContainer');
       const selectedSpan = document.getElementById('shopSelectedBall');
       selectedSpan.textContent = `${getBallEmoji(currentUser.selectedBall)} (${formatNumber(currentUser.selectedBall)} очк.)`;
-      
+
       container.innerHTML = '';
-      
+
       const ballPrices = {
         1: 0,
         2: 1000,
@@ -1196,7 +1311,7 @@
         9: 1000000,
         10: 2000000
       };
-      
+
       for (let val = 1; val <= 10; val++) {
         const price = ballPrices[val] || val * 22;
         const owned = currentUser.ownedBalls.includes(val);
@@ -1204,7 +1319,7 @@
         const div = document.createElement('div');
         div.className = 'shop-item';
         if (isSelected) div.classList.add('selected');
-        
+
         div.innerHTML = `
           <div class="ball-preview" style="color:${getBallColor(val)};">${getBallEmoji(val)}</div>
           <div style="font-size:0.75rem;"><strong>${formatNumber(val)} очк.</strong></div>
@@ -1215,21 +1330,21 @@
         `;
         container.appendChild(div);
       }
-      
+
       document.querySelectorAll('.buyBallBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           buyBall(parseInt(e.target.getAttribute('data-value')));
         });
       });
-      
+
       document.querySelectorAll('.selectBallBtn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           selectBall(parseInt(e.target.getAttribute('data-value')));
         });
       });
-      
+
       document.getElementById('shopModal').classList.remove('hidden');
     }
 
@@ -1287,7 +1402,7 @@
       buildAll();
       updateUI();
       resetBalls();
-      
+
       if (user.name.toLowerCase() === 'casper') {
         setTimeout(() => {
           alert('👻 Привет, casper! Все карты открыты бесплатно!');
@@ -1331,7 +1446,7 @@
     document.getElementById('closeShopBtn').addEventListener('click', ()=> document.getElementById('shopModal').classList.add('hidden'));
     document.getElementById('closeMapsBtn').addEventListener('click', ()=> document.getElementById('mapsModal').classList.add('hidden'));
     document.getElementById('closeProfileBtn').addEventListener('click', ()=> document.getElementById('profileModal').classList.add('hidden'));
-    
+
     loginBtn.addEventListener('click', ()=>{
       initAudio();
       if(usernameInput.value.trim()) loginUser(usernameInput.value.trim());
