@@ -288,13 +288,24 @@
   
   <div class="action-row">
     <button id="dropButton" class="big-btn">🚀 Запуск</button>
-    <button id="bonusButton" class="big-btn bonus-btn">🎁 Бонус</button>
   </div>
   <div class="action-row">
     <button id="mapsButton" class="maps-btn small-btn">🗺️ Карты</button>
     <button id="shopButton" class="small-btn">🛒 Магазин</button>
     <button id="profileButton" class="small-btn">👤 Профиль</button>
     <button id="logoutButton" class="small-btn">🚪 Выйти</button>
+  </div>
+</div>
+
+<!-- Окно выбора шара -->
+<div id="betModal" class="modal hidden">
+  <div class="modal-content" id="betContent">
+    <h2 style="color:#ffd700; text-align:center;">🎯 Выберите шар и ставку</h2>
+    <p style="text-align:center; color:#88aacc;">Ваш баланс: ⭐ <span id="betBalance">0</span></p>
+    <div id="ballSelection" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;"></div>
+    <input type="number" id="betInput" placeholder="Сумма ставки" min="1" value="1" style="text-align:center;">
+    <button id="confirmBetBtn" class="big-btn">✅ Подтвердить</button>
+    <button id="cancelBetBtn">Отмена</button>
   </div>
 </div>
 
@@ -379,20 +390,6 @@
       playSound(400 + Math.random() * 200, 'triangle', 0.08, 0.06);
     }
 
-    function soundBumper() {
-      playSound(600, 'square', 0.1, 0.08);
-    }
-
-    function soundBin() {
-      playSound(200, 'triangle', 0.2, 0.12);
-      setTimeout(() => playSound(300, 'triangle', 0.15, 0.1), 0.08);
-    }
-
-    function soundTeleport() {
-      playSound(800, 'sine', 0.15, 0.15);
-      setTimeout(() => playSound(1200, 'sine', 0.15, 0.15), 0.1);
-    }
-
     function soundDrop() {
       playSound(250, 'square', 0.12, 0.1);
     }
@@ -463,10 +460,10 @@
     // ========== КАРТЫ ==========
     const maps = [
       { id: 1, name: 'Лунная база', icon: '🌙', color: '#c0c0c0', multiplierBonus: 0, price: 0, expCost: 0, desc: 'Стандартная', specials: [] },
-      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 0, expCost: 2000, desc: '+10% множители', specials: ['bumper'] },
-      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 0, expCost: 5000, desc: '+20% множители', specials: ['bumper', 'teleport'] },
-      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 10000, desc: '+35% множители', specials: ['bumper', 'teleport', 'blackhole'] },
-      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 20000, desc: '+50% множители', specials: ['bumper', 'teleport', 'blackhole', 'doublebumper'] }
+      { id: 2, name: 'Марсианский каньон', icon: '🔴', color: '#ff4444', multiplierBonus: 0.1, price: 0, expCost: 2000, desc: '+10% опыт', specials: [] },
+      { id: 3, name: 'Пояс астероидов', icon: '☄️', color: '#ff8800', multiplierBonus: 0.2, price: 0, expCost: 5000, desc: '+20% опыт', specials: [] },
+      { id: 4, name: 'Туманность Ориона', icon: '🌟', color: '#aa44ff', multiplierBonus: 0.35, price: 0, expCost: 10000, desc: '+35% опыт', specials: [] },
+      { id: 5, name: 'Чёрная дыра', icon: '🕳️', color: '#000000', multiplierBonus: 0.5, price: 0, expCost: 20000, desc: '+50% опыт', specials: [] }
     ];
 
     // ========== ИГРОВЫЕ ПЕРЕМЕННЫЕ ==========
@@ -487,51 +484,19 @@
       buildAll();
     });
 
-    const GRAVITY = 0.09;
-    const BOUNCE = 0.4;
-    const PLATFORM_RADIUS = 1.75;
+    const GRAVITY = 0.12;
+    const BOUNCE = 0.35;
     const BALL_RADIUS = 7;
+    const PLATFORM_RADIUS = 3;
 
     let platforms = [];
-    let specials = [];
-    let binWalls = [];
-
-    let rows = 22;
-    let startY = 80;
-    let rowSpacing = 13;
-    const colSpacing = 36;
-
-    let multipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-    let binCount = 19;
-
-    let ball = {
-      x: 220, y: 60, vx: 0, vy: 0, active: false, value: 1, color: '#44aaff', teleported: false, teleportCooldown: 0
-    };
-    
-    // Бонусные шары
-    let bonusBalls = [];
-    let bonusActive = false;
-    
     let gameActive = false;
-    let swingAngle = 0;
-    let swingSpeed = 0.04;
-    let stringAnchorX = 220;
-    let stringAnchorY = 25;
-    let stringLength = 40;
-
-    let sessionExp = 0;
-    let waitingForResultClose = false;
-    let ballInBin = false;
-    let binTimer = 0;
-
-    // Для бонусного режима - собираем результаты
-    let bonusResults = [];
-    let bonusTotalWinnings = 0;
-    let bonusGameEndDelay = 0;
-    let normalGameEndDelay = 0;
-    
-    // Анимация чёрной дыры
-    let blackHoleAngle = 0;
+    let balls = [];
+    let finishLine = 0;
+    let betAmount = 0;
+    let selectedBetBall = 1;
+    let raceResults = [];
+    let totalWinnings = 0;
 
     function getBallColor(value) {
       const colors = {
@@ -564,239 +529,122 @@
     const loginBtn = document.getElementById('loginBtn');
     const resultModal = document.getElementById('resultModal');
     const resultContent = document.getElementById('resultContent');
-    const bonusButton = document.getElementById('bonusButton');
+    const betModal = document.getElementById('betModal');
 
     function getCurrentMap() {
       return maps.find(m => m.id === currentMapId) || maps[0];
     }
 
-    function updateMultipliers() {
-      const baseMultipliers = [20, 15, 10, 8, 5, 2, 1, 0.5, 0.1, -1, 0.1, 0.5, 1, 2, 5, 8, 10, 15, 20];
-      const bonus = getCurrentMap().multiplierBonus;
-      multipliers = baseMultipliers.map(m => {
-        if (m === -1) return -1;
-        return Math.round((m * (1 + bonus)) * 10) / 10;
-      });
-    }
-
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
     function buildAll() {
-      stringAnchorX = canvas.width / 2;
-      startY = canvas.height * 0.11;
-      rowSpacing = (canvas.height - startY - 55) / rows;
-      if (rowSpacing < 11) rowSpacing = 11;
-      stringLength = startY - 15;
-      stringAnchorY = 10;
-      
-      updateMultipliers();
-      buildSpecials();
-      buildPlatforms();
-      buildBinWalls();
-      resetBall();
+      platforms = [];
+      finishLine = canvas.height - 30;
+      buildTrack();
+      resetBalls();
     }
 
-    function getRandomPositions(count, rows) {
-      let positions = [];
-      for (let r = 2; r < rows - 1; r++) {
-        positions.push(r);
-      }
-      positions = shuffleArray(positions);
-      return positions.slice(0, count);
-    }
-
-    function buildSpecials() {
-      specials = [];
-      const mapConfig = getCurrentMap();
+    function buildTrack() {
+      platforms = [];
       const w = canvas.width;
       const h = canvas.height;
       const cx = w / 2;
+      const margin = 15;
       
-      if (mapConfig.specials.includes('bumper')) {
-        const count = Math.floor(Math.random() * 3) + 4;
-        const rows_pos = getRandomPositions(count, rows);
-        const cols = shuffleArray([-0.4, -0.2, 0, 0.2, 0.4]);
+      // Создаем полукруглую дорожку из платформ
+      for (let row = 0; row < 18; row++) {
+        const y = canvas.height * 0.12 + row * ((finishLine - canvas.height * 0.12) / 20);
+        if (y > finishLine - 30) continue;
         
-        for (let i = 0; i < count; i++) {
-          const r = rows_pos[i];
-          const y = startY + r * rowSpacing;
-          const colOffset = cols[i % cols.length];
-          
-          specials.push({
-            x: cx + colOffset * w * 0.8,
-            y: y,
-            width: 50,
-            height: 4,
-            type: 'bumper',
-            color: '#ff4466',
-            bounceForce: 2.5,
-            id: 'bumper_' + i
-          });
-        }
-      }
-      
-      if (mapConfig.specials.includes('doublebumper')) {
-        const rows_pos = getRandomPositions(2, rows);
-        const y1 = startY + rows_pos[0] * rowSpacing;
-        const y2 = startY + rows_pos[1] * rowSpacing;
-        
-        specials.push({
-          x: cx - w * 0.2,
-          y: y1,
-          width: 50,
-          height: 4,
-          type: 'bumper',
-          color: '#ff0044',
-          bounceForce: 3.2,
-          id: 'bumper_' + specials.length
-        });
-        specials.push({
-          x: cx + w * 0.2,
-          y: y2,
-          width: 50,
-          height: 4,
-          type: 'bumper',
-          color: '#ff0044',
-          bounceForce: 3.2,
-          id: 'bumper_' + specials.length
-        });
-      }
-      
-      if (mapConfig.specials.includes('teleport')) {
-        const pairCount = mapConfig.id >= 5 ? 2 : 1;
-        for (let p = 0; p < pairCount; p++) {
-          const rows_pos = getRandomPositions(2, rows);
-          const y1 = startY + rows_pos[0] * rowSpacing;
-          const y2 = startY + rows_pos[1] * rowSpacing;
-          
-          specials.push({
-            x: cx - w * 0.25,
-            y: Math.min(y1, h - 90),
-            radius: 12,
-            type: 'teleport',
-            color: '#00ff88'
-          });
-          specials.push({
-            x: cx + w * 0.25,
-            y: Math.min(y2, h - 90),
-            radius: 12,
-            type: 'teleport',
-            color: '#ff8800'
-          });
-        }
-      }
-      
-      if (mapConfig.specials.includes('blackhole')) {
-        const r = Math.floor(Math.random() * (rows - 6)) + 3;
-        const y = startY + r * rowSpacing;
-        specials.push({
-          x: cx,
+        // Левая стена
+        platforms.push({
+          x: margin + 12,
           y: y,
-          radius: 18,
-          type: 'blackhole',
-          color: '#6600cc',
-          pullForce: 0.15,
-          targetX: stringAnchorX,
-          targetY: startY - 5
+          radius: PLATFORM_RADIUS + 2,
+          color1: '#4488cc',
+          type: 'wall'
         });
-      }
-    }
-
-    function buildPlatforms() {
-      platforms = [];
-      const mapConfig = getCurrentMap();
-      const pinColors = {
-        1: ['#f4d03f', '#b7950b'],
-        2: ['#ff6b6b', '#cc3333'],
-        3: ['#ff9944', '#cc6600'],
-        4: ['#bb88ff', '#7733cc'],
-        5: ['#4444ff', '#0000cc']
-      };
-      const colors = pinColors[mapConfig.id] || pinColors[1];
-      const w = canvas.width;
-      const margin = 10;
-      
-      for (let r = 0; r < rows - 1; r++) {
-        const y = startY + r * rowSpacing;
-        if (y < startY + 10) continue;
         
-        const availableWidth = w - margin * 2;
-        const pinsInRow = Math.floor(availableWidth / colSpacing) + 1;
-        const totalWidth = (pinsInRow - 1) * colSpacing;
-        const startX = (w - totalWidth) / 2;
-        const offsetX = (r % 2 === 0) ? 0 : colSpacing * 0.5;
+        // Правая стена
+        platforms.push({
+          x: w - margin - 12,
+          y: y,
+          radius: PLATFORM_RADIUS + 2,
+          color1: '#4488cc',
+          type: 'wall'
+        });
         
-        for (let c = 0; c < pinsInRow; c++) {
-          const px = startX + c * colSpacing + offsetX;
-          if (px < margin || px > w - margin) continue;
-          
-          let overlapped = false;
-          for (let s of specials) {
-            if (s.type === 'bumper') {
-              if (Math.abs(px - s.x) < s.width / 2 + PLATFORM_RADIUS + 3 && 
-                  Math.abs(y - s.y) < s.height / 2 + PLATFORM_RADIUS + 3) {
-                overlapped = true;
-                break;
-              }
-            } else if (s.type === 'teleport' || s.type === 'blackhole') {
-              const dx = px - s.x;
-              const dy = y - s.y;
-              if (Math.sqrt(dx*dx+dy*dy) < s.radius + PLATFORM_RADIUS + 5) {
-                overlapped = true;
-                break;
-              }
-            }
-          }
-          if (!overlapped) {
+        // Платформы на дорожке (полукругом)
+        const progress = row / 18;
+        const curveOffset = Math.sin(progress * Math.PI) * w * 0.3;
+        
+        for (let i = -2; i <= 2; i++) {
+          if (i === 0 && row % 3 !== 0) continue;
+          const px = cx + i * (w * 0.12) + (row % 2 === 0 ? curveOffset * 0.5 : -curveOffset * 0.5);
+          if (px > margin + 25 && px < w - margin - 25) {
             platforms.push({
-              x: px, y: y, radius: PLATFORM_RADIUS,
-              color1: colors[0], type: 'pin'
+              x: px,
+              y: y,
+              radius: PLATFORM_RADIUS,
+              color1: row % 2 === 0 ? '#f4d03f' : '#e67e22',
+              type: 'track'
             });
           }
         }
       }
-    }
-
-    function buildBinWalls() {
-      binWalls = [];
-      const binWidth = canvas.width / binCount;
-      const binY = canvas.height - 30;
-      const wallHeight = 30;
-      for (let i = 0; i <= binCount; i++) {
-        const x = i * binWidth;
-        binWalls.push({
-          x1: x, y1: binY - wallHeight,
-          x2: x, y2: binY + 30
-        });
+      
+      // Добавляем несколько случайных препятствий
+      for (let i = 0; i < 8; i++) {
+        const y = canvas.height * 0.15 + Math.random() * (finishLine - canvas.height * 0.15 - 50);
+        const x = margin + 30 + Math.random() * (w - margin * 2 - 60);
+        
+        // Проверяем, нет ли рядом других платформ
+        let tooClose = false;
+        for (let p of platforms) {
+          const dx = p.x - x;
+          const dy = p.y - y;
+          if (Math.sqrt(dx*dx+dy*dy) < 25) {
+            tooClose = true;
+            break;
+          }
+        }
+        if (!tooClose) {
+          platforms.push({
+            x: x,
+            y: y,
+            radius: PLATFORM_RADIUS + 4,
+            color1: '#ff6644',
+            type: 'obstacle'
+          });
+        }
       }
     }
 
-    function resetBall() {
-      ball.active = false;
-      ball.x = stringAnchorX;
-      ball.y = stringAnchorY + stringLength;
-      ball.vx = 0;
-      ball.vy = 0;
-      ball.teleported = false;
-      ball.teleportCooldown = 0;
+    function resetBalls() {
+      balls = [];
+      const w = canvas.width;
+      const startY = canvas.height * 0.08;
+      const colors = ['#ff4444', '#44ff44', '#4444ff', '#ffaa00', '#ff44ff', '#00ffff'];
+      
+      for (let i = 0; i < 6; i++) {
+        const x = w * 0.1 + i * (w * 0.8 / 5);
+        balls.push({
+          x: x,
+          y: startY,
+          vx: 0,
+          vy: 0,
+          active: true,
+          finished: false,
+          finishTime: 0,
+          value: i + 1,
+          color: colors[i],
+          ropeX: x,
+          ropeY: 5,
+          ropeLength: startY - 10
+        });
+      }
+      
       gameActive = false;
-      swingAngle = 0;
-      sessionExp = 0;
-      waitingForResultClose = false;
-      ballInBin = false;
-      binTimer = 0;
-      bonusActive = false;
-      bonusBalls = [];
-      bonusResults = [];
-      bonusTotalWinnings = 0;
-      bonusGameEndDelay = 0;
-      normalGameEndDelay = 0;
+      raceResults = [];
+      totalWinnings = 0;
     }
 
     function updateUI() {
@@ -804,54 +652,239 @@
         balanceSpan.textContent = '0';
         expSpan.textContent = '0';
         userGreeting.textContent = '👨‍🚀 Гость';
-        ball.color = getBallColor(1);
         mapIndicator.textContent = '🌍 Карта 1';
-        bonusButton.textContent = '🎁 Бонус';
         return;
       }
       balanceSpan.textContent = formatNumber(currentUser.balance);
       expSpan.textContent = formatNumber(currentUser.exp);
       userGreeting.textContent = `👨‍🚀 ${currentUser.name}`;
-      ball.color = getBallColor(currentUser.selectedBall);
       mapIndicator.textContent = `${getCurrentMap().icon} ${getCurrentMap().name}`;
-      bonusButton.textContent = '🎁 Бонус';
     }
 
-    function showResult(betValue, multiplier, winnings, oldBalance, newBalance, totalExp) {
-      const ballEmoji = getBallEmoji(currentUser ? currentUser.selectedBall : 1);
+    function showBetModal() {
+      if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
+      if (gameActive) return;
+      
+      document.getElementById('betBalance').textContent = formatNumber(currentUser.balance);
+      
+      const ballSelection = document.getElementById('ballSelection');
+      ballSelection.innerHTML = '';
+      
+      for (let i = 1; i <= 6; i++) {
+        const ballDiv = document.createElement('div');
+        ballDiv.style.cssText = `
+          width: 45px; height: 45px; border-radius: 50%;
+          background: ${getBallColor(i)};
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer; border: 3px solid ${i === selectedBetBall ? '#ffd700' : '#333'};
+          font-size: 1.2rem; font-weight: bold;
+        `;
+        ballDiv.textContent = i;
+        ballDiv.addEventListener('click', () => {
+          selectedBetBall = i;
+          document.querySelectorAll('#ballSelection div').forEach(el => el.style.border = '3px solid #333');
+          ballDiv.style.border = '3px solid #ffd700';
+        });
+        ballSelection.appendChild(ballDiv);
+      }
+      
+      document.getElementById('betInput').value = 1;
+      betModal.classList.remove('hidden');
+    }
+
+    function confirmBet() {
+      const bet = parseInt(document.getElementById('betInput').value);
+      if (!bet || bet < 1) { alert('Введите корректную ставку!'); return; }
+      if (bet > currentUser.balance) { alert('Недостаточно звёзд!'); return; }
+      
+      betAmount = bet;
+      selectedBetBall = selectedBetBall;
+      betModal.classList.add('hidden');
+      
+      startRace();
+    }
+
+    function startRace() {
+      initAudio();
+      gameActive = true;
+      raceResults = [];
+      totalWinnings = 0;
+      
+      // Отпускаем все шары
+      for (let b of balls) {
+        b.active = true;
+        b.vy = 0.3;
+        b.vx = (Math.random() - 0.5) * 0.5;
+      }
+      
+      soundDrop();
+    }
+
+    function applyPhysics() {
+      if (!gameActive) return;
+      
+      let allFinished = true;
+      
+      for (let b of balls) {
+        if (b.finished) continue;
+        allFinished = false;
+        
+        b.vy += GRAVITY;
+        b.x += b.vx;
+        b.y += b.vy;
+        
+        // Границы экрана
+        if (b.x - BALL_RADIUS < 5) { b.x = BALL_RADIUS + 5; b.vx = Math.abs(b.vx) * BOUNCE; }
+        if (b.x + BALL_RADIUS > canvas.width - 5) { b.x = canvas.width - BALL_RADIUS - 5; b.vx = -Math.abs(b.vx) * BOUNCE; }
+        if (b.y - BALL_RADIUS < 5) { b.y = BALL_RADIUS + 5; b.vy = Math.abs(b.vy) * BOUNCE; }
+        
+        // Столкновения с платформами
+        for (let p of platforms) {
+          const dx = b.x - p.x;
+          const dy = b.y - p.y;
+          const dist = Math.sqrt(dx*dx+dy*dy);
+          const minDist = BALL_RADIUS + p.radius;
+          
+          if (dist < minDist && dist > 0.001) {
+            const nx = dx/dist, ny = dy/dist;
+            b.x += nx * (minDist - dist);
+            b.y += ny * (minDist - dist);
+            const vn = b.vx * nx + b.vy * ny;
+            if (vn < 0) {
+              b.vx -= (1+BOUNCE)*vn*nx;
+              b.vy -= (1+BOUNCE)*vn*ny;
+              soundBounce();
+            }
+            b.vx *= 0.998;
+            b.vy *= 0.998;
+          }
+        }
+        
+        // Столкновения между шарами
+        for (let other of balls) {
+          if (other === b || other.finished) continue;
+          const dx = b.x - other.x;
+          const dy = b.y - other.y;
+          const dist = Math.sqrt(dx*dx+dy*dy);
+          const minDist = BALL_RADIUS * 2;
+          if (dist < minDist && dist > 0.001) {
+            const nx = dx/dist, ny = dy/dist;
+            const overlap = minDist - dist;
+            b.x += nx * overlap * 0.5;
+            b.y += ny * overlap * 0.5;
+            other.x -= nx * overlap * 0.5;
+            other.y -= ny * overlap * 0.5;
+            
+            const vn = (b.vx - other.vx) * nx + (b.vy - other.vy) * ny;
+            if (vn < 0) {
+              b.vx -= vn * nx;
+              b.vy -= vn * ny;
+              other.vx += vn * nx;
+              other.vy += vn * ny;
+              soundBounce();
+            }
+          }
+        }
+        
+        // Проверка финиша
+        if (b.y >= finishLine && !b.finished) {
+          b.finished = true;
+          b.finishTime = Date.now();
+          b.y = finishLine;
+          b.active = false;
+          
+          raceResults.push({
+            value: b.value,
+            color: b.color,
+            position: raceResults.length + 1
+          });
+        }
+        
+        if (b.y > canvas.height + 50) {
+          b.finished = true;
+          b.active = false;
+        }
+      }
+      
+      // Проверка завершения гонки
+      if (raceResults.length === 6 && allFinished === false) {
+        allFinished = true;
+      }
+      
+      if (allFinished && raceResults.length > 0) {
+        endRace();
+      }
+    }
+
+    function endRace() {
+      gameActive = false;
+      
+      // Расчет выигрыша
+      const selectedBall = raceResults.find(r => r.value === selectedBetBall);
+      let winnings = 0;
+      let multiplier = 0;
+      
+      if (selectedBall) {
+        switch(selectedBall.position) {
+          case 1: multiplier = 6; break;
+          case 2: multiplier = 3; break;
+          case 3: multiplier = 2; break;
+          default: multiplier = 0;
+        }
+        winnings = Math.floor(betAmount * multiplier);
+      }
+      
+      const oldBalance = currentUser.balance;
+      currentUser.balance -= betAmount;
+      currentUser.balance += winnings;
+      
+      const expGain = Math.floor(betAmount * (1 + getCurrentMap().multiplierBonus));
+      currentUser.exp += expGain;
+      
+      updateUserData(currentUser);
+      updateUI();
+      
+      // Показать результаты
+      let resultsHtml = '';
+      const positions = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
+      
+      raceResults.forEach(r => {
+        const isSelected = r.value === selectedBetBall;
+        resultsHtml += `
+          <div class="result-row" style="${isSelected ? 'background: rgba(255,215,0,0.2); border-radius: 8px; padding: 4px 8px;' : ''}">
+            <span class="result-label">${positions[r.position-1]} Шар ${r.value}</span>
+            <span class="result-value" style="color: ${r.color};">
+              ${isSelected ? '✅ Ваш шар' : ''}
+            </span>
+          </div>
+        `;
+      });
       
       resultContent.innerHTML = `
-        <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">📊 Результат броска</h3>
+        <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">🏁 Результаты гонки</h3>
         <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;">
+          ${resultsHtml}
+          <div class="result-row" style="border-top: 2px solid rgba(255,215,0,0.3); margin-top: 8px;">
+            <span class="result-label">🎯 Ваш шар</span>
+            <span class="result-value" style="color: ${getBallColor(selectedBetBall)};">#${selectedBetBall} - ${selectedBall ? positions[selectedBall.position-1] + ' место' : 'Не финишировал'}</span>
+          </div>
           <div class="result-row">
-            <span class="result-label">🎯 Шар</span>
-            <span class="result-value">${ballEmoji} (ставка ${formatNumber(betValue)} ⭐)</span>
+            <span class="result-label">💰 Ставка</span>
+            <span class="result-value">${formatNumber(betAmount)} ⭐</span>
           </div>
           <div class="result-row">
             <span class="result-label">✖️ Множитель</span>
             <span class="result-value" style="color: #ffd700;">x${multiplier}</span>
           </div>
           <div class="result-row">
-            <span class="result-label">💼 Было</span>
-            <span class="result-value">${formatNumber(oldBalance)} ⭐</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">💼 Стало</span>
-            <span class="result-value">${formatNumber(newBalance)} ⭐</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📈 Итог</span>
+            <span class="result-label">📈 Выигрыш</span>
             <span class="result-value" style="color: ${winnings >= 0 ? '#4caf50' : '#f44336'}; font-size: 1rem;">
               ${winnings >= 0 ? '+' : ''}${formatNumber(winnings)} ⭐
             </span>
           </div>
           <div class="result-row">
-            <span class="result-label">✨ Опыт за бросок</span>
-            <span class="result-value" style="color: #44ff44;">+${formatNumber(sessionExp)}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">✨ Всего опыта</span>
-            <span class="result-value" style="color: #44ff44;">${formatNumber(totalExp)}</span>
+            <span class="result-label">✨ Опыт</span>
+            <span class="result-value" style="color: #44ff44;">+${formatNumber(expGain)}</span>
           </div>
         </div>
         <button id="closeResultBtn" style="align-self: center;">Ок</button>
@@ -860,718 +893,9 @@
       
       document.getElementById('closeResultBtn').addEventListener('click', () => {
         resultModal.classList.add('hidden');
-        waitingForResultClose = false;
         buildAll();
-        resetBall();
+        resetBalls();
       });
-    }
-
-    function showBonusResult(oldBalance, totalExp) {
-      const newBalance = currentUser ? currentUser.balance : 0;
-      const totalWinnings = bonusTotalWinnings;
-      
-      let resultsHtml = '';
-      bonusResults.forEach((r, i) => {
-        const emoji = getBallEmoji(r.value);
-        resultsHtml += `
-          <div class="result-row">
-            <span class="result-label">🎯 Шар ${i+1}</span>
-            <span class="result-value">${emoji} x${r.multiplier} → ${r.winnings >= 0 ? '+' : ''}${formatNumber(r.winnings)} ⭐</span>
-          </div>
-        `;
-      });
-      
-      resultContent.innerHTML = `
-        <h3 style="color: #66ccff; margin: 0 0 4px 0; font-size: 1rem;">🎁 Бонус-бросок (5 шаров)</h3>
-        <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;">
-          ${resultsHtml}
-          <div class="result-row" style="border-top: 2px solid rgba(255,255,255,0.2); margin-top: 4px;">
-            <span class="result-label">💼 Было</span>
-            <span class="result-value">${formatNumber(oldBalance)} ⭐</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">💼 Стало</span>
-            <span class="result-value">${formatNumber(newBalance)} ⭐</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">📈 Общий итог</span>
-            <span class="result-value" style="color: ${totalWinnings >= 0 ? '#4caf50' : '#f44336'}; font-size: 1rem;">
-              ${totalWinnings >= 0 ? '+' : ''}${formatNumber(totalWinnings)} ⭐
-            </span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">✨ Опыт за бросок</span>
-            <span class="result-value" style="color: #44ff44;">+${formatNumber(sessionExp)}</span>
-          </div>
-          <div class="result-row">
-            <span class="result-label">✨ Всего опыта</span>
-            <span class="result-value" style="color: #44ff44;">${formatNumber(totalExp)}</span>
-          </div>
-        </div>
-        <button id="closeResultBtn" style="align-self: center;">Ок</button>
-      `;
-      resultModal.classList.remove('hidden');
-      
-      document.getElementById('closeResultBtn').addEventListener('click', () => {
-        resultModal.classList.add('hidden');
-        waitingForResultClose = false;
-        buildAll();
-        resetBall();
-      });
-    }
-
-    function launchBonus() {
-      initAudio();
-      if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
-      if (gameActive || ball.active || waitingForResultClose || bonusActive) return;
-      
-      alert('📺 Смотрим рекламу...\n🎁 Получено 5 шаров!');
-      
-      bonusActive = true;
-      gameActive = true;
-      ball.active = true;
-      sessionExp = 0;
-      bonusResults = [];
-      bonusTotalWinnings = 0;
-      bonusGameEndDelay = 0;
-      
-      const ballValue = currentUser.selectedBall;
-      const ballColor = getBallColor(ballValue);
-      
-      bonusBalls = [];
-      for (let i = 0; i < 5; i++) {
-        const angle = (i / 5) * Math.PI * 2 + swingAngle;
-        const bx = stringAnchorX + Math.sin(angle) * stringLength * 0.7;
-        const by = stringAnchorY + Math.cos(angle) * stringLength * 0.7;
-        
-        bonusBalls.push({
-          x: bx,
-          y: by,
-          vx: Math.sin(angle) * 1.5,
-          vy: 0.5 + Math.random() * 0.5,
-          active: true,
-          value: ballValue,
-          color: ballColor,
-          inBin: false,
-          binTimer: 0,
-          finished: false,
-          winnings: 0,
-          multiplier: 0,
-          settled: false,
-          teleported: false,
-          teleportCooldown: 0
-        });
-      }
-      
-      ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
-      ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
-      ball.vx = Math.sin(swingAngle) * 1.2;
-      ball.vy = 0.6;
-      ball.value = ballValue;
-      ball.color = ballColor;
-      ball.settled = false;
-      ball.teleported = false;
-      ball.teleportCooldown = 0;
-      
-      soundDrop();
-      updateUI();
-    }
-
-    function checkWallCollisionForBall(b, wall) {
-      const dx = wall.x2 - wall.x1;
-      const dy = wall.y2 - wall.y1;
-      const lengthSq = dx * dx + dy * dy;
-      
-      let t = ((b.x - wall.x1) * dx + (b.y - wall.y1) * dy) / lengthSq;
-      t = Math.max(0, Math.min(1, t));
-      
-      const closestX = wall.x1 + t * dx;
-      const closestY = wall.y1 + t * dy;
-      
-      const distX = b.x - closestX;
-      const distY = b.y - closestY;
-      const dist = Math.sqrt(distX * distX + distY * distY);
-      
-      if (dist < BALL_RADIUS && dist > 0.001) {
-        const nx = distX / dist;
-        const ny = distY / dist;
-        b.x += nx * (BALL_RADIUS - dist);
-        b.y += ny * (BALL_RADIUS - dist);
-        const vn = b.vx * nx + b.vy * ny;
-        if (vn < 0) {
-          b.vx -= (1 + BOUNCE) * vn * nx;
-          b.vy -= (1 + BOUNCE) * vn * ny;
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function checkBumperCollisionForBall(b, bumper) {
-      const halfW = bumper.width / 2;
-      const halfH = bumper.height / 2;
-      
-      if (b.x > bumper.x - halfW - BALL_RADIUS && 
-          b.x < bumper.x + halfW + BALL_RADIUS &&
-          b.y > bumper.y - halfH - BALL_RADIUS && 
-          b.y < bumper.y + halfH + BALL_RADIUS) {
-        
-        const closestX = Math.max(bumper.x - halfW, Math.min(b.x, bumper.x + halfW));
-        const closestY = Math.max(bumper.y - halfH, Math.min(b.y, bumper.y + halfH));
-        
-        const dx = b.x - closestX;
-        const dy = b.y - closestY;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        
-        if (dist < BALL_RADIUS && dist > 0.001) {
-          const nx = dx / dist;
-          const ny = dy / dist;
-          b.x += nx * (BALL_RADIUS - dist);
-          b.y += ny * (BALL_RADIUS - dist);
-          
-          b.vy = -Math.abs(b.vy) * bumper.bounceForce - 3;
-          b.vx += (Math.random() - 0.5) * 3;
-          
-          soundBumper();
-          
-          if (currentUser) {
-            currentUser.exp += 1;
-            sessionExp += 1;
-            updateUserData(currentUser);
-          }
-          return true;
-        }
-      }
-      return false;
-    }
-
-    function applyPhysicsToBall(b) {
-      // Уменьшаем кулдаун телепорта
-      if (b.teleportCooldown > 0) {
-        b.teleportCooldown--;
-        if (b.teleportCooldown === 0) {
-          b.teleported = false;
-        }
-      }
-      
-      b.vy += GRAVITY;
-      b.x += b.vx;
-      b.y += b.vy;
-
-      if (b.x - BALL_RADIUS < 2) { 
-        b.x = BALL_RADIUS + 2; 
-        b.vx = Math.abs(b.vx) * BOUNCE; 
-        soundBounce();
-      }
-      if (b.x + BALL_RADIUS > canvas.width - 2) { 
-        b.x = canvas.width - BALL_RADIUS - 2; 
-        b.vx = -Math.abs(b.vx) * BOUNCE; 
-        soundBounce();
-      }
-      
-      if (b.y - BALL_RADIUS < 2) { 
-        b.y = BALL_RADIUS + 2; 
-        b.vy = Math.abs(b.vy) * BOUNCE; 
-        soundBounce();
-      }
-
-      // Проверка коллизий между бонусными шарами
-      for (let other of bonusBalls) {
-        if (other === b || !other.active) continue;
-        const dx = b.x - other.x;
-        const dy = b.y - other.y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        const minDist = BALL_RADIUS * 2;
-        if (dist < minDist && dist > 0.001) {
-          const nx = dx/dist, ny = dy/dist;
-          const overlap = minDist - dist;
-          b.x += nx * overlap * 0.5;
-          b.y += ny * overlap * 0.5;
-          other.x -= nx * overlap * 0.5;
-          other.y -= ny * overlap * 0.5;
-          
-          const vn = (b.vx - other.vx) * nx + (b.vy - other.vy) * ny;
-          if (vn < 0) {
-            b.vx -= vn * nx;
-            b.vy -= vn * ny;
-            other.vx += vn * nx;
-            other.vy += vn * ny;
-            soundBounce();
-          }
-        }
-      }
-
-      // Коллизия с основным шаром
-      if (ball.active && b !== ball) {
-        const dx = b.x - ball.x;
-        const dy = b.y - ball.y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        const minDist = BALL_RADIUS * 2;
-        if (dist < minDist && dist > 0.001) {
-          const nx = dx/dist, ny = dy/dist;
-          const overlap = minDist - dist;
-          b.x += nx * overlap * 0.5;
-          b.y += ny * overlap * 0.5;
-          ball.x -= nx * overlap * 0.5;
-          ball.y -= ny * overlap * 0.5;
-          
-          const vn = (b.vx - ball.vx) * nx + (b.vy - ball.vy) * ny;
-          if (vn < 0) {
-            b.vx -= vn * nx;
-            b.vy -= vn * ny;
-            ball.vx += vn * nx;
-            ball.vy += vn * ny;
-            soundBounce();
-          }
-        }
-      }
-
-      for (let p of platforms) {
-        const dx = b.x - p.x;
-        const dy = b.y - p.y;
-        const dist = Math.sqrt(dx*dx+dy*dy);
-        const minDist = BALL_RADIUS + p.radius;
-        if (dist < minDist && dist > 0.001) {
-          const nx = dx/dist, ny = dy/dist;
-          b.x += nx * (minDist - dist);
-          b.y += ny * (minDist - dist);
-          const vn = b.vx * nx + b.vy * ny;
-          if (vn < 0) {
-            b.vx -= (1+BOUNCE)*vn*nx;
-            b.vy -= (1+BOUNCE)*vn*ny;
-            soundBounce();
-            
-            if (currentUser) {
-              currentUser.exp += 1;
-              sessionExp += 1;
-              updateUserData(currentUser);
-            }
-          }
-          b.vx *= 0.999;
-          b.vy *= 0.999;
-        }
-      }
-      
-      for (let wall of binWalls) {
-        checkWallCollisionForBall(b, wall);
-      }
-      
-      // Спецэффекты
-      for (let s of specials) {
-        if (s.type === 'bumper') {
-          checkBumperCollisionForBall(b, s);
-        }
-        
-        if (s.type === 'teleport' && !b.teleported) {
-          const dx = b.x - s.x;
-          const dy = b.y - s.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const minDist = BALL_RADIUS + s.radius;
-          if (dist < minDist) {
-            // Телепорт в случайное место вверху экрана
-            const margin = 30;
-            b.x = margin + Math.random() * (canvas.width - margin * 2);
-            b.y = startY + Math.random() * 15;
-            b.vx = (Math.random() - 0.5) * 2;
-            b.vy = 0.5 + Math.random() * 0.5;
-            b.teleported = true;
-            b.teleportCooldown = 30; // Кулдаун 30 кадров (0.5 сек)
-            
-            soundTeleport();
-            
-            if (currentUser) {
-              currentUser.exp += 2;
-              sessionExp += 2;
-              updateUserData(currentUser);
-            }
-          }
-        }
-        
-        if (s.type === 'blackhole') {
-          const dx = b.x - s.x;
-          const dy = b.y - s.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          const influenceRadius = 100;
-          const captureRadius = s.radius + BALL_RADIUS;
-          
-          if (dist < influenceRadius && dist > 0.001) {
-            // Притяжение к чёрной дыре
-            const force = s.pullForce * (1 - dist / influenceRadius);
-            b.vx -= (dx / dist) * force;
-            b.vy -= (dy / dist) * force;
-            
-            // Если шар достаточно близко - засасывает и выбрасывает сверху
-            if (dist < captureRadius) {
-              b.x = s.targetX;
-              b.y = s.targetY;
-              b.vx = (Math.random() - 0.5) * 3;
-              b.vy = 0.5;
-              b.teleported = true;
-              b.teleportCooldown = 20;
-              
-              soundTeleport();
-              
-              if (currentUser) {
-                currentUser.exp += 3;
-                sessionExp += 3;
-                updateUserData(currentUser);
-              }
-            }
-          }
-        }
-      }
-    }
-
-    function dropBall() {
-      initAudio();
-      if (!currentUser) { alert('Сначала войдите в профиль!'); return; }
-      if (gameActive || ball.active || waitingForResultClose || bonusActive) return;
-      
-      ball.value = currentUser.selectedBall;
-      ball.color = getBallColor(currentUser.selectedBall);
-      ball.active = true;
-      ball.settled = false;
-      ball.teleported = false;
-      ball.teleportCooldown = 0;
-      gameActive = true;
-      waitingForResultClose = false;
-      sessionExp = 0;
-      normalGameEndDelay = 0;
-      ball.x = stringAnchorX + Math.sin(swingAngle) * stringLength;
-      ball.y = stringAnchorY + Math.cos(swingAngle) * stringLength;
-      ball.vx = Math.sin(swingAngle) * 1.2;
-      ball.vy = 0.6;
-      
-      soundDrop();
-    }
-
-    function allBallsFinished() {
-      return bonusBalls.every(b => b.finished);
-    }
-
-    function processBonusBallResult(b) {
-      const binWidth = canvas.width / binCount;
-      let binIndex = Math.floor(b.x / binWidth);
-      if (binIndex < 0) binIndex = 0;
-      if (binIndex >= binCount) binIndex = binCount - 1;
-      const multiplier = multipliers[binIndex];
-      
-      let winnings;
-      if (multiplier === -1) {
-        winnings = -b.value;
-      } else {
-        winnings = Math.floor(b.value * multiplier);
-      }
-      
-      b.winnings = winnings;
-      b.multiplier = multiplier;
-      
-      if (currentUser) {
-        currentUser.balance += winnings;
-        updateUserData(currentUser);
-      }
-      
-      bonusResults.push({
-        value: b.value,
-        multiplier: multiplier,
-        winnings: winnings
-      });
-      bonusTotalWinnings += winnings;
-      
-      b.finished = true;
-      soundBin();
-    }
-
-    function endBonusGame() {
-      const oldBalance = currentUser ? currentUser.balance - bonusTotalWinnings : 0;
-      const totalExp = currentUser ? currentUser.exp : 0;
-      
-      gameActive = false;
-      ball.active = false;
-      bonusActive = false;
-      waitingForResultClose = true;
-      
-      updateUI();
-      
-      setTimeout(() => {
-        showBonusResult(oldBalance, totalExp);
-      }, 500);
-    }
-
-    function applyPhysics() {
-      if (!gameActive) return;
-      
-      // Обработка основного шара в корзине (обычный режим)
-      if (ballInBin && !bonusActive) {
-        applyPhysicsToBall(ball);
-        
-        if (ball.y > canvas.height + 30) {
-          normalGameEndDelay++;
-          if (normalGameEndDelay > 30) {
-            const binWidth = canvas.width / binCount;
-            let binIndex = Math.floor(ball.x / binWidth);
-            if (binIndex < 0) binIndex = 0;
-            if (binIndex >= binCount) binIndex = binCount - 1;
-            const multiplier = multipliers[binIndex];
-            
-            const oldBalance = currentUser ? currentUser.balance : 0;
-            let winnings;
-            if (multiplier === -1) {
-              winnings = -ball.value;
-            } else {
-              winnings = Math.floor(ball.value * multiplier);
-            }
-            
-            if (currentUser) {
-              currentUser.balance += winnings;
-              updateUserData(currentUser);
-            }
-            const newBalance = currentUser ? currentUser.balance : 0;
-            const totalExp = currentUser ? currentUser.exp : 0;
-            
-            ballInBin = false;
-            gameActive = false;
-            ball.active = false;
-            waitingForResultClose = true;
-            
-            updateUI();
-            
-            setTimeout(() => {
-              showResult(ball.value, multiplier, winnings, oldBalance, newBalance, totalExp);
-            }, 500);
-          }
-        }
-        return;
-      }
-      
-      // Обработка бонусных шаров
-      if (bonusActive) {
-        let allFinished = true;
-        
-        for (let b of bonusBalls) {
-          if (b.finished) continue;
-          allFinished = false;
-          
-          if (b.inBin && !b.settled) {
-            applyPhysicsToBall(b);
-            
-            if (b.y > canvas.height + 30) {
-              b.binTimer++;
-              if (b.binTimer > 30) {
-                processBonusBallResult(b);
-              }
-            }
-            continue;
-          }
-          
-          if (b.active) {
-            applyPhysicsToBall(b);
-          }
-          
-          if (b.active && b.y + BALL_RADIUS >= canvas.height - 30 && b.y < canvas.height + 50) {
-            b.inBin = true;
-            b.binTimer = 0;
-          }
-          
-          if (b.y > canvas.height + 150 || b.y < -100) { 
-            b.finished = true;
-            bonusResults.push({
-              value: b.value,
-              multiplier: 0,
-              winnings: 0
-            });
-          }
-        }
-        
-        if (ball.active) {
-          applyPhysicsToBall(ball);
-        }
-        
-        if (ball.active && ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
-          ballInBin = true;
-        }
-        
-        if (ballInBin && !ball.settled) {
-          if (ball.y > canvas.height + 30) {
-            ball.binTimer = (ball.binTimer || 0) + 1;
-            if (ball.binTimer > 30) {
-              const binWidth = canvas.width / binCount;
-              let binIndex = Math.floor(ball.x / binWidth);
-              if (binIndex < 0) binIndex = 0;
-              if (binIndex >= binCount) binIndex = binCount - 1;
-              const multiplier = multipliers[binIndex];
-              
-              let winnings;
-              if (multiplier === -1) {
-                winnings = -ball.value;
-              } else {
-                winnings = Math.floor(ball.value * multiplier);
-              }
-              
-              if (currentUser) {
-                currentUser.balance += winnings;
-                updateUserData(currentUser);
-              }
-              
-              bonusResults.push({
-                value: ball.value,
-                multiplier: multiplier,
-                winnings: winnings
-              });
-              bonusTotalWinnings += winnings;
-              
-              ball.settled = true;
-              ballInBin = false;
-              soundBin();
-            }
-          }
-        }
-        
-        const allBonusSettled = bonusBalls.every(b => b.finished);
-        if (allBonusSettled && (!ball.active || ball.settled)) {
-          bonusGameEndDelay++;
-          if (bonusGameEndDelay > 30) {
-            endBonusGame();
-          }
-        }
-        
-        updateUI();
-        return;
-      }
-      
-      // Обычный режим
-      if (!ball.active) return;
-      
-      applyPhysicsToBall(ball);
-      
-      updateUI();
-
-      if (ball.y + BALL_RADIUS >= canvas.height - 30 && ball.y < canvas.height + 50) {
-        ballInBin = true;
-      }
-      
-      if (ball.y > canvas.height + 150 || ball.y < -100) { 
-        resetBall(); 
-        gameActive = false; 
-      }
-    }
-
-    function drawSpecials() {
-      blackHoleAngle += 0.05;
-      
-      for (let s of specials) {
-        if (s.type === 'bumper') {
-          const halfW = s.width / 2;
-          const halfH = s.height / 2;
-          
-          ctx.fillStyle = s.color;
-          ctx.fillRect(s.x - halfW, s.y - halfH, s.width, s.height * 2);
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1;
-          ctx.strokeRect(s.x - halfW, s.y - halfH, s.width, s.height * 2);
-          
-          ctx.fillStyle = '#ffffff';
-          ctx.font = 'bold 10px sans-serif';
-          ctx.textAlign = 'center';
-          const arrowCount = Math.floor(s.width / 25);
-          for (let a = 0; a < arrowCount; a++) {
-            const ax = s.x - halfW + 15 + a * (s.width / arrowCount);
-            ctx.fillText('▲', ax, s.y + 4);
-          }
-        }
-        
-        if (s.type === 'teleport') {
-          // Анимированный телепорт
-          const pulse = Math.sin(blackHoleAngle * 3) * 0.3 + 0.7;
-          
-          ctx.strokeStyle = s.color;
-          ctx.lineWidth = 3 * pulse;
-          ctx.beginPath();
-          ctx.moveTo(s.x - s.radius, s.y - s.radius);
-          ctx.lineTo(s.x - s.radius, s.y + s.radius);
-          ctx.moveTo(s.x + s.radius, s.y - s.radius);
-          ctx.lineTo(s.x + s.radius, s.y + s.radius);
-          ctx.stroke();
-          ctx.lineWidth = 1;
-          
-          // Мерцающие частицы вокруг
-          for (let i = 0; i < 4; i++) {
-            const angle = blackHoleAngle * 2 + (i * Math.PI / 2);
-            const px = s.x + Math.cos(angle) * s.radius * 1.2;
-            const py = s.y + Math.sin(angle) * s.radius * 1.2;
-            ctx.fillStyle = s.color;
-            ctx.beginPath();
-            ctx.arc(px, py, 2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-          
-          ctx.fillStyle = s.color;
-          ctx.font = 'bold 8px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('⏫', s.x, s.y + 3);
-        }
-        
-        if (s.type === 'blackhole') {
-          // Анимированная чёрная дыра
-          const pulse = Math.sin(blackHoleAngle * 2) * 0.2 + 0.8;
-          
-          // Внешнее свечение
-          for (let i = 3; i >= 0; i--) {
-            const r = s.radius + i * 8;
-            const alpha = 0.15 - i * 0.03;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, r * pulse, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(100, 0, 200, ${alpha})`;
-            ctx.fill();
-          }
-          
-          // Спиральные рукава
-          ctx.strokeStyle = '#8844cc';
-          ctx.lineWidth = 1.5;
-          for (let i = 0; i < 3; i++) {
-            const startAngle = blackHoleAngle + (i * Math.PI * 2 / 3);
-            ctx.beginPath();
-            for (let a = 0; a < Math.PI * 2; a += 0.1) {
-              const r = s.radius * (0.2 + a / (Math.PI * 2) * 1.8);
-              const x = s.x + Math.cos(a + startAngle) * r * pulse;
-              const y = s.y + Math.sin(a + startAngle) * r * pulse;
-              if (a === 0) ctx.moveTo(x, y);
-              else ctx.lineTo(x, y);
-            }
-            ctx.stroke();
-          }
-          ctx.lineWidth = 1;
-          
-          // Центральный круг
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius * 0.6, 0, Math.PI * 2);
-          const gradient = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.radius * 0.6);
-          gradient.addColorStop(0, '#000000');
-          gradient.addColorStop(1, '#440088');
-          ctx.fillStyle = gradient;
-          ctx.fill();
-          
-          // Кольцо горизонта событий
-          ctx.beginPath();
-          ctx.arc(s.x, s.y, s.radius * 0.7, 0, Math.PI * 2);
-          ctx.strokeStyle = '#9944ff';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.lineWidth = 1;
-          
-          // Частицы вокруг дыры
-          for (let i = 0; i < 8; i++) {
-            const angle = blackHoleAngle * 3 + (i * Math.PI / 4);
-            const r = s.radius * 1.5 * (0.8 + Math.sin(blackHoleAngle * 5 + i) * 0.2);
-            const px = s.x + Math.cos(angle) * r;
-            const py = s.y + Math.sin(angle) * r;
-            ctx.fillStyle = '#cc88ff';
-            ctx.beginPath();
-            ctx.arc(px, py, 1.5, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-      }
     }
 
     function drawScene() {
@@ -1580,99 +904,69 @@
       ctx.fillStyle = '#000020';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      ctx.strokeStyle = '#4488cc';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(0, 2);
-      ctx.lineTo(canvas.width, 2);
-      ctx.stroke();
-      ctx.lineWidth = 1;
-      
-      // Рисуем маятник
-      if (!ball.active && !gameActive && !waitingForResultClose && !bonusActive) {
-        swingAngle += swingSpeed;
-        if (swingAngle > 1.7 || swingAngle < -1.7) swingSpeed *= -1;
-        const ballX = stringAnchorX + Math.sin(swingAngle) * stringLength;
-        const ballY = stringAnchorY + Math.cos(swingAngle) * stringLength;
-        
-        ctx.beginPath();
-        ctx.moveTo(stringAnchorX, stringAnchorY);
-        ctx.lineTo(ballX, ballY);
-        ctx.strokeStyle = '#66ccff';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.arc(ballX, ballY, BALL_RADIUS, 0, 2*Math.PI);
-        const ballColor = currentUser ? getBallColor(currentUser.selectedBall) : '#44aaff';
-        ctx.fillStyle = ballColor;
-        ctx.fill();
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      drawSpecials();
-
+      // Рисуем платформы
       for (let p of platforms) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, 2*Math.PI);
         ctx.fillStyle = p.color1;
         ctx.fill();
-      }
-
-      const binWidth = canvas.width / binCount;
-      const binY = canvas.height - 30;
-      for (let i = 0; i < binCount; i++) {
-        const x = i * binWidth;
-        const mult = multipliers[i];
-        const isNegative = mult === -1;
-        ctx.fillStyle = isNegative ? '#2a0000' : '#0a1a30';
-        ctx.fillRect(x, binY, binWidth, 30);
-        
-        ctx.strokeStyle = isNegative ? '#ff4444' : '#3399ff';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, binY, binWidth, 30);
-        
-        ctx.fillStyle = isNegative ? '#ff6666' : '#ffffff';
-        ctx.font = 'bold 9px "Segoe UI"';
-        ctx.textAlign = 'center';
-        ctx.fillText(isNegative ? '−1' : `x${mult}`, x+binWidth/2, binY+19);
-      }
-
-      ctx.strokeStyle = '#4488cc';
-      ctx.lineWidth = 2;
-      for (let wall of binWalls) {
-        ctx.beginPath();
-        ctx.moveTo(wall.x1, wall.y1);
-        ctx.lineTo(wall.x2, wall.y2);
-        ctx.stroke();
-      }
-      ctx.lineWidth = 1;
-
-      // Рисуем бонусные шары
-      for (let b of bonusBalls) {
-        if (b.finished) continue;
-        if (b.active || b.inBin) {
-          ctx.beginPath();
-          ctx.arc(b.x, b.y, BALL_RADIUS, 0, 2*Math.PI);
-          ctx.fillStyle = b.color;
-          ctx.fill();
-          ctx.strokeStyle = '#ffffff';
+        if (p.type === 'wall') {
+          ctx.strokeStyle = '#66aaff';
           ctx.lineWidth = 1;
           ctx.stroke();
         }
       }
-
-      // Рисуем основной шар
-      if (ball.active || ballInBin) {
+      
+      // Линия финиша
+      ctx.strokeStyle = '#ffd700';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 5]);
+      ctx.beginPath();
+      ctx.moveTo(20, finishLine);
+      ctx.lineTo(canvas.width - 20, finishLine);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineWidth = 1;
+      
+      ctx.fillStyle = '#ffd700';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('🏁 ФИНИШ', canvas.width/2, finishLine - 5);
+      
+      // Рисуем шары
+      for (let b of balls) {
+        if (!gameActive) {
+          // Веревки
+          ctx.beginPath();
+          ctx.moveTo(b.ropeX, b.ropeY);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = '#66ccff';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+        
         ctx.beginPath();
-        ctx.arc(ball.x, ball.y, BALL_RADIUS, 0, 2*Math.PI);
-        ctx.fillStyle = ball.color;
+        ctx.arc(b.x, b.y, BALL_RADIUS, 0, 2*Math.PI);
+        ctx.fillStyle = b.color;
         ctx.fill();
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 1;
         ctx.stroke();
+        
+        // Номер шара
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 8px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(b.value, b.x, b.y + 2);
+      }
+      
+      // Если гонка идет, показываем позиции
+      if (gameActive && raceResults.length > 0) {
+        ctx.fillStyle = '#ffd700';
+        ctx.font = 'bold 14px sans-serif';
+        ctx.textAlign = 'center';
+        const leaders = raceResults.slice(0, 3);
+        ctx.fillText(`Лидируют: ${leaders.map(r => '#'+r.value).join(', ')}`, canvas.width/2, 20);
       }
     }
 
@@ -1882,7 +1176,7 @@
       authModal.classList.add('hidden');
       buildAll();
       updateUI();
-      resetBall();
+      resetBalls();
       
       if (user.name.toLowerCase() === 'casper') {
         setTimeout(() => {
@@ -1896,7 +1190,7 @@
       currentMapId = 1;
       authModal.classList.remove('hidden');
       buildAll();
-      resetBall();
+      resetBalls();
       updateUI();
     }
 
@@ -1917,8 +1211,9 @@
     }
 
     // ========== ОБРАБОТЧИКИ ==========
-    dropButton.addEventListener('click', dropBall);
-    bonusButton.addEventListener('click', launchBonus);
+    dropButton.addEventListener('click', showBetModal);
+    document.getElementById('confirmBetBtn').addEventListener('click', confirmBet);
+    document.getElementById('cancelBetBtn').addEventListener('click', () => betModal.classList.add('hidden'));
     document.getElementById('shopButton').addEventListener('click', openShop);
     document.getElementById('mapsButton').addEventListener('click', openMaps);
     document.getElementById('profileButton').addEventListener('click', showProfile);
@@ -1936,9 +1231,8 @@
     resultModal.addEventListener('click', (e) => {
       if (e.target === resultModal) {
         resultModal.classList.add('hidden');
-        waitingForResultClose = false;
         buildAll();
-        resetBall();
+        resetBalls();
       }
     });
 
