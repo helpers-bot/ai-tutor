@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <style>
-        /* ===== ВЕСЬ СТИЛЬ ===== */
+        /* ===== БАЗОВЫЙ СТИЛЬ (упрощён) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -162,8 +162,7 @@
             color: #b0c0d8;
         }
         .form-group input,
-        .form-group select,
-        .form-group textarea {
+        .form-group select {
             width: 100%;
             padding: 12px 16px;
             border-radius: 12px;
@@ -444,35 +443,39 @@
 
     <script>
         // ================================================================
-        // 1. КЛЮЧИ SUPABASE (ваши)
+        // 1. КЛЮЧИ
         // ================================================================
         const SUPABASE_URL = 'https://l2ls0os3zwf9gutoachw.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
-
-        // ================================================================
-        // 2. КЛЮЧИ CLOUDINARY (ваши)
-        // ================================================================
         const CLOUD_NAME = 'корень';
         const UPLOAD_PRESET = 'vds_upload';
-
-        // ================================================================
-        // 3. ИНИЦИАЛИЗАЦИЯ (только ОДИН раз!)
-        // ================================================================
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        let currentUser = null;
-        let isAdmin = false;
         const ADMIN_PASSWORD = '135710Aa';
 
         // ================================================================
-        // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // 2. ИНИЦИАЛИЗАЦИЯ
         // ================================================================
-        function $(id) { return document.getElementById(id); }
+        let currentUser = null;
+        let isAdmin = false;
+
+        // Проверяем, что supabase загружен
+        if (typeof window.supabase === 'undefined') {
+            alert('Ошибка: Supabase не загружен! Проверьте интернет-соединение.');
+        } else {
+            var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase подключён');
+        }
+
+        // ================================================================
+        // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ================================================================
+        function $(id) {
+            return document.getElementById(id);
+        }
 
         function showAlert(containerId, message, type = 'info') {
             const el = $(containerId);
             if (!el) return;
-            el.className = `alert alert-${type}`;
+            el.className = 'alert alert-' + type;
             el.textContent = message;
             el.classList.remove('hidden');
         }
@@ -487,52 +490,107 @@
         }
 
         function closeModals() {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            document.querySelectorAll('.modal').forEach(function(m) {
+                m.style.display = 'none';
+            });
+        }
+
+        // ================================================================
+        // 4. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
+        // ================================================================
+        function updateUI() {
+            var isLogged = !!currentUser;
+            var greeting = $('greeting');
+            var userName = $('userName');
+            var btnLogin = $('btnLogin');
+            var btnRegister = $('btnRegister');
+            var btnLogout = $('btnLogout');
+            var btnAdmin = $('btnAdminPanel');
+            var adminPanel = $('adminPanel');
+
+            if (isLogged) {
+                greeting.classList.remove('hidden');
+                userName.textContent = currentUser.username;
+                btnLogin.classList.add('hidden');
+                btnRegister.classList.add('hidden');
+                btnLogout.classList.remove('hidden');
+                btnAdmin.classList.remove('hidden');
+            } else {
+                greeting.classList.add('hidden');
+                btnLogin.classList.remove('hidden');
+                btnRegister.classList.remove('hidden');
+                btnLogout.classList.add('hidden');
+                btnAdmin.classList.add('hidden');
+                adminPanel.classList.add('hidden');
+            }
+
+            if (isAdmin) {
+                adminPanel.classList.remove('hidden');
+                loadAdminData();
+            } else {
+                adminPanel.classList.add('hidden');
+            }
         }
 
         // ================================================================
         // 5. АВТОРИЗАЦИЯ
         // ================================================================
         async function registerUser(username, password) {
-            const { data: existing } = await supabase
-                .from('users')
-                .select('id')
-                .eq('username', username)
-                .single();
-            if (existing) {
-                showAlert('registerMessage', '⚠️ Ник уже занят!', 'error');
+            try {
+                var { data: existing } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('username', username)
+                    .single();
+
+                if (existing) {
+                    showAlert('registerMessage', '⚠️ Ник уже занят!', 'error');
+                    return false;
+                }
+
+                var { error } = await supabase
+                    .from('users')
+                    .insert({ username: username, password: password });
+
+                if (error) {
+                    showAlert('registerMessage', '❌ Ошибка: ' + error.message, 'error');
+                    return false;
+                }
+
+                showAlert('registerMessage', '✅ Аккаунт создан! Теперь войдите.', 'success');
+                return true;
+            } catch (e) {
+                showAlert('registerMessage', '❌ Ошибка: ' + e.message, 'error');
                 return false;
             }
-            const { error } = await supabase
-                .from('users')
-                .insert({ username, password });
-            if (error) {
-                showAlert('registerMessage', '❌ Ошибка: ' + error.message, 'error');
-                return false;
-            }
-            showAlert('registerMessage', '✅ Аккаунт создан! Теперь войдите.', 'success');
-            return true;
         }
 
         async function loginUser(username, password) {
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('username', username)
-                .eq('password', password)
-                .single();
-            if (error || !data) {
-                showAlert('loginMessage', '❌ Неверный ник или пароль', 'error');
+            try {
+                var { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('username', username)
+                    .eq('password', password)
+                    .single();
+
+                if (error || !data) {
+                    showAlert('loginMessage', '❌ Неверный ник или пароль', 'error');
+                    return false;
+                }
+
+                currentUser = data;
+                localStorage.setItem('vds_user', JSON.stringify(currentUser));
+                updateUI();
+                hideAlert('loginMessage');
+                closeModals();
+                loadContestArts();
+                loadMyArts();
+                return true;
+            } catch (e) {
+                showAlert('loginMessage', '❌ Ошибка: ' + e.message, 'error');
                 return false;
             }
-            currentUser = data;
-            localStorage.setItem('vds_user', JSON.stringify(currentUser));
-            updateUI();
-            hideAlert('loginMessage');
-            closeModals();
-            loadContestArts();
-            loadMyArts();
-            return true;
         }
 
         function logoutUser() {
@@ -540,32 +598,21 @@
             isAdmin = false;
             localStorage.removeItem('vds_user');
             updateUI();
-            $('adminPanel').classList.add('hidden');
+            var adminPanel = $('adminPanel');
+            if (adminPanel) adminPanel.classList.add('hidden');
         }
 
         function checkAutoLogin() {
-            const saved = localStorage.getItem('vds_user');
+            var saved = localStorage.getItem('vds_user');
             if (saved) {
                 try {
                     currentUser = JSON.parse(saved);
                     updateUI();
-                } catch (e) { logoutUser(); }
-            }
-        }
-
-        function updateUI() {
-            const isLogged = !!currentUser;
-            $('greeting').classList.toggle('hidden', !isLogged);
-            if (isLogged) $('userName').textContent = currentUser.username;
-            $('btnLogin').classList.toggle('hidden', isLogged);
-            $('btnRegister').classList.toggle('hidden', isLogged);
-            $('btnLogout').classList.toggle('hidden', !isLogged);
-            $('btnAdminPanel').classList.toggle('hidden', !isLogged);
-            if (isAdmin) {
-                $('adminPanel').classList.remove('hidden');
-                loadAdminData();
-            } else {
-                $('adminPanel').classList.add('hidden');
+                    loadContestArts();
+                    loadMyArts();
+                } catch (e) {
+                    logoutUser();
+                }
             }
         }
 
@@ -573,112 +620,142 @@
         // 6. РАБОТА С РИСУНКАМИ
         // ================================================================
         async function loadContestArts() {
-            const { data, error } = await supabase
-                .from('arts')
-                .select('*, users!user_id(username)')
-                .eq('contest_round', 1)
-                .order('votes', { ascending: false });
-            if (error) { console.error(error); return; }
-            renderArts('contestArts', data, true);
-            renderArts('topList', data, false);
+            try {
+                var { data, error } = await supabase
+                    .from('arts')
+                    .select('*, users!user_id(username)')
+                    .eq('contest_round', 1)
+                    .order('votes', { ascending: false });
+
+                if (error) {
+                    console.error('Ошибка загрузки:', error);
+                    return;
+                }
+
+                renderArts('contestArts', data, true);
+                renderArts('topList', data, false);
+            } catch (e) {
+                console.error('Ошибка:', e);
+            }
         }
 
         function renderArts(containerId, arts, showVote) {
-            const container = $(containerId);
+            var container = $(containerId);
             if (!container) return;
+
             if (!arts || arts.length === 0) {
                 container.innerHTML = '<p style="color:#6a7a9a;grid-column:1/-1;">Пока нет работ. Будь первым!</p>';
                 return;
             }
-            container.innerHTML = arts.map(art => `
-                <div class="art-card">
-                    <img src="${art.image_url}" alt="${art.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%232a3346%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%22 y=%22110%22 fill=%22%236a7a9a%22 font-size=%2220%22%3E🖼️%3C/text%3E%3C/svg%3E'" />
-                    <div class="title">${art.title}</div>
-                    <div class="author">✏️ ${art.users?.username || 'Аноним'}</div>
-                    <div class="votes">⭐ ${art.votes || 0}</div>
-                    ${showVote && currentUser ? `
-                        <button class="vote-btn" onclick="voteForArt('${art.id}')">➕ Голосовать</button>
-                    ` : ''}
-                    ${art.status === 'winner' ? '<span style="color:#f1c40f;font-weight:700;">🏆 ПОБЕДИТЕЛЬ</span>' : ''}
-                    ${art.status === 'paid' ? '<span style="color:#6fcf97;font-weight:700;">✅ Приз выдан</span>' : ''}
-                </div>
-            `).join('');
+
+            var html = '';
+            for (var i = 0; i < arts.length; i++) {
+                var art = arts[i];
+                var voteBtn = '';
+                if (showVote && currentUser) {
+                    voteBtn = '<button class="vote-btn" onclick="voteForArt(\'' + art.id + '\')">➕ Голосовать</button>';
+                }
+
+                var statusText = '';
+                if (art.status === 'winner') {
+                    statusText = '<span style="color:#f1c40f;font-weight:700;">🏆 ПОБЕДИТЕЛЬ</span>';
+                } else if (art.status === 'paid') {
+                    statusText = '<span style="color:#6fcf97;font-weight:700;">✅ Приз выдан</span>';
+                }
+
+                html += `
+                    <div class="art-card">
+                        <img src="${art.image_url}" alt="${art.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%232a3346%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%22 y=%22110%22 fill=%22%236a7a9a%22 font-size=%2220%22%3E🖼️%3C/text%3E%3C/svg%3E'" />
+                        <div class="title">${art.title}</div>
+                        <div class="author">✏️ ${art.users?.username || 'Аноним'}</div>
+                        <div class="votes">⭐ ${art.votes || 0}</div>
+                        ${voteBtn}
+                        ${statusText}
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
         }
 
         async function voteForArt(artId) {
-            if (!currentUser) { alert('Войдите, чтобы голосовать!'); return; }
-            const today = getToday();
-            const { data: existing } = await supabase
-                .from('votes')
-                .select('id')
-                .eq('user_id', currentUser.id)
-                .eq('voted_at', today)
-                .single();
-            if (existing) {
-                alert('⛔ Вы уже голосовали сегодня! Возвращайтесь завтра.');
+            if (!currentUser) {
+                alert('Войдите, чтобы голосовать!');
                 return;
             }
-            const { error: voteError } = await supabase
-                .from('votes')
-                .insert({ art_id: artId, user_id: currentUser.id, voted_at: today });
-            if (voteError) { alert('❌ Ошибка: ' + voteError.message); return; }
-            const { data: art } = await supabase
-                .from('arts')
-                .select('votes')
-                .eq('id', artId)
-                .single();
-            if (art) {
-                await supabase
+
+            try {
+                var today = getToday();
+                var { data: existing } = await supabase
+                    .from('votes')
+                    .select('id')
+                    .eq('user_id', currentUser.id)
+                    .eq('voted_at', today)
+                    .single();
+
+                if (existing) {
+                    alert('⛔ Вы уже голосовали сегодня! Возвращайтесь завтра.');
+                    return;
+                }
+
+                var { error: voteError } = await supabase
+                    .from('votes')
+                    .insert({ art_id: artId, user_id: currentUser.id, voted_at: today });
+
+                if (voteError) {
+                    alert('❌ Ошибка: ' + voteError.message);
+                    return;
+                }
+
+                var { data: art } = await supabase
                     .from('arts')
-                    .update({ votes: (art.votes || 0) + 1 })
-                    .eq('id', artId);
+                    .select('votes')
+                    .eq('id', artId)
+                    .single();
+
+                if (art) {
+                    await supabase
+                        .from('arts')
+                        .update({ votes: (art.votes || 0) + 1 })
+                        .eq('id', artId);
+                }
+
+                alert('✅ Голос учтён!');
+                loadContestArts();
+                loadMyArts();
+            } catch (e) {
+                alert('❌ Ошибка: ' + e.message);
             }
-            alert('✅ Голос учтён!');
-            loadContestArts();
-            loadMyArts();
         }
 
         // ================================================================
-        // 7. ЗАГРУЗКА РИСУНКА В CLOUDINARY
+        // 7. ЗАГРУЗКА РИСУНКА
         // ================================================================
         async function uploadArt(title, file) {
-            if (!currentUser) { alert('Войдите, чтобы загружать работы!'); return false; }
-
-            if (UPLOAD_PRESET === 'vds_upload') {
-                // Проверяем, что пользователь создал Upload Preset
-                const confirmOk = confirm(
-                    '⚠️ ВНИМАНИЕ! В Cloudinary нужно создать Upload Preset с именем "vds_upload".\n\n' +
-                    'Как это сделать:\n' +
-                    '1. Зайдите в консоль Cloudinary\n' +
-                    '2. Нажмите Settings (шестерёнка)\n' +
-                    '3. Вкладка Upload\n' +
-                    '4. В разделе Upload Presets нажмите "Add upload preset"\n' +
-                    '5. Назовите его "vds_upload"\n' +
-                    '6. Включите "Unsigned"\n' +
-                    '7. Нажмите Save\n\n' +
-                    'Если вы уже сделали это, нажмите "ОК" для продолжения.'
-                );
-                if (!confirmOk) return false;
+            if (!currentUser) {
+                alert('Войдите, чтобы загружать работы!');
+                return false;
             }
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('upload_preset', UPLOAD_PRESET);
-
             try {
-                const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, {
+                var formData = new FormData();
+                formData.append('file', file);
+                formData.append('upload_preset', UPLOAD_PRESET);
+
+                var res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUD_NAME + '/image/upload', {
                     method: 'POST',
                     body: formData,
                 });
-                const data = await res.json();
+
+                var data = await res.json();
+
                 if (!data.secure_url) {
                     alert('❌ Ошибка загрузки в Cloudinary: ' + (data.error?.message || 'неизвестно'));
                     return false;
                 }
 
-                const imageUrl = data.secure_url;
+                var imageUrl = data.secure_url;
 
-                const { error: dbError } = await supabase
+                var { error: dbError } = await supabase
                     .from('arts')
                     .insert({
                         user_id: currentUser.id,
@@ -688,16 +765,18 @@
                         contest_round: 1,
                         status: 'active',
                     });
+
                 if (dbError) {
                     alert('❌ Ошибка сохранения в базу: ' + dbError.message);
                     return false;
                 }
+
                 alert('✅ Работа загружена! Теперь она участвует в конкурсе.');
                 loadContestArts();
                 loadMyArts();
                 return true;
             } catch (e) {
-                alert('❌ Ошибка сети: ' + e.message);
+                alert('❌ Ошибка: ' + e.message);
                 return false;
             }
         }
@@ -707,25 +786,41 @@
         // ================================================================
         async function loadMyArts() {
             if (!currentUser) return;
-            const { data, error } = await supabase
-                .from('arts')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-            if (error) return;
-            const container = $('myArtsList');
-            if (!data || data.length === 0) {
-                container.innerHTML = '<p style="color:#6a7a9a;grid-column:1/-1;">У вас пока нет работ.</p>';
-                return;
+
+            try {
+                var { data, error } = await supabase
+                    .from('arts')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) return;
+
+                var container = $('myArtsList');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p style="color:#6a7a9a;grid-column:1/-1;">У вас пока нет работ.</p>';
+                    return;
+                }
+
+                var html = '';
+                for (var i = 0; i < data.length; i++) {
+                    var art = data[i];
+                    var statusText = art.status === 'active' ? '🟢 Участвует' :
+                        art.status === 'winner' ? '🏆 Победитель' :
+                        '✅ Приз получен';
+                    html += `
+                        <div class="art-card">
+                            <img src="${art.image_url}" alt="${art.title}" style="height:120px;" />
+                            <div class="title">${art.title}</div>
+                            <div class="votes">⭐ ${art.votes || 0}</div>
+                            <div style="font-size:12px;color:#6a7a9a;">${statusText}</div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (e) {
+                console.error('Ошибка загрузки моих работ:', e);
             }
-            container.innerHTML = data.map(art => `
-                <div class="art-card">
-                    <img src="${art.image_url}" alt="${art.title}" style="height:120px;" />
-                    <div class="title">${art.title}</div>
-                    <div class="votes">⭐ ${art.votes || 0}</div>
-                    <div style="font-size:12px;color:#6a7a9a;">${art.status === 'active' ? '🟢 Участвует' : art.status === 'winner' ? '🏆 Победитель' : '✅ Приз получен'}</div>
-                </div>
-            `).join('');
         }
 
         // ================================================================
@@ -733,29 +828,49 @@
         // ================================================================
         async function loadAdminData() {
             if (!isAdmin) return;
-            const { data, error } = await supabase
-                .from('arts')
-                .select('*, users!user_id(username)')
-                .eq('contest_round', 1)
-                .order('votes', { ascending: false });
-            if (error) {
-                $('adminTableBody').innerHTML = `<tr><td colspan="6">Ошибка загрузки</td></tr>`;
-                return;
+
+            try {
+                var { data, error } = await supabase
+                    .from('arts')
+                    .select('*, users!user_id(username)')
+                    .eq('contest_round', 1)
+                    .order('votes', { ascending: false });
+
+                if (error) {
+                    $('adminTableBody').innerHTML = '<tr><td colspan="6">Ошибка загрузки</td></tr>';
+                    return;
+                }
+
+                var rows = '';
+                for (var i = 0; i < data.length; i++) {
+                    var art = data[i];
+                    var statusClass = art.status === 'active' ? 'active' :
+                        art.status === 'winner' ? 'winner' : 'paid';
+                    var statusText = art.status === 'active' ? 'Активен' :
+                        art.status === 'winner' ? '🏆 Победитель' : '✅ Выдано';
+
+                    var actionButtons = '';
+                    if (art.status === 'winner' && !art.paid) {
+                        actionButtons = '<button class="btn btn-success" onclick="markPaid(\'' + art.id + '\')">Выдано</button>';
+                    } else if (art.status === 'active') {
+                        actionButtons = '<button class="btn btn-primary" onclick="setWinner(\'' + art.id + '\', 1)">🏆 1 место</button>';
+                    }
+
+                    rows += `
+                        <tr>
+                            <td>${art.id.slice(0,8)}</td>
+                            <td>${art.users?.username || '??'}</td>
+                            <td>${art.title}</td>
+                            <td><strong>${art.votes || 0}</strong></td>
+                            <td><span class="status-badge status-${statusClass}">${statusText}</span></td>
+                            <td>${actionButtons}</td>
+                        </tr>
+                    `;
+                }
+                $('adminTableBody').innerHTML = rows || '<tr><td colspan="6">Нет работ</td></tr>';
+            } catch (e) {
+                console.error('Ошибка загрузки админки:', e);
             }
-            const rows = data.map(art => `
-                <tr>
-                    <td>${art.id.slice(0,8)}</td>
-                    <td>${art.users?.username || '??'}</td>
-                    <td>${art.title}</td>
-                    <td><strong>${art.votes || 0}</strong></td>
-                    <td><span class="status-badge status-${art.status === 'active' ? 'active' : art.status === 'winner' ? 'winner' : 'paid'}">${art.status === 'active' ? 'Активен' : art.status === 'winner' ? '🏆 Победитель' : '✅ Выдано'}</span></td>
-                    <td>
-                        ${art.status === 'winner' && !art.paid ? `<button class="btn btn-success" onclick="markPaid('${art.id}')">Выдано</button>` : ''}
-                        ${art.status === 'active' ? `<button class="btn btn-primary" onclick="setWinner('${art.id}', 1)">🏆 1 место</button>` : ''}
-                    </td>
-                </tr>
-            `).join('');
-            $('adminTableBody').innerHTML = rows || '<tr><td colspan="6">Нет работ</td></tr>';
         }
 
         async function setWinner(artId, place) {
@@ -775,131 +890,218 @@
         async function finishContest() {
             if (!isAdmin) return;
             if (!confirm('Завершить конкурс? Будут выбраны 1, 2, 3 места.')) return;
-            const { data, error } = await supabase
-                .from('arts')
-                .select('id')
-                .eq('contest_round', 1)
-                .eq('status', 'active')
-                .order('votes', { ascending: false })
-                .limit(3);
-            if (error || !data || data.length === 0) {
-                alert('Нет работ для завершения.');
-                return;
-            }
-            const places = [1, 2, 3];
-            for (let i = 0; i < data.length; i++) {
-                await supabase
+
+            try {
+                var { data, error } = await supabase
                     .from('arts')
-                    .update({ status: 'winner', winner_place: places[i] })
-                    .eq('id', data[i].id);
+                    .select('id')
+                    .eq('contest_round', 1)
+                    .eq('status', 'active')
+                    .order('votes', { ascending: false })
+                    .limit(3);
+
+                if (error || !data || data.length === 0) {
+                    alert('Нет работ для завершения.');
+                    return;
+                }
+
+                var places = [1, 2, 3];
+                for (var i = 0; i < data.length; i++) {
+                    await supabase
+                        .from('arts')
+                        .update({ status: 'winner', winner_place: places[i] })
+                        .eq('id', data[i].id);
+                }
+
+                alert('✅ Конкурс завершён! Победители объявлены.');
+                loadAdminData();
+                loadContestArts();
+            } catch (e) {
+                alert('❌ Ошибка: ' + e.message);
             }
-            alert('✅ Конкурс завершён! Победители объявлены.');
-            loadAdminData();
-            loadContestArts();
         }
 
         // ================================================================
         // 10. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
         // ================================================================
         function initTabs() {
-            document.querySelectorAll('[data-tab]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
-                    document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-                    $(tabName).classList.remove('hidden');
-                    document.querySelectorAll('[data-tab]').forEach(b => b.classList.remove('active'));
+            var tabs = document.querySelectorAll('[data-tab]');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].addEventListener('click', function() {
+                    var tabName = this.dataset.tab;
+                    var contents = document.querySelectorAll('.tab-content');
+                    for (var j = 0; j < contents.length; j++) {
+                        contents[j].classList.add('hidden');
+                    }
+                    var target = $(tabName);
+                    if (target) target.classList.remove('hidden');
+
+                    var allTabs = document.querySelectorAll('[data-tab]');
+                    for (var k = 0; k < allTabs.length; k++) {
+                        allTabs[k].classList.remove('active');
+                    }
                     this.classList.add('active');
-                    if (tabName === 'tabContest' || tabName === 'tabTop') loadContestArts();
-                    if (tabName === 'tabMyArts') loadMyArts();
+
+                    if (tabName === 'tabContest' || tabName === 'tabTop') {
+                        loadContestArts();
+                    }
+                    if (tabName === 'tabMyArts') {
+                        loadMyArts();
+                    }
                 });
-            });
+            }
         }
 
         // ================================================================
-        // 11. ОБРАБОТЧИКИ СОБЫТИЙ
+        // 11. ЗАПУСК ПРИ ЗАГРУЗКЕ
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Сайт загружен, инициализация...');
+
+            // Проверяем авторизацию
             checkAutoLogin();
+
+            // Инициализируем вкладки
             initTabs();
+
+            // Загружаем конкурс
             loadContestArts();
-            if (currentUser) loadMyArts();
+
+            // ===== ОБРАБОТЧИКИ КНОПОК =====
 
             // Вход
-            $('btnLogin').addEventListener('click', () => $('modalLogin').style.display = 'flex');
-            $('modalLoginClose').addEventListener('click', closeModals);
-            $('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await loginUser($('loginUsername').value.trim(), $('loginPassword').value.trim());
-            });
+            var btnLogin = $('btnLogin');
+            if (btnLogin) {
+                btnLogin.addEventListener('click', function() {
+                    $('modalLogin').style.display = 'flex';
+                });
+            }
+
+            var modalLoginClose = $('modalLoginClose');
+            if (modalLoginClose) {
+                modalLoginClose.addEventListener('click', closeModals);
+            }
+
+            var loginForm = $('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var username = $('loginUsername').value.trim();
+                    var password = $('loginPassword').value.trim();
+                    loginUser(username, password);
+                });
+            }
 
             // Регистрация
-            $('btnRegister').addEventListener('click', () => $('modalRegister').style.display = 'flex');
-            $('modalRegisterClose').addEventListener('click', closeModals);
-            $('registerForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await registerUser($('regUsername').value.trim(), $('regPassword').value.trim());
-            });
+            var btnRegister = $('btnRegister');
+            if (btnRegister) {
+                btnRegister.addEventListener('click', function() {
+                    $('modalRegister').style.display = 'flex';
+                });
+            }
+
+            var modalRegisterClose = $('modalRegisterClose');
+            if (modalRegisterClose) {
+                modalRegisterClose.addEventListener('click', closeModals);
+            }
+
+            var registerForm = $('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var username = $('regUsername').value.trim();
+                    var password = $('regPassword').value.trim();
+                    registerUser(username, password);
+                });
+            }
 
             // Выход
-            $('btnLogout').addEventListener('click', logoutUser);
+            var btnLogout = $('btnLogout');
+            if (btnLogout) {
+                btnLogout.addEventListener('click', logoutUser);
+            }
 
             // Админ-панель
-            $('btnAdminPanel').addEventListener('click', function() {
-                if (isAdmin) {
-                    isAdmin = false;
-                    $('adminPanel').classList.add('hidden');
-                    updateUI();
-                    return;
-                }
-                const pwd = prompt('Введите пароль администратора:');
-                if (pwd === ADMIN_PASSWORD) {
-                    isAdmin = true;
-                    updateUI();
-                    loadAdminData();
-                } else {
-                    alert('Неверный пароль!');
-                }
-            });
-
-            // Загрузка рисунка
-            $('uploadForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (!currentUser) { alert('Войдите, чтобы загружать работы!'); return; }
-                const title = $('artTitle').value.trim();
-                const file = $('artFile').files[0];
-                if (!title || !file) { alert('Заполните название и выберите файл.'); return; }
-                await uploadArt(title, file);
-                $('uploadForm').reset();
-            });
-
-            // Админ: завершить конкурс
-            $('adminFinishContest').addEventListener('click', finishContest);
-            $('adminRefresh').addEventListener('click', () => {
-                loadAdminData();
-                loadContestArts();
-            });
-
-            // Закрытие модалок по клику на фон
-            document.querySelectorAll('.modal').forEach(m => {
-                m.addEventListener('click', function(e) {
-                    if (e.target === this) this.style.display = 'none';
-                });
-            });
-
-            // Переключение вкладок
-            document.querySelectorAll('.tab-bar .btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const tabName = this.dataset.tab;
-                    if (!currentUser && (tabName === 'tabUpload' || tabName === 'tabMyArts')) {
-                        alert('Пожалуйста, войдите или зарегистрируйтесь, чтобы загружать работы и видеть свои.');
+            var btnAdmin = $('btnAdminPanel');
+            if (btnAdmin) {
+                btnAdmin.addEventListener('click', function() {
+                    if (isAdmin) {
+                        isAdmin = false;
+                        $('adminPanel').classList.add('hidden');
+                        updateUI();
                         return;
                     }
+                    var pwd = prompt('Введите пароль администратора:');
+                    if (pwd === ADMIN_PASSWORD) {
+                        isAdmin = true;
+                        updateUI();
+                        loadAdminData();
+                    } else {
+                        alert('Неверный пароль!');
+                    }
                 });
-            });
+            }
+
+            // Загрузка рисунка
+            var uploadForm = $('uploadForm');
+            if (uploadForm) {
+                uploadForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    if (!currentUser) {
+                        alert('Войдите, чтобы загружать работы!');
+                        return;
+                    }
+                    var title = $('artTitle').value.trim();
+                    var file = $('artFile').files[0];
+                    if (!title || !file) {
+                        alert('Заполните название и выберите файл.');
+                        return;
+                    }
+                    uploadArt(title, file);
+                    $('uploadForm').reset();
+                });
+            }
+
+            // Админ: завершить конкурс
+            var adminFinish = $('adminFinishContest');
+            if (adminFinish) {
+                adminFinish.addEventListener('click', finishContest);
+            }
+
+            var adminRefresh = $('adminRefresh');
+            if (adminRefresh) {
+                adminRefresh.addEventListener('click', function() {
+                    loadAdminData();
+                    loadContestArts();
+                });
+            }
+
+            // Закрытие модалок по клику на фон
+            var modals = document.querySelectorAll('.modal');
+            for (var i = 0; i < modals.length; i++) {
+                modals[i].addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        this.style.display = 'none';
+                    }
+                });
+            }
+
+            // Проверка вкладок
+            var tabButtons = document.querySelectorAll('.tab-bar .btn');
+            for (var i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].addEventListener('click', function() {
+                    var tabName = this.dataset.tab;
+                    if (!currentUser && (tabName === 'tabUpload' || tabName === 'tabMyArts')) {
+                        alert('Пожалуйста, войдите или зарегистрируйтесь, чтобы загружать работы и видеть свои.');
+                    }
+                });
+            }
+
+            console.log('✅ Инициализация завершена');
         });
 
         // ================================================================
-        // 12. ГЛОБАЛЬНЫЕ ФУНКЦИИ ДЛЯ HTML-КНОПОК
+        // 12. ГЛОБАЛЬНЫЕ ФУНКЦИИ
         // ================================================================
         window.voteForArt = voteForArt;
         window.setWinner = setWinner;
