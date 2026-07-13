@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VDS-GAME.INK — Конкурс рисунков</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+    </script>
     <style>
         /* ===== ВЕСЬ СТИЛЬ ===== */
         * {
@@ -451,11 +452,11 @@
         // ================================================================
         // 2. КЛЮЧИ CLOUDINARY (ваши)
         // ================================================================
-        const CLOUD_NAME = 'корень'; // ваше cloud name
-        const UPLOAD_PRESET = 'vds_upload'; // ⚠️ НУЖНО СОЗДАТЬ В CLOUDINARY!
+        const CLOUD_NAME = 'корень';
+        const UPLOAD_PRESET = 'vds_upload';
 
         // ================================================================
-        // 3. ИНИЦИАЛИЗАЦИЯ
+        // 3. ИНИЦИАЛИЗАЦИЯ (только ОДИН раз!)
         // ================================================================
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -643,19 +644,21 @@
         async function uploadArt(title, file) {
             if (!currentUser) { alert('Войдите, чтобы загружать работы!'); return false; }
 
-            // Проверяем, что UPLOAD_PRESET настроен
             if (UPLOAD_PRESET === 'vds_upload') {
-                alert('⚠️ ВНИМАНИЕ! В Cloudinary нужно создать Upload Preset с именем "vds_upload".\n\n' +
+                // Проверяем, что пользователь создал Upload Preset
+                const confirmOk = confirm(
+                    '⚠️ ВНИМАНИЕ! В Cloudinary нужно создать Upload Preset с именем "vds_upload".\n\n' +
                     'Как это сделать:\n' +
                     '1. Зайдите в консоль Cloudinary\n' +
                     '2. Нажмите Settings (шестерёнка)\n' +
                     '3. Вкладка Upload\n' +
                     '4. В разделе Upload Presets нажмите "Add upload preset"\n' +
                     '5. Назовите его "vds_upload"\n' +
-                    '6. Включите "Unsigned" (чтобы не требовался подписанный запрос)\n' +
+                    '6. Включите "Unsigned"\n' +
                     '7. Нажмите Save\n\n' +
-                    'После этого загрузка заработает!');
-                return false;
+                    'Если вы уже сделали это, нажмите "ОК" для продолжения.'
+                );
+                if (!confirmOk) return false;
             }
 
             const formData = new FormData();
@@ -887,7 +890,6 @@
             document.querySelectorAll('.tab-bar .btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const tabName = this.dataset.tab;
-                    // Если пользователь не авторизован и пытается зайти в "Загрузить" или "Мои работы"
                     if (!currentUser && (tabName === 'tabUpload' || tabName === 'tabMyArts')) {
                         alert('Пожалуйста, войдите или зарегистрируйтесь, чтобы загружать работы и видеть свои.');
                         return;
