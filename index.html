@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <style>
-        /* ===== БАЗОВЫЙ СТИЛЬ (упрощён) ===== */
+        /* ===== СТИЛИ (упрощённые) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -338,7 +338,7 @@
                 <p style="color:#8899bb;">Загружай свой рисунок, получай голоса и борись за приз 1000 ₽!</p>
                 <div id="contestInfo" class="alert alert-info">⏳ Идёт приём работ. Голосование до воскресенья.</div>
                 <div id="contestArts" class="flex-grid">
-                    <!-- Сюда подгружаются рисунки -->
+                    <p style="color:#6a7a9a;grid-column:1/-1;">Загрузка работ...</p>
                 </div>
             </div>
         </div>
@@ -378,7 +378,7 @@
             <div class="card">
                 <h2>🏅 Рейтинг рисунков</h2>
                 <div id="topList" class="flex-grid">
-                    <!-- Топ загрузится автоматически -->
+                    <p style="color:#6a7a9a;grid-column:1/-1;">Загрузка...</p>
                 </div>
             </div>
         </div>
@@ -397,7 +397,7 @@
                         <tr><th>ID</th><th>Автор</th><th>Название</th><th>Голосов</th><th>Статус</th><th>Действие</th></tr>
                     </thead>
                     <tbody id="adminTableBody">
-                        <!-- строки добавляются скриптом -->
+                        <tr><td colspan="6">Загрузка...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -443,27 +443,29 @@
 
     <script>
         // ================================================================
-        // 1. КЛЮЧИ
+        // 1. ПРАВИЛЬНЫЕ КЛЮЧИ
         // ================================================================
-        const SUPABASE_URL = 'https://l2ls0os3zwf9gutoachw.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
-        const CLOUD_NAME = 'корень';
-        const UPLOAD_PRESET = 'vds_upload';
-        const ADMIN_PASSWORD = '135710Aa';
+        var SUPABASE_URL = 'https://l2ls0os3zwf9gutoachw.supabase.co';
+        var SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
+        var CLOUD_NAME = 'корень';
+        var UPLOAD_PRESET = 'vds_upload';
+        var ADMIN_PASSWORD = '135710Aa';
 
         // ================================================================
-        // 2. ИНИЦИАЛИЗАЦИЯ
+        // 2. ПРОВЕРКА И ИНИЦИАЛИЗАЦИЯ
         // ================================================================
-        let currentUser = null;
-        let isAdmin = false;
+        console.log('🚀 Сайт загружен, инициализация...');
+        console.log('🔑 URL Supabase:', SUPABASE_URL);
 
-        // Проверяем, что supabase загружен
         if (typeof window.supabase === 'undefined') {
-            alert('Ошибка: Supabase не загружен! Проверьте интернет-соединение.');
+            alert('❌ Ошибка: Supabase не загружен! Проверьте интернет.');
         } else {
             var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             console.log('✅ Supabase подключён');
         }
+
+        var currentUser = null;
+        var isAdmin = false;
 
         // ================================================================
         // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
@@ -472,16 +474,16 @@
             return document.getElementById(id);
         }
 
-        function showAlert(containerId, message, type = 'info') {
-            const el = $(containerId);
+        function showAlert(containerId, message, type) {
+            var el = $(containerId);
             if (!el) return;
-            el.className = 'alert alert-' + type;
+            el.className = 'alert alert-' + (type || 'info');
             el.textContent = message;
             el.classList.remove('hidden');
         }
 
         function hideAlert(containerId) {
-            const el = $(containerId);
+            var el = $(containerId);
             if (el) el.classList.add('hidden');
         }
 
@@ -490,9 +492,10 @@
         }
 
         function closeModals() {
-            document.querySelectorAll('.modal').forEach(function(m) {
-                m.style.display = 'none';
-            });
+            var modals = document.querySelectorAll('.modal');
+            for (var i = 0; i < modals.length; i++) {
+                modals[i].style.display = 'none';
+            }
         }
 
         // ================================================================
@@ -621,6 +624,8 @@
         // ================================================================
         async function loadContestArts() {
             try {
+                console.log('📡 Загрузка работ из Supabase...');
+
                 var { data, error } = await supabase
                     .from('arts')
                     .select('*, users!user_id(username)')
@@ -628,14 +633,17 @@
                     .order('votes', { ascending: false });
 
                 if (error) {
-                    console.error('Ошибка загрузки:', error);
+                    console.error('❌ Ошибка загрузки:', error);
+                    showAlert('contestInfo', '❌ Ошибка загрузки: ' + error.message, 'error');
                     return;
                 }
 
+                console.log('✅ Загружено работ:', data ? data.length : 0);
                 renderArts('contestArts', data, true);
                 renderArts('topList', data, false);
             } catch (e) {
-                console.error('Ошибка:', e);
+                console.error('❌ Ошибка:', e);
+                showAlert('contestInfo', '❌ Ошибка: ' + e.message, 'error');
             }
         }
 
@@ -956,7 +964,7 @@
         // 11. ЗАПУСК ПРИ ЗАГРУЗКЕ
         // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Сайт загружен, инициализация...');
+            console.log('📄 DOM загружен, запуск...');
 
             // Проверяем авторизацию
             checkAutoLogin();
