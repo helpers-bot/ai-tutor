@@ -17,6 +17,11 @@ async function request(endpoint, options = {}) {
 }
 
 export const supabase = {
+    // Google вход
+    signInWithGoogle() {
+        window.location.href = `${URL}/auth/v1/authorize?provider=google&redirect_to=https://vds-game.ink`;
+    },
+
     async signUp(email, password, username) {
         const res = await fetch(`${URL}/auth/v1/signup`, {
             method: 'POST',
