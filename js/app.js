@@ -3,8 +3,27 @@ import { uploadToCloudinary, getVideoDuration } from './cloudinary.js';
 import { CONFIG } from './config.js';
 
 const appEl = document.getElementById('app');
+
+// Проверка редиректа после Google входа
+if (window.location.hash.includes('access_token')) {
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const token = params.get('access_token');
+    if (token) {
+        localStorage.setItem('token', token);
+        fetch('https://aywfviexlltujeoaqeaq.supabase.co/auth/v1/user', {
+            headers: { 'apikey': 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y', 'Authorization': `Bearer ${token}` }
+        }).then(r => r.json()).then(user => {
+            localStorage.setItem('user', JSON.stringify(user));
+            window.location.hash = '';
+            showFeed();
+        });
+    }
+}
+
 let authMode = 'login';
 
+// ====== AUTH ======
 function showAuth() {
     appEl.innerHTML = `
         <div class="auth-container">
@@ -22,11 +41,21 @@ function showAuth() {
                 <div class="form-group"><label>Пароль</label><input type="password" id="password" placeholder="Минимум 6 символов" minlength="6" required></div>
                 <button type="submit" class="submit-btn" id="submitBtn">${authMode==='login'?'Войти':'Зарегистрироваться'}</button>
             </form>
+            
+            <div style="text-align:center;margin-top:15px;color:#888">или</div>
+            
+            <button id="googleBtn" style="width:100%;padding:12px;background:#fff;color:#000;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin-top:15px;display:flex;align-items:center;justify-content:center;gap:10px">
+                <span style="font-size:20px">G</span> Войти через Google
+            </button>
+            
             <div id="msg"></div>
         </div>`;
     
     document.getElementById('tabLogin').onclick = () => { authMode = 'login'; showAuth(); };
     document.getElementById('tabRegister').onclick = () => { authMode = 'register'; showAuth(); };
+    
+    document.getElementById('googleBtn').onclick = () => supabase.signInWithGoogle();
+    
     document.getElementById('authForm').onsubmit = async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim();
@@ -44,7 +73,7 @@ function showAuth() {
                 await supabase.signUp(email, password, username || email.split('@')[0]);
                 msg.innerHTML = '<div style="color:#4f4;padding:10px;text-align:center">✅ Регистрация успешна! Можете войти.</div>';
                 authMode = 'login';
-                setTimeout(showAuth, 1000);
+                setTimeout(showAuth, 1500);
             } else {
                 await supabase.signIn(email, password);
                 showFeed();
@@ -57,6 +86,7 @@ function showAuth() {
     };
 }
 
+// ====== FEED ======
 async function showFeed() {
     const user = supabase.getUser();
     if (!user) return showAuth();
@@ -81,7 +111,7 @@ async function showFeed() {
             const canAccess = item.is_premium ? await supabase.canAccess(item.id, user.id) : true;
             const likes = await supabase.getLikesCount(item.id);
             const comments = await supabase.getComments(item.id);
-            html += renderCard(item, canAccess, likes, comments.length, user.id);
+            html += renderCard(item, canAccess, likes, comments.length);
         }
         html += '</div>';
     }
@@ -91,7 +121,6 @@ async function showFeed() {
     document.getElementById('uploadBtn').onclick = showUpload;
     document.getElementById('buyBtn').onclick = showBuyStars;
     
-    // Лайки
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
             await supabase.toggleLike(btn.dataset.id, user.id);
@@ -100,12 +129,10 @@ async function showFeed() {
         };
     });
     
-    // Комментарии
     document.querySelectorAll('.comment-btn').forEach(btn => {
         btn.onclick = () => showComments(btn.dataset.id);
     });
     
-    // Репосты
     document.querySelectorAll('.repost-btn').forEach(btn => {
         btn.onclick = async () => {
             await supabase.repost(user.id, btn.dataset.id);
@@ -113,7 +140,6 @@ async function showFeed() {
         };
     });
     
-    // Разблокировка
     document.querySelectorAll('.unlock-area').forEach(el => {
         el.onclick = async () => {
             const cid = el.dataset.id;
@@ -128,7 +154,7 @@ async function showFeed() {
     });
 }
 
-function renderCard(item, canAccess, likes, comments, userId) {
+function renderCard(item, canAccess, likes, comments) {
     const blur = !canAccess;
     return `<div class="content-card">
         <div class="content-header">
