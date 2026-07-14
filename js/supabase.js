@@ -5,17 +5,14 @@ const KEY = CONFIG.supabase.publishableKey;
 
 function headers() {
     const h = { 'apikey': KEY, 'Content-Type': 'application/json' };
-    const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('token');
     if (token) h['Authorization'] = `Bearer ${token}`;
     return h;
 }
 
 async function request(endpoint, options = {}) {
     const res = await fetch(`${URL}/rest/v1/${endpoint}`, { headers: headers(), ...options });
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Error ' + res.status);
-    }
+    if (!res.ok) throw new Error('Error ' + res.status);
     return res.json();
 }
 
@@ -27,19 +24,9 @@ export const supabase = {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (data.user) {
-            localStorage.setItem('auth_token', data.access_token || '');
-            localStorage.setItem('user', JSON.stringify(data.user));
-            try {
-                await request('users', {
-                    method: 'POST',
-                    body: JSON.stringify({ id: data.user.id, username: username || email.split('@')[0], stars_balance: 0 })
-                });
-            } catch (e) {
-                console.log('User already exists in users table');
-            }
-        }
-        if (!res.ok) throw new Error((await res.json().catch(()=>({}))).message || 'Signup failed');
+        if (!res.ok) throw new Error((data.msg || data.message || 'Signup failed'));
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         return data;
     },
     
@@ -50,50 +37,31 @@ export const supabase = {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (data.access_token) {
-            localStorage.setItem('auth_token', data.access_token);
-            localStorage.setItem('user', JSON.stringify(data.user));
-        }
-        if (!res.ok) throw new Error((await res.json().catch(()=>({}))).message || 'Login failed');
+        if (!res.ok) throw new Error((data.error_description || data.msg || 'Login failed'));
+        localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         return data;
     },
     
-    async signOut() {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-    },
-    
-    getUser() {
-        const u = localStorage.getItem('user');
-        return u ? JSON.parse(u) : null;
-    },
-    
-    isAuth() { return !!localStorage.getItem('auth_token'); },
-    
+    signOut() { localStorage.removeItem('token'); localStorage.removeItem('user'); },
+    getUser() { return JSON.parse(localStorage.getItem('user') || 'null'); },
+    isAuth() { return !!localStorage.getItem('token'); },
     getFeed() { return request('content?select=*,users(username)&order=created_at.desc'); },
-    
-    createContent(data) { return request('content', { method: 'POST', body: JSON.stringify(data) }); },
-    
-    async toggleLike(cid, uid) {
-        const ex = await request(`likes?user_id=eq.${uid}&content_id=eq.${cid}`);
-        if (ex.length > 0) {
-            await fetch(`${URL}/rest/v1/likes?user_id=eq.${uid}&content_id=eq.${cid}`, { method: 'DELETE', headers: headers() });
-            return false;
-        } else {
-            await request('likes', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) });
-            return true;
-        }
-    },
+    createContent(d) { return request('content', { method: 'POST', body: JSON.stringify(d) }); },
     
     async getLikesCount(cid) {
         const d = await request(`likes?content_id=eq.${cid}&select=count`);
         return d[0]?.count || 0;
     },
     
+    async toggleLike(cid, uid) {
+        const ex = await request(`likes?user_id=eq.${uid}&content_id=eq.${cid}`);
+        if (ex.length) await fetch(`${URL}/rest/v1/likes?user_id=eq.${uid}&content_id=eq.${cid}`, { method: 'DELETE', headers: headers() });
+        else await request('likes', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) });
+    },
+    
     addComment(uid, cid, text) { return request('comments', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, text }) }); },
-    
     getComments(cid) { return request(`comments?content_id=eq.${cid}&select=*,users(username)&order=created_at.asc`); },
-    
     repost(uid, cid) { return request('reposts', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) }); },
     
     async getUserBalance(uid) {
