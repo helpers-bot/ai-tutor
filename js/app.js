@@ -3,6 +3,7 @@ import { uploadToCloudinary, getVideoDuration } from './cloudinary.js';
 import { CONFIG } from './config.js';
 
 const appEl = document.getElementById('app');
+let currentPage = 'feed';
 
 // Проверка редиректа после Google входа
 if (window.location.hash.includes('access_token')) {
@@ -23,6 +24,7 @@ if (window.location.hash.includes('access_token')) {
 
 let authMode = 'login';
 
+// ====== АВТОРИЗАЦИЯ ======
 function showAuth() {
     appEl.innerHTML = `
         <div class="auth-container">
@@ -65,7 +67,7 @@ function showAuth() {
         try {
             if (authMode === 'register') {
                 await supabase.signUp(email, password, username || email.split('@')[0]);
-                msg.innerHTML = '<div style="color:#4f4;padding:10px;text-align:center">✅ Регистрация успешна! Можете войти.</div>';
+                msg.innerHTML = '<div style="color:#4f4;padding:10px;text-align:center">✅ Регистрация успешна! Войдите.</div>';
                 authMode = 'login';
                 setTimeout(showAuth, 1500);
             } else {
@@ -80,29 +82,42 @@ function showAuth() {
     };
 }
 
+// ====== НАВИГАЦИЯ ======
+function renderNav(active) {
+    return `
+    <nav class="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #222;z-index:1000">
+        <button class="nav-item ${active==='feed'?'active':''}" data-page="feed" style="background:transparent;border:none;color:${active==='feed'?'#ff0050':'#888'};font-size:20px;cursor:pointer;padding:5px 15px">
+            <div>🏠</div><div style="font-size:10px">Лента</div>
+        </button>
+        <button class="nav-item ${active==='upload'?'active':''}" data-page="upload" style="background:transparent;border:none;color:${active==='upload'?'#ff0050':'#888'};font-size:20px;cursor:pointer;padding:5px 15px">
+            <div>➕</div><div style="font-size:10px">Загрузить</div>
+        </button>
+        <button class="nav-item ${active==='profile'?'active':''}" data-page="profile" style="background:transparent;border:none;color:${active==='profile'?'#ff0050':'#888'};font-size:20px;cursor:pointer;padding:5px 15px">
+            <div>👤</div><div style="font-size:10px">Профиль</div>
+        </button>
+    </nav>`;
+}
+
+// ====== ЛЕНТА ======
 async function showFeed() {
+    currentPage = 'feed';
     const user = supabase.getUser();
-    if (!user || !user.id) {
-        supabase.signOut();
-        showAuth();
-        return;
-    }
+    if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
     
     let content = [];
     try { content = await supabase.getFeed(); } catch (e) { console.error(e); }
     
-    let html = `<div class="feed-container">
+    let html = `<div class="feed-container" style="padding-bottom:70px">
         <div class="nav">
-            <h2>TikTok Clone</h2>
+            <h2>🔥 Лента</h2>
             <div class="nav-actions">
-                <button class="btn btn-gold" id="buyBtn">⭐ Купить</button>
-                <button class="btn btn-primary" id="uploadBtn">+ Загрузить</button>
-                <button class="btn btn-secondary" id="logoutBtn">Выйти</button>
+                <button class="btn btn-gold" id="buyBtn">⭐</button>
+                <button class="btn btn-secondary" id="logoutBtn">🚪</button>
             </div>
         </div>`;
     
     if (content.length === 0) {
-        html += `<div class="empty-state"><h2>Пока нет контента</h2><p>Загрузите первое фото или видео!</p></div></div>`;
+        html += `<div class="empty-state"><h2>Пока нет контента</h2><p>Загрузите первое фото или видео!</p></div>`;
     } else {
         for (const item of content) {
             const canAccess = item.is_premium ? await supabase.canAccess(item.id, user.id) : true;
@@ -110,14 +125,25 @@ async function showFeed() {
             const comments = await supabase.getComments(item.id);
             html += renderCard(item, canAccess, likes, comments.length);
         }
-        html += '</div>';
     }
+    
+    html += renderNav('feed') + '</div>';
     appEl.innerHTML = html;
     
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
-    document.getElementById('uploadBtn').onclick = showUpload;
     document.getElementById('buyBtn').onclick = showBuyStars;
     
+    // Навигация
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.onclick = () => {
+            const page = btn.dataset.page;
+            if (page === 'feed') showFeed();
+            else if (page === 'upload') showUpload();
+            else if (page === 'profile') showProfile();
+        };
+    });
+    
+    // Лайки, комментарии, репосты, разблокировка
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
             await supabase.toggleLike(btn.dataset.id, user.id);
@@ -125,18 +151,10 @@ async function showFeed() {
             btn.querySelector('span').textContent = c;
         };
     });
-    
-    document.querySelectorAll('.comment-btn').forEach(btn => {
-        btn.onclick = () => showComments(btn.dataset.id);
-    });
-    
+    document.querySelectorAll('.comment-btn').forEach(btn => btn.onclick = () => showComments(btn.dataset.id));
     document.querySelectorAll('.repost-btn').forEach(btn => {
-        btn.onclick = async () => {
-            await supabase.repost(user.id, btn.dataset.id);
-            alert('✅ Поделились!');
-        };
+        btn.onclick = async () => { await supabase.repost(user.id, btn.dataset.id); alert('✅ Поделились!'); };
     });
-    
     document.querySelectorAll('.unlock-area').forEach(el => {
         el.onclick = async () => {
             const cid = el.dataset.id;
@@ -175,21 +193,24 @@ function renderMedia(item, blurred) {
     return `<img ${b} src="${item.media_url}">`;
 }
 
+// ====== ЗАГРУЗКА ======
 function showUpload() {
-    appEl.innerHTML = `<div class="upload-container"><h2>Загрузить контент</h2>
+    currentPage = 'upload';
+    appEl.innerHTML = `<div class="upload-container" style="padding-bottom:70px"><h2>📤 Загрузить контент</h2>
         <div class="upload-form">
             <div class="file-upload-area" id="fileArea"><input type="file" id="fileInput" accept="image/*,video/*"><div class="upload-icon">📁</div><h3>Выберите файл</h3><p style="color:#888">Фото или видео до 15с</p></div>
             <div class="preview-container" id="preview"></div>
             <div class="form-group"><textarea id="description" placeholder="Описание..."></textarea></div>
             <div class="premium-settings"><label class="checkbox-group"><input type="checkbox" id="isPremium"><span>Закрытый контент</span></label><div class="price-input" id="priceSettings"><label>Цена ⭐</label><input type="number" id="priceStars" min="1" value="10"></div></div>
-            <div style="display:flex;gap:10px"><button class="btn btn-primary" id="doUpload" style="flex:1">Загрузить</button><button class="btn btn-secondary" id="cancelUpload">Отмена</button></div>
-        </div></div>`;
+            <div style="display:flex;gap:10px"><button class="btn btn-primary" id="doUpload" style="flex:1">Загрузить</button></div>
+        </div>
+        ${renderNav('upload')}</div>`;
     
     let selectedFile = null;
     document.getElementById('fileArea').onclick = () => document.getElementById('fileInput').click();
     document.getElementById('fileInput').onchange = (e) => { selectedFile = e.target.files[0]; previewFile(selectedFile); };
     document.getElementById('isPremium').onchange = (e) => document.getElementById('priceSettings').classList.toggle('active', e.target.checked);
-    document.getElementById('cancelUpload').onclick = showFeed;
+    
     document.getElementById('doUpload').onclick = async () => {
         if (!selectedFile) return alert('Выберите файл');
         const user = supabase.getUser();
@@ -202,8 +223,7 @@ function showUpload() {
         try {
             const url = await uploadToCloudinary(selectedFile);
             await supabase.createContent({
-                user_id: user.id,
-                media_url: url,
+                user_id: user.id, media_url: url,
                 media_type: selectedFile.type.startsWith('video/') ? 'video' : 'photo',
                 description: document.getElementById('description').value,
                 is_premium: document.getElementById('isPremium').checked,
@@ -213,6 +233,13 @@ function showUpload() {
             showFeed();
         } catch (err) { alert('Ошибка: ' + err.message); btn.disabled = false; btn.textContent = 'Загрузить'; }
     };
+    
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.onclick = () => {
+            if (btn.dataset.page === 'feed') showFeed();
+            else if (btn.dataset.page === 'profile') showProfile();
+        };
+    });
 }
 
 function previewFile(file) {
@@ -223,6 +250,36 @@ function previewFile(file) {
     reader.readAsDataURL(file);
 }
 
+// ====== ПРОФИЛЬ ======
+async function showProfile() {
+    currentPage = 'profile';
+    const user = supabase.getUser();
+    if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
+    
+    const balance = await supabase.getUserBalance(user.id);
+    
+    appEl.innerHTML = `<div style="max-width:500px;margin:0 auto;padding:20px;padding-bottom:70px">
+        <div class="nav"><h2>👤 Профиль</h2></div>
+        <div style="text-align:center;padding:30px 0">
+            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto;font-weight:bold">${(user.email||'U')[0].toUpperCase()}</div>
+            <h2 style="margin-top:15px">${user.email}</h2>
+            <p style="color:gold;font-size:24px;margin:10px 0">⭐ ${balance} звёзд</p>
+            <button class="btn btn-gold" id="buyStarsBtn" style="margin:5px">Купить звёзды</button>
+            <button class="btn btn-secondary" id="logoutBtn" style="margin:5px">Выйти</button>
+        </div>
+        ${renderNav('profile')}</div>`;
+    
+    document.getElementById('buyStarsBtn').onclick = showBuyStars;
+    document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.onclick = () => {
+            if (btn.dataset.page === 'feed') showFeed();
+            else if (btn.dataset.page === 'upload') showUpload();
+        };
+    });
+}
+
+// ====== КОММЕНТАРИИ ======
 async function showComments(cid) {
     const user = supabase.getUser();
     const comments = await supabase.getComments(cid);
@@ -242,6 +299,7 @@ async function showComments(cid) {
     };
 }
 
+// ====== ПОКУПКА ЗВЁЗД ======
 function showBuyStars() {
     const pkgs = [{s:50,p:49},{s:150,p:129},{s:500,p:399},{s:1200,p:899}];
     let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>Купить звёзды</h3><button class="close-btn" id="closeMod">✕</button></div><div class="shop-grid">`;
@@ -254,11 +312,11 @@ function showBuyStars() {
             await supabase.addStars(supabase.getUser().id, p.s);
             alert(`✅ Куплено ${p.s} ⭐!`);
             document.getElementById('mod').remove();
-            showFeed();
+            showProfile();
         };
     });
 }
 
-// Старт
+// ====== СТАРТ ======
 if (supabase.isAuth()) showFeed();
 else showAuth();
