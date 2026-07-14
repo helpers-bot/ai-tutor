@@ -4,7 +4,7 @@ export const CONFIG = {
         publishableKey: 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y'
     },
     cloudinary: {
-        cloudName: 'vds_upload',
+        cloudName: 'x4bdzb2a',
         uploadPreset: 'vds_upload'
     },
     content: {
