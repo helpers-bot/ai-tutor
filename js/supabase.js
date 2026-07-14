@@ -17,7 +17,6 @@ async function request(endpoint, options = {}) {
 }
 
 export const supabase = {
-    // Google вход
     signInWithGoogle() {
         window.location.href = `${URL}/auth/v1/authorize?provider=google&redirect_to=https://vds-game.ink`;
     },
@@ -54,9 +53,24 @@ export const supabase = {
         return data;
     },
     
-    signOut() { localStorage.removeItem('token'); localStorage.removeItem('user'); },
-    getUser() { return JSON.parse(localStorage.getItem('user') || 'null'); },
-    isAuth() { return !!localStorage.getItem('token'); },
+    signOut() { 
+        localStorage.removeItem('token'); 
+        localStorage.removeItem('user'); 
+    },
+    
+    getUser() { 
+        const u = localStorage.getItem('user');
+        if (!u || u === 'undefined' || u === 'null') return null;
+        try { return JSON.parse(u); } 
+        catch(e) { return null; }
+    },
+    
+    isAuth() { 
+        const t = localStorage.getItem('token');
+        const u = this.getUser();
+        return !!(t && u);
+    },
+    
     getFeed() { return request('content?select=*,users(username)&order=created_at.desc'); },
     createContent(d) { return request('content', { method: 'POST', body: JSON.stringify(d) }); },
     
