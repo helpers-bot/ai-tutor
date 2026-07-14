@@ -1,8 +1,7 @@
 import { CONFIG } from './config.js';
 
-// Инициализация Supabase клиента
 const SUPABASE_URL = CONFIG.supabase.url;
-const SUPABASE_KEY = CONFIG.supabase.publishableKey;
+const SUPABASE_KEY = CONFIG.supabase.publishableKey; // Только публичный ключ!
 
 class SupabaseClient {
     constructor() {
@@ -16,9 +15,19 @@ class SupabaseClient {
     }
 
     async request(endpoint, options = {}) {
+        const token = localStorage.getItem('supabase_token');
+        const headers = {
+            ...this.headers
+        };
+        
+        // Используем токен пользователя, а не секретный ключ
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const url = `${this.url}/rest/v1/${endpoint}`;
         const config = {
-            headers: this.headers,
+            headers,
             ...options
         };
 
@@ -27,28 +36,34 @@ class SupabaseClient {
             
             if (!response.ok) {
                 const error = await response.json();
-                throw new Error(error.message || 'Supabase request failed');
+                throw new Error(error.message || 'Request failed');
             }
             
             return await response.json();
         } catch (error) {
-            console.error('Supabase request error:', error);
+            console.error('Request error:', error);
             throw error;
         }
     }
 
-    // Аутентификация
     async signUp(email, password, username) {
         const response = await fetch(`${this.url}/auth/v1/signup`, {
             method: 'POST',
-            headers: this.headers,
+            headers: {
+                'apikey': this.key,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ email, password })
         });
         
         const data = await response.json();
         
-        if (data.user) {
-            // Создаем профиль пользователя
+        if (data.user && data.access_token) {
+            // Сохраняем сессию
+            localStorage.setItem('supabase_token', data.access_token);
+            localStorage.setItem('supabase_user', JSON.stringify(data.user));
+            
+            // Создаем профиль
             await this.request('users', {
                 method: 'POST',
                 body: JSON.stringify({
@@ -65,93 +80,57 @@ class SupabaseClient {
     async signIn(email, password) {
         const response = await fetch(`${this.url}/auth/v1/token?grant_type=password`, {
             method: 'POST',
-            headers: this.headers,
+            headers: {
+                'apikey': this.key,
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ email, password })
         });
         
-        return await response.json();
-    }
-
-    async signOut() {
-        const token = localStorage.getItem('supabase_token');
-        await fetch(`${this.url}/auth/v1/logout`, {
-            method: 'POST',
-            headers: {
-                ...this.headers,
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const data = await response.json();
         
-        localStorage.removeItem('supabase_token');
-        localStorage.removeItem('supabase_user');
+        if (data.access_token) {
+            localStorage.setItem('supabase_token', data.access_token);
+            localStorage.setItem('supabase_user', JSON.stringify(data.user));
+        }
+        
+        return data;
     }
 
-    // Контент
     async getFeed() {
-        const token = localStorage.getItem('supabase_token');
-        const response = await fetch(
-            `${this.url}/rest/v1/content?select=*,users(username)`,
-            {
-                headers: {
-                    ...this.headers,
-                    'Authorization': `Bearer ${token}`
-                }
-            }
-        );
-        
-        return await response.json();
+        return await this.request('content?select=*,users(username)');
     }
 
     async createContent(data) {
-        const token = localStorage.getItem('supabase_token');
         return await this.request('content', {
             method: 'POST',
             headers: {
                 ...this.headers,
-                'Authorization': `Bearer ${token}`,
                 'Prefer': 'return=representation'
             },
             body: JSON.stringify(data)
         });
     }
 
-    // Лайки
     async toggleLike(contentId, userId) {
-        const token = localStorage.getItem('supabase_token');
-        
-        // Проверяем существующий лайк
-        const existing = await fetch(
-            `${this.url}/rest/v1/likes?user_id=eq.${userId}&content_id=eq.${contentId}`,
-            {
-                headers: {
-                    ...this.headers,
-                    'Authorization': `Bearer ${token}`
-                }
-            }
+        const existing = await this.request(
+            `likes?user_id=eq.${userId}&content_id=eq.${contentId}`
         );
         
-        const likes = await existing.json();
-        
-        if (likes.length > 0) {
-            // Удаляем лайк
+        if (existing.length > 0) {
             await fetch(
                 `${this.url}/rest/v1/likes?user_id=eq.${userId}&content_id=eq.${contentId}`,
                 {
                     method: 'DELETE',
                     headers: {
-                        ...this.headers,
-                        'Authorization': `Bearer ${token}`
+                        'apikey': this.key,
+                        'Authorization': `Bearer ${localStorage.getItem('supabase_token')}`
                     }
                 }
             );
         } else {
-            // Добавляем лайк
             await this.request('likes', {
                 method: 'POST',
-                headers: {
-                    ...this.headers,
-                    'Authorization': `Bearer ${token}`
-                },
                 body: JSON.stringify({
                     user_id: userId,
                     content_id: contentId
@@ -161,24 +140,15 @@ class SupabaseClient {
     }
 
     async getLikesCount(contentId) {
-        const response = await fetch(
-            `${this.url}/rest/v1/likes?content_id=eq.${contentId}&select=count`,
-            { headers: this.headers }
+        const data = await this.request(
+            `likes?content_id=eq.${contentId}&select=count`
         );
-        
-        const data = await response.json();
         return data[0]?.count || 0;
     }
 
-    // Комментарии
     async addComment(userId, contentId, text) {
-        const token = localStorage.getItem('supabase_token');
         return await this.request('comments', {
             method: 'POST',
-            headers: {
-                ...this.headers,
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({
                 user_id: userId,
                 content_id: contentId,
@@ -188,23 +158,14 @@ class SupabaseClient {
     }
 
     async getComments(contentId) {
-        const response = await fetch(
-            `${this.url}/rest/v1/comments?content_id=eq.${contentId}&select=*,users(username)`,
-            { headers: this.headers }
+        return await this.request(
+            `comments?content_id=eq.${contentId}&select=*,users(username)`
         );
-        
-        return await response.json();
     }
 
-    // Репосты
     async repost(userId, contentId) {
-        const token = localStorage.getItem('supabase_token');
         return await this.request('reposts', {
             method: 'POST',
-            headers: {
-                ...this.headers,
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({
                 user_id: userId,
                 content_id: contentId
@@ -212,17 +173,16 @@ class SupabaseClient {
         });
     }
 
-    // Покупки и звезды
+    async getUserBalance(userId) {
+        const data = await this.request(
+            `users?id=eq.${userId}&select=stars_balance`
+        );
+        return data[0]?.stars_balance || 0;
+    }
+
     async buyContent(userId, contentId, stars) {
-        const token = localStorage.getItem('supabase_token');
-        
-        // Создаем запись о покупке
         await this.request('purchases', {
             method: 'POST',
-            headers: {
-                ...this.headers,
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({
                 user_id: userId,
                 content_id: contentId,
@@ -230,61 +190,34 @@ class SupabaseClient {
             })
         });
         
-        // Обновляем баланс пользователя
         const currentBalance = await this.getUserBalance(userId);
         await this.request(`users?id=eq.${userId}`, {
             method: 'PATCH',
-            headers: {
-                ...this.headers,
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({
                 stars_balance: currentBalance - stars
             })
         });
     }
 
-    async getUserBalance(userId) {
-        const response = await fetch(
-            `${this.url}/rest/v1/users?id=eq.${userId}&select=stars_balance`,
-            { headers: this.headers }
-        );
-        
-        const data = await response.json();
-        return data[0]?.stars_balance || 0;
-    }
-
     async addStars(userId, amount) {
-        const token = localStorage.getItem('supabase_token');
         const currentBalance = await this.getUserBalance(userId);
-        
         return await this.request(`users?id=eq.${userId}`, {
             method: 'PATCH',
-            headers: {
-                ...this.headers,
-                'Authorization': `Bearer ${token}`
-            },
             body: JSON.stringify({
                 stars_balance: currentBalance + amount
             })
         });
     }
 
-    // Проверка доступа к контенту
     async canAccessContent(contentId, userId) {
-        const response = await fetch(
-            `${this.url}/rest/v1/rpc/can_access_content`,
-            {
-                method: 'POST',
-                headers: this.headers,
-                body: JSON.stringify({
-                    content_id: contentId,
-                    user_id: userId
-                })
-            }
-        );
-        
-        return await response.json();
+        const data = await this.request('rpc/can_access_content', {
+            method: 'POST',
+            body: JSON.stringify({
+                content_id: contentId,
+                user_id: userId
+            })
+        });
+        return data;
     }
 }
 
