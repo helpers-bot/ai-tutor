@@ -12,7 +12,7 @@ function headers() {
 
 async function request(endpoint, options = {}) {
     const res = await fetch(`${URL}/rest/v1/${endpoint}`, { headers: headers(), ...options });
-    if (!res.ok) throw new Error('Error ' + res.status);
+    if (!res.ok) throw new Error('Ошибка сервера');
     return res.json();
 }
 
@@ -24,7 +24,10 @@ export const supabase = {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error((data.msg || data.message || 'Signup failed'));
+        
+        if (res.status === 429) throw new Error('Слишком много попыток. Подождите немного.');
+        if (!res.ok) throw new Error(data.msg || data.message || 'Ошибка регистрации');
+        
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.user));
         return data;
@@ -37,7 +40,10 @@ export const supabase = {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        if (!res.ok) throw new Error((data.error_description || data.msg || 'Login failed'));
+        
+        if (res.status === 429) throw new Error('Слишком много попыток. Подождите немного.');
+        if (!res.ok) throw new Error('Неверный email или пароль');
+        
         localStorage.setItem('token', data.access_token);
         localStorage.setItem('user', JSON.stringify(data.user));
         return data;
