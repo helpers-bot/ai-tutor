@@ -17,13 +17,12 @@ if (window.location.hash.includes('access_token')) {
             localStorage.setItem('user', JSON.stringify(user));
             window.location.hash = '';
             showFeed();
-        });
+        }).catch(() => showFeed());
     }
 }
 
 let authMode = 'login';
 
-// ====== AUTH ======
 function showAuth() {
     appEl.innerHTML = `
         <div class="auth-container">
@@ -41,21 +40,16 @@ function showAuth() {
                 <div class="form-group"><label>Пароль</label><input type="password" id="password" placeholder="Минимум 6 символов" minlength="6" required></div>
                 <button type="submit" class="submit-btn" id="submitBtn">${authMode==='login'?'Войти':'Зарегистрироваться'}</button>
             </form>
-            
             <div style="text-align:center;margin-top:15px;color:#888">или</div>
-            
             <button id="googleBtn" style="width:100%;padding:12px;background:#fff;color:#000;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin-top:15px;display:flex;align-items:center;justify-content:center;gap:10px">
                 <span style="font-size:20px">G</span> Войти через Google
             </button>
-            
             <div id="msg"></div>
         </div>`;
     
     document.getElementById('tabLogin').onclick = () => { authMode = 'login'; showAuth(); };
     document.getElementById('tabRegister').onclick = () => { authMode = 'register'; showAuth(); };
-    
     document.getElementById('googleBtn').onclick = () => supabase.signInWithGoogle();
-    
     document.getElementById('authForm').onsubmit = async (e) => {
         e.preventDefault();
         const email = document.getElementById('email').value.trim();
@@ -86,10 +80,13 @@ function showAuth() {
     };
 }
 
-// ====== FEED ======
 async function showFeed() {
     const user = supabase.getUser();
-    if (!user) return showAuth();
+    if (!user || !user.id) {
+        supabase.signOut();
+        showAuth();
+        return;
+    }
     
     let content = [];
     try { content = await supabase.getFeed(); } catch (e) { console.error(e); }
