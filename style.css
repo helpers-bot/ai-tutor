@@ -90,3 +90,52 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .empty-state h2{margin-bottom:15px}
 .empty-state p{color:#888;margin-bottom:20px}
 @media (max-width:600px){.auth-container{margin:20px;padding:20px}.feed-container{padding:10px}.nav{padding:10px 15px}.nav-actions{gap:5px}.btn{padding:6px 12px;font-size:12px}.upload-container{margin:10px;padding:20px}}
+
+/* Нижняя навигация как в TikTok */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #000;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0 12px;
+    border-top: 1px solid #1a1a1a;
+    z-index: 1000;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
+.nav-item {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px 20px;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nav-item:active {
+    transform: scale(0.9);
+}
+
+.page-container {
+    padding-bottom: 70px;
+    min-height: 100vh;
+}
+
+/* Адаптация под телефон */
+@media (max-width: 500px) {
+    .content-card {
+        border-radius: 0;
+        margin-bottom: 2px;
+    }
+    
+    .upload-container {
+        margin: 10px;
+        padding: 15px;
+    }
+}
