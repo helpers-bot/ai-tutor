@@ -3,9 +3,8 @@ import { uploadToCloudinary, getVideoDuration } from './cloudinary.js';
 import { CONFIG } from './config.js';
 
 const appEl = document.getElementById('app');
-let currentPage = 'feed';
 
-// Проверка редиректа после Google входа
+// Google редирект
 if (window.location.hash.includes('access_token')) {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
@@ -28,7 +27,8 @@ let authMode = 'login';
 function showAuth() {
     appEl.innerHTML = `
         <div class="auth-container">
-            <h1>TikTok Clone</h1>
+            <h1>VDS</h1>
+            <p style="text-align:center;color:#888;margin-bottom:20px">Короткие видео · Premium контент</p>
             <div class="auth-tabs">
                 <button class="${authMode==='login'?'active':''}" id="tabLogin">Вход</button>
                 <button class="${authMode==='register'?'active':''}" id="tabRegister">Регистрация</button>
@@ -43,8 +43,8 @@ function showAuth() {
                 <button type="submit" class="submit-btn" id="submitBtn">${authMode==='login'?'Войти':'Зарегистрироваться'}</button>
             </form>
             <div style="text-align:center;margin-top:15px;color:#888">или</div>
-            <button id="googleBtn" style="width:100%;padding:12px;background:#fff;color:#000;border:none;border-radius:5px;cursor:pointer;font-weight:bold;margin-top:15px;display:flex;align-items:center;justify-content:center;gap:10px">
-                <span style="font-size:20px">G</span> Войти через Google
+            <button id="googleBtn" style="width:100%;padding:12px;background:#fff;color:#000;border:none;border-radius:10px;cursor:pointer;font-weight:bold;margin-top:15px;display:flex;align-items:center;justify-content:center;gap:10px">
+                G Войти через Google
             </button>
             <div id="msg"></div>
         </div>`;
@@ -59,17 +59,12 @@ function showAuth() {
         const username = document.getElementById('username')?.value?.trim();
         const btn = document.getElementById('submitBtn');
         const msg = document.getElementById('msg');
-        
-        btn.disabled = true;
-        btn.textContent = 'Подождите...';
-        msg.innerHTML = '';
-        
+        btn.disabled = true; btn.textContent = 'Подождите...'; msg.innerHTML = '';
         try {
             if (authMode === 'register') {
                 await supabase.signUp(email, password, username || email.split('@')[0]);
-                msg.innerHTML = '<div style="color:#4f4;padding:10px;text-align:center">✅ Регистрация успешна! Войдите.</div>';
-                authMode = 'login';
-                setTimeout(showAuth, 1500);
+                msg.innerHTML = '<div style="color:#4f4;padding:10px;text-align:center">✅ Готово! Войдите.</div>';
+                authMode = 'login'; setTimeout(showAuth, 1500);
             } else {
                 await supabase.signIn(email, password);
                 showFeed();
@@ -82,42 +77,41 @@ function showAuth() {
     };
 }
 
-// ====== НАВИГАЦИЯ ======
+// ====== НАВИГАЦИЯ (как в TikTok) ======
 function renderNav(active) {
-    return `
-    <nav class="bottom-nav" style="position:fixed;bottom:0;left:0;right:0;background:#0a0a0a;display:flex;justify-content:space-around;padding:10px 0;border-top:1px solid #222;z-index:1000">
-        <button class="nav-item ${active==='feed'?'active':''}" data-page="feed" style="background:transparent;border:none;color:${active==='feed'?'#ff0050':'#888'};font-size:20px;cursor:pointer;padding:5px 15px">
-            <div>🏠</div><div style="font-size:10px">Лента</div>
-        </button>
-        <button class="nav-item ${active==='upload'?'active':''}" data-page="upload" style="background:transparent;border:none;color:${active==='upload'?'#ff0050':'#888'};font-size:20px;cursor:pointer;padding:5px 15px">
-            <div>➕</div><div style="font-size:10px">Загрузить</div>
-        </button>
-        <button class="nav-item ${active==='profile'?'active':''}" data-page="profile" style="background:transparent;border:none;color:${active==='profile'?'#ff0050':'#888'};font-size:20px;cursor:pointer;padding:5px 15px">
-            <div>👤</div><div style="font-size:10px">Профиль</div>
-        </button>
-    </nav>`;
+    const items = [
+        { id: 'feed', icon: '🏠', label: 'Главная' },
+        { id: 'upload', icon: '➕', label: 'Создать' },
+        { id: 'profile', icon: '👤', label: 'Профиль' }
+    ];
+    let html = '<nav class="bottom-nav">';
+    items.forEach(i => {
+        const isActive = active === i.id;
+        html += `<button class="nav-item" data-page="${i.id}" style="color:${isActive?'#fff':'#888'}">
+            <div style="font-size:22px">${i.icon}</div>
+            <div style="font-size:10px;margin-top:2px">${i.label}</div>
+        </button>`;
+    });
+    html += '</nav>';
+    return html;
 }
 
 // ====== ЛЕНТА ======
 async function showFeed() {
-    currentPage = 'feed';
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
     
     let content = [];
     try { content = await supabase.getFeed(); } catch (e) { console.error(e); }
     
-    let html = `<div class="feed-container" style="padding-bottom:70px">
-        <div class="nav">
-            <h2>🔥 Лента</h2>
-            <div class="nav-actions">
-                <button class="btn btn-gold" id="buyBtn">⭐</button>
-                <button class="btn btn-secondary" id="logoutBtn">🚪</button>
-            </div>
-        </div>`;
+    let html = `<div class="page-container">`;
     
     if (content.length === 0) {
-        html += `<div class="empty-state"><h2>Пока нет контента</h2><p>Загрузите первое фото или видео!</p></div>`;
+        html += `<div class="empty-state" style="padding-top:100px">
+            <div style="font-size:60px">🎬</div>
+            <h2>Пока нет видео</h2>
+            <p>Станьте первым!</p>
+        </div>`;
     } else {
         for (const item of content) {
             const canAccess = item.is_premium ? await supabase.canAccess(item.id, user.id) : true;
@@ -130,53 +124,25 @@ async function showFeed() {
     html += renderNav('feed') + '</div>';
     appEl.innerHTML = html;
     
-    document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
-    document.getElementById('buyBtn').onclick = showBuyStars;
-    
-    // Навигация
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.onclick = () => {
-            const page = btn.dataset.page;
-            if (page === 'feed') showFeed();
-            else if (page === 'upload') showUpload();
-            else if (page === 'profile') showProfile();
-        };
-    });
-    
-    // Лайки, комментарии, репосты, разблокировка
-    document.querySelectorAll('.like-btn').forEach(btn => {
-        btn.onclick = async () => {
-            await supabase.toggleLike(btn.dataset.id, user.id);
-            const c = await supabase.getLikesCount(btn.dataset.id);
-            btn.querySelector('span').textContent = c;
-        };
-    });
-    document.querySelectorAll('.comment-btn').forEach(btn => btn.onclick = () => showComments(btn.dataset.id));
-    document.querySelectorAll('.repost-btn').forEach(btn => {
-        btn.onclick = async () => { await supabase.repost(user.id, btn.dataset.id); alert('✅ Поделились!'); };
-    });
-    document.querySelectorAll('.unlock-area').forEach(el => {
-        el.onclick = async () => {
-            const cid = el.dataset.id;
-            const price = parseInt(el.dataset.price);
-            if (!confirm(`Разблокировать за ${price} ⭐?`)) return;
-            const bal = await supabase.getUserBalance(user.id);
-            if (bal < price) return alert(`Недостаточно звёзд! У вас: ${bal} ⭐`);
-            await supabase.buyContent(user.id, cid, price);
-            alert('✅ Разблокировано!');
-            showFeed();
-        };
-    });
+    attachNavEvents();
+    attachFeedEvents(user);
 }
 
 function renderCard(item, canAccess, likes, comments) {
+    const initial = (item.users?.username || 'U')[0].toUpperCase();
     const blur = !canAccess;
     return `<div class="content-card">
         <div class="content-header">
-            <div class="user-info"><div class="user-avatar">${(item.users?.username||'U')[0].toUpperCase()}</div><div><div class="username">@${item.users?.username||'user'}</div>${item.is_premium?'<span class="premium-badge">⭐ Premium</span>':''}</div></div>
+            <div class="user-info">
+                <div class="user-avatar">${initial}</div>
+                <div>
+                    <div class="username">@${item.users?.username||'user'}</div>
+                    ${item.is_premium?'<span class="premium-badge">⭐ Premium</span>':''}
+                </div>
+            </div>
         </div>
         <div class="content-body">
-            ${blur ? `<div class="blurred-content unlock-area" data-id="${item.id}" data-price="${item.price_stars}"><div class="blur-overlay"><div class="lock-icon">🔒</div><h3>Закрытый контент</h3><p style="font-size:24px;color:gold">${item.price_stars} ⭐</p><button class="unlock-btn">Разблокировать</button></div>${renderMedia(item,true)}</div>` : renderMedia(item)}
+            ${blur ? `<div class="blurred-content unlock-area" data-id="${item.id}" data-price="${item.price_stars}"><div class="blur-overlay"><div class="lock-icon">🔒</div><h3>Закрытый контент</h3><p style="font-size:24px;color:gold">${item.price_stars} ⭐</p><button class="unlock-btn">Смотреть</button></div>${renderMedia(item,true)}</div>` : renderMedia(item)}
         </div>
         ${item.description?`<div class="content-description">${item.description}</div>`:''}
         <div class="content-actions">
@@ -190,21 +156,55 @@ function renderCard(item, canAccess, likes, comments) {
 function renderMedia(item, blurred) {
     const b = blurred ? 'class="blurred"' : '';
     if (item.media_type === 'video') return `<video ${b} loop muted playsinline onmouseenter="if(!this.classList.contains('blurred'))this.play()" onmouseleave="this.pause()"><source src="${item.media_url}"></video>`;
-    return `<img ${b} src="${item.media_url}">`;
+    return `<img ${b} src="${item.media_url}" alt="Content">`;
+}
+
+function attachNavEvents() {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.onclick = () => {
+            const p = btn.dataset.page;
+            if (p === 'feed') showFeed();
+            else if (p === 'upload') showUpload();
+            else if (p === 'profile') showProfile();
+        };
+    });
+}
+
+function attachFeedEvents(user) {
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.onclick = async () => {
+            await supabase.toggleLike(btn.dataset.id, user.id);
+            btn.querySelector('span').textContent = await supabase.getLikesCount(btn.dataset.id);
+        };
+    });
+    document.querySelectorAll('.comment-btn').forEach(btn => btn.onclick = () => showComments(btn.dataset.id));
+    document.querySelectorAll('.repost-btn').forEach(btn => {
+        btn.onclick = async () => { await supabase.repost(user.id, btn.dataset.id); alert('✅ Поделились!'); };
+    });
+    document.querySelectorAll('.unlock-area').forEach(el => {
+        el.onclick = async () => {
+            const cid = el.dataset.id, price = parseInt(el.dataset.price);
+            if (!confirm(`Открыть за ${price} ⭐?`)) return;
+            if (await supabase.getUserBalance(user.id) < price) return alert('Недостаточно звёзд!');
+            await supabase.buyContent(user.id, cid, price);
+            alert('✅ Открыто!'); showFeed();
+        };
+    });
 }
 
 // ====== ЗАГРУЗКА ======
 function showUpload() {
-    currentPage = 'upload';
-    appEl.innerHTML = `<div class="upload-container" style="padding-bottom:70px"><h2>📤 Загрузить контент</h2>
-        <div class="upload-form">
-            <div class="file-upload-area" id="fileArea"><input type="file" id="fileInput" accept="image/*,video/*"><div class="upload-icon">📁</div><h3>Выберите файл</h3><p style="color:#888">Фото или видео до 15с</p></div>
-            <div class="preview-container" id="preview"></div>
-            <div class="form-group"><textarea id="description" placeholder="Описание..."></textarea></div>
-            <div class="premium-settings"><label class="checkbox-group"><input type="checkbox" id="isPremium"><span>Закрытый контент</span></label><div class="price-input" id="priceSettings"><label>Цена ⭐</label><input type="number" id="priceStars" min="1" value="10"></div></div>
-            <div style="display:flex;gap:10px"><button class="btn btn-primary" id="doUpload" style="flex:1">Загрузить</button></div>
-        </div>
-        ${renderNav('upload')}</div>`;
+    appEl.innerHTML = `<div class="page-container">
+        <div class="upload-container">
+            <h2>📤 Новое видео</h2>
+            <div class="upload-form">
+                <div class="file-upload-area" id="fileArea"><input type="file" id="fileInput" accept="image/*,video/*"><div class="upload-icon">📁</div><h3>Выбрать файл</h3><p style="color:#888">Фото или видео до 15с</p></div>
+                <div class="preview-container" id="preview"></div>
+                <div class="form-group"><textarea id="description" placeholder="Описание..."></textarea></div>
+                <div class="premium-settings"><label class="checkbox-group"><input type="checkbox" id="isPremium"><span>Закрытый контент (Premium)</span></label><div class="price-input" id="priceSettings"><label>Цена ⭐</label><input type="number" id="priceStars" min="1" value="10"></div></div>
+                <button class="btn btn-primary" id="doUpload" style="width:100%;padding:14px;font-size:16px">Загрузить</button>
+            </div>
+        </div>${renderNav('upload')}</div>`;
     
     let selectedFile = null;
     document.getElementById('fileArea').onclick = () => document.getElementById('fileInput').click();
@@ -216,7 +216,7 @@ function showUpload() {
         const user = supabase.getUser();
         if (selectedFile.type.startsWith('video/')) {
             const d = await getVideoDuration(selectedFile);
-            if (d > CONFIG.content.maxVideoDuration) return alert(`Видео не длиннее 15с`);
+            if (d > CONFIG.content.maxVideoDuration) return alert('Видео не длиннее 15с');
         }
         const btn = document.getElementById('doUpload');
         btn.disabled = true; btn.textContent = 'Загрузка...';
@@ -229,17 +229,11 @@ function showUpload() {
                 is_premium: document.getElementById('isPremium').checked,
                 price_stars: parseInt(document.getElementById('priceStars').value) || 10
             });
-            alert('✅ Загружено!');
-            showFeed();
+            alert('✅ Загружено!'); showFeed();
         } catch (err) { alert('Ошибка: ' + err.message); btn.disabled = false; btn.textContent = 'Загрузить'; }
     };
     
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.onclick = () => {
-            if (btn.dataset.page === 'feed') showFeed();
-            else if (btn.dataset.page === 'profile') showProfile();
-        };
-    });
+    attachNavEvents();
 }
 
 function previewFile(file) {
@@ -252,38 +246,37 @@ function previewFile(file) {
 
 // ====== ПРОФИЛЬ ======
 async function showProfile() {
-    currentPage = 'profile';
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
     
     const balance = await supabase.getUserBalance(user.id);
+    const initial = (user.email || 'U')[0].toUpperCase();
     
-    appEl.innerHTML = `<div style="max-width:500px;margin:0 auto;padding:20px;padding-bottom:70px">
-        <div class="nav"><h2>👤 Профиль</h2></div>
-        <div style="text-align:center;padding:30px 0">
-            <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(45deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto;font-weight:bold">${(user.email||'U')[0].toUpperCase()}</div>
-            <h2 style="margin-top:15px">${user.email}</h2>
-            <p style="color:gold;font-size:24px;margin:10px 0">⭐ ${balance} звёзд</p>
-            <button class="btn btn-gold" id="buyStarsBtn" style="margin:5px">Купить звёзды</button>
-            <button class="btn btn-secondary" id="logoutBtn" style="margin:5px">Выйти</button>
-        </div>
-        ${renderNav('profile')}</div>`;
+    appEl.innerHTML = `<div class="page-container">
+        <div style="text-align:center;padding:40px 20px">
+            <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>
+            <h2 style="margin-top:15px">@${user.email?.split('@')[0] || 'user'}</h2>
+            <p style="color:#888">${user.email}</p>
+            <div style="background:#111;border-radius:15px;padding:20px;margin:20px 0;display:inline-block">
+                <div style="font-size:14px;color:#888">Баланс</div>
+                <div style="font-size:36px;color:gold;font-weight:bold">⭐ ${balance}</div>
+            </div>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+                <button class="btn btn-gold" id="buyBtn">Купить звёзды</button>
+                <button class="btn btn-secondary" id="logoutBtn">Выйти</button>
+            </div>
+        </div>${renderNav('profile')}</div>`;
     
-    document.getElementById('buyStarsBtn').onclick = showBuyStars;
+    document.getElementById('buyBtn').onclick = showBuyStars;
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.onclick = () => {
-            if (btn.dataset.page === 'feed') showFeed();
-            else if (btn.dataset.page === 'upload') showUpload();
-        };
-    });
+    attachNavEvents();
 }
 
 // ====== КОММЕНТАРИИ ======
 async function showComments(cid) {
     const user = supabase.getUser();
     const comments = await supabase.getComments(cid);
-    let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>Комментарии</h3><button class="close-btn" id="closeMod">✕</button></div>`;
+    let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>💬 Комментарии</h3><button class="close-btn" id="closeMod">✕</button></div>`;
     if (!comments.length) h += '<p style="color:#888;text-align:center;padding:20px">Нет комментариев</p>';
     else comments.forEach(c => h += `<div class="comment"><div class="comment-user">@${c.users?.username||'user'}</div><div class="comment-text">${c.text}</div></div>`);
     h += `<div class="comment-input-group"><input id="ci" placeholder="Написать..."><button class="btn btn-primary" id="sb">Отправить</button></div></div></div>`;
@@ -299,24 +292,22 @@ async function showComments(cid) {
     };
 }
 
-// ====== ПОКУПКА ЗВЁЗД ======
+// ====== ЗВЁЗДЫ ======
 function showBuyStars() {
     const pkgs = [{s:50,p:49},{s:150,p:129},{s:500,p:399},{s:1200,p:899}];
-    let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>Купить звёзды</h3><button class="close-btn" id="closeMod">✕</button></div><div class="shop-grid">`;
+    let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>⭐ Купить звёзды</h3><button class="close-btn" id="closeMod">✕</button></div><div class="shop-grid">`;
     pkgs.forEach(p => h += `<div class="star-package" id="pkg${p.s}"><div class="star-amount">⭐ ${p.s}</div><div class="star-price">$${p.p}</div></div>`);
     h += `</div></div></div>`;
     document.body.insertAdjacentHTML('beforeend', h);
     document.getElementById('closeMod').onclick = () => document.getElementById('mod').remove();
-    pkgs.forEach(p => {
-        document.getElementById(`pkg${p.s}`).onclick = async () => {
-            await supabase.addStars(supabase.getUser().id, p.s);
-            alert(`✅ Куплено ${p.s} ⭐!`);
-            document.getElementById('mod').remove();
-            showProfile();
-        };
+    pkgs.forEach(p => document.getElementById(`pkg${p.s}`).onclick = async () => {
+        await supabase.addStars(supabase.getUser().id, p.s);
+        alert(`✅ +${p.s} ⭐!`);
+        document.getElementById('mod').remove();
+        showProfile();
     });
 }
 
-// ====== СТАРТ ======
+// Старт
 if (supabase.isAuth()) showFeed();
 else showAuth();
