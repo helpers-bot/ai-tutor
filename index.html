@@ -7,7 +7,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <style>
-        /* ===== СТИЛИ (упрощённые) ===== */
         * {
             margin: 0;
             padding: 0;
@@ -311,7 +310,6 @@
 <body>
     <div class="container" id="app">
 
-        <!-- ===== ШАПКА ===== -->
         <header>
             <div class="logo">VDS-GAME<span>.INK</span></div>
             <div class="user-area" id="userArea">
@@ -323,7 +321,6 @@
             </div>
         </header>
 
-        <!-- ===== ВКЛАДКИ ===== -->
         <div class="tab-bar" id="tabBar">
             <button class="btn active" data-tab="tabContest">🏆 Конкурс</button>
             <button class="btn" data-tab="tabUpload">📤 Загрузить</button>
@@ -331,7 +328,6 @@
             <button class="btn" data-tab="tabTop">🏅 Топ</button>
         </div>
 
-        <!-- ===== ВКЛАДКА 1: КОНКУРС ===== -->
         <div id="tabContest" class="tab-content">
             <div class="card">
                 <h2>🏆 Текущий конкурс: «Космический пейзаж»</h2>
@@ -343,7 +339,6 @@
             </div>
         </div>
 
-        <!-- ===== ВКЛАДКА 2: ЗАГРУЗКА ===== -->
         <div id="tabUpload" class="tab-content hidden">
             <div class="card">
                 <h2>📤 Загрузить рисунок на конкурс</h2>
@@ -363,7 +358,6 @@
             </div>
         </div>
 
-        <!-- ===== ВКЛАДКА 3: МОИ РАБОТЫ ===== -->
         <div id="tabMyArts" class="tab-content hidden">
             <div class="card">
                 <h2>🎨 Мои работы</h2>
@@ -373,7 +367,6 @@
             </div>
         </div>
 
-        <!-- ===== ВКЛАДКА 4: ТОП ===== -->
         <div id="tabTop" class="tab-content hidden">
             <div class="card">
                 <h2>🏅 Рейтинг рисунков</h2>
@@ -383,7 +376,6 @@
             </div>
         </div>
 
-        <!-- ===== АДМИН-ПАНЕЛЬ ===== -->
         <div id="adminPanel" class="admin-panel hidden">
             <h2>🔐 Админ-панель VDS-GAME</h2>
             <div id="adminMessage"></div>
@@ -404,7 +396,6 @@
             <p style="margin-top:15px;color:#6a7a9a;font-size:13px;">* Нажмите «Завершить конкурс» — победители получат статус. Затем вручную переведите приз и нажмите «Выдано».</p>
         </div>
 
-        <!-- ===== МОДАЛКИ ===== -->
         <div id="modalLogin" class="modal">
             <div class="card">
                 <h2>🔑 Вход</h2>
@@ -431,7 +422,6 @@
             </div>
         </div>
 
-        <!-- ===== ПОДВАЛ ===== -->
         <div class="footer-links">
             <span>© 2026 VDS-GAME.INK — Конкурс рисунков</span>
             <span>
@@ -443,36 +433,27 @@
 
     <script>
         // ================================================================
-        // 1. ПРАВИЛЬНЫЕ КЛЮЧИ (ИСПРАВЛЕНО!)
+        // ПРАВИЛЬНЫЙ URL (исправлен!)
         // ================================================================
-        var SUPABASE_URL = 'https://l2ls0os3zwf9gutoachw.supabase.co';  // <-- ПРАВИЛЬНЫЙ URL
+        var SUPABASE_URL = 'https://l2ls0oS3ZwF9GUTochw.supabase.co';  // <-- ТОЧНО ТАК!
         var SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
         var CLOUD_NAME = 'корень';
         var UPLOAD_PRESET = 'vds_upload';
         var ADMIN_PASSWORD = '135710Aa';
 
-        // ================================================================
-        // 2. ПРОВЕРКА И ИНИЦИАЛИЗАЦИЯ
-        // ================================================================
-        console.log('🚀 Сайт загружен, инициализация...');
-        console.log('🔑 URL Supabase:', SUPABASE_URL);
+        console.log('🚀 URL Supabase:', SUPABASE_URL);
 
         if (typeof window.supabase === 'undefined') {
-            alert('❌ Ошибка: Supabase не загружен! Проверьте интернет.');
+            alert('❌ Supabase не загружен!');
         } else {
             var supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase подключён');
+            console.log('✅ Supabase создан');
         }
 
         var currentUser = null;
         var isAdmin = false;
 
-        // ================================================================
-        // 3. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ================================================================
-        function $(id) {
-            return document.getElementById(id);
-        }
+        function $(id) { return document.getElementById(id); }
 
         function showAlert(containerId, message, type) {
             var el = $(containerId);
@@ -492,15 +473,9 @@
         }
 
         function closeModals() {
-            var modals = document.querySelectorAll('.modal');
-            for (var i = 0; i < modals.length; i++) {
-                modals[i].style.display = 'none';
-            }
+            document.querySelectorAll('.modal').forEach(function(m) { m.style.display = 'none'; });
         }
 
-        // ================================================================
-        // 4. ОБНОВЛЕНИЕ ИНТЕРФЕЙСА
-        // ================================================================
         function updateUI() {
             var isLogged = !!currentUser;
             var greeting = $('greeting');
@@ -535,9 +510,6 @@
             }
         }
 
-        // ================================================================
-        // 5. АВТОРИЗАЦИЯ
-        // ================================================================
         async function registerUser(username, password) {
             try {
                 var { data: existing } = await supabase
@@ -619,13 +591,9 @@
             }
         }
 
-        // ================================================================
-        // 6. РАБОТА С РИСУНКАМИ
-        // ================================================================
         async function loadContestArts() {
             try {
-                console.log('📡 Загрузка работ из Supabase...');
-
+                console.log('📡 Загрузка работ...');
                 var { data, error } = await supabase
                     .from('arts')
                     .select('*, users!user_id(username)')
@@ -633,17 +601,17 @@
                     .order('votes', { ascending: false });
 
                 if (error) {
-                    console.error('❌ Ошибка загрузки:', error);
-                    showAlert('contestInfo', '❌ Ошибка загрузки: ' + error.message, 'error');
+                    console.error('❌ Ошибка:', error);
+                    showAlert('contestInfo', '❌ ' + error.message, 'error');
                     return;
                 }
 
-                console.log('✅ Загружено работ:', data ? data.length : 0);
+                console.log('✅ Загружено:', data ? data.length : 0);
                 renderArts('contestArts', data, true);
                 renderArts('topList', data, false);
             } catch (e) {
                 console.error('❌ Ошибка:', e);
-                showAlert('contestInfo', '❌ Ошибка: ' + e.message, 'error');
+                showAlert('contestInfo', '❌ ' + e.message, 'error');
             }
         }
 
@@ -735,9 +703,6 @@
             }
         }
 
-        // ================================================================
-        // 7. ЗАГРУЗКА РИСУНКА
-        // ================================================================
         async function uploadArt(title, file) {
             if (!currentUser) {
                 alert('Войдите, чтобы загружать работы!');
@@ -789,9 +754,6 @@
             }
         }
 
-        // ================================================================
-        // 8. МОИ РАБОТЫ
-        // ================================================================
         async function loadMyArts() {
             if (!currentUser) return;
 
@@ -831,9 +793,6 @@
             }
         }
 
-        // ================================================================
-        // 9. АДМИН-ПАНЕЛЬ
-        // ================================================================
         async function loadAdminData() {
             if (!isAdmin) return;
 
@@ -929,9 +888,6 @@
             }
         }
 
-        // ================================================================
-        // 10. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
-        // ================================================================
         function initTabs() {
             var tabs = document.querySelectorAll('[data-tab]');
             for (var i = 0; i < tabs.length; i++) {
@@ -960,24 +916,13 @@
             }
         }
 
-        // ================================================================
-        // 11. ЗАПУСК ПРИ ЗАГРУЗКЕ
-        // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
             console.log('📄 DOM загружен, запуск...');
 
-            // Проверяем авторизацию
             checkAutoLogin();
-
-            // Инициализируем вкладки
             initTabs();
-
-            // Загружаем конкурс
             loadContestArts();
 
-            // ===== ОБРАБОТЧИКИ КНОПОК =====
-
-            // Вход
             var btnLogin = $('btnLogin');
             if (btnLogin) {
                 btnLogin.addEventListener('click', function() {
@@ -1000,7 +945,6 @@
                 });
             }
 
-            // Регистрация
             var btnRegister = $('btnRegister');
             if (btnRegister) {
                 btnRegister.addEventListener('click', function() {
@@ -1023,13 +967,11 @@
                 });
             }
 
-            // Выход
             var btnLogout = $('btnLogout');
             if (btnLogout) {
                 btnLogout.addEventListener('click', logoutUser);
             }
 
-            // Админ-панель
             var btnAdmin = $('btnAdminPanel');
             if (btnAdmin) {
                 btnAdmin.addEventListener('click', function() {
@@ -1050,7 +992,6 @@
                 });
             }
 
-            // Загрузка рисунка
             var uploadForm = $('uploadForm');
             if (uploadForm) {
                 uploadForm.addEventListener('submit', function(e) {
@@ -1070,7 +1011,6 @@
                 });
             }
 
-            // Админ: завершить конкурс
             var adminFinish = $('adminFinishContest');
             if (adminFinish) {
                 adminFinish.addEventListener('click', finishContest);
@@ -1084,7 +1024,6 @@
                 });
             }
 
-            // Закрытие модалок по клику на фон
             var modals = document.querySelectorAll('.modal');
             for (var i = 0; i < modals.length; i++) {
                 modals[i].addEventListener('click', function(e) {
@@ -1094,13 +1033,12 @@
                 });
             }
 
-            // Проверка вкладок
             var tabButtons = document.querySelectorAll('.tab-bar .btn');
             for (var i = 0; i < tabButtons.length; i++) {
                 tabButtons[i].addEventListener('click', function() {
                     var tabName = this.dataset.tab;
                     if (!currentUser && (tabName === 'tabUpload' || tabName === 'tabMyArts')) {
-                        alert('Пожалуйста, войдите или зарегистрируйтесь, чтобы загружать работы и видеть свои.');
+                        alert('Пожалуйста, войдите или зарегистрируйтесь.');
                     }
                 });
             }
@@ -1108,9 +1046,6 @@
             console.log('✅ Инициализация завершена');
         });
 
-        // ================================================================
-        // 12. ГЛОБАЛЬНЫЕ ФУНКЦИИ
-        // ================================================================
         window.voteForArt = voteForArt;
         window.setWinner = setWinner;
         window.markPaid = markPaid;
