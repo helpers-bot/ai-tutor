@@ -4,7 +4,6 @@ import { CONFIG } from './config.js';
 
 const appEl = document.getElementById('app');
 
-// Google редирект
 if (window.location.hash.includes('access_token')) {
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
@@ -21,7 +20,6 @@ if (window.location.hash.includes('access_token')) {
     }
 }
 
-// ====== ГЛАВНЫЙ ЭКРАН (только Google) ======
 function showAuth() {
     appEl.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:20px;text-align:center">
@@ -31,12 +29,10 @@ function showAuth() {
             <button id="googleBtn" style="width:100%;max-width:300px;padding:16px;background:#fff;color:#000;border:none;border-radius:15px;cursor:pointer;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">
                 G &nbsp; Войти через Google
             </button>
-            <p style="color:#666;margin-top:30px;font-size:12px">Нажимая, вы соглашаетесь с условиями</p>
         </div>`;
     document.getElementById('googleBtn').onclick = () => supabase.signInWithGoogle();
 }
 
-// ====== НАВИГАЦИЯ ======
 function renderNav(active) {
     const items = [
         { id: 'feed', icon: '🏠', label: 'Главная' },
@@ -64,13 +60,12 @@ function attachNav() {
     });
 }
 
-// ====== ЛЕНТА ======
 async function showFeed() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
 
     let content = [];
-    try { content = await supabase.getFeed(); } catch (e) { console.error(e); }
+    try { content = await supabase.getFeed(); } catch (e) { content = []; }
 
     let html = '<div class="page-container">';
 
@@ -79,7 +74,10 @@ async function showFeed() {
             <div style="font-size:60px">🎬</div><h2>Пока нет видео</h2><p>Станьте первым!</p></div>`;
     } else {
         for (const item of content) {
-            const canAccess = item.is_premium ? await supabase.canAccess(item.id, user.id) : true;
+            let canAccess = true;
+            if (item.is_premium) {
+                try { canAccess = await supabase.canAccess(item.id, user.id); } catch(e) { canAccess = false; }
+            }
             const likes = await supabase.getLikesCount(item.id);
             const comments = await supabase.getComments(item.id);
             html += renderCard(item, canAccess, likes, comments.length);
@@ -143,7 +141,6 @@ function attachFeedEvents(user) {
     });
 }
 
-// ====== ЗАГРУЗКА ======
 function showUpload() {
     appEl.innerHTML = `<div class="page-container"><div class="upload-container">
         <h2>📤 Новое видео</h2>
@@ -192,7 +189,6 @@ function previewFile(file) {
     reader.readAsDataURL(file);
 }
 
-// ====== ПРОФИЛЬ ======
 async function showProfile() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
@@ -204,7 +200,7 @@ async function showProfile() {
     appEl.innerHTML = `<div class="page-container">
         <div style="text-align:center;padding:40px 20px">
             <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>
-            <h2 style="margin-top:15px" id="displayName">@${username}</h2>
+            <h2 style="margin-top:15px">@${username}</h2>
             <p style="color:#888">${user.email}</p>
             <button class="btn btn-secondary" id="editNameBtn" style="margin:10px">✏️ Сменить ник</button>
             <div style="background:#111;border-radius:15px;padding:20px;margin:20px 0;display:inline-block">
@@ -217,25 +213,20 @@ async function showProfile() {
             </div>
         </div>${renderNav('profile')}</div>`;
 
-    document.getElementById('editNameBtn').onclick = () => editUsername(user.id);
+    document.getElementById('editNameBtn').onclick = async () => {
+        const newName = prompt('Новый никнейм:', username);
+        if (!newName || newName.length < 3) return alert('Минимум 3 символа');
+        try {
+            await supabase.updateUsername(user.id, newName);
+            alert('✅ Готово!');
+            showProfile();
+        } catch (e) { alert('❌ Ошибка'); }
+    };
     document.getElementById('buyBtn').onclick = showBuyStars;
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
     attachNav();
 }
 
-async function editUsername(uid) {
-    const newName = prompt('Новый никнейм:', '');
-    if (!newName || newName.length < 3) return alert('Минимум 3 символа');
-    try {
-        await supabase.updateUsername(uid, newName);
-        alert('✅ Никнейм изменён!');
-        showProfile();
-    } catch (e) {
-        alert('❌ Ошибка. Возможно, ник занят.');
-    }
-}
-
-// ====== КОММЕНТАРИИ ======
 async function showComments(cid) {
     const user = supabase.getUser();
     const comments = await supabase.getComments(cid);
@@ -255,7 +246,6 @@ async function showComments(cid) {
     };
 }
 
-// ====== ЗВЁЗДЫ ======
 function showBuyStars() {
     const pkgs = [{s:50,p:49},{s:150,p:129},{s:500,p:399},{s:1200,p:899}];
     let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>⭐ Купить звёзды</h3><button class="close-btn" id="closeMod">✕</button></div><div class="shop-grid">`;
@@ -271,6 +261,5 @@ function showBuyStars() {
     });
 }
 
-// Старт
 if (supabase.isAuth()) showFeed();
 else showAuth();
