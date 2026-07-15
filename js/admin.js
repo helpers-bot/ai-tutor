@@ -1,8 +1,10 @@
-<script type="module" src="js/supabase.js"></script>
+// Импортируем supabase.js, чтобы инициализировать window.supabase
+import './supabase.js';
 
 const ADMIN_PASSWORD = '135710Aa!';
 const adminApp = document.getElementById('adminApp');
 
+// Проверяем авторизацию при загрузке
 if (sessionStorage.getItem('admin_auth') === 'true') {
     renderAdminPanel();
 } else {
@@ -11,6 +13,7 @@ if (sessionStorage.getItem('admin_auth') === 'true') {
 
 function showLoginForm() {
     adminApp.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:20px;text-align:center;background:#000"><div style="font-size:60px;margin-bottom:20px">🔐</div><h1 style="color:#ff0050;margin-bottom:10px">VDS</h1><p style="color:#888;margin-bottom:30px">Админ-панель</p><input type="password" id="adminPass" placeholder="Введите пароль" style="width:100%;max-width:300px;padding:14px;background:#111;border:1px solid #333;border-radius:10px;color:#fff;font-size:16px;text-align:center;margin-bottom:20px"><button id="adminLoginBtn" style="width:100%;max-width:300px;padding:14px;background:#ff0050;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:16px;font-weight:bold">Войти</button><p id="adminError" style="color:#f44;margin-top:15px;display:none">Неверный пароль</p><a href="/" style="color:#888;margin-top:30px;text-decoration:none">← На сайт</a></div>';
+    
     document.getElementById('adminLoginBtn').onclick = function() {
         if (document.getElementById('adminPass').value === ADMIN_PASSWORD) {
             sessionStorage.setItem('admin_auth', 'true');
@@ -24,9 +27,11 @@ function showLoginForm() {
 async function renderAdminPanel(tab) {
     tab = tab || 'moderation';
     var users = [], pending = [], history = [];
-    try { users = await supabase.getAllUsers(); } catch(e) {}
-    try { pending = await supabase.getPendingContent(); } catch(e) {}
-    try { history = await supabase.getModerationHistory(); } catch(e) {}
+    
+    // Получаем данные
+    try { users = await window.supabase.getAllUsers(); } catch(e) {}
+    try { pending = await window.supabase.getPendingContent(); } catch(e) {}
+    try { history = await window.supabase.getModerationHistory(); } catch(e) {}
 
     var html = '<div style="max-width:900px;margin:0 auto;padding:20px;color:#fff"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h1 style="color:#ff0050">⚙️ Админ-панель</h1><div><a href="/" class="btn btn-secondary" style="text-decoration:none;margin-right:10px">🏠 На сайт</a><button class="btn btn-secondary" id="logoutAdmin">🚪 Выйти</button></div></div><div style="display:flex;gap:10px;margin:20px 0;flex-wrap:wrap"><button class="btn '+(tab==='moderation'?'btn-primary':'btn-secondary')+'" id="tabModeration">📋 Модерация ('+pending.length+')</button><button class="btn '+(tab==='users'?'btn-primary':'btn-secondary')+'" id="tabUsers">👥 Пользователи ('+users.length+')</button><button class="btn '+(tab==='history'?'btn-primary':'btn-secondary')+'" id="tabHistory">📜 История</button></div>';
 
@@ -52,6 +57,7 @@ async function renderAdminPanel(tab) {
     html += '</div>';
     adminApp.innerHTML = html;
 
+    // Привязываем события
     document.getElementById('logoutAdmin').onclick = function() { sessionStorage.removeItem('admin_auth'); location.reload(); };
     document.getElementById('tabModeration').onclick = function() { renderAdminPanel('moderation'); };
     document.getElementById('tabUsers').onclick = function() { renderAdminPanel('users'); };
@@ -61,8 +67,8 @@ async function renderAdminPanel(tab) {
     for (var i = 0; i < approveBtns.length; i++) {
         approveBtns[i].onclick = function() {
             var id = this.getAttribute('data-approve');
-            supabase.approveContent(id).then(function() {
-                supabase.toast('✅ Одобрено!');
+            window.supabase.approveContent(id).then(function() {
+                window.supabase.toast('✅ Одобрено!');
                 renderAdminPanel('moderation');
             });
         };
@@ -73,8 +79,8 @@ async function renderAdminPanel(tab) {
         rejectBtns[i].onclick = function() {
             var id = this.getAttribute('data-reject');
             if (confirm('Отклонить?')) {
-                supabase.rejectContent(id).then(function() {
-                    supabase.toast('❌ Отклонено');
+                window.supabase.rejectContent(id).then(function() {
+                    window.supabase.toast('❌ Отклонено');
                     renderAdminPanel('moderation');
                 });
             }
@@ -88,8 +94,8 @@ async function renderAdminPanel(tab) {
             var bal = this.getAttribute('data-bal');
             var a = prompt('Новый баланс:', bal);
             if (a !== null) {
-                supabase.updateUser(uid, { stars_balance: parseInt(a) }).then(function() {
-                    supabase.toast('✅ Готово!');
+                window.supabase.updateUser(uid, { stars_balance: parseInt(a) }).then(function() {
+                    window.supabase.toast('✅ Готово!');
                     renderAdminPanel('users');
                 });
             }
@@ -103,8 +109,8 @@ async function renderAdminPanel(tab) {
             var cur = this.getAttribute('data-cur');
             var n = prompt('Новый ник:', cur);
             if (n && n.length >= 3) {
-                supabase.updateUser(uid, { username: n }).then(function() {
-                    supabase.toast('✅ Готово!');
+                window.supabase.updateUser(uid, { username: n }).then(function() {
+                    window.supabase.toast('✅ Готово!');
                     renderAdminPanel('users');
                 });
             }
