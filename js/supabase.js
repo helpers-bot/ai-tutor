@@ -60,7 +60,7 @@ async function checkAuth() {
 
 // Feed functions
 async function getFeed() {
-    return request('artworks?is_published=eq.true&is_auction_cancelled=eq.false&select=*,users(username,avatar_url)&order=created_at.desc&limit=50');
+    return request('artworks?is_published=eq.true&select=*,users(username,avatar_url)&order=created_at.desc&limit=50');
 }
 
 async function getArtwork(id) {
@@ -78,6 +78,13 @@ async function getCurrentBank() {
 async function getUserProfile(userId) {
     const data = await request(`users?id=eq.${userId}&select=*`);
     return data[0] || null;
+}
+
+async function updateUserProfile(userId, data) {
+    return request(`users?id=eq.${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    });
 }
 
 async function updateUserBalance(userId, amount) {
@@ -100,17 +107,23 @@ async function saveArtwork(data) {
     });
 }
 
+async function updateArtwork(artworkId, data) {
+    return request(`artworks?id=eq.${artworkId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    });
+}
+
+async function deleteArtwork(artworkId) {
+    return request(`artworks?id=eq.${artworkId}`, {
+        method: 'DELETE'
+    });
+}
+
 async function publishArtwork(artworkId) {
     return request(`artworks?id=eq.${artworkId}`, {
         method: 'PATCH',
         body: JSON.stringify({ is_published: true, stars_spent: 50 })
-    });
-}
-
-async function cancelAuction(artworkId) {
-    return request(`artworks?id=eq.${artworkId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ is_auction_cancelled: true, is_published: false })
     });
 }
 
@@ -124,13 +137,11 @@ async function likeArtwork(userId, artworkId) {
     
     if (existing.length > 0) return null;
     
-    // Создаем лайк
     await request('likes', {
         method: 'POST',
         body: JSON.stringify({ user_id: userId, artwork_id: artworkId })
     });
     
-    // Обновляем счетчик
     const artwork = await getArtwork(artworkId);
     if (artwork) {
         await request(`artworks?id=eq.${artworkId}`, {
@@ -139,7 +150,6 @@ async function likeArtwork(userId, artworkId) {
         });
     }
     
-    // Записываем покупку
     await request('purchases', {
         method: 'POST',
         body: JSON.stringify({
@@ -161,7 +171,6 @@ async function recordView(userId, artworkId) {
             body: JSON.stringify({ user_id: userId, artwork_id: artworkId })
         });
         
-        // Обновляем счетчик просмотров
         const artwork = await getArtwork(artworkId);
         if (artwork) {
             await request(`artworks?id=eq.${artworkId}`, {
@@ -174,11 +183,6 @@ async function recordView(userId, artworkId) {
     } catch {
         return false;
     }
-}
-
-async function getUserViewCount(userId) {
-    const data = await request(`view_rewards?user_id=eq.${userId}&select=count`);
-    return data[0]?.count || 0;
 }
 
 async function getTodayViews(userId) {
@@ -195,7 +199,7 @@ async function claimDailyStar(userId) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const existing = await request(`star_claims?user_id=eq.${userId}&claimed_at=gte.${today.toISOString()}`);
+    const existing = await request(`star_claims?user_id=eq.${userId}&claim_type=eq.daily&claimed_at=gte.${today.toISOString()}`);
     
     if (existing.length > 0) return null;
     
@@ -203,10 +207,34 @@ async function claimDailyStar(userId) {
     
     await request('star_claims', {
         method: 'POST',
-        body: JSON.stringify({ user_id: userId, stars_claimed: 1 })
+        body: JSON.stringify({ user_id: userId, claim_type: 'daily', stars_claimed: 1 })
     });
     
     return true;
+}
+
+async function claimViewStar(userId) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Проверяем количество просмотров сегодня
+    const views = await getTodayViews(userId);
+    
+    if (views < 5) return { success: false, message: `Нужно 5 просмотров, сейчас ${views}` };
+    
+    // Проверяем, не получал ли уже звезду за просмотры сегодня
+    const existing = await request(`star_claims?user_id=eq.${userId}&claim_type=eq.views&claimed_at=gte.${today.toISOString()}`);
+    
+    if (existing.length > 0) return { success: false, message: 'Уже получена звезда за просмотры сегодня' };
+    
+    await updateUserBalance(userId, 1);
+    
+    await request('star_claims', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: userId, claim_type: 'views', stars_claimed: 1 })
+    });
+    
+    return { success: true, message: 'Звезда получена!' };
 }
 
 // Winner
@@ -227,16 +255,18 @@ export {
     getArtwork,
     getCurrentBank,
     getUserProfile,
+    updateUserProfile,
     updateUserBalance,
     saveArtwork,
+    updateArtwork,
+    deleteArtwork,
     publishArtwork,
-    cancelAuction,
     getUserArtworks,
     likeArtwork,
     recordView,
-    getUserViewCount,
     getTodayViews,
     claimDailyStar,
+    claimViewStar,
     getLastWinner,
     determineWinner
 };
