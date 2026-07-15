@@ -46,9 +46,9 @@ async function renderAdminPanel(tab = 'moderation') {
             </div>
         </div>
         <div style="display:flex;gap:10px;margin:20px 0;flex-wrap:wrap">
-            <button class="btn ${tab==='moderation'?'btn-primary':'btn-secondary'}" onclick="window._tab('moderation')">📋 Модерация (${pending.length})</button>
-            <button class="btn ${tab==='users'?'btn-primary':'btn-secondary'}" onclick="window._tab('users')">👥 Пользователи (${users.length})</button>
-            <button class="btn ${tab==='history'?'btn-primary':'btn-secondary'}" onclick="window._tab('history')">📜 История</button>
+            <button class="btn ${tab==='moderation'?'btn-primary':'btn-secondary'}" id="tabModeration">📋 Модерация (${pending.length})</button>
+            <button class="btn ${tab==='users'?'btn-primary':'btn-secondary'}" id="tabUsers">👥 Пользователи (${users.length})</button>
+            <button class="btn ${tab==='history'?'btn-primary':'btn-secondary'}" id="tabHistory">📜 История</button>
         </div>`;
 
     if (tab === 'moderation') {
@@ -63,8 +63,8 @@ async function renderAdminPanel(tab = 'moderation') {
                         <p><b>@${item.username||'user'}</b> ${item.is_premium?`<span style="color:gold">⭐ ${item.price_stars} звёзд</span>`:'Бесплатный'}</p>
                         <p style="color:#ccc;font-size:14px">${item.description||'Без описания'}</p>
                         <div style="display:flex;gap:10px;margin-top:10px">
-                            <button class="btn btn-primary" onclick="window._approve('${item.id}')">✅ Одобрить</button>
-                            <button class="btn btn-secondary" onclick="window._reject('${item.id}')">❌ Отклонить</button>
+                            <button class="btn btn-primary approve-btn" data-id="${item.id}">✅ Одобрить</button>
+                            <button class="btn btn-secondary reject-btn" data-id="${item.id}">❌ Отклонить</button>
                         </div>
                     </div>
                 </div>
@@ -78,8 +78,8 @@ async function renderAdminPanel(tab = 'moderation') {
                 <td style="padding:10px;text-align:center">⭐ ${u.stars_balance||0}</td>
                 <td style="padding:10px;text-align:center;font-size:12px;color:#888">${new Date(u.created_at).toLocaleDateString('ru-RU')}</td>
                 <td style="padding:10px;text-align:center">
-                    <button class="btn btn-secondary" style="margin:2px;font-size:12px" onclick="window._editStars('${u.id}',${u.stars_balance||0})">⭐</button>
-                    <button class="btn btn-secondary" style="margin:2px;font-size:12px" onclick="window._editUser('${u.id}','${u.username||''}')">✏️</button>
+                    <button class="btn btn-secondary stars-btn" data-uid="${u.id}" data-bal="${u.stars_balance||0}" style="margin:2px;font-size:12px">⭐</button>
+                    <button class="btn btn-secondary name-btn" data-uid="${u.id}" data-name="${u.username||''}" style="margin:2px;font-size:12px">✏️</button>
                 </td>
             </tr>`;
         });
@@ -94,10 +94,50 @@ async function renderAdminPanel(tab = 'moderation') {
     }
     html += '</div>';
     adminApp.innerHTML = html;
-}
 
-window._tab = (t) => renderAdminPanel(t);
-window._approve = async (id) => { await supabase.approveContent(id); supabase.toast('✅ Одобрено!'); renderAdminPanel('moderation'); };
-window._reject = async (id) => { if(confirm('Отклонить?')){await supabase.rejectContent(id);supabase.toast('❌ Отклонено');renderAdminPanel('moderation');} };
-window._editStars = async (uid, cur) => { const a=prompt('Новый баланс:',cur); if(a===null)return; await supabase.updateUser(uid,{stars_balance:parseInt(a)}); supabase.toast('✅ Готово!'); renderAdminPanel('users'); };
-window._editUser = async (uid, cur) => { const n=prompt('Новый ник:',cur); if(!n||n.length<3)return; await supabase.updateUser(uid,{username:n}); supabase.toast('✅ Готово!'); renderAdminPanel('users'); };
+    // Кнопки табов
+    const tabMod = document.getElementById('tabModeration');
+    const tabUsr = document.getElementById('tabUsers');
+    const tabHis = document.getElementById('tabHistory');
+    if (tabMod) tabMod.onclick = () => renderAdminPanel('moderation');
+    if (tabUsr) tabUsr.onclick = () => renderAdminPanel('users');
+    if (tabHis) tabHis.onclick = () => renderAdminPanel('history');
+
+    // Кнопки одобрить/отклонить
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.onclick = async () => {
+            await supabase.approveContent(btn.dataset.id);
+            supabase.toast('✅ Одобрено!');
+            renderAdminPanel('moderation');
+        };
+    });
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.onclick = async () => {
+            if (confirm('Отклонить?')) {
+                await supabase.rejectContent(btn.dataset.id);
+                supabase.toast('❌ Отклонено');
+                renderAdminPanel('moderation');
+            }
+        };
+    });
+
+    // Кнопки пользователей
+    document.querySelectorAll('.stars-btn').forEach(btn => {
+        btn.onclick = async () => {
+            const a = prompt('Новый баланс:', btn.dataset.bal);
+            if (a === null) return;
+            await supabase.updateUser(btn.dataset.uid, { stars_balance: parseInt(a) });
+            supabase.toast('✅ Готово!');
+            renderAdminPanel('users');
+        };
+    });
+    document.querySelectorAll('.name-btn').forEach(btn => {
+        btn.onclick = async () => {
+            const n = prompt('Новый ник:', btn.dataset.name);
+            if (!n || n.length < 3) return;
+            await supabase.updateUser(btn.dataset.uid, { username: n });
+            supabase.toast('✅ Готово!');
+            renderAdminPanel('users');
+        };
+    });
+}
