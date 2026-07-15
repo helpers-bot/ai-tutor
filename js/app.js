@@ -108,7 +108,7 @@ class ArtStarsApp {
                     <button class="tool-btn" onclick="window.undoCanvas()" title="Отменить">↩️</button>
                     <button class="tool-btn" onclick="window.clearCanvas()" title="Очистить">🗑️</button>
                 </div>
-                <div style="display:flex; justify-content:center; align-items:center; flex:1; background:#2a2a2a;">
+                <div style="display:flex; justify-content:center; align-items:center; flex:1; background:#2a2a2a; overflow:hidden;">
                     <canvas id="drawCanvas"></canvas>
                 </div>
                 <div class="canvas-actions">
@@ -171,7 +171,6 @@ class ArtStarsApp {
         const file = event.target.files[0];
         if (!file || !this.user) return;
         
-        // Проверяем размер файла (макс 5MB)
         if (file.size > 5 * 1024 * 1024) {
             alert('Файл слишком большой! Максимальный размер 5MB.');
             return;
@@ -180,10 +179,6 @@ class ArtStarsApp {
         try {
             const fileExt = file.name.split('.').pop();
             const fileName = `${this.user.id}-${Date.now()}.${fileExt}`;
-            
-            // Загружаем в Supabase Storage
-            const formData = new FormData();
-            formData.append('file', file);
             
             const response = await fetch(`${SUPABASE_URL}/storage/v1/object/avatars/${fileName}`, {
                 method: 'POST',
@@ -197,10 +192,8 @@ class ArtStarsApp {
             if (response.ok) {
                 const avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/avatars/${fileName}`;
                 
-                // Обновляем профиль
                 await updateUserProfile(this.user.id, { avatar_url: avatarUrl });
                 
-                // Обновляем отображение
                 await this.loadProfile();
                 alert('Аватар обновлен!');
             } else {
@@ -240,7 +233,10 @@ class ArtStarsApp {
         
         const profile = await getUserProfile(this.user.id);
         if (profile) {
-            document.getElementById('starsDisplay').textContent = profile.stars_balance || 0;
+            const starsDisplay = document.getElementById('starsDisplay');
+            if (starsDisplay) {
+                starsDisplay.textContent = profile.stars_balance || 0;
+            }
         }
     }
 
@@ -495,6 +491,9 @@ class ArtStarsApp {
                             `).join('')}
                         </div>
                         <p>Просмотрено сегодня: ${todayViews}/5 видео</p>
+                        ${this.viewTimerSeconds > 0 ? `
+                            <p class="view-timer">⏰ Таймер: ${Math.floor(this.viewTimerSeconds / 60)}:${(this.viewTimerSeconds % 60).toString().padStart(2, '0')}</p>
+                        ` : ''}
                         <button class="neon-btn" onclick="window.claimViewStar()" style="margin:10px 0;" ${todayViews >= 5 ? '' : 'disabled'}>
                             ⭐ Получить звезду за просмотры
                         </button>
