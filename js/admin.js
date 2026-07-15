@@ -1,4 +1,4 @@
-import { supabase } from '/js/supabase.js';
+<script type="module" src="js/supabase.js"></script>
 
 const ADMIN_PASSWORD = '135710Aa!';
 const adminApp = document.getElementById('adminApp');
