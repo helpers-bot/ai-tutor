@@ -3,43 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>VDS — Короткие видео</title>
-    <meta name="description" content="VDS — платформа коротких видео. Смотри, создавай, делись. Закрытый контент, звёзды, лайки и комментарии.">
-    <meta name="keywords" content="видео, короткие видео, vds, социальная сеть, контент, звёзды, premium">
-    <meta name="author" content="VDS">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#ff0050">
+    <title>ArtStars — Рисуй и побеждай</title>
+    <meta name="theme-color" content="#0a0a2e">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="VDS">
-    <meta name="application-name" content="VDS">
-    
-    <meta property="og:title" content="VDS — Короткие видео">
-    <meta property="og:description" content="Смотри, создавай, делись короткими видео. Закрытый контент и звёзды.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vds-game.ink">
-    <meta property="og:image" content="https://vds-game.ink/icon.svg">
-    <meta property="og:site_name" content="VDS">
-    <meta property="og:locale" content="ru_RU">
-    
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="apple-touch-icon" href="icon.svg">
-    <link rel="manifest" href="manifest.json">
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="app">
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Загрузка...</p>
+        <div class="loading-screen">
+            <div class="neon-spinner"></div>
+            <p class="loading-text">ArtStars</p>
         </div>
     </div>
-    
-    <!-- Подключаем скрипты как модули -->
     <script type="module" src="js/config.js"></script>
     <script type="module" src="js/supabase.js"></script>
-    <script type="module" src="js/cloudinary.js"></script>
+    <script type="module" src="js/canvas.js"></script>
     <script type="module" src="js/app.js"></script>
 </body>
 </html>
