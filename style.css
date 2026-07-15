@@ -320,3 +320,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
         margin: 0 auto;
     }
 }
+.video-container{position:fixed;top:0;left:0;right:0;bottom:0;background:#000;z-index:1}
+.video-wrapper{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.full-media{width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0}
+.blurred-heavy{filter:blur(40px);opacity:0.4;transform:scale(1.1)}
+.video-overlay{position:absolute;bottom:80px;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:20px;z-index:10;pointer-events:none}
+.video-info{flex:1;pointer-events:auto}
+.user-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.user-avatar-small{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:18px}
+.username{font-weight:bold;font-size:16px}
+.desc-text{color:#ccc;font-size:14px;max-width:70%}
+.actions-right{display:flex;flex-direction:column;gap:20px;align-items:center;pointer-events:auto}
+.actions-right .action-btn{background:transparent;border:none;color:#fff;cursor:pointer;text-align:center;font-size:14px;padding:0}
+.actions-right .action-btn span{display:block;font-size:12px;margin-top:2px}
+.premium-lock{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:20;pointer-events:auto;cursor:pointer;width:90%;max-width:350px}
+.lock-content{background:rgba(0,0,0,0.95);border:2px solid gold;border-radius:20px;padding:30px;text-align:center}
+.lock-icon{font-size:60px;margin-bottom:15px}
+.lock-content h3{color:gold;margin-bottom:10px}
+.lock-content p{color:#ccc;margin-bottom:15px;font-size:14px}
+.unlock-btn{padding:14px 40px;background:linear-gradient(45deg,#ffd700,#ffed4a);color:#000;border:none;border-radius:25px;font-weight:bold;font-size:16px;cursor:pointer}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.9);display:flex;justify-content:space-around;padding:8px 0 12px;border-top:1px solid #1a1a1a;z-index:100;padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.nav-item{background:transparent;border:none;cursor:pointer;padding:5px 20px;display:flex;flex-direction:column;align-items:center}
+.page-container{padding-bottom:70px;min-height:100vh}
+.profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.profile-grid-item{aspect-ratio:9/16;background:#111;overflow:hidden}
+@media(min-width:768px){.video-wrapper{max-width:400px;margin:0 auto}}
