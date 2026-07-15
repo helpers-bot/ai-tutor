@@ -23,13 +23,6 @@ if (window.location.hash.includes('access_token')) {
     }
 }
 
-// Проверка админки
-if (window.location.pathname === '/admin' || window.location.pathname === '/admin/') {
-    import('./admin.js').then(m => m.showAdmin());
-    // Не продолжаем загрузку основного приложения
-    throw new Error('ADMIN_REDIRECT');
-}
-
 function showAuth() {
     appEl.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:20px;text-align:center;background:#000">
         <div style="font-size:60px;margin-bottom:20px">🎬</div>
@@ -141,6 +134,7 @@ function renderMediaFull(item) {
     if (item.media_type === 'video') return `<video src="${item.media_url}" loop playsinline autoplay class="full-media"></video>`;
     return `<img src="${item.media_url}" class="full-media">`;
 }
+
 function renderBlurredMedia(item) {
     if (item.media_type === 'video') return `<video src="${item.media_url}" loop muted playsinline class="full-media blurred-heavy"></video>`;
     return `<img src="${item.media_url}" class="full-media blurred-heavy">`;
@@ -242,7 +236,6 @@ async function showProfile() {
     const avatarUrl = profile.avatar_url||'';
     const initial = (profile.username||user.email||'U')[0].toUpperCase();
     const username = profile.username||user.email?.split('@')[0]||'user';
-    const isAdmin = await supabase.isAdmin(user.id);
 
     let grid = myContent.length===0?'<p style="color:#888;text-align:center;padding:20px">Нет публикаций</p>':'<div class="profile-grid">'+myContent.map(item => `<div class="profile-grid-item" style="position:relative">${item.media_type==='video'?`<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>`:`<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}${item.is_premium?'<span style="position:absolute;top:5px;left:5px;background:gold;color:#000;padding:2px 6px;border-radius:8px;font-size:10px">⭐</span>':''}<button class="delete-btn" data-id="${item.id}" style="position:absolute;top:5px;right:5px;background:rgba(255,0,0,0.8);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🗑</button></div>`).join('')+'</div>';
 
@@ -250,7 +243,7 @@ async function showProfile() {
         <div style="position:relative;display:inline-block">${avatarUrl?`<img src="${avatarUrl}" style="width:90px;height:90px;border-radius:50%;object-fit:cover">`:`<div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>`}<button id="changeAvatarBtn" style="position:absolute;bottom:0;right:0;background:#333;color:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px">📷</button><input type="file" id="avatarInput" accept="image/*" style="display:none"></div>
         <h2 style="margin-top:15px">@${username}</h2><p style="color:#888">${user.email}</p>
         <button class="btn btn-secondary" id="editNameBtn" style="margin:10px">✏️ Сменить ник</button>
-        ${isAdmin ? '<a href="/admin" class="btn btn-gold" style="display:inline-block;margin:10px;text-decoration:none;padding:8px 16px;border-radius:20px">⚙️ Админ-панель</a>' : ''}
+        <a href="/admin.html" class="btn btn-gold" style="display:inline-block;margin:10px;text-decoration:none;padding:8px 16px;border-radius:20px;font-size:14px">⚙️ Админка</a>
         <div style="background:#111;border-radius:15px;padding:20px;margin:20px 0;display:inline-block"><div style="font-size:14px;color:#888">Баланс</div><div style="font-size:36px;color:gold;font-weight:bold">⭐ ${profile.stars_balance}</div></div>
         <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:30px"><button class="btn btn-gold" id="buyBtn">Купить звёзды</button><button class="btn btn-secondary" id="logoutBtn">Выйти</button></div>
         <h3 style="text-align:left;margin-bottom:15px">📱 Мои публикации</h3>${grid}
