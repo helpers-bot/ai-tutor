@@ -364,3 +364,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
     85% { opacity: 1; transform: translateX(-50%) translateY(0); }
     100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
 }
+.action-round {
+    background: rgba(0,0,0,0.4);
+    border: none;
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+}
+.action-round span {
+    color: #fff;
+    font-size: 11px;
+    margin-top: 0;
+}
+.action-round.liked {
+    background: rgba(255,0,64,0.3);
+}
+.action-round:active {
+    transform: scale(0.9);
+}
+.unmute-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 15;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
