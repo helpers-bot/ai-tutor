@@ -4,15 +4,27 @@ const URL = CONFIG.supabase.url;
 const KEY = CONFIG.supabase.publishableKey;
 
 function headers() {
-    const h = { 'apikey': KEY, 'Content-Type': 'application/json' };
+    const h = { 
+        'apikey': KEY, 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${KEY}`
+    };
     const token = localStorage.getItem('token');
-    if (token) h['Authorization'] = `Bearer ${token}`;
+    if (token) {
+        h['Authorization'] = `Bearer ${token}`;
+    }
     return h;
 }
 
 async function request(endpoint, options = {}) {
-    const res = await fetch(`${URL}/rest/v1/${endpoint}`, { headers: headers(), ...options });
-    if (!res.ok) throw new Error('Ошибка сервера');
+    const res = await fetch(`${URL}/rest/v1/${endpoint}`, { 
+        headers: headers(), 
+        ...options 
+    });
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Ошибка сервера: ' + res.status);
+    }
     return res.json();
 }
 
@@ -28,12 +40,12 @@ export const supabase = {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        
-        if (res.status === 429) throw new Error('Слишком много попыток. Подождите немного.');
+        if (res.status === 429) throw new Error('Слишком много попыток. Подождите.');
         if (!res.ok) throw new Error(data.msg || data.message || 'Ошибка регистрации');
-        
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.access_token) {
+            localStorage.setItem('token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+        }
         return data;
     },
     
@@ -44,12 +56,12 @@ export const supabase = {
             body: JSON.stringify({ email, password })
         });
         const data = await res.json();
-        
-        if (res.status === 429) throw new Error('Слишком много попыток. Подождите немного.');
+        if (res.status === 429) throw new Error('Слишком много попыток. Подождите.');
         if (!res.ok) throw new Error('Неверный email или пароль');
-        
-        localStorage.setItem('token', data.access_token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.access_token) {
+            localStorage.setItem('token', data.access_token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+        }
         return data;
     },
     
@@ -66,13 +78,16 @@ export const supabase = {
     },
     
     isAuth() { 
-        const t = localStorage.getItem('token');
-        const u = this.getUser();
-        return !!(t && u);
+        return !!(localStorage.getItem('token') && this.getUser());
     },
     
-    getFeed() { return request('content?select=*,users(username)&order=created_at.desc'); },
-    createContent(d) { return request('content', { method: 'POST', body: JSON.stringify(d) }); },
+    getFeed() { 
+        return request('content?select=*,users(username)&order=created_at.desc'); 
+    },
+    
+    createContent(d) { 
+        return request('content', { method: 'POST', body: JSON.stringify(d) }); 
+    },
     
     async getLikesCount(cid) {
         const d = await request(`likes?content_id=eq.${cid}&select=count`);
@@ -81,13 +96,36 @@ export const supabase = {
     
     async toggleLike(cid, uid) {
         const ex = await request(`likes?user_id=eq.${uid}&content_id=eq.${cid}`);
-        if (ex.length) await fetch(`${URL}/rest/v1/likes?user_id=eq.${uid}&content_id=eq.${cid}`, { method: 'DELETE', headers: headers() });
-        else await request('likes', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) });
+        if (ex.length) {
+            await fetch(`${URL}/rest/v1/likes?user_id=eq.${uid}&content_id=eq.${cid}`, { 
+                method: 'DELETE', 
+                headers: headers() 
+            });
+        } else {
+            await request('likes', { 
+                method: 'POST', 
+                body: JSON.stringify({ user_id: uid, content_id: cid }) 
+            });
+        }
     },
     
-    addComment(uid, cid, text) { return request('comments', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, text }) }); },
-    getComments(cid) { return request(`comments?content_id=eq.${cid}&select=*,users(username)&order=created_at.asc`); },
-    repost(uid, cid) { return request('reposts', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) }); },
+    addComment(uid, cid, text) { 
+        return request('comments', { 
+            method: 'POST', 
+            body: JSON.stringify({ user_id: uid, content_id: cid, text }) 
+        }); 
+    },
+    
+    getComments(cid) { 
+        return request(`comments?content_id=eq.${cid}&select=*,users(username)&order=created_at.asc`); 
+    },
+    
+    repost(uid, cid) { 
+        return request('reposts', { 
+            method: 'POST', 
+            body: JSON.stringify({ user_id: uid, content_id: cid }) 
+        }); 
+    },
     
     async getUserBalance(uid) {
         const d = await request(`users?id=eq.${uid}&select=stars_balance`);
@@ -95,18 +133,30 @@ export const supabase = {
     },
     
     async buyContent(uid, cid, stars) {
-        await request('purchases', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, stars_spent: stars }) });
+        await request('purchases', { 
+            method: 'POST', 
+            body: JSON.stringify({ user_id: uid, content_id: cid, stars_spent: stars }) 
+        });
         const bal = await this.getUserBalance(uid);
-        await request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ stars_balance: bal - stars }) });
+        await request(`users?id=eq.${uid}`, { 
+            method: 'PATCH', 
+            body: JSON.stringify({ stars_balance: bal - stars }) 
+        });
     },
     
     async addStars(uid, amount) {
         const bal = await this.getUserBalance(uid);
-        await request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ stars_balance: bal + amount }) });
+        await request(`users?id=eq.${uid}`, { 
+            method: 'PATCH', 
+            body: JSON.stringify({ stars_balance: bal + amount }) 
+        });
     },
     
     async canAccess(cid, uid) {
-        const d = await request('rpc/can_access_content', { method: 'POST', body: JSON.stringify({ content_id: cid, user_id: uid }) });
+        const d = await request('rpc/can_access_content', { 
+            method: 'POST', 
+            body: JSON.stringify({ content_id: cid, user_id: uid }) 
+        });
         return d === true || d === 'true';
     }
 };
