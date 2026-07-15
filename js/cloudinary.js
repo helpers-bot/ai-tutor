@@ -1,5 +1,4 @@
-import { CONFIG } from '/js/config.js';
-
+import { CONFIG } from './config.js';
 export function uploadToCloudinary(file) {
     return new Promise((resolve, reject) => {
         const fd = new FormData();
