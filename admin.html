@@ -2,17 +2,641 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель VDS</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ArtStars - Админ-панель</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a2e;
+            --bg-secondary: #1a1a4e;
+            --neon-pink: #ff2d95;
+            --neon-blue: #00d4ff;
+            --neon-purple: #b44dff;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffe600;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0d0;
+            --glass-bg: rgba(26, 26, 78, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .login-form {
+            background: var(--glass-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 30px rgba(180, 77, 255, 0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--neon-purple);
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 15px rgba(180, 77, 255, 0.5);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(255, 45, 149, 0.5);
+        }
+
+        .error-msg {
+            color: var(--neon-pink);
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .admin-panel {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: var(--glass-bg);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: var(--neon-pink);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--neon-purple);
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--neon-blue);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .users-table {
+            background: var(--glass-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .user-row {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px 200px;
+            gap: 15px;
+            padding: 15px;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.3s;
+        }
+
+        .user-row:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .user-row.header {
+            background: var(--bg-secondary);
+            font-weight: bold;
+            color: var(--neon-blue);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid var(--neon-purple);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .user-id {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .user-stars {
+            color: var(--neon-yellow);
+            font-weight: bold;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--neon-blue);
+            border-radius: 8px;
+            background: transparent;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: var(--neon-blue);
+            color: var(--bg-primary);
+        }
+
+        .action-btn.danger {
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        .action-btn.danger:hover {
+            background: var(--neon-pink);
+            color: white;
+        }
+
+        .action-btn.success {
+            border-color: var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .action-btn.success:hover {
+            background: var(--neon-green);
+            color: var(--bg-primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 40px rgba(180, 77, 255, 0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .user-row {
+                grid-template-columns: 50px 1fr;
+                gap: 10px;
+            }
+            
+            .user-stars, .user-actions {
+                grid-column: 1 / -1;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="adminApp">
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Загрузка...</p>
+    <!-- Экран входа -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-form">
+            <h2>🔐 Админ-панель</h2>
+            <div class="input-group">
+                <label>Пароль</label>
+                <input type="password" id="passwordInput" placeholder="Введите пароль">
+            </div>
+            <button class="login-btn" onclick="login()">Войти</button>
+            <p class="error-msg" id="errorMsg">Неверный пароль!</p>
         </div>
     </div>
-    <script type="module" src="js/admin.js"></script>
+
+    <!-- Админ-панель -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="admin-header">
+            <h2>👑 Админ-панель ArtStars</h2>
+            <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Поиск по имени или ID..." oninput="filterUsers()">
+        </div>
+
+        <div class="users-table">
+            <div class="user-row header">
+                <div>Аватар</div>
+                <div>Пользователь</div>
+                <div>Звёзды</div>
+                <div>Действия</div>
+            </div>
+            <div id="usersList"></div>
+        </div>
+    </div>
+
+    <!-- Модальное окно -->
+    <div id="modal" class="modal">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
+        const ADMIN_PASSWORD = '135710Aa!';
+        
+        let allUsers = [];
+        let isLoggedIn = false;
+
+        // Проверяем, был ли вход ранее
+        if (localStorage.getItem('admin_logged_in') === 'true') {
+            isLoggedIn = true;
+            showAdminPanel();
+        }
+
+        async function login() {
+            const password = document.getElementById('passwordInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (password === ADMIN_PASSWORD) {
+                isLoggedIn = true;
+                localStorage.setItem('admin_logged_in', 'true');
+                errorMsg.style.display = 'none';
+                showAdminPanel();
+            } else {
+                errorMsg.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            localStorage.removeItem('admin_logged_in');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+
+        async function showAdminPanel() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            await loadData();
+        }
+
+        async function request(endpoint, options = {}) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    ...options
+                });
+                
+                if (!res.ok) {
+                    console.error('API Error:', await res.text());
+                    return [];
+                }
+                
+                return await res.json();
+            } catch (error) {
+                console.error('Request error:', error);
+                return [];
+            }
+        }
+
+        async function loadData() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '<div class="loading">Загрузка...</div>';
+            
+            try {
+                // Загружаем пользователей
+                allUsers = await request('users?select=*&order=created_at.desc');
+                
+                // Загружаем арты для статистики
+                const artworks = await request('artworks?select=*');
+                const publishedArtworks = artworks.filter(a => a.is_published);
+                
+                // Обновляем статистику
+                updateStats(allUsers, artworks, publishedArtworks);
+                
+                // Отображаем пользователей
+                displayUsers(allUsers);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                usersList.innerHTML = '<div class="loading">Ошибка загрузки данных</div>';
+            }
+        }
+
+        function updateStats(users, artworks, publishedArtworks) {
+            document.getElementById('statsGrid').innerHTML = `
+                <div class="stat-card">
+                    <h3>Всего пользователей</h3>
+                    <div class="value">${users.length}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Всего рисунков</h3>
+                    <div class="value">${artworks.length}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Опубликовано</h3>
+                    <div class="value">${publishedArtworks.length}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Общий баланс</h3>
+                    <div class="value">⭐ ${users.reduce((sum, u) => sum + (u.stars_balance || 0), 0)}</div>
+                </div>
+            `;
+        }
+
+        function displayUsers(users) {
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="loading">Пользователи не найдены</div>';
+                return;
+            }
+            
+            usersList.innerHTML = users.map(user => `
+                <div class="user-row" data-user-id="${user.id}">
+                    <img src="${user.avatar_url || 'icon.svg'}" class="user-avatar" alt="Avatar" onerror="this.src='icon.svg'">
+                    <div class="user-info">
+                        <div class="user-name">${user.username || 'Без имени'}</div>
+                        <div class="user-id">ID: ${user.id}</div>
+                        <div style="font-size:12px; color:var(--text-secondary);">Создан: ${new Date(user.created_at).toLocaleDateString('ru-RU')}</div>
+                    </div>
+                    <div class="user-stars">⭐ ${user.stars_balance || 0}</div>
+                    <div class="user-actions">
+                        <button class="action-btn" onclick="editUsername('${user.id}', '${user.username || ''}')">✏️ Имя</button>
+                        <button class="action-btn" onclick="editAvatar('${user.id}')">📷 Аватар</button>
+                        <button class="action-btn success" onclick="editStars('${user.id}', ${user.stars_balance || 0})">⭐ Звёзды</button>
+                        <button class="action-btn danger" onclick="deleteUser('${user.id}', '${user.username || 'Без имени'}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allUsers.filter(user => 
+                (user.username || '').toLowerCase().includes(searchTerm) ||
+                user.id.toLowerCase().includes(searchTerm)
+            );
+            displayUsers(filtered);
+        }
+
+        async function editUsername(userId, currentName) {
+            const newName = prompt('Введите новое имя:', currentName);
+            if (newName !== null && newName !== currentName) {
+                await updateUser(userId, { username: newName });
+                await loadData();
+            }
+        }
+
+        function editAvatar(userId) {
+            const url = prompt('Введите URL нового аватара:');
+            if (url) {
+                updateUser(userId, { avatar_url: url }).then(() => loadData());
+            }
+        }
+
+        async function editStars(userId, currentStars) {
+            const modal = document.getElementById('modal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <h3>Управление звёздами</h3>
+                <p style="text-align:center; margin-bottom:20px;">Текущий баланс: ⭐ ${currentStars}</p>
+                <div class="input-group">
+                    <label>Добавить звёзды</label>
+                    <input type="number" id="addStars" placeholder="Количество" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Убрать звёзды</label>
+                    <input type="number" id="removeStars" placeholder="Количество" min="0">
+                </div>
+                <div class="input-group">
+                    <label>Установить точное значение</label>
+                    <input type="number" id="setStars" placeholder="Точное количество" min="0">
+                </div>
+                <div class="modal-actions">
+                    <button onclick="closeModal()" style="background:var(--neon-pink);">Отмена</button>
+                    <button onclick="applyStars('${userId}', ${currentStars})" style="background:var(--neon-green);">Применить</button>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+        }
+
+        async function applyStars(userId, currentStars) {
+            const addValue = parseInt(document.getElementById('addStars').value) || 0;
+            const removeValue = parseInt(document.getElementById('removeStars').value) || 0;
+            const setValue = document.getElementById('setStars').value;
+            
+            let newBalance = currentStars;
+            
+            if (setValue !== '') {
+                newBalance = parseInt(setValue);
+            } else {
+                newBalance = currentStars + addValue - removeValue;
+            }
+            
+            if (newBalance < 0) newBalance = 0;
+            
+            await updateUser(userId, { stars_balance: newBalance });
+            closeModal();
+            await loadData();
+        }
+
+        async function deleteUser(userId, username) {
+            if (confirm(`Вы уверены, что хотите удалить пользователя "${username}"?\n\nЭто действие нельзя отменить! Все рисунки и данные пользователя будут удалены.`)) {
+                await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                await loadData();
+            }
+        }
+
+        async function updateUser(userId, data) {
+            try {
+                await request(`users?id=eq.${userId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify(data)
+                });
+            } catch (error) {
+                console.error('Error updating user:', error);
+                alert('Ошибка обновления пользователя');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Закрытие модального окна по клику вне его
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Вход по Enter
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
 </body>
 </html>
