@@ -8,6 +8,7 @@ let feedData = [];
 let touchStartY = 0;
 let touchEndY = 0;
 let viewingUserId = null;
+let likedSet = new Set();
 
 function toast(msg) {
     const existing = document.querySelector('.toast-msg');
@@ -73,6 +74,7 @@ async function showFeed() {
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
     try { feedData = await supabase.getFeed(); } catch (e) { feedData = []; }
     currentIndex = 0;
+    likedSet = new Set();
     if (feedData.length === 0) {
         appEl.innerHTML = `<div class="page-container"><div class="empty-state" style="padding-top:80px"><div style="font-size:60px">🎬</div><h2>Пока нет видео</h2><p>Станьте первым!</p></div>${renderNav('feed')}</div>`;
         attachNav(); return;
@@ -88,12 +90,14 @@ async function renderCurrentVideo(user) {
     if (item.is_premium) { try { canAccess = await supabase.canAccess(item.id, user.id); } catch(e) { canAccess = false; } }
     const likes = await supabase.getLikesCount(item.id);
     const comments = await supabase.getComments(item.id);
+    const isLiked = likedSet.has(item.id);
     const avatarUrl = item.users?.avatar_url || '';
     const initial = (item.users?.username || 'U')[0].toUpperCase();
 
     appEl.innerHTML = `<div class="video-container" id="videoContainer">
         <div class="video-wrapper">
             ${canAccess ? renderMediaFull(item) : renderBlurredMedia(item)}
+            ${canAccess && item.media_type === 'video' ? `<button class="unmute-btn" id="unmuteBtn" title="Включить звук">🔇</button>` : ''}
             <div class="video-overlay">
                 <div class="video-info">
                     <div class="user-row" id="profileLink" data-uid="${item.user_id}" style="cursor:pointer">
@@ -104,10 +108,18 @@ async function renderCurrentVideo(user) {
                     <div class="desc-text">${item.description || ''}</div>
                 </div>
                 <div class="actions-right">
-                    <button class="action-btn like-btn" data-id="${item.id}"><div style="font-size:28px">❤️</div><span>${likes}</span></button>
-                    <button class="action-btn comment-btn" data-id="${item.id}"><div style="font-size:28px">💬</div><span>${comments.length}</span></button>
-                    <button class="action-btn share-btn" data-id="${item.id}"><div style="font-size:28px">📤</div></button>
-                    ${item.is_premium ? '<div style="font-size:28px;text-align:center">⭐</div>' : ''}
+                    <button class="action-round like-btn ${isLiked ? 'liked' : ''}" data-id="${item.id}">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="${isLiked ? '#ff0040' : 'none'}" stroke="${isLiked ? '#ff0040' : '#fff'}" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        <span>${likes}</span>
+                    </button>
+                    <button class="action-round comment-btn" data-id="${item.id}">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span>${comments.length}</span>
+                    </button>
+                    <button class="action-round share-btn" data-id="${item.id}">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                    </button>
+                    ${item.is_premium ? '<div style="text-align:center;font-size:24px">⭐</div>' : ''}
                 </div>
                 ${!canAccess ? `<div class="premium-lock" data-id="${item.id}" data-price="${item.price_stars}">
                     <div class="lock-content">
@@ -123,6 +135,22 @@ async function renderCurrentVideo(user) {
         ${renderNav('feed')}
     </div>`;
 
+    // Звук
+    const video = document.querySelector('.video-wrapper video');
+    const unmuteBtn = document.getElementById('unmuteBtn');
+    if (video && unmuteBtn) {
+        video.muted = true;
+        unmuteBtn.onclick = () => {
+            if (video.muted) {
+                video.muted = false;
+                unmuteBtn.textContent = '🔊';
+            } else {
+                video.muted = true;
+                unmuteBtn.textContent = '🔇';
+            }
+        };
+    }
+
     // Свайпы
     const container = document.getElementById('videoContainer');
     container.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
@@ -136,18 +164,15 @@ async function renderCurrentVideo(user) {
         else if (e.deltaY < -30 && currentIndex > 0) { currentIndex--; renderCurrentVideo(user); }
     }, { passive: true });
 
-    // Клик на профиль
     const profileLink = document.getElementById('profileLink');
-    if (profileLink) {
-        profileLink.onclick = () => showUserProfile(item.user_id);
-    }
+    if (profileLink) profileLink.onclick = () => showUserProfile(item.user_id);
 
     attachNav();
     attachActions(user, item);
 }
 
 function renderMediaFull(item) {
-    if (item.media_type === 'video') return `<video src="${item.media_url}" loop muted playsinline autoplay class="full-media"></video>`;
+    if (item.media_type === 'video') return `<video src="${item.media_url}" loop playsinline autoplay class="full-media"></video>`;
     return `<img src="${item.media_url}" class="full-media">`;
 }
 
@@ -159,15 +184,24 @@ function renderBlurredMedia(item) {
 function attachActions(user, item) {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
-            await supabase.toggleLike(btn.dataset.id, user.id);
-            btn.querySelector('span').textContent = await supabase.getLikesCount(btn.dataset.id);
+            const id = btn.dataset.id;
+            await supabase.toggleLike(id, user.id);
+            if (likedSet.has(id)) { likedSet.delete(id); }
+            else { likedSet.add(id); }
+            const count = await supabase.getLikesCount(id);
+            btn.querySelector('span').textContent = count;
+            const liked = likedSet.has(id);
+            btn.classList.toggle('liked', liked);
+            const svg = btn.querySelector('svg');
+            if (svg) {
+                svg.setAttribute('fill', liked ? '#ff0040' : 'none');
+                svg.setAttribute('stroke', liked ? '#ff0040' : '#fff');
+            }
         };
     });
     document.querySelectorAll('.comment-btn').forEach(btn => btn.onclick = () => showComments(btn.dataset.id));
     document.querySelectorAll('.share-btn').forEach(btn => {
-        btn.onclick = async () => {
-            await supabase.shareContent(item);
-        };
+        btn.onclick = async () => { await supabase.shareContent(item); };
     });
     const lock = document.querySelector('.premium-lock');
     if (lock) {
@@ -186,7 +220,6 @@ function attachActions(user, item) {
 // ====== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ======
 async function showUserProfile(uid) {
     viewingUserId = uid;
-    const user = supabase.getUser();
     const profile = await supabase.getUserById(uid);
     if (!profile) return toast('Пользователь не найден');
     const myContent = await supabase.getUserContent(uid);
@@ -200,9 +233,7 @@ async function showUserProfile(uid) {
         contentGrid = '<div class="profile-grid">';
         myContent.forEach(item => {
             contentGrid += `<div class="profile-grid-item">
-                ${item.media_type === 'video' 
-                    ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` 
-                    : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
+                ${item.media_type === 'video' ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
                 ${item.is_premium ? '<span style="position:absolute;top:5px;left:5px;background:gold;color:#000;padding:2px 6px;border-radius:8px;font-size:10px">⭐</span>' : ''}
             </div>`;
         });
@@ -217,7 +248,6 @@ async function showUserProfile(uid) {
             <h3 style="text-align:left;margin-top:30px;margin-bottom:15px">📱 Публикации</h3>
             ${contentGrid}
         </div>${renderNav('feed')}</div>`;
-
     document.getElementById('backBtn').onclick = () => { viewingUserId = null; showFeed(); };
     attachNav();
 }
@@ -244,17 +274,14 @@ function showUpload() {
         document.getElementById('priceSettings').classList.toggle('active', e.target.checked);
         document.getElementById('premiumHint').style.display = e.target.checked ? 'block' : 'none';
     };
-    document.getElementById('description').oninput = (e) => {
-        document.getElementById('charCount').textContent = e.target.value.length;
-    };
+    document.getElementById('description').oninput = (e) => { document.getElementById('charCount').textContent = e.target.value.length; };
     document.getElementById('doUpload').onclick = async () => {
         if (!selectedFile) return toast('Выберите файл');
         const user = supabase.getUser();
         const desc = document.getElementById('description').value;
         const tags = document.getElementById('hashtags').value;
         if (desc.length > 2000) return toast('Максимум 2000 символов');
-        const tagCount = tags.split(' ').filter(t => t.startsWith('#')).length;
-        if (tagCount > 5) return toast('Максимум 5 хештегов');
+        if (tags.split(' ').filter(t => t.startsWith('#')).length > 5) return toast('Максимум 5 хештегов');
         if (selectedFile.type.startsWith('video/')) {
             const d = await getVideoDuration(selectedFile);
             if (d > CONFIG.content.maxVideoDuration) return toast('Видео не длиннее 15с');
@@ -270,8 +297,7 @@ function showUpload() {
                 is_premium: document.getElementById('isPremium').checked,
                 price_stars: parseInt(document.getElementById('priceStars').value) || 10
             });
-            toast('✅ Загружено!');
-            showFeed();
+            toast('✅ Загружено!'); showFeed();
         } catch (err) { toast('Ошибка: ' + err.message); btn.disabled = false; btn.textContent = 'Загрузить'; }
     };
     attachNav();
@@ -302,9 +328,7 @@ async function showProfile() {
         contentGrid = '<div class="profile-grid">';
         myContent.forEach(item => {
             contentGrid += `<div class="profile-grid-item" style="position:relative">
-                ${item.media_type === 'video' 
-                    ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` 
-                    : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
+                ${item.media_type === 'video' ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
                 ${item.is_premium ? '<span style="position:absolute;top:5px;left:5px;background:gold;color:#000;padding:2px 6px;border-radius:8px;font-size:10px">⭐</span>' : ''}
                 <button class="delete-btn" data-id="${item.id}" style="position:absolute;top:5px;right:5px;background:rgba(255,0,0,0.8);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🗑</button>
             </div>`;
@@ -332,12 +356,7 @@ async function showProfile() {
     document.getElementById('avatarInput').onchange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        try {
-            const url = await uploadToCloudinary(file);
-            await supabase.updateAvatar(user.id, url);
-            toast('✅ Аватар обновлён!');
-            showProfile();
-        } catch (err) { toast('❌ Ошибка загрузки'); }
+        try { const url = await uploadToCloudinary(file); await supabase.updateAvatar(user.id, url); toast('✅ Аватар обновлён!'); showProfile(); } catch (err) { toast('❌ Ошибка'); }
     };
     document.getElementById('editNameBtn').onclick = async () => {
         const newName = prompt('Новый никнейм:', username);
@@ -346,18 +365,12 @@ async function showProfile() {
     };
     document.getElementById('buyBtn').onclick = showBuyStars;
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
-    
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.onclick = async (e) => {
             e.stopPropagation();
-            if (confirm('Удалить публикацию?')) {
-                await supabase.deleteContent(btn.dataset.id);
-                toast('✅ Удалено');
-                showProfile();
-            }
+            if (confirm('Удалить публикацию?')) { await supabase.deleteContent(btn.dataset.id); toast('✅ Удалено'); showProfile(); }
         };
     });
-    
     attachNav();
 }
 
