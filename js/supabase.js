@@ -13,6 +13,16 @@ async function request(endpoint, options = {}) {
     return text ? JSON.parse(text) : [];
 }
 
+function toast(msg) {
+    const existing = document.querySelector('.toast-msg');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast-msg';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+}
+
 export const supabase = {
     signInWithGoogle() {
         window.location.href = `${URL}/auth/v1/authorize?provider=google&redirect_to=https://vds-game.ink`;
@@ -23,16 +33,18 @@ export const supabase = {
         const res = await fetch(`${URL}/auth/v1/user`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${token}` } });
         return res.json();
     },
+    async getUserById(uid) {
+        const d = await request(`users?id=eq.${uid}&select=*`);
+        return d[0] || null;
+    },
+    async getUserContent(uid) { return request(`content?user_id=eq.${uid}&order=created_at.desc`); },
     signOut() { localStorage.clear(); },
     getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } },
     isAuth() { return !!localStorage.getItem('token'); },
-    getFeed() { return request('content?select=*,users(username)&order=created_at.desc'); },
+    getFeed() { return request('content?select=*,users(username,avatar_url)&order=created_at.desc'); },
     createContent(d) { return request('content', { method: 'POST', body: JSON.stringify(d) }); },
-    async getUserContent(uid) { return request(`content?user_id=eq.${uid}&order=created_at.desc`); },
     async deleteContent(cid) {
-        await fetch(`${URL}/rest/v1/content?id=eq.${cid}`, {
-            method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
-        });
+        await fetch(`${URL}/rest/v1/content?id=eq.${cid}`, { method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
     },
     async getLikesCount(cid) { const d = await request(`likes?content_id=eq.${cid}&select=count`); return d[0]?.count || 0; },
     async toggleLike(cid, uid) {
@@ -44,10 +56,11 @@ export const supabase = {
         }
     },
     addComment(uid, cid, text) { return request('comments', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, text }) }); },
-    getComments(cid) { return request(`comments?content_id=eq.${cid}&select=*,users(username)&order=created_at.asc`); },
+    getComments(cid) { return request(`comments?content_id=eq.${cid}&select=*,users(username,avatar_url)&order=created_at.asc`); },
     repost(uid, cid) { return request('reposts', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) }); },
-    async getUserBalance(uid) { const d = await request(`users?id=eq.${uid}&select=stars_balance,username`); return d[0] || { stars_balance: 0, username: '' }; },
+    async getUserBalance(uid) { const d = await request(`users?id=eq.${uid}&select=stars_balance,username,avatar_url`); return d[0] || { stars_balance: 0, username: '', avatar_url: '' }; },
     async updateUsername(uid, username) { return request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ username }) }); },
+    async updateAvatar(uid, avatar_url) { return request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ avatar_url }) }); },
     async buyContent(uid, cid, stars) {
         await request('purchases', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, stars_spent: stars }) });
         const bal = await this.getUserBalance(uid);
@@ -64,5 +77,14 @@ export const supabase = {
         if (item.user_id === uid) return true;
         const p = await request(`purchases?user_id=eq.${uid}&content_id=eq.${cid}&select=id`);
         return p.length > 0;
+    },
+    async shareContent(item) {
+        const url = `https://vds-game.ink?video=${item.id}`;
+        if (navigator.share) {
+            await navigator.share({ title: 'VDS видео', text: item.description || 'Смотри видео!', url });
+        } else {
+            await navigator.clipboard.writeText(url);
+            toast('🔗 Ссылка скопирована!');
+        }
     }
 };
