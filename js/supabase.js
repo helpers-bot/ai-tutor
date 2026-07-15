@@ -28,6 +28,12 @@ export const supabase = {
     isAuth() { return !!localStorage.getItem('token'); },
     getFeed() { return request('content?select=*,users(username)&order=created_at.desc'); },
     createContent(d) { return request('content', { method: 'POST', body: JSON.stringify(d) }); },
+    async getUserContent(uid) { return request(`content?user_id=eq.${uid}&order=created_at.desc`); },
+    async deleteContent(cid) {
+        await fetch(`${URL}/rest/v1/content?id=eq.${cid}`, {
+            method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+        });
+    },
     async getLikesCount(cid) { const d = await request(`likes?content_id=eq.${cid}&select=count`); return d[0]?.count || 0; },
     async toggleLike(cid, uid) {
         const ex = await request(`likes?user_id=eq.${uid}&content_id=eq.${cid}`);
