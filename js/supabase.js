@@ -1,56 +1,110 @@
-async function showProfile() {
-    const user = supabase.getUser();
-    if (!user||!user.id) { supabase.signOut(); showAuth(); return; }
-    const profile = await supabase.getUserBalance(user.id);
-    const myContent = await supabase.getUserContent(user.id);
-    const avatarUrl = profile.avatar_url||'';
-    const initial = (profile.username||user.email||'U')[0].toUpperCase();
-    const username = profile.username||user.email?.split('@')[0]||'user';
+const URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
+const KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
 
-    let grid = '';
-    if (myContent.length === 0) {
-        grid = '<p style="color:#888;text-align:center;padding:20px">Нет публикаций</p>';
-    } else {
-        grid = '<div class="profile-grid">';
-        for (const item of myContent) {
-            const modStatus = await supabase.getModerationStatus(item.id);
-            const likes = await supabase.getLikesCount(item.id);
-            const views = await supabase.getViewsCount(item.id);
-            const statusText = modStatus === 'pending' ? '⏳ На модерации' : modStatus === 'rejected' ? '❌ Отклонено' : '✅ Опубликовано';
-            const statusColor = modStatus === 'pending' ? '#ffaa00' : modStatus === 'rejected' ? '#ff0000' : '#00ff00';
-            
-            grid += '<div class="profile-grid-item" style="position:relative">'+
-                (item.media_type==='video'?'<video src="'+item.media_url+'" muted style="width:100%;height:100%;object-fit:cover"></video>':'<img src="'+item.media_url+'" style="width:100%;height:100%;object-fit:cover">')+
-                '<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);padding:5px;font-size:10px;display:flex;justify-content:space-around">'+
-                '<span>❤️ '+likes+'</span><span>👁 '+views+'</span>'+
-                '</div>'+
-                '<span style="position:absolute;top:5px;left:5px;background:'+statusColor+';color:#fff;padding:2px 6px;border-radius:8px;font-size:9px">'+statusText+'</span>'+
-                (item.is_premium?'<span style="position:absolute;top:5px;right:35px;background:gold;color:#000;padding:2px 6px;border-radius:8px;font-size:10px">⭐</span>':'')+
-                '<button class="delete-btn" data-id="'+item.id+'" style="position:absolute;top:5px;right:5px;background:rgba(255,0,0,0.8);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🗑</button>'+
-                '</div>';
-        }
-        grid += '</div>';
-    }
-
-    appEl.innerHTML = '<div class="page-container"><div style="text-align:center;padding:40px 20px 20px">'+
-        '<div style="position:relative;display:inline-block">'+(avatarUrl?'<img src="'+avatarUrl+'" style="width:90px;height:90px;border-radius:50%;object-fit:cover">':'<div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">'+initial+'</div>')+'<button id="changeAvatarBtn" style="position:absolute;bottom:0;right:0;background:#333;color:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px">📷</button><input type="file" id="avatarInput" accept="image/*" style="display:none"></div>'+
-        '<h2 style="margin-top:15px">@'+username+'</h2><p style="color:#888">'+user.email+'</p>'+
-        '<button class="btn btn-secondary" id="editNameBtn" style="margin:10px">✏️ Сменить ник</button>'+
-        '<a href="/admin.html" class="btn btn-gold" style="display:inline-block;margin:10px;text-decoration:none;padding:8px 16px;border-radius:20px;font-size:14px">⚙️ Админка</a>'+
-        '<div style="background:#111;border-radius:15px;padding:20px;margin:20px 0;display:inline-block"><div style="font-size:14px;color:#888">Баланс</div><div style="font-size:36px;color:gold;font-weight:bold">⭐ '+profile.stars_balance+'</div></div>'+
-        '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:30px"><button class="btn btn-gold" id="buyBtn">Купить звёзды</button><button class="btn btn-secondary" id="logoutBtn">Выйти</button></div>'+
-        '<h3 style="text-align:left;margin-bottom:15px">📱 Мои публикации</h3>'+grid+
-        '</div>'+renderNav('profile')+'</div>';
-
-    document.getElementById('changeAvatarBtn').onclick = function() { document.getElementById('avatarInput').click(); };
-    document.getElementById('avatarInput').onchange = async function(e) { var f=e.target.files[0]; if(!f)return; try{var url=await uploadToCloudinary(f);await supabase.updateAvatar(user.id,url);supabase.toast('✅ Готово!');showProfile();}catch(err){supabase.toast('❌ Ошибка');} };
-    document.getElementById('editNameBtn').onclick = async function() { var n=prompt('Новый ник:',username); if(!n||n.length<3)return supabase.toast('Минимум 3 символа'); try{await supabase.updateUsername(user.id,n);supabase.toast('✅ Готово!');showProfile();}catch(e){supabase.toast('❌ Ошибка');} };
-    document.getElementById('buyBtn').onclick = showBuyStars;
-    document.getElementById('logoutBtn').onclick = async function() { await supabase.signOut(); showAuth(); };
-    
-    var delBtns = document.querySelectorAll('.delete-btn');
-    for (var i = 0; i < delBtns.length; i++) {
-        delBtns[i].onclick = async function(e) { e.stopPropagation(); if(confirm('Удалить?')){await supabase.deleteContent(this.dataset.id);supabase.toast('✅ Удалено');showProfile();} };
-    }
-    attachNav();
+async function request(endpoint, options = {}) {
+    const res = await fetch(`${URL}/rest/v1/${endpoint}`, {
+        headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
+        ...options
+    });
+    if (!res.ok) throw new Error('Error ' + res.status);
+    const text = await res.text();
+    return text ? JSON.parse(text) : [];
 }
+
+function toast(msg) {
+    const existing = document.querySelector('.toast-msg');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast-msg';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+}
+
+window.supabase = {
+    toast,
+    signInWithGoogle() {
+        window.location.href = `${URL}/auth/v1/authorize?provider=google&redirect_to=https://vds-game.ink`;
+    },
+    async getUserProfile() {
+        const token = localStorage.getItem('token');
+        if (!token) return null;
+        const res = await fetch(`${URL}/auth/v1/user`, { headers: { 'apikey': KEY, 'Authorization': `Bearer ${token}` } });
+        return res.json();
+    },
+    async getUserById(uid) { const d = await request(`users?id=eq.${uid}&select=*`); return d[0] || null; },
+    async getAllUsers() { return request('users?select=*&order=created_at.desc'); },
+    async getUserContent(uid) { return request(`content?user_id=eq.${uid}&order=created_at.desc`); },
+    async getModerationStatus(cid) { const d = await request(`content_moderation?content_id=eq.${cid}&select=status`); return d[0]?.status || 'approved'; },
+    async getViewsCount(cid) { const d = await request(`views?content_id=eq.${cid}&select=count`); return d[0]?.count || 0; },
+    async addView(uid, cid) { await request('views', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) }); },
+    signOut() { localStorage.clear(); },
+    getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } },
+    isAuth() { return !!localStorage.getItem('token'); },
+    getFeed() { return request('content?select=*,users(username,avatar_url)&order=created_at.desc'); },
+    
+    async createContent(d) {
+        const data = await request('content', { method: 'POST', body: JSON.stringify(d) });
+        const user = this.getUser();
+        const contentId = Array.isArray(data) ? data[0]?.id : data.id;
+        if (contentId) {
+            await request('content_moderation', { method: 'POST', body: JSON.stringify({ content_id: contentId, user_id: d.user_id, media_url: d.media_url, media_type: d.media_type, description: d.description || '', is_premium: d.is_premium || false, price_stars: d.price_stars || 0, username: user?.email?.split('@')[0] || 'user', status: 'pending' }) });
+        }
+        return data;
+    },
+    
+    async getPendingContent() { return request('content_moderation?status=eq.pending&order=created_at.desc'); },
+    async getModerationHistory() { return request('content_moderation?order=created_at.desc&limit=50'); },
+    async approveContent(id) { await request(`content_moderation?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) }); },
+    
+    async rejectContent(id) {
+        const item = await request(`content_moderation?id=eq.${id}&select=*`);
+        if (item[0]) {
+            await request(`content_moderation?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'rejected' }) });
+            if (item[0].content_id) {
+                await fetch(`${URL}/rest/v1/content?id=eq.${item[0].content_id}`, { method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } });
+            }
+        }
+    },
+    
+    async deleteContent(cid) { await fetch(`${URL}/rest/v1/content?id=eq.${cid}`, { method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } }); },
+    async updateUser(uid, data) { return request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify(data) }); },
+    async isAdmin(uid) { const d = await request(`admins?user_id=eq.${uid}&select=id`); return d.length > 0; },
+    async getLikesCount(cid) { const d = await request(`likes?content_id=eq.${cid}&select=count`); return d[0]?.count || 0; },
+    
+    async toggleLike(cid, uid) {
+        const ex = await request(`likes?user_id=eq.${uid}&content_id=eq.${cid}`);
+        if (ex.length) { await fetch(`${URL}/rest/v1/likes?user_id=eq.${uid}&content_id=eq.${cid}`, { method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` } }); }
+        else { await request('likes', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) }); }
+    },
+    
+    addComment(uid, cid, text) { return request('comments', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, text }) }); },
+    getComments(cid) { return request(`comments?content_id=eq.${cid}&select=*,users(username,avatar_url)&order=created_at.asc`); },
+    repost(uid, cid) { return request('reposts', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) }); },
+    async getUserBalance(uid) { const d = await request(`users?id=eq.${uid}&select=stars_balance,username,avatar_url`); return d[0] || { stars_balance: 0, username: '', avatar_url: '' }; },
+    async updateUsername(uid, username) { return request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ username }) }); },
+    async updateAvatar(uid, avatar_url) { return request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ avatar_url }) }); },
+    
+    async buyContent(uid, cid, stars) {
+        await request('purchases', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, stars_spent: stars }) });
+        const bal = await this.getUserBalance(uid);
+        await request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ stars_balance: bal.stars_balance - stars }) });
+    },
+    
+    async addStars(uid, amount) { const bal = await this.getUserBalance(uid); await request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ stars_balance: bal.stars_balance + amount }) }); },
+    
+    async canAccess(cid, uid) {
+        const d = await request(`content?id=eq.${cid}&select=user_id,is_premium`);
+        const item = d[0];
+        if (!item || !item.is_premium) return true;
+        if (item.user_id === uid) return true;
+        const p = await request(`purchases?user_id=eq.${uid}&content_id=eq.${cid}&select=id`);
+        return p.length > 0;
+    },
+    
+    async shareContent(item) {
+        const url = `https://vds-game.ink?video=${item.id}`;
+        if (navigator.share) { await navigator.share({ title: 'VDS видео', text: item.description || 'Смотри видео!', url }); }
+        else { await navigator.clipboard.writeText(url); toast('🔗 Ссылка скопирована!'); }
+    }
+};
