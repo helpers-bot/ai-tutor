@@ -16,7 +16,7 @@ class ArtStarsApp {
         this.editingArtworkId = null;
         this.viewTimer = null;
         this.viewTimerSeconds = 0;
-        this.viewedUser = null; // Для просмотра профиля другого пользователя
+        this.viewedUser = null;
         
         this.init();
     }
@@ -116,11 +116,9 @@ class ArtStarsApp {
         await this.updateDisplay();
         await this.loadFeed();
         
-        // Обновляем банк
         setInterval(() => this.updateBankDisplay(), 10000);
         this.updateBankDisplay();
         
-        // Глобальные функции для canvas
         window.closeCanvas = () => this.closeCanvas();
         window.saveCanvas = () => this.saveCanvas();
         window.publishCanvas = () => this.publishCanvas();
@@ -136,7 +134,7 @@ class ArtStarsApp {
                 btn.classList.add('active');
                 
                 this.currentPage = btn.dataset.page;
-                this.viewedUser = null; // Сбрасываем просмотр чужого профиля
+                this.viewedUser = null;
                 
                 if (this.currentPage !== 'draw') {
                     this.closeCanvas();
@@ -159,13 +157,11 @@ class ArtStarsApp {
         
         this.editingArtworkId = artworkId;
         
-        // Показываем/скрываем кнопку удаления
         const deleteBtn = document.getElementById('deleteArtworkBtn');
         if (deleteBtn) {
             deleteBtn.style.display = artworkId ? 'block' : 'none';
         }
         
-        // Инициализируем canvas
         setTimeout(() => {
             this.drawingCanvas = new DrawingCanvas(existingImage);
         }, 100);
@@ -287,7 +283,6 @@ class ArtStarsApp {
             document.querySelector('.nav-btn[data-page="feed"]')?.classList.remove('active');
         };
         
-        // Записываем просмотр
         if (this.user) {
             await recordView(this.user.id, artwork.id);
         }
@@ -300,13 +295,11 @@ class ArtStarsApp {
         
         try {
             if (this.editingArtworkId) {
-                // Обновляем существующий арт
                 await updateArtwork(this.editingArtworkId, {
                     image_url: imageData
                 });
                 alert('Рисунок обновлён!');
             } else {
-                // Сохраняем новый
                 await saveArtwork({
                     user_id: this.user.id,
                     image_url: imageData,
@@ -341,14 +334,12 @@ class ArtStarsApp {
             let artworkId = this.editingArtworkId;
             
             if (artworkId) {
-                // Обновляем существующий
                 await updateArtwork(artworkId, {
                     image_url: imageData,
                     is_published: true,
                     stars_spent: 50
                 });
             } else {
-                // Сохраняем новый и публикуем
                 const saved = await saveArtwork({
                     user_id: this.user.id,
                     image_url: imageData,
@@ -362,10 +353,12 @@ class ArtStarsApp {
                 }
             }
             
-            // Списываем звёзды
             await updateUserBalance(this.user.id, -50);
             
             // Записываем покупку
+            const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
+            
             if (artworkId) {
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
@@ -480,7 +473,6 @@ class ArtStarsApp {
             </div>
         `;
         
-        // Функции для профиля
         window.changeAvatar = async () => {
             const url = prompt('Введите URL нового аватара:');
             if (url) {
@@ -518,7 +510,8 @@ class ArtStarsApp {
         };
         
         window.editArtwork = async (artworkId) => {
-            const artwork = await import('./supabase.js').then(m => m.getArtwork(artworkId));
+            const { getArtwork } = await import('./supabase.js');
+            const artwork = await getArtwork(artworkId);
             if (artwork) {
                 this.openCanvas(artwork.image_url, artworkId);
                 document.querySelector('.nav-btn[data-page="draw"]')?.click();
@@ -531,6 +524,9 @@ class ArtStarsApp {
                 alert('Недостаточно звёзд! Нужно 50 звёзд.');
                 return;
             }
+            
+            const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
             
             await publishArtwork(artworkId);
             await updateUserBalance(this.user.id, -50);
@@ -567,7 +563,3 @@ class ArtStarsApp {
 
 // Запускаем приложение
 window.app = new ArtStarsApp();
-
-// Экспортируем SUPABASE_URL для использования в app.js
-import { SUPABASE_URL } from './supabase.js';
-window.SUPABASE_URL = SUPABASE_URL;
