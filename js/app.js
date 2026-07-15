@@ -1,4 +1,5 @@
-<script type="module" src="js/supabase.js"></script>
+const appEl = document.getElementById('app');
+let currentIndex = 0;
 import { uploadToCloudinary, getVideoDuration } from './cloudinary.js';
 import { CONFIG } from './config.js';
 
