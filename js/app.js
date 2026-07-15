@@ -1,8 +1,9 @@
 import { 
     signInWithGoogle, checkAuth, getUser, getFeed, getCurrentBank,
-    getUserProfile, updateUserBalance, saveArtwork, publishArtwork,
-    cancelAuction, getUserArtworks, likeArtwork, recordView,
-    getTodayViews, claimDailyStar, getLastWinner
+    getUserProfile, updateUserProfile, updateUserBalance, saveArtwork,
+    updateArtwork, deleteArtwork, publishArtwork, getUserArtworks,
+    likeArtwork, recordView, getTodayViews, claimDailyStar,
+    claimViewStar, getLastWinner
 } from './supabase.js';
 
 import { DrawingCanvas } from './canvas.js';
@@ -12,9 +13,10 @@ class ArtStarsApp {
         this.user = null;
         this.currentPage = 'feed';
         this.drawingCanvas = null;
-        this.viewCount = 0;
+        this.editingArtworkId = null;
         this.viewTimer = null;
         this.viewTimerSeconds = 0;
+        this.viewedUser = null; // Для просмотра профиля другого пользователя
         
         this.init();
     }
@@ -61,9 +63,7 @@ class ArtStarsApp {
                     </div>
                 </div>
                 
-                <div class="page-container" id="pageContainer">
-                    <!-- Контент страниц -->
-                </div>
+                <div class="page-container" id="pageContainer"></div>
                 
                 <div class="bottom-nav">
                     <button class="nav-btn active" data-page="feed">
@@ -83,18 +83,27 @@ class ArtStarsApp {
             
             <div id="canvasContainer" class="canvas-container">
                 <div class="canvas-toolbar">
-                    <button class="tool-btn active" data-tool="brush">✏️</button>
-                    <button class="tool-btn" data-tool="eraser">🧹</button>
-                    <input type="color" id="colorPicker" class="color-picker" value="#ff2d95">
-                    <input type="range" id="sizeSlider" class="size-slider" min="1" max="20" value="5">
-                    <span id="sizeValue" style="color:white">5</span>
-                    <button class="tool-btn" onclick="window.undoCanvas()">↩️</button>
-                    <button class="tool-btn" onclick="window.clearCanvas()">🗑️</button>
+                    <button class="tool-btn" onclick="window.closeCanvas()" style="background: var(--neon-pink); border-color: var(--neon-pink);">
+                        ✕
+                    </button>
+                    <button class="tool-btn active" data-tool="brush" title="Кисть">✏️</button>
+                    <button class="tool-btn" data-tool="spray" title="Распылитель">💨</button>
+                    <button class="tool-btn" data-tool="eraser" title="Ластик">🧹</button>
+                    <input type="color" id="colorPicker" class="color-picker" value="#ff2d95" title="Цвет кисти">
+                    <span style="color:white; font-size:12px;">Фон:</span>
+                    <input type="color" id="bgColorPicker" class="color-picker" value="#ffffff" title="Цвет фона">
+                    <input type="range" id="sizeSlider" class="size-slider" min="1" max="30" value="5" title="Размер кисти">
+                    <span id="sizeValue" style="color:white; font-size:12px;">5px</span>
+                    <button class="tool-btn" onclick="window.undoCanvas()" title="Отменить">↩️</button>
+                    <button class="tool-btn" onclick="window.clearCanvas()" title="Очистить">🗑️</button>
                 </div>
-                <canvas id="drawCanvas"></canvas>
+                <div style="display:flex; justify-content:center; align-items:center; flex:1; background:#2a2a2a;">
+                    <canvas id="drawCanvas"></canvas>
+                </div>
                 <div class="canvas-actions">
                     <button class="neon-btn" onclick="window.saveCanvas()">💾 Сохранить</button>
                     <button class="neon-btn publish" onclick="window.publishCanvas()">🚀 Опубликовать (50 ⭐)</button>
+                    <button class="neon-btn danger" id="deleteArtworkBtn" style="display:none;" onclick="window.deleteCurrentArtwork()">❌ Удалить</button>
                 </div>
             </div>
         `;
@@ -107,19 +116,15 @@ class ArtStarsApp {
         await this.updateDisplay();
         await this.loadFeed();
         
-        // Обновляем банк каждые 10 секунд
+        // Обновляем банк
         setInterval(() => this.updateBankDisplay(), 10000);
         this.updateBankDisplay();
         
-        // Инициализируем canvas при необходимости
-        document.getElementById('drawCanvas')?.addEventListener('click', () => {
-            if (!this.drawingCanvas) {
-                this.drawingCanvas = new DrawingCanvas();
-            }
-        });
-        
+        // Глобальные функции для canvas
+        window.closeCanvas = () => this.closeCanvas();
         window.saveCanvas = () => this.saveCanvas();
         window.publishCanvas = () => this.publishCanvas();
+        window.deleteCurrentArtwork = () => this.deleteCurrentArtwork();
         window.undoCanvas = () => this.drawingCanvas?.undo();
         window.clearCanvas = () => this.drawingCanvas?.clear();
     }
@@ -131,24 +136,46 @@ class ArtStarsApp {
                 btn.classList.add('active');
                 
                 this.currentPage = btn.dataset.page;
-                const canvasContainer = document.getElementById('canvasContainer');
+                this.viewedUser = null; // Сбрасываем просмотр чужого профиля
                 
-                if (this.currentPage === 'draw') {
-                    canvasContainer.style.display = 'flex';
-                    if (!this.drawingCanvas) {
-                        this.drawingCanvas = new DrawingCanvas();
-                    }
-                } else {
-                    canvasContainer.style.display = 'none';
+                if (this.currentPage !== 'draw') {
+                    this.closeCanvas();
                 }
                 
-                if (this.currentPage === 'feed') {
+                if (this.currentPage === 'draw') {
+                    this.openCanvas();
+                } else if (this.currentPage === 'feed') {
                     await this.loadFeed();
                 } else if (this.currentPage === 'profile') {
                     await this.loadProfile();
                 }
             });
         });
+    }
+
+    openCanvas(existingImage = null, artworkId = null) {
+        const canvasContainer = document.getElementById('canvasContainer');
+        canvasContainer.style.display = 'flex';
+        
+        this.editingArtworkId = artworkId;
+        
+        // Показываем/скрываем кнопку удаления
+        const deleteBtn = document.getElementById('deleteArtworkBtn');
+        if (deleteBtn) {
+            deleteBtn.style.display = artworkId ? 'block' : 'none';
+        }
+        
+        // Инициализируем canvas
+        setTimeout(() => {
+            this.drawingCanvas = new DrawingCanvas(existingImage);
+        }, 100);
+    }
+
+    closeCanvas() {
+        const canvasContainer = document.getElementById('canvasContainer');
+        canvasContainer.style.display = 'none';
+        this.drawingCanvas = null;
+        this.editingArtworkId = null;
     }
 
     async updateDisplay() {
@@ -165,7 +192,6 @@ class ArtStarsApp {
         const bankDisplay = document.getElementById('bankDisplay');
         if (bankDisplay) {
             bankDisplay.textContent = bank;
-            // Добавляем анимацию
             bankDisplay.style.animation = 'none';
             bankDisplay.offsetHeight;
             bankDisplay.style.animation = 'pulse 0.5s ease-in-out';
@@ -232,15 +258,18 @@ class ArtStarsApp {
         modal.className = 'modal';
         modal.style.display = 'flex';
         modal.innerHTML = `
-            <div class="modal-content">
+            <div class="modal-content" style="text-align:center;">
                 <img src="${artwork.image_url}" class="art-detail-image" alt="${artwork.title}">
                 <h3>${artwork.title}</h3>
-                <p>Автор: ${artwork.users?.username || 'Неизвестный'}</p>
-                <div style="display:flex; gap:20px; margin:15px 0;">
-                    <span>👁 ${artwork.views_count || 0}</span>
-                    <span>❤️ ${artwork.likes_count || 0}</span>
+                <div class="author-info" style="cursor:pointer; display:inline-flex; align-items:center; gap:10px; margin:10px 0;" onclick="window.viewUserProfile('${artwork.user_id}')">
+                    <img src="${artwork.users?.avatar_url || 'icon.svg'}" style="width:30px;height:30px;border-radius:50%;border:2px solid var(--neon-purple);">
+                    <span style="color:var(--neon-blue); text-decoration:underline;">${artwork.users?.username || 'Неизвестный'}</span>
                 </div>
-                <button class="neon-btn" onclick="this.parentElement.parentElement.remove()">Закрыть</button>
+                <div style="display:flex; gap:20px; margin:15px 0; justify-content:center;">
+                    <span>👁 ${artwork.views_count || 0} просмотров</span>
+                    <span>❤️ ${artwork.likes_count || 0} лайков</span>
+                </div>
+                <button class="neon-btn" style="margin-top:10px;" onclick="this.parentElement.parentElement.remove()">Закрыть</button>
             </div>
         `;
         
@@ -250,10 +279,17 @@ class ArtStarsApp {
         
         document.body.appendChild(modal);
         
+        window.viewUserProfile = (userId) => {
+            modal.remove();
+            this.viewedUser = userId;
+            this.loadProfile();
+            document.querySelector('.nav-btn[data-page="profile"]')?.classList.add('active');
+            document.querySelector('.nav-btn[data-page="feed"]')?.classList.remove('active');
+        };
+        
         // Записываем просмотр
         if (this.user) {
             await recordView(this.user.id, artwork.id);
-            await this.updateViewProgress();
         }
     }
 
@@ -263,14 +299,26 @@ class ArtStarsApp {
         const imageData = this.drawingCanvas.getImage();
         
         try {
-            await saveArtwork({
-                user_id: this.user.id,
-                image_url: imageData,
-                title: 'Мой рисунок',
-                is_published: false
-            });
+            if (this.editingArtworkId) {
+                // Обновляем существующий арт
+                await updateArtwork(this.editingArtworkId, {
+                    image_url: imageData
+                });
+                alert('Рисунок обновлён!');
+            } else {
+                // Сохраняем новый
+                await saveArtwork({
+                    user_id: this.user.id,
+                    image_url: imageData,
+                    title: 'Мой рисунок',
+                    is_published: false
+                });
+                alert('Рисунок сохранён в профиле!');
+            }
             
-            alert('Рисунок сохранён в профиле!');
+            this.closeCanvas();
+            await this.loadProfile();
+            document.querySelector('.nav-btn[data-page="profile"]')?.click();
         } catch (error) {
             console.error('Error saving artwork:', error);
             alert('Ошибка сохранения');
@@ -290,22 +338,35 @@ class ArtStarsApp {
         const imageData = this.drawingCanvas.getImage();
         
         try {
-            // Сохраняем
-            const saved = await saveArtwork({
-                user_id: this.user.id,
-                image_url: imageData,
-                title: 'Мой рисунок',
-                is_published: false
-            });
+            let artworkId = this.editingArtworkId;
             
-            if (saved && saved.length > 0) {
-                // Публикуем
-                await publishArtwork(saved[0].id);
+            if (artworkId) {
+                // Обновляем существующий
+                await updateArtwork(artworkId, {
+                    image_url: imageData,
+                    is_published: true,
+                    stars_spent: 50
+                });
+            } else {
+                // Сохраняем новый и публикуем
+                const saved = await saveArtwork({
+                    user_id: this.user.id,
+                    image_url: imageData,
+                    title: 'Мой рисунок',
+                    is_published: true,
+                    stars_spent: 50
+                });
                 
-                // Списываем звёзды
-                await updateUserBalance(this.user.id, -50);
-                
-                // Записываем покупку
+                if (saved && saved.length > 0) {
+                    artworkId = saved[0].id;
+                }
+            }
+            
+            // Списываем звёзды
+            await updateUserBalance(this.user.id, -50);
+            
+            // Записываем покупку
+            if (artworkId) {
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
                     headers: {
@@ -316,59 +377,84 @@ class ArtStarsApp {
                     },
                     body: JSON.stringify({
                         user_id: this.user.id,
-                        artwork_id: saved[0].id,
+                        artwork_id: artworkId,
                         stars_spent: 50,
                         purchase_type: 'publish'
                     })
                 });
-                
-                alert('Рисунок опубликован!');
-                await this.updateDisplay();
-                await this.updateBankDisplay();
-                
-                // Переключаем на ленту
-                document.querySelector('[data-page="feed"]')?.click();
             }
+            
+            alert('Рисунок опубликован!');
+            await this.updateDisplay();
+            await this.updateBankDisplay();
+            this.closeCanvas();
+            document.querySelector('.nav-btn[data-page="feed"]')?.click();
         } catch (error) {
             console.error('Error publishing artwork:', error);
             alert('Ошибка публикации');
         }
     }
 
-    async loadProfile() {
-        if (!this.user) return;
+    async deleteCurrentArtwork() {
+        if (!this.editingArtworkId) return;
         
+        if (confirm('Удалить этот рисунок? Это действие нельзя отменить.')) {
+            await deleteArtwork(this.editingArtworkId);
+            this.closeCanvas();
+            await this.loadProfile();
+            document.querySelector('.nav-btn[data-page="profile"]')?.click();
+        }
+    }
+
+    async loadProfile() {
         const container = document.getElementById('pageContainer');
         if (!container) return;
         
-        const profile = await getUserProfile(this.user.id);
-        const artworks = await getUserArtworks(this.user.id);
-        const todayViews = await getTodayViews(this.user.id);
+        const userId = this.viewedUser || this.user.id;
+        const isOwnProfile = userId === this.user.id;
+        
+        const profile = await getUserProfile(userId);
+        const artworks = await getUserArtworks(userId);
+        const todayViews = await getTodayViews(userId);
         const lastWinner = await getLastWinner();
         
         container.innerHTML = `
             <div class="profile-screen">
                 <div class="profile-header">
-                    <img src="${this.user.user_metadata?.avatar_url || 'icon.svg'}" class="profile-avatar" alt="Avatar">
+                    <img src="${profile?.avatar_url || 'icon.svg'}" class="profile-avatar" alt="Avatar" 
+                         ${isOwnProfile ? 'onclick="window.changeAvatar()" style="cursor:pointer;"' : ''}>
+                    ${isOwnProfile ? `
+                        <div style="margin-top:10px;">
+                            <button class="neon-btn" onclick="window.changeAvatar()" style="font-size:12px; padding:5px 15px;">📷 Сменить аватар</button>
+                            <button class="neon-btn" onclick="window.changeUsername()" style="font-size:12px; padding:5px 15px;">✏️ Сменить имя</button>
+                        </div>
+                    ` : ''}
                     <h2>${profile?.username || 'Пользователь'}</h2>
                     <p>⭐ ${profile?.stars_balance || 0} звёзд</p>
                 </div>
                 
-                <div class="star-claim-section">
-                    <h3>🎁 Получить звезду</h3>
-                    <div class="claim-progress">
-                        ${Array.from({length: 5}, (_, i) => `
-                            <div class="progress-cell ${i < (todayViews % 5) ? 'filled' : ''}"></div>
-                        `).join('')}
+                ${isOwnProfile ? `
+                    <div class="star-claim-section">
+                        <h3>🎁 Ежедневная звезда</h3>
+                        <button class="neon-btn" onclick="window.claimDaily()" style="margin:10px 0;">🎁 Получить 1 звезду (раз в сутки)</button>
+                        
+                        <h3>👁 Звезда за просмотры</h3>
+                        <div class="claim-progress">
+                            ${Array.from({length: 5}, (_, i) => `
+                                <div class="progress-cell ${i < (todayViews % 5) ? 'filled' : ''}"></div>
+                            `).join('')}
+                        </div>
+                        <p>Просмотрено сегодня: ${todayViews}/5 видео</p>
+                        ${this.viewTimerSeconds > 0 ? `
+                            <p class="view-timer">⏰ Таймер: ${Math.floor(this.viewTimerSeconds / 60)}:${(this.viewTimerSeconds % 60).toString().padStart(2, '0')}</p>
+                        ` : ''}
+                        <button class="neon-btn" onclick="window.claimViewStar()" style="margin:10px 0;" ${todayViews >= 5 ? '' : 'disabled'}>
+                            ⭐ Получить звезду за просмотры
+                        </button>
                     </div>
-                    <p>Просмотрено сегодня: ${todayViews}/5 видео</p>
-                    ${this.viewTimerSeconds > 0 ? `
-                        <p class="view-timer">⏰ Следующий просмотр через: ${Math.floor(this.viewTimerSeconds / 60)}:${(this.viewTimerSeconds % 60).toString().padStart(2, '0')}</p>
-                    ` : ''}
-                    <button class="neon-btn" onclick="window.claimStar()">🎁 Получить звезду</button>
-                </div>
+                ` : ''}
                 
-                ${lastWinner ? `
+                ${lastWinner && isOwnProfile ? `
                     <div class="star-claim-section" style="border-color: var(--neon-yellow); box-shadow: 0 0 20px var(--neon-yellow);">
                         <h3>🏆 Последний победитель</h3>
                         <p>${lastWinner.users?.username} — ${lastWinner.total_bank} звёзд!</p>
@@ -376,16 +462,17 @@ class ArtStarsApp {
                     </div>
                 ` : ''}
                 
-                <h3>Мои работы (${artworks.length})</h3>
+                <h3>Работы (${artworks.length})</h3>
                 <div class="my-artworks">
                     ${artworks.map(art => `
-                        <div class="artwork-item">
+                        <div class="artwork-item" onclick="window.editArtwork('${art.id}')">
                             <img src="${art.image_url}" alt="${art.title}">
+                            ${art.is_published ? '<div style="position:absolute;top:5px;right:5px;background:var(--neon-purple);padding:2px 8px;border-radius:10px;font-size:10px;">Опубл.</div>' : ''}
                             <div class="artwork-actions">
-                                ${!art.is_published && !art.is_auction_cancelled ? `
-                                    <button class="mini-btn" onclick="window.cancelArtwork('${art.id}')">Отменить</button>
+                                ${!art.is_published ? `
+                                    <button class="mini-btn" onclick="event.stopPropagation(); window.publishExistingArtwork('${art.id}')">🚀 Опубликовать</button>
                                 ` : ''}
-                                ${art.is_auction_cancelled ? '<span style="color:red">Отменено</span>' : ''}
+                                <button class="mini-btn" style="border-color:red; color:red;" onclick="event.stopPropagation(); window.deleteUserArtwork('${art.id}')">🗑️</button>
                             </div>
                         </div>
                     `).join('')}
@@ -393,10 +480,27 @@ class ArtStarsApp {
             </div>
         `;
         
-        window.claimStar = async () => {
+        // Функции для профиля
+        window.changeAvatar = async () => {
+            const url = prompt('Введите URL нового аватара:');
+            if (url) {
+                await updateUserProfile(this.user.id, { avatar_url: url });
+                await this.loadProfile();
+            }
+        };
+        
+        window.changeUsername = async () => {
+            const name = prompt('Введите новое имя:');
+            if (name) {
+                await updateUserProfile(this.user.id, { username: name });
+                await this.loadProfile();
+            }
+        };
+        
+        window.claimDaily = async () => {
             const result = await claimDailyStar(this.user.id);
             if (result) {
-                alert('Звезда получена!');
+                alert('Ежедневная звезда получена!');
                 await this.updateDisplay();
                 await this.loadProfile();
             } else {
@@ -404,52 +508,66 @@ class ArtStarsApp {
             }
         };
         
-        window.cancelArtwork = async (artworkId) => {
-            if (confirm('Отменить участие в аукционе? Звёзды не возвращаются.')) {
-                await cancelAuction(artworkId);
+        window.claimViewStar = async () => {
+            const result = await claimViewStar(this.user.id);
+            alert(result.message);
+            if (result.success) {
+                await this.updateDisplay();
                 await this.loadProfile();
             }
         };
-    }
-
-    async updateViewProgress() {
-        if (!this.user) return;
         
-        const todayViews = await getTodayViews(this.user.id);
+        window.editArtwork = async (artworkId) => {
+            const artwork = await import('./supabase.js').then(m => m.getArtwork(artworkId));
+            if (artwork) {
+                this.openCanvas(artwork.image_url, artworkId);
+                document.querySelector('.nav-btn[data-page="draw"]')?.click();
+            }
+        };
         
-        // Запускаем таймер после просмотра
-        if (todayViews < 5) {
-            this.startViewTimer();
-        }
-        
-        if (this.currentPage === 'profile') {
+        window.publishExistingArtwork = async (artworkId) => {
+            const profile = await getUserProfile(this.user.id);
+            if (profile.stars_balance < 50) {
+                alert('Недостаточно звёзд! Нужно 50 звёзд.');
+                return;
+            }
+            
+            await publishArtwork(artworkId);
+            await updateUserBalance(this.user.id, -50);
+            
+            await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=representation'
+                },
+                body: JSON.stringify({
+                    user_id: this.user.id,
+                    artwork_id: artworkId,
+                    stars_spent: 50,
+                    purchase_type: 'publish'
+                })
+            });
+            
+            await this.updateDisplay();
+            await this.updateBankDisplay();
             await this.loadProfile();
-        }
-    }
-
-    startViewTimer() {
-        if (this.viewTimer) return;
+        };
         
-        this.viewTimerSeconds = 120;
-        this.viewTimer = setInterval(() => {
-            this.viewTimerSeconds--;
-            
-            if (this.viewTimerSeconds <= 0) {
-                clearInterval(this.viewTimer);
-                this.viewTimer = null;
-                
-                if (this.currentPage === 'profile') {
-                    this.loadProfile();
-                }
+        window.deleteUserArtwork = async (artworkId) => {
+            if (confirm('Удалить этот рисунок?')) {
+                await deleteArtwork(artworkId);
+                await this.loadProfile();
             }
-            
-            // Обновляем отображение в профиле
-            if (this.currentPage === 'profile') {
-                this.loadProfile();
-            }
-        }, 1000);
+        };
     }
 }
 
 // Запускаем приложение
 window.app = new ArtStarsApp();
+
+// Экспортируем SUPABASE_URL для использования в app.js
+import { SUPABASE_URL } from './supabase.js';
+window.SUPABASE_URL = SUPABASE_URL;
