@@ -8,6 +8,10 @@ import {
 
 import { DrawingCanvas } from './canvas.js';
 
+// Константы для использования внутри app.js
+const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
+
 class ArtStarsApp {
     constructor() {
         this.user = null;
@@ -355,10 +359,6 @@ class ArtStarsApp {
             
             await updateUserBalance(this.user.id, -50);
             
-            // Записываем покупку
-            const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
-            
             if (artworkId) {
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
@@ -524,9 +524,6 @@ class ArtStarsApp {
                 alert('Недостаточно звёзд! Нужно 50 звёзд.');
                 return;
             }
-            
-            const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
             
             await publishArtwork(artworkId);
             await updateUserBalance(this.user.id, -50);
