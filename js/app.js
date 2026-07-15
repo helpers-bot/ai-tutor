@@ -33,7 +33,6 @@ if (window.location.hash.includes('access_token')) {
     }
 }
 
-// ====== АВТОРИЗАЦИЯ ======
 function showAuth() {
     appEl.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:20px;text-align:center;background:#000">
         <div style="font-size:60px;margin-bottom:20px">🎬</div>
@@ -44,7 +43,6 @@ function showAuth() {
     document.getElementById('googleBtn').onclick = () => supabase.signInWithGoogle();
 }
 
-// ====== НАВИГАЦИЯ ======
 function renderNav(active) {
     const items = [
         { id: 'feed', icon: '🏠', label: 'Главная' },
@@ -68,7 +66,6 @@ function attachNav() {
     });
 }
 
-// ====== ЛЕНТА ======
 async function showFeed() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
@@ -97,7 +94,6 @@ async function renderCurrentVideo(user) {
     appEl.innerHTML = `<div class="video-container" id="videoContainer">
         <div class="video-wrapper">
             ${canAccess ? renderMediaFull(item) : renderBlurredMedia(item)}
-            ${canAccess && item.media_type === 'video' ? `<button class="unmute-btn" id="unmuteBtn" title="Включить звук">🔇</button>` : ''}
             <div class="video-overlay">
                 <div class="video-info">
                     <div class="user-row" id="profileLink" data-uid="${item.user_id}" style="cursor:pointer">
@@ -135,22 +131,6 @@ async function renderCurrentVideo(user) {
         ${renderNav('feed')}
     </div>`;
 
-    // Звук
-    const video = document.querySelector('.video-wrapper video');
-    const unmuteBtn = document.getElementById('unmuteBtn');
-    if (video && unmuteBtn) {
-        video.muted = true;
-        unmuteBtn.onclick = () => {
-            if (video.muted) {
-                video.muted = false;
-                unmuteBtn.textContent = '🔊';
-            } else {
-                video.muted = true;
-                unmuteBtn.textContent = '🔇';
-            }
-        };
-    }
-
     // Свайпы
     const container = document.getElementById('videoContainer');
     container.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
@@ -186,8 +166,7 @@ function attachActions(user, item) {
         btn.onclick = async () => {
             const id = btn.dataset.id;
             await supabase.toggleLike(id, user.id);
-            if (likedSet.has(id)) { likedSet.delete(id); }
-            else { likedSet.add(id); }
+            if (likedSet.has(id)) { likedSet.delete(id); } else { likedSet.add(id); }
             const count = await supabase.getLikesCount(id);
             btn.querySelector('span').textContent = count;
             const liked = likedSet.has(id);
@@ -217,7 +196,6 @@ function attachActions(user, item) {
     }
 }
 
-// ====== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ======
 async function showUserProfile(uid) {
     viewingUserId = uid;
     const profile = await supabase.getUserById(uid);
@@ -252,7 +230,6 @@ async function showUserProfile(uid) {
     attachNav();
 }
 
-// ====== ЗАГРУЗКА ======
 function showUpload() {
     appEl.innerHTML = `<div class="page-container"><div class="upload-container">
         <h2>📤 Новое видео</h2>
@@ -311,7 +288,6 @@ function previewFile(file) {
     reader.readAsDataURL(file);
 }
 
-// ====== ПРОФИЛЬ ======
 async function showProfile() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
@@ -374,7 +350,6 @@ async function showProfile() {
     attachNav();
 }
 
-// ====== КОММЕНТАРИИ ======
 async function showComments(cid) {
     const user = supabase.getUser();
     const comments = await supabase.getComments(cid);
@@ -394,7 +369,6 @@ async function showComments(cid) {
     };
 }
 
-// ====== ЗВЁЗДЫ ======
 function showBuyStars() {
     const pkgs = [{s:50,p:49},{s:150,p:129},{s:500,p:399},{s:1200,p:899}];
     let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>⭐ Купить звёзды</h3><button class="close-btn" id="closeMod">✕</button></div><div class="shop-grid">`;
@@ -410,6 +384,5 @@ function showBuyStars() {
     });
 }
 
-// Старт
 if (supabase.isAuth()) showFeed();
 else showAuth();
