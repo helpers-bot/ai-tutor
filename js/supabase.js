@@ -37,6 +37,17 @@ export const supabase = {
     async getUserById(uid) { const d = await request(`users?id=eq.${uid}&select=*`); return d[0] || null; },
     async getAllUsers() { return request('users?select=*&order=created_at.desc'); },
     async getUserContent(uid) { return request(`content?user_id=eq.${uid}&order=created_at.desc`); },
+    async getModerationStatus(cid) {
+        const d = await request(`content_moderation?content_id=eq.${cid}&select=status`);
+        return d[0]?.status || 'approved';
+    },
+    async getViewsCount(cid) {
+        const d = await request(`views?content_id=eq.${cid}&select=count`);
+        return d[0]?.count || 0;
+    },
+    async addView(uid, cid) {
+        await request('views', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) });
+    },
     signOut() { localStorage.clear(); },
     getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } },
     isAuth() { return !!localStorage.getItem('token'); },
@@ -69,10 +80,7 @@ export const supabase = {
     async getModerationHistory() { return request('content_moderation?order=created_at.desc&limit=50'); },
     
     async approveContent(id) {
-        const item = await request(`content_moderation?id=eq.${id}&select=*`);
-        if (item[0]) {
-            await request(`content_moderation?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) });
-        }
+        await request(`content_moderation?id=eq.${id}`, { method: 'PATCH', body: JSON.stringify({ status: 'approved' }) });
     },
     
     async rejectContent(id) {
