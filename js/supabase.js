@@ -270,3 +270,42 @@ export {
     getLastWinner,
     determineWinner
 };
+
+// Добавьте в конец файла перед export:
+
+// Admin functions
+async function isAdmin(userId) {
+    const data = await request(`admins?user_id=eq.${userId}&select=*`);
+    return data.length > 0;
+}
+
+async function getAllUsers() {
+    return request('users?select=*&order=created_at.desc');
+}
+
+// И добавьте isAdmin и getAllUsers в export в конце файла:
+export {
+    signInWithGoogle,
+    checkAuth,
+    getUser,
+    getFeed,
+    getArtwork,
+    getCurrentBank,
+    getUserProfile,
+    updateUserProfile,
+    updateUserBalance,
+    saveArtwork,
+    updateArtwork,
+    deleteArtwork,
+    publishArtwork,
+    getUserArtworks,
+    likeArtwork,
+    recordView,
+    getTodayViews,
+    claimDailyStar,
+    claimViewStar,
+    getLastWinner,
+    determineWinner,
+    isAdmin,      // ← добавить
+    getAllUsers   // ← добавить
+};
