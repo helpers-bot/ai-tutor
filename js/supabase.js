@@ -217,12 +217,10 @@ async function claimViewStar(userId) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Проверяем количество просмотров сегодня
     const views = await getTodayViews(userId);
     
     if (views < 5) return { success: false, message: `Нужно 5 просмотров, сейчас ${views}` };
     
-    // Проверяем, не получал ли уже звезду за просмотры сегодня
     const existing = await request(`star_claims?user_id=eq.${userId}&claim_type=eq.views&claimed_at=gte.${today.toISOString()}`);
     
     if (existing.length > 0) return { success: false, message: 'Уже получена звезда за просмотры сегодня' };
@@ -243,36 +241,6 @@ async function getLastWinner() {
     return data[0] || null;
 }
 
-async function determineWinner() {
-    return request('rpc/determine_weekly_winner');
-}
-
-export {
-    signInWithGoogle,
-    checkAuth,
-    getUser,
-    getFeed,
-    getArtwork,
-    getCurrentBank,
-    getUserProfile,
-    updateUserProfile,
-    updateUserBalance,
-    saveArtwork,
-    updateArtwork,
-    deleteArtwork,
-    publishArtwork,
-    getUserArtworks,
-    likeArtwork,
-    recordView,
-    getTodayViews,
-    claimDailyStar,
-    claimViewStar,
-    getLastWinner,
-    determineWinner
-};
-
-// Добавьте в конец файла перед export:
-
 // Admin functions
 async function isAdmin(userId) {
     const data = await request(`admins?user_id=eq.${userId}&select=*`);
@@ -283,7 +251,7 @@ async function getAllUsers() {
     return request('users?select=*&order=created_at.desc');
 }
 
-// И добавьте isAdmin и getAllUsers в export в конце файла:
+// Экспорт всех функций
 export {
     signInWithGoogle,
     checkAuth,
@@ -305,7 +273,6 @@ export {
     claimDailyStar,
     claimViewStar,
     getLastWinner,
-    determineWinner,
-    isAdmin,      // ← добавить
-    getAllUsers   // ← добавить
+    isAdmin,
+    getAllUsers
 };
