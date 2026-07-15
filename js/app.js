@@ -1,4 +1,4 @@
-import { supabase } from '/js/supabase.js';
+<script type="module" src="js/supabase.js"></script>
 import { uploadToCloudinary, getVideoDuration } from './cloudinary.js';
 import { CONFIG } from './config.js';
 
