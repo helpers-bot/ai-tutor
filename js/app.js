@@ -3,12 +3,11 @@ import {
     getUserProfile, updateUserProfile, updateUserBalance, saveArtwork,
     updateArtwork, deleteArtwork, publishArtwork, getUserArtworks,
     likeArtwork, recordView, getTodayViews, claimDailyStar,
-    claimViewStar, getLastWinner
+    claimViewStar, getLastWinner, isAdmin, getAllUsers
 } from './supabase.js';
 
 import { DrawingCanvas } from './canvas.js';
 
-// Константы для использования внутри app.js
 const SUPABASE_URL = 'https://aywfviexlltujeoaqeaq.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
 
@@ -53,6 +52,8 @@ class ArtStarsApp {
     }
 
     async loadMainApp() {
+        const adminCheck = await isAdmin(this.user.id);
+        
         document.getElementById('app').innerHTML = `
             <div class="main-screen">
                 <div class="header">
@@ -82,6 +83,12 @@ class ArtStarsApp {
                         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                         Профиль
                     </button>
+                    ${adminCheck ? `
+                        <button class="nav-btn" data-page="admin">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                            Админ
+                        </button>
+                    ` : ''}
                 </div>
             </div>
             
@@ -110,6 +117,8 @@ class ArtStarsApp {
                     <button class="neon-btn danger" id="deleteArtworkBtn" style="display:none;" onclick="window.deleteCurrentArtwork()">❌ Удалить</button>
                 </div>
             </div>
+            
+            <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="window.handleAvatarUpload(event)">
         `;
         
         await this.initApp();
@@ -129,6 +138,7 @@ class ArtStarsApp {
         window.deleteCurrentArtwork = () => this.deleteCurrentArtwork();
         window.undoCanvas = () => this.drawingCanvas?.undo();
         window.clearCanvas = () => this.drawingCanvas?.clear();
+        window.handleAvatarUpload = (e) => this.handleAvatarUpload(e);
     }
 
     setupNavigation() {
@@ -150,9 +160,56 @@ class ArtStarsApp {
                     await this.loadFeed();
                 } else if (this.currentPage === 'profile') {
                     await this.loadProfile();
+                } else if (this.currentPage === 'admin') {
+                    await this.loadAdminPanel();
                 }
             });
         });
+    }
+
+    async handleAvatarUpload(event) {
+        const file = event.target.files[0];
+        if (!file || !this.user) return;
+        
+        // Проверяем размер файла (макс 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой! Максимальный размер 5MB.');
+            return;
+        }
+        
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${this.user.id}-${Date.now()}.${fileExt}`;
+            
+            // Загружаем в Supabase Storage
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch(`${SUPABASE_URL}/storage/v1/object/avatars/${fileName}`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                },
+                body: file
+            });
+            
+            if (response.ok) {
+                const avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/avatars/${fileName}`;
+                
+                // Обновляем профиль
+                await updateUserProfile(this.user.id, { avatar_url: avatarUrl });
+                
+                // Обновляем отображение
+                await this.loadProfile();
+                alert('Аватар обновлен!');
+            } else {
+                throw new Error('Ошибка загрузки');
+            }
+        } catch (error) {
+            console.error('Error uploading avatar:', error);
+            alert('Ошибка загрузки аватара');
+        }
     }
 
     openCanvas(existingImage = null, artworkId = null) {
@@ -415,10 +472,10 @@ class ArtStarsApp {
             <div class="profile-screen">
                 <div class="profile-header">
                     <img src="${profile?.avatar_url || 'icon.svg'}" class="profile-avatar" alt="Avatar" 
-                         ${isOwnProfile ? 'onclick="window.changeAvatar()" style="cursor:pointer;"' : ''}>
+                         ${isOwnProfile ? 'onclick="document.getElementById(\'avatarInput\').click()" style="cursor:pointer;"' : ''}>
                     ${isOwnProfile ? `
                         <div style="margin-top:10px;">
-                            <button class="neon-btn" onclick="window.changeAvatar()" style="font-size:12px; padding:5px 15px;">📷 Сменить аватар</button>
+                            <button class="neon-btn" onclick="document.getElementById('avatarInput').click()" style="font-size:12px; padding:5px 15px;">📷 Загрузить аватар</button>
                             <button class="neon-btn" onclick="window.changeUsername()" style="font-size:12px; padding:5px 15px;">✏️ Сменить имя</button>
                         </div>
                     ` : ''}
@@ -438,9 +495,6 @@ class ArtStarsApp {
                             `).join('')}
                         </div>
                         <p>Просмотрено сегодня: ${todayViews}/5 видео</p>
-                        ${this.viewTimerSeconds > 0 ? `
-                            <p class="view-timer">⏰ Таймер: ${Math.floor(this.viewTimerSeconds / 60)}:${(this.viewTimerSeconds % 60).toString().padStart(2, '0')}</p>
-                        ` : ''}
                         <button class="neon-btn" onclick="window.claimViewStar()" style="margin:10px 0;" ${todayViews >= 5 ? '' : 'disabled'}>
                             ⭐ Получить звезду за просмотры
                         </button>
@@ -472,14 +526,6 @@ class ArtStarsApp {
                 </div>
             </div>
         `;
-        
-        window.changeAvatar = async () => {
-            const url = prompt('Введите URL нового аватара:');
-            if (url) {
-                await updateUserProfile(this.user.id, { avatar_url: url });
-                await this.loadProfile();
-            }
-        };
         
         window.changeUsername = async () => {
             const name = prompt('Введите новое имя:');
@@ -555,6 +601,93 @@ class ArtStarsApp {
                 await this.loadProfile();
             }
         };
+    }
+
+    async loadAdminPanel() {
+        const container = document.getElementById('pageContainer');
+        if (!container) return;
+        
+        container.innerHTML = '<div style="text-align:center; padding: 40px;">Загрузка админ-панели...</div>';
+        
+        try {
+            const users = await getAllUsers();
+            
+            container.innerHTML = `
+                <div class="admin-panel" style="padding:20px;">
+                    <h2 style="text-align:center; margin-bottom:20px;">👑 Админ-панель</h2>
+                    <div style="background: var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:20px;">
+                        <h3>📊 Статистика</h3>
+                        <p>Всего пользователей: ${users.length}</p>
+                    </div>
+                    
+                    <div style="max-height:70vh; overflow-y:auto;">
+                        ${users.map(u => `
+                            <div style="background: var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1);">
+                                <div style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                                    <img src="${u.avatar_url || 'icon.svg'}" style="width:50px;height:50px;border-radius:50%;border:2px solid var(--neon-purple);">
+                                    <div style="flex:1;">
+                                        <strong>${u.username || 'Без имени'}</strong>
+                                        <p style="font-size:12px; color:var(--text-secondary);">ID: ${u.id}</p>
+                                        <p style="color:var(--neon-yellow);">⭐ ${u.stars_balance} звёзд</p>
+                                    </div>
+                                </div>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                                    <button class="mini-btn" onclick="window.editUserField('${u.id}', 'username', 'Имя')">✏️ Имя</button>
+                                    <button class="mini-btn" onclick="window.editUserField('${u.id}', 'avatar_url', 'URL аватара')">📷 Аватар</button>
+                                    <button class="mini-btn" onclick="window.editUserStars('${u.id}', ${u.stars_balance})">⭐ Звёзды</button>
+                                    <button class="mini-btn" style="border-color:red; color:red;" onclick="window.deleteUser('${u.id}', '${u.username}')">🗑️ Удалить</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            window.editUserField = async (userId, field, label) => {
+                const value = prompt(`Введите новое значение для ${label}:`);
+                if (value !== null) {
+                    await updateUserProfile(userId, { [field]: value });
+                    await this.loadAdminPanel();
+                }
+            };
+            
+            window.editUserStars = async (userId, currentStars) => {
+                const action = prompt('Введите "+50" чтобы начислить, "-50" чтобы снять, или число для установки:');
+                if (action !== null) {
+                    let newBalance = currentStars;
+                    
+                    if (action.startsWith('+')) {
+                        newBalance = currentStars + parseInt(action.substring(1));
+                    } else if (action.startsWith('-')) {
+                        newBalance = currentStars - parseInt(action.substring(1));
+                    } else {
+                        newBalance = parseInt(action);
+                    }
+                    
+                    if (!isNaN(newBalance)) {
+                        await updateUserProfile(userId, { stars_balance: newBalance });
+                        await this.loadAdminPanel();
+                    }
+                }
+            };
+            
+            window.deleteUser = async (userId, username) => {
+                if (confirm(`Удалить пользователя ${username}? Это действие нельзя отменить!`)) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    });
+                    await this.loadAdminPanel();
+                }
+            };
+            
+        } catch (error) {
+            console.error('Error loading admin panel:', error);
+            container.innerHTML = '<div style="text-align:center; padding: 40px;">Ошибка загрузки админ-панели</div>';
+        }
     }
 }
 
