@@ -1,14 +1,42 @@
 import { supabase } from './supabase.js';
-import { CONFIG } from './config.js';
+
+const ADMIN_PASSWORD = '135710Aa!';
 
 export async function showAdmin() {
-    const user = supabase.getUser();
-    if (!user || !user.id) { window.location.href = '/'; return; }
-    const isAdmin = await supabase.isAdmin(user.id);
-    if (!isAdmin) { window.location.href = '/'; return; }
-
     const appEl = document.getElementById('app');
-    renderAdminPanel();
+    
+    // Проверяем авторизацию админа в сессии
+    if (sessionStorage.getItem('admin_auth') === 'true') {
+        renderAdminPanel();
+        return;
+    }
+
+    // Форма входа в админку
+    appEl.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:20px;text-align:center;background:#000">
+            <div style="font-size:60px;margin-bottom:20px">🔐</div>
+            <h1 style="color:#ff0050;margin-bottom:30px">Админ-панель VDS</h1>
+            <input type="password" id="adminPass" placeholder="Введите пароль" style="width:100%;max-width:300px;padding:14px;background:#111;border:1px solid #333;border-radius:10px;color:#fff;font-size:16px;text-align:center;margin-bottom:20px">
+            <button id="adminLoginBtn" style="width:100%;max-width:300px;padding:14px;background:#ff0050;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:16px;font-weight:bold">Войти</button>
+            <p id="adminError" style="color:#f44;margin-top:15px;display:none">Неверный пароль</p>
+            <a href="/" style="color:#888;margin-top:30px;text-decoration:none">← На сайт</a>
+        </div>`;
+
+    document.getElementById('adminLoginBtn').onclick = () => {
+        const pass = document.getElementById('adminPass').value;
+        if (pass === ADMIN_PASSWORD) {
+            sessionStorage.setItem('admin_auth', 'true');
+            renderAdminPanel();
+        } else {
+            document.getElementById('adminError').style.display = 'block';
+        }
+    };
+
+    document.getElementById('adminPass').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            document.getElementById('adminLoginBtn').click();
+        }
+    });
 }
 
 async function renderAdminPanel(tab = 'moderation') {
@@ -17,33 +45,41 @@ async function renderAdminPanel(tab = 'moderation') {
     const history = await supabase.getModerationHistory();
 
     let html = `<div style="max-width:900px;margin:0 auto;padding:20px;color:#fff">
-        <h1 style="color:#ff0050">⚙️ Админ-панель</h1>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+            <h1 style="color:#ff0050">⚙️ Админ-панель</h1>
+            <div>
+                <a href="/" class="btn btn-secondary" style="text-decoration:none;margin-right:10px">🏠 На сайт</a>
+                <button class="btn btn-secondary" onclick="sessionStorage.removeItem('admin_auth');location.reload()">🚪 Выйти</button>
+            </div>
+        </div>
         <div style="display:flex;gap:10px;margin:20px 0;flex-wrap:wrap">
             <button class="btn ${tab==='moderation'?'btn-primary':'btn-secondary'}" onclick="window._adminTab('moderation')">📋 Модерация (${pending.length})</button>
             <button class="btn ${tab==='users'?'btn-primary':'btn-secondary'}" onclick="window._adminTab('users')">👥 Пользователи (${users.length})</button>
             <button class="btn ${tab==='history'?'btn-primary':'btn-secondary'}" onclick="window._adminTab('history')">📜 История</button>
-            <a href="/" class="btn btn-secondary">🏠 На сайт</a>
         </div>`;
 
     if (tab === 'moderation') {
-        if (pending.length === 0) html += '<p style="color:#888;text-align:center;padding:40px">Нет контента на проверку</p>';
-        else pending.forEach(item => {
-            html += `<div style="background:#111;border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid #222">
-                <div style="display:flex;gap:15px;align-items:start">
-                    <div style="width:120px;height:180px;background:#000;border-radius:10px;overflow:hidden;flex-shrink:0">
-                        ${item.media_type==='video'?`<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>`:`<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
-                    </div>
-                    <div style="flex:1">
-                        <p><b>@${item.username||'user'}</b> ${item.is_premium?`<span style="color:gold">⭐ ${item.price_stars} звёзд</span>`:'Бесплатный'}</p>
-                        <p style="color:#ccc;font-size:14px">${item.description||'Без описания'}</p>
-                        <div style="display:flex;gap:10px;margin-top:10px">
-                            <button class="btn btn-primary" onclick="window._approve('${item.id}')">✅ Одобрить</button>
-                            <button class="btn btn-secondary" onclick="window._reject('${item.id}')">❌ Отклонить</button>
+        if (pending.length === 0) {
+            html += '<p style="color:#888;text-align:center;padding:40px">Нет контента на проверку</p>';
+        } else {
+            pending.forEach(item => {
+                html += `<div style="background:#111;border-radius:15px;padding:15px;margin-bottom:15px;border:1px solid #222">
+                    <div style="display:flex;gap:15px;align-items:start;flex-wrap:wrap">
+                        <div style="width:120px;height:180px;background:#000;border-radius:10px;overflow:hidden;flex-shrink:0">
+                            ${item.media_type==='video'?`<video src="${item.media_url}" controls style="width:100%;height:100%;object-fit:cover"></video>`:`<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
+                        </div>
+                        <div style="flex:1;min-width:200px">
+                            <p><b>@${item.username||'user'}</b> ${item.is_premium?`<span style="color:gold">⭐ ${item.price_stars} звёзд</span>`:'Бесплатный'}</p>
+                            <p style="color:#ccc;font-size:14px">${item.description||'Без описания'}</p>
+                            <div style="display:flex;gap:10px;margin-top:10px">
+                                <button class="btn btn-primary" onclick="window._approve('${item.id}')">✅ Одобрить</button>
+                                <button class="btn btn-secondary" onclick="window._reject('${item.id}')">❌ Отклонить</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>`;
-        });
+                </div>`;
+            });
+        }
     } else if (tab === 'users') {
         html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse"><tr style="border-bottom:1px solid #333"><th style="padding:10px;text-align:left">Пользователь</th><th style="padding:10px">Баланс</th><th style="padding:10px">Дата</th><th style="padding:10px">Действия</th></tr>';
         users.forEach(u => {
@@ -52,21 +88,24 @@ async function renderAdminPanel(tab = 'moderation') {
                 <td style="padding:10px;text-align:center">⭐ ${u.stars_balance||0}</td>
                 <td style="padding:10px;text-align:center;font-size:12px;color:#888">${new Date(u.created_at).toLocaleDateString()}</td>
                 <td style="padding:10px;text-align:center">
-                    <button class="btn btn-secondary" style="margin:2px;font-size:12px" onclick="window._editStars('${u.id}',${u.stars_balance})">⭐</button>
+                    <button class="btn btn-secondary" style="margin:2px;font-size:12px" onclick="window._editStars('${u.id}',${u.stars_balance||0})">⭐</button>
                     <button class="btn btn-secondary" style="margin:2px;font-size:12px" onclick="window._editUser('${u.id}','${u.username||''}')">✏️</button>
                 </td>
             </tr>`;
         });
         html += '</table></div>';
     } else if (tab === 'history') {
-        if (history.length === 0) html += '<p style="color:#888;text-align:center;padding:40px">История пуста</p>';
-        else history.forEach(item => {
-            html += `<div style="background:#111;border-radius:10px;padding:10px;margin-bottom:10px;border-left:3px solid ${item.status==='approved'?'#0f0':item.status==='rejected'?'#f00':'#888'}">
-                <b>@${item.username||'user'}</b> — ${item.status==='approved'?'✅ Одобрен':item.status==='rejected'?'❌ Отклонён':'⏳ Ожидает'}
-                <span style="color:#888;font-size:12px;float:right">${new Date(item.created_at).toLocaleString()}</span>
-                <p style="font-size:12px;color:#888;margin-top:5px">${item.description?.substring(0,50)||'Без описания'}</p>
-            </div>`;
-        });
+        if (history.length === 0) {
+            html += '<p style="color:#888;text-align:center;padding:40px">История пуста</p>';
+        } else {
+            history.forEach(item => {
+                html += `<div style="background:#111;border-radius:10px;padding:10px;margin-bottom:10px;border-left:3px solid ${item.status==='approved'?'#0f0':item.status==='rejected'?'#f00':'#888'}">
+                    <b>@${item.username||'user'}</b> — ${item.status==='approved'?'✅ Одобрен':item.status==='rejected'?'❌ Отклонён':'⏳ Ожидает'}
+                    <span style="color:#888;font-size:12px;float:right">${new Date(item.created_at).toLocaleString()}</span>
+                    <p style="font-size:12px;color:#888;margin-top:5px">${item.description?.substring(0,50)||'Без описания'}</p>
+                </div>`;
+            });
+        }
     }
 
     html += '</div>';
@@ -90,7 +129,7 @@ window._reject = async (id) => {
 };
 
 window._editStars = async (uid, current) => {
-    const amount = prompt('Новый баланс или +/- звёзд:', current);
+    const amount = prompt('Новый баланс звёзд:', current);
     if (amount === null) return;
     const newAmount = parseInt(amount);
     if (isNaN(newAmount)) return;
