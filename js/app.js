@@ -24,8 +24,10 @@ if (window.location.hash.includes('access_token')) {
 }
 
 // Проверка админки
-if (window.location.pathname === '/admin') {
+if (window.location.pathname === '/admin' || window.location.pathname === '/admin/') {
     import('./admin.js').then(m => m.showAdmin());
+    // Не продолжаем загрузку основного приложения
+    throw new Error('ADMIN_REDIRECT');
 }
 
 function showAuth() {
