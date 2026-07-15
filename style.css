@@ -1,25 +1,534 @@
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background: #000; color: #fff; font-family: sans-serif; overflow-x: hidden; }
-
-/* Анимация VDS */
-@keyframes neonPulse { 
-    0%, 100% { text-shadow: 0 0 10px #ff0050, 0 0 20px #ff0050; } 
-    50% { text-shadow: 0 0 30px #ff0050, 0 0 40px #ff0050; } 
-}
-.neon-logo { font-size: 60px; font-weight: 900; color: #ff0050; animation: neonPulse 2s infinite; text-align: center; margin: 20px 0; }
-
-/* Анимированная кнопка */
-@keyframes borderRotate { 100% { filter: hue-rotate(360deg); } }
-.btn-neon {
-    background: linear-gradient(45deg, #ff0050, #00f2ff);
-    padding: 15px 30px; border: none; border-radius: 30px; color: #fff; font-weight: bold; cursor: pointer;
-    position: relative; animation: borderRotate 3s linear infinite;
+:root {
+    --bg-primary: #0a0a2e;
+    --bg-secondary: #1a1a4e;
+    --neon-pink: #ff2d95;
+    --neon-blue: #00d4ff;
+    --neon-purple: #b44dff;
+    --neon-green: #39ff14;
+    --neon-yellow: #ffe600;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0d0;
+    --glass-bg: rgba(26, 26, 78, 0.8);
+    --border-glow: 0 0 10px var(--neon-blue);
 }
 
-/* Анимированная лента для видео */
-.video-glow-border {
-    position: relative; padding: 2px; border-radius: 15px;
-    background: linear-gradient(45deg, #ff0050, #00f2ff);
-    animation: borderRotate 3s linear infinite;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
-.video-content { background: #000; border-radius: 13px; overflow: hidden; position: relative; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(255, 45, 149, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+#app {
+    position: relative;
+    z-index: 1;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Загрузочный экран */
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: var(--bg-primary);
+}
+
+.neon-spinner {
+    width: 60px;
+    height: 60px;
+    border: 3px solid transparent;
+    border-top-color: var(--neon-pink);
+    border-right-color: var(--neon-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 20px var(--neon-pink), 0 0 40px var(--neon-blue);
+}
+
+.loading-text {
+    margin-top: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(45deg, var(--neon-pink), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Страница входа */
+.auth-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+.auth-logo {
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    background: linear-gradient(45deg, var(--neon-pink), var(--neon-purple), var(--neon-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px var(--neon-pink);
+    animation: float 3s ease-in-out infinite;
+}
+
+.google-btn {
+    padding: 16px 40px;
+    background: var(--glass-bg);
+    border: 2px solid var(--neon-blue);
+    border-radius: 50px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+    box-shadow: var(--border-glow);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.google-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px var(--neon-blue);
+    border-color: var(--neon-pink);
+}
+
+/* Основной экран */
+.main-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.header {
+    padding: 15px 20px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.user-stars {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--neon-yellow);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.bank-display {
+    background: linear-gradient(45deg, var(--neon-purple), var(--neon-pink));
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    animation: glow 2s ease-in-out infinite;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Контейнер страниц */
+.page-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    padding-bottom: 80px;
+}
+
+/* Лента */
+.feed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+    padding: 10px;
+}
+
+.art-card {
+    position: relative;
+    border-radius: 15px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    cursor: pointer;
+    transition: transform 0.3s;
+    border: 2px solid transparent;
+    background: var(--bg-secondary);
+}
+
+.art-card:hover {
+    transform: scale(1.05);
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 20px rgba(180, 77, 255, 0.5);
+}
+
+.art-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.art-card-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.art-stats {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.like-btn {
+    background: none;
+    border: none;
+    color: var(--neon-pink);
+    cursor: pointer;
+    font-size: 20px;
+    transition: transform 0.2s;
+}
+
+.like-btn:hover {
+    transform: scale(1.3);
+}
+
+/* Canvas */
+.canvas-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-primary);
+    z-index: 100;
+    flex-direction: column;
+}
+
+.canvas-toolbar {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-secondary);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tool-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-blue);
+    background: var(--glass-bg);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.tool-btn.active {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-pink);
+}
+
+.tool-btn:hover {
+    box-shadow: 0 0 15px var(--neon-blue);
+}
+
+.color-picker {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    background: none;
+}
+
+.size-slider {
+    width: 100px;
+    accent-color: var(--neon-purple);
+}
+
+#drawCanvas {
+    flex: 1;
+    cursor: crosshair;
+    background: white;
+}
+
+.canvas-actions {
+    padding: 10px;
+    background: var(--bg-secondary);
+    display: flex;
+    gap: 10px;
+}
+
+.neon-btn {
+    padding: 12px 24px;
+    border: 2px solid var(--neon-purple);
+    border-radius: 25px;
+    background: var(--glass-bg);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+    flex: 1;
+}
+
+.neon-btn:hover {
+    box-shadow: 0 0 20px var(--neon-purple);
+    transform: translateY(-2px);
+}
+
+.neon-btn.publish {
+    border-color: var(--neon-yellow);
+    color: var(--neon-yellow);
+}
+
+.neon-btn.publish:hover {
+    box-shadow: 0 0 20px var(--neon-yellow);
+}
+
+.neon-btn.danger {
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+}
+
+/* Профиль */
+.profile-screen {
+    padding: 20px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-purple);
+    box-shadow: 0 0 30px var(--neon-purple);
+    margin-bottom: 15px;
+}
+
+.star-claim-section {
+    background: var(--glass-bg);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.claim-progress {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.progress-cell {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--bg-secondary);
+    border: 2px solid var(--neon-blue);
+    transition: all 0.3s;
+}
+
+.progress-cell.filled {
+    background: var(--neon-purple);
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 15px var(--neon-purple);
+}
+
+.view-timer {
+    text-align: center;
+    color: var(--neon-blue);
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+.my-artworks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+}
+
+.artwork-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1;
+}
+
+.artwork-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.artwork-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.9));
+    display: flex;
+    gap: 5px;
+}
+
+.mini-btn {
+    padding: 5px 10px;
+    border: 1px solid var(--neon-pink);
+    border-radius: 15px;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    cursor: pointer;
+    font-size: 12px;
+    flex: 1;
+}
+
+/* Модальное окно */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    border: 2px solid var(--neon-purple);
+    box-shadow: 0 0 40px var(--neon-purple);
+}
+
+.art-detail-image {
+    width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+/* Нижнее меню */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 50;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 10px;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+}
+
+.nav-btn.active {
+    color: var(--neon-purple);
+    text-shadow: 0 0 10px var(--neon-purple);
+}
+
+.nav-btn svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Анимации */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 10px var(--neon-pink); }
+    50% { box-shadow: 0 0 30px var(--neon-pink), 0 0 50px var(--neon-purple); }
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .feed-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
