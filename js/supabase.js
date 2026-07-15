@@ -8,8 +8,11 @@ async function request(endpoint, options = {}) {
         headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}`, 'Content-Type': 'application/json' },
         ...options
     });
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || 'Error ' + res.status);
+    }
     const text = await res.text();
-    if (!res.ok) throw new Error('Ошибка сервера');
     return text ? JSON.parse(text) : [];
 }
 
@@ -17,6 +20,7 @@ export const supabase = {
     signInWithGoogle() {
         window.location.href = `${URL}/auth/v1/authorize?provider=google&redirect_to=https://vds-game.ink`;
     },
+
     async getUserProfile() {
         const token = localStorage.getItem('token');
         if (!token) return null;
@@ -25,54 +29,100 @@ export const supabase = {
         });
         return res.json();
     },
+
     signOut() { localStorage.clear(); },
+
     getUser() {
-        try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; }
+        try { return JSON.parse(localStorage.getItem('user')); }
+        catch(e) { return null; }
     },
+
     isAuth() { return !!localStorage.getItem('token'); },
-    getFeed() { return request('content?select=*,users(username)&order=created_at.desc'); },
-    createContent(d) { return request('content', { method: 'POST', body: JSON.stringify(d) }); },
+
+    getFeed() {
+        return request('content?select=*,users(username)&order=created_at.desc');
+    },
+
+    createContent(d) {
+        return request('content', { method: 'POST', body: JSON.stringify(d) });
+    },
+
     async getLikesCount(cid) {
         const d = await request(`likes?content_id=eq.${cid}&select=count`);
         return d[0]?.count || 0;
     },
+
     async toggleLike(cid, uid) {
         const ex = await request(`likes?user_id=eq.${uid}&content_id=eq.${cid}`);
         if (ex.length) {
             await fetch(`${URL}/rest/v1/likes?user_id=eq.${uid}&content_id=eq.${cid}`, {
-                method: 'DELETE', headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
+                method: 'DELETE',
+                headers: { 'apikey': KEY, 'Authorization': `Bearer ${KEY}` }
             });
         } else {
-            await request('likes', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) });
+            await request('likes', {
+                method: 'POST',
+                body: JSON.stringify({ user_id: uid, content_id: cid })
+            });
         }
     },
+
     addComment(uid, cid, text) {
-        return request('comments', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, text }) });
+        return request('comments', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: uid, content_id: cid, text })
+        });
     },
+
     getComments(cid) {
         return request(`comments?content_id=eq.${cid}&select=*,users(username)&order=created_at.asc`);
     },
+
     repost(uid, cid) {
-        return request('reposts', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid }) });
+        return request('reposts', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: uid, content_id: cid })
+        });
     },
+
     async getUserBalance(uid) {
         const d = await request(`users?id=eq.${uid}&select=stars_balance,username`);
         return d[0] || { stars_balance: 0, username: '' };
     },
+
     async updateUsername(uid, username) {
-        return request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ username }) });
+        return request(`users?id=eq.${uid}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ username })
+        });
     },
+
     async buyContent(uid, cid, stars) {
-        await request('purchases', { method: 'POST', body: JSON.stringify({ user_id: uid, content_id: cid, stars_spent: stars }) });
+        await request('purchases', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: uid, content_id: cid, stars_spent: stars })
+        });
         const bal = await this.getUserBalance(uid);
-        await request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ stars_balance: bal.stars_balance - stars }) });
+        await request(`users?id=eq.${uid}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ stars_balance: bal.stars_balance - stars })
+        });
     },
+
     async addStars(uid, amount) {
         const bal = await this.getUserBalance(uid);
-        await request(`users?id=eq.${uid}`, { method: 'PATCH', body: JSON.stringify({ stars_balance: bal.stars_balance + amount }) });
+        await request(`users?id=eq.${uid}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ stars_balance: bal.stars_balance + amount })
+        });
     },
+
     async canAccess(cid, uid) {
-        const d = await request('rpc/can_access_content', { method: 'POST', body: JSON.stringify({ content_id: cid, user_id: uid }) });
-        return d === true || d === 'true';
+        const d = await request(`content?id=eq.${cid}&select=user_id,is_premium`);
+        const item = d[0];
+        if (!item || !item.is_premium) return true;
+        if (item.user_id === uid) return true;
+        const p = await request(`purchases?user_id=eq.${uid}&content_id=eq.${cid}&select=id`);
+        return p.length > 0;
     }
 };
