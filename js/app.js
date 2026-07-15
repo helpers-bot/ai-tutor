@@ -1,5 +1,4 @@
-const appEl = document.getElementById('app');
-let currentIndex = 0;
+// Импорты ВСЕГДА должны быть на самом верху файла
 import { uploadToCloudinary, getVideoDuration } from './cloudinary.js';
 import { CONFIG } from './config.js';
 
@@ -19,7 +18,11 @@ if (window.location.hash.includes('access_token')) {
     if (token) {
         localStorage.setItem('token', token);
         supabase.getUserProfile().then(user => {
-            if (user) { localStorage.setItem('user', JSON.stringify(user)); window.location.hash = ''; showFeed(); }
+            if (user) { 
+                localStorage.setItem('user', JSON.stringify(user)); 
+                window.location.hash = ''; 
+                showFeed(); 
+            }
         }).catch(() => showFeed());
     }
 }
