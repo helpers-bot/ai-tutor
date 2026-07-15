@@ -24,5 +24,12 @@ async function showProfile() {
             </div>
         </div>
     `).join('');
+
+    import './supabase.js';
+async function renderAdminPanel(tab = 'moderation') {
+    const pending = await window.supabase.getPendingContent(); 
+    // ... отрисовка списка из таблицы content, где status = pending
+    // При клике на "Одобрить" вызывай supabase.approveContent(id)
+}
     appEl.innerHTML = `<div style="padding:20px"><a href="/">Назад</a><h2>Мои видео</h2><div style="display:grid;grid-template-columns:1fr 1fr">${grid}</div></div>`;
 }
