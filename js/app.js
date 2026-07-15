@@ -55,20 +55,16 @@ function attachNav() {
     });
 }
 
-// ====== ЛЕНТА (свайпы, 9:16) ======
+// ====== ЛЕНТА ======
 async function showFeed() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
-
     try { feedData = await supabase.getFeed(); } catch (e) { feedData = []; }
     currentIndex = 0;
-
     if (feedData.length === 0) {
         appEl.innerHTML = `<div class="page-container"><div class="empty-state" style="padding-top:80px"><div style="font-size:60px">🎬</div><h2>Пока нет видео</h2><p>Станьте первым!</p></div>${renderNav('feed')}</div>`;
-        attachNav();
-        return;
+        attachNav(); return;
     }
-
     renderCurrentVideo(user);
     attachNav();
 }
@@ -109,7 +105,6 @@ async function renderCurrentVideo(user) {
         ${renderNav('feed')}
     </div>`;
 
-    // Свайпы
     const container = document.getElementById('videoContainer');
     container.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
     container.addEventListener('touchend', (e) => {
@@ -191,7 +186,7 @@ function showUpload() {
         const user = supabase.getUser();
         const desc = document.getElementById('description').value;
         const tags = document.getElementById('hashtags').value;
-        if (desc.length > 2000) return alert('Максимум 2000 символов в описании');
+        if (desc.length > 2000) return alert('Максимум 2000 символов');
         const tagCount = tags.split(' ').filter(t => t.startsWith('#')).length;
         if (tagCount > 5) return alert('Максимум 5 хештегов');
         if (selectedFile.type.startsWith('video/')) {
@@ -228,17 +223,37 @@ async function showProfile() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
     const profile = await supabase.getUserBalance(user.id);
+    const myContent = await supabase.getUserContent(user.id);
     const initial = (profile.username || user.email || 'U')[0].toUpperCase();
     const username = profile.username || user.email?.split('@')[0] || 'user';
 
+    let contentGrid = '';
+    if (myContent.length === 0) {
+        contentGrid = '<p style="color:#888;text-align:center;padding:20px">Нет публикаций</p>';
+    } else {
+        contentGrid = '<div class="profile-grid">';
+        myContent.forEach(item => {
+            contentGrid += `<div class="profile-grid-item" data-id="${item.id}" style="position:relative;cursor:pointer">
+                ${item.media_type === 'video' 
+                    ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` 
+                    : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
+                ${item.is_premium ? '<span style="position:absolute;top:5px;left:5px;background:gold;color:#000;padding:2px 6px;border-radius:8px;font-size:10px">⭐</span>' : ''}
+                <button class="delete-btn" data-id="${item.id}" style="position:absolute;top:5px;right:5px;background:rgba(255,0,0,0.8);color:#fff;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center">🗑</button>
+            </div>`;
+        });
+        contentGrid += '</div>';
+    }
+
     appEl.innerHTML = `<div class="page-container">
-        <div style="text-align:center;padding:40px 20px">
+        <div style="text-align:center;padding:40px 20px 20px">
             <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>
             <h2 style="margin-top:15px">@${username}</h2>
             <p style="color:#888">${user.email}</p>
             <button class="btn btn-secondary" id="editNameBtn" style="margin:10px">✏️ Сменить ник</button>
             <div style="background:#111;border-radius:15px;padding:20px;margin:20px 0;display:inline-block"><div style="font-size:14px;color:#888">Баланс</div><div style="font-size:36px;color:gold;font-weight:bold">⭐ ${profile.stars_balance}</div></div>
-            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="btn btn-gold" id="buyBtn">Купить звёзды</button><button class="btn btn-secondary" id="logoutBtn">Выйти</button></div>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:30px"><button class="btn btn-gold" id="buyBtn">Купить звёзды</button><button class="btn btn-secondary" id="logoutBtn">Выйти</button></div>
+            <h3 style="text-align:left;margin-bottom:15px">📱 Мои публикации</h3>
+            ${contentGrid}
         </div>${renderNav('profile')}</div>`;
 
     document.getElementById('editNameBtn').onclick = async () => {
@@ -248,6 +263,19 @@ async function showProfile() {
     };
     document.getElementById('buyBtn').onclick = showBuyStars;
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
+    
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.onclick = async (e) => {
+            e.stopPropagation();
+            const cid = btn.dataset.id;
+            if (confirm('Удалить публикацию?')) {
+                await supabase.deleteContent(cid);
+                alert('✅ Удалено');
+                showProfile();
+            }
+        };
+    });
+    
     attachNav();
 }
 
