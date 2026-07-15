@@ -11,73 +11,32 @@ if (window.location.hash.includes('access_token')) {
     const token = params.get('access_token');
     if (token) {
         localStorage.setItem('token', token);
-        fetch('https://aywfviexlltujeoaqeaq.supabase.co/auth/v1/user', {
-            headers: { 'apikey': 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y', 'Authorization': `Bearer ${token}` }
-        }).then(r => r.json()).then(user => {
-            localStorage.setItem('user', JSON.stringify(user));
-            window.location.hash = '';
-            showFeed();
+        supabase.getUserProfile().then(user => {
+            if (user) {
+                localStorage.setItem('user', JSON.stringify(user));
+                window.location.hash = '';
+                showFeed();
+            }
         }).catch(() => showFeed());
     }
 }
 
-let authMode = 'login';
-
-// ====== АВТОРИЗАЦИЯ ======
+// ====== ГЛАВНЫЙ ЭКРАН (только Google) ======
 function showAuth() {
     appEl.innerHTML = `
-        <div class="auth-container">
-            <h1>VDS</h1>
-            <p style="text-align:center;color:#888;margin-bottom:20px">Короткие видео · Premium контент</p>
-            <div class="auth-tabs">
-                <button class="${authMode==='login'?'active':''}" id="tabLogin">Вход</button>
-                <button class="${authMode==='register'?'active':''}" id="tabRegister">Регистрация</button>
-            </div>
-            <form class="auth-form" id="authForm">
-                <div class="form-group" id="usernameGroup" style="display:${authMode==='register'?'block':'none'}">
-                    <label>Имя пользователя</label>
-                    <input type="text" id="username" placeholder="Ваше имя">
-                </div>
-                <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="your@email.com" required></div>
-                <div class="form-group"><label>Пароль</label><input type="password" id="password" placeholder="Минимум 6 символов" minlength="6" required></div>
-                <button type="submit" class="submit-btn" id="submitBtn">${authMode==='login'?'Войти':'Зарегистрироваться'}</button>
-            </form>
-            <div style="text-align:center;margin-top:15px;color:#888">или</div>
-            <button id="googleBtn" style="width:100%;padding:12px;background:#fff;color:#000;border:none;border-radius:10px;cursor:pointer;font-weight:bold;margin-top:15px;display:flex;align-items:center;justify-content:center;gap:10px">
-                G Войти через Google
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;padding:20px;text-align:center">
+            <div style="font-size:60px;margin-bottom:20px">🎬</div>
+            <h1 style="font-size:36px;margin-bottom:10px">VDS</h1>
+            <p style="color:#888;margin-bottom:40px">Короткие видео · Premium контент</p>
+            <button id="googleBtn" style="width:100%;max-width:300px;padding:16px;background:#fff;color:#000;border:none;border-radius:15px;cursor:pointer;font-weight:bold;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px">
+                G &nbsp; Войти через Google
             </button>
-            <div id="msg"></div>
+            <p style="color:#666;margin-top:30px;font-size:12px">Нажимая, вы соглашаетесь с условиями</p>
         </div>`;
-    
-    document.getElementById('tabLogin').onclick = () => { authMode = 'login'; showAuth(); };
-    document.getElementById('tabRegister').onclick = () => { authMode = 'register'; showAuth(); };
     document.getElementById('googleBtn').onclick = () => supabase.signInWithGoogle();
-    document.getElementById('authForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value.trim();
-        const password = document.getElementById('password').value;
-        const username = document.getElementById('username')?.value?.trim();
-        const btn = document.getElementById('submitBtn');
-        const msg = document.getElementById('msg');
-        btn.disabled = true; btn.textContent = 'Подождите...'; msg.innerHTML = '';
-        try {
-            if (authMode === 'register') {
-                await supabase.signUp(email, password, username || email.split('@')[0]);
-                msg.innerHTML = '<div style="color:#4f4;padding:10px;text-align:center">✅ Готово! Войдите.</div>';
-                authMode = 'login'; setTimeout(showAuth, 1500);
-            } else {
-                await supabase.signIn(email, password);
-                showFeed();
-            }
-        } catch (err) {
-            msg.innerHTML = `<div style="color:#f44;padding:10px;text-align:center">❌ ${err.message}</div>`;
-            btn.disabled = false;
-            btn.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
-        }
-    };
 }
 
-// ====== НАВИГАЦИЯ (как в TikTok) ======
+// ====== НАВИГАЦИЯ ======
 function renderNav(active) {
     const items = [
         { id: 'feed', icon: '🏠', label: 'Главная' },
@@ -86,32 +45,38 @@ function renderNav(active) {
     ];
     let html = '<nav class="bottom-nav">';
     items.forEach(i => {
-        const isActive = active === i.id;
-        html += `<button class="nav-item" data-page="${i.id}" style="color:${isActive?'#fff':'#888'}">
+        html += `<button class="nav-item" data-page="${i.id}" style="color:${active===i.id?'#fff':'#888'}">
             <div style="font-size:22px">${i.icon}</div>
             <div style="font-size:10px;margin-top:2px">${i.label}</div>
         </button>`;
     });
-    html += '</nav>';
-    return html;
+    return html + '</nav>';
+}
+
+function attachNav() {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.onclick = () => {
+            const p = btn.dataset.page;
+            if (p === 'feed') showFeed();
+            else if (p === 'upload') showUpload();
+            else if (p === 'profile') showProfile();
+        };
+    });
 }
 
 // ====== ЛЕНТА ======
 async function showFeed() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
-    
+
     let content = [];
     try { content = await supabase.getFeed(); } catch (e) { console.error(e); }
-    
-    let html = `<div class="page-container">`;
-    
+
+    let html = '<div class="page-container">';
+
     if (content.length === 0) {
-        html += `<div class="empty-state" style="padding-top:100px">
-            <div style="font-size:60px">🎬</div>
-            <h2>Пока нет видео</h2>
-            <p>Станьте первым!</p>
-        </div>`;
+        html += `<div class="empty-state" style="padding-top:80px">
+            <div style="font-size:60px">🎬</div><h2>Пока нет видео</h2><p>Станьте первым!</p></div>`;
     } else {
         for (const item of content) {
             const canAccess = item.is_premium ? await supabase.canAccess(item.id, user.id) : true;
@@ -120,11 +85,9 @@ async function showFeed() {
             html += renderCard(item, canAccess, likes, comments.length);
         }
     }
-    
     html += renderNav('feed') + '</div>';
     appEl.innerHTML = html;
-    
-    attachNavEvents();
+    attachNav();
     attachFeedEvents(user);
 }
 
@@ -135,10 +98,8 @@ function renderCard(item, canAccess, likes, comments) {
         <div class="content-header">
             <div class="user-info">
                 <div class="user-avatar">${initial}</div>
-                <div>
-                    <div class="username">@${item.users?.username||'user'}</div>
-                    ${item.is_premium?'<span class="premium-badge">⭐ Premium</span>':''}
-                </div>
+                <div><div class="username">@${item.users?.username||'user'}</div>
+                ${item.is_premium?'<span class="premium-badge">⭐ Premium</span>':''}</div>
             </div>
         </div>
         <div class="content-body">
@@ -159,17 +120,6 @@ function renderMedia(item, blurred) {
     return `<img ${b} src="${item.media_url}" alt="Content">`;
 }
 
-function attachNavEvents() {
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.onclick = () => {
-            const p = btn.dataset.page;
-            if (p === 'feed') showFeed();
-            else if (p === 'upload') showUpload();
-            else if (p === 'profile') showProfile();
-        };
-    });
-}
-
 function attachFeedEvents(user) {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
@@ -185,7 +135,8 @@ function attachFeedEvents(user) {
         el.onclick = async () => {
             const cid = el.dataset.id, price = parseInt(el.dataset.price);
             if (!confirm(`Открыть за ${price} ⭐?`)) return;
-            if (await supabase.getUserBalance(user.id) < price) return alert('Недостаточно звёзд!');
+            const bal = await supabase.getUserBalance(user.id);
+            if (bal.stars_balance < price) return alert('Недостаточно звёзд!');
             await supabase.buyContent(user.id, cid, price);
             alert('✅ Открыто!'); showFeed();
         };
@@ -194,23 +145,21 @@ function attachFeedEvents(user) {
 
 // ====== ЗАГРУЗКА ======
 function showUpload() {
-    appEl.innerHTML = `<div class="page-container">
-        <div class="upload-container">
-            <h2>📤 Новое видео</h2>
-            <div class="upload-form">
-                <div class="file-upload-area" id="fileArea"><input type="file" id="fileInput" accept="image/*,video/*"><div class="upload-icon">📁</div><h3>Выбрать файл</h3><p style="color:#888">Фото или видео до 15с</p></div>
-                <div class="preview-container" id="preview"></div>
-                <div class="form-group"><textarea id="description" placeholder="Описание..."></textarea></div>
-                <div class="premium-settings"><label class="checkbox-group"><input type="checkbox" id="isPremium"><span>Закрытый контент (Premium)</span></label><div class="price-input" id="priceSettings"><label>Цена ⭐</label><input type="number" id="priceStars" min="1" value="10"></div></div>
-                <button class="btn btn-primary" id="doUpload" style="width:100%;padding:14px;font-size:16px">Загрузить</button>
-            </div>
-        </div>${renderNav('upload')}</div>`;
-    
+    appEl.innerHTML = `<div class="page-container"><div class="upload-container">
+        <h2>📤 Новое видео</h2>
+        <div class="upload-form">
+            <div class="file-upload-area" id="fileArea"><input type="file" id="fileInput" accept="image/*,video/*"><div class="upload-icon">📁</div><h3>Выбрать файл</h3><p style="color:#888">Фото или видео до 15с</p></div>
+            <div class="preview-container" id="preview"></div>
+            <div class="form-group"><textarea id="description" placeholder="Описание..."></textarea></div>
+            <div class="premium-settings"><label class="checkbox-group"><input type="checkbox" id="isPremium"><span>Закрытый контент (Premium)</span></label><div class="price-input" id="priceSettings"><label>Цена ⭐</label><input type="number" id="priceStars" min="1" value="10"></div></div>
+            <button class="btn btn-primary" id="doUpload" style="width:100%;padding:14px">Загрузить</button>
+        </div>
+    </div>${renderNav('upload')}</div>`;
+
     let selectedFile = null;
     document.getElementById('fileArea').onclick = () => document.getElementById('fileInput').click();
     document.getElementById('fileInput').onchange = (e) => { selectedFile = e.target.files[0]; previewFile(selectedFile); };
     document.getElementById('isPremium').onchange = (e) => document.getElementById('priceSettings').classList.toggle('active', e.target.checked);
-    
     document.getElementById('doUpload').onclick = async () => {
         if (!selectedFile) return alert('Выберите файл');
         const user = supabase.getUser();
@@ -232,8 +181,7 @@ function showUpload() {
             alert('✅ Загружено!'); showFeed();
         } catch (err) { alert('Ошибка: ' + err.message); btn.disabled = false; btn.textContent = 'Загрузить'; }
     };
-    
-    attachNavEvents();
+    attachNav();
 }
 
 function previewFile(file) {
@@ -248,28 +196,43 @@ function previewFile(file) {
 async function showProfile() {
     const user = supabase.getUser();
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
-    
-    const balance = await supabase.getUserBalance(user.id);
-    const initial = (user.email || 'U')[0].toUpperCase();
-    
+
+    const profile = await supabase.getUserBalance(user.id);
+    const initial = (profile.username || user.email || 'U')[0].toUpperCase();
+    const username = profile.username || user.email?.split('@')[0] || 'user';
+
     appEl.innerHTML = `<div class="page-container">
         <div style="text-align:center;padding:40px 20px">
             <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>
-            <h2 style="margin-top:15px">@${user.email?.split('@')[0] || 'user'}</h2>
+            <h2 style="margin-top:15px" id="displayName">@${username}</h2>
             <p style="color:#888">${user.email}</p>
+            <button class="btn btn-secondary" id="editNameBtn" style="margin:10px">✏️ Сменить ник</button>
             <div style="background:#111;border-radius:15px;padding:20px;margin:20px 0;display:inline-block">
                 <div style="font-size:14px;color:#888">Баланс</div>
-                <div style="font-size:36px;color:gold;font-weight:bold">⭐ ${balance}</div>
+                <div style="font-size:36px;color:gold;font-weight:bold">⭐ ${profile.stars_balance}</div>
             </div>
             <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
                 <button class="btn btn-gold" id="buyBtn">Купить звёзды</button>
                 <button class="btn btn-secondary" id="logoutBtn">Выйти</button>
             </div>
         </div>${renderNav('profile')}</div>`;
-    
+
+    document.getElementById('editNameBtn').onclick = () => editUsername(user.id);
     document.getElementById('buyBtn').onclick = showBuyStars;
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
-    attachNavEvents();
+    attachNav();
+}
+
+async function editUsername(uid) {
+    const newName = prompt('Новый никнейм:', '');
+    if (!newName || newName.length < 3) return alert('Минимум 3 символа');
+    try {
+        await supabase.updateUsername(uid, newName);
+        alert('✅ Никнейм изменён!');
+        showProfile();
+    } catch (e) {
+        alert('❌ Ошибка. Возможно, ник занят.');
+    }
 }
 
 // ====== КОММЕНТАРИИ ======
@@ -297,7 +260,7 @@ function showBuyStars() {
     const pkgs = [{s:50,p:49},{s:150,p:129},{s:500,p:399},{s:1200,p:899}];
     let h = `<div class="modal active" id="mod"><div class="modal-content"><div class="modal-header"><h3>⭐ Купить звёзды</h3><button class="close-btn" id="closeMod">✕</button></div><div class="shop-grid">`;
     pkgs.forEach(p => h += `<div class="star-package" id="pkg${p.s}"><div class="star-amount">⭐ ${p.s}</div><div class="star-price">$${p.p}</div></div>`);
-    h += `</div></div></div>`;
+    h += '</div></div></div>';
     document.body.insertAdjacentHTML('beforeend', h);
     document.getElementById('closeMod').onclick = () => document.getElementById('mod').remove();
     pkgs.forEach(p => document.getElementById(`pkg${p.s}`).onclick = async () => {
