@@ -1,5 +1,5 @@
 export class DrawingCanvas {
-    constructor() {
+    constructor(existingImage = null) {
         this.canvas = null;
         this.ctx = null;
         this.isDrawing = false;
@@ -8,6 +8,7 @@ export class DrawingCanvas {
         this.brushSize = 5;
         this.bgColor = '#ffffff';
         this.undoStack = [];
+        this.existingImage = existingImage;
         this.init();
     }
 
@@ -18,13 +19,24 @@ export class DrawingCanvas {
         this.ctx = this.canvas.getContext('2d');
         
         // Установка размера canvas
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight - 160;
+        this.canvas.width = Math.min(window.innerWidth, 600);
+        this.canvas.height = Math.min(window.innerHeight - 200, 600);
         
+        // Заливаем фон
         this.ctx.fillStyle = this.bgColor;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         
-        this.saveState();
+        // Если есть существующее изображение - загружаем его
+        if (this.existingImage) {
+            const img = new Image();
+            img.onload = () => {
+                this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
+                this.saveState();
+            };
+            img.src = this.existingImage;
+        } else {
+            this.saveState();
+        }
         
         this.setupEvents();
         this.setupTools();
@@ -52,6 +64,7 @@ export class DrawingCanvas {
 
     setupTools() {
         const colorPicker = document.getElementById('colorPicker');
+        const bgColorPicker = document.getElementById('bgColorPicker');
         const sizeSlider = document.getElementById('sizeSlider');
         const sizeValue = document.getElementById('sizeValue');
         
@@ -59,13 +72,17 @@ export class DrawingCanvas {
             this.brushColor = e.target.value;
         });
         
+        bgColorPicker?.addEventListener('input', (e) => {
+            this.setBackground(e.target.value);
+        });
+        
         sizeSlider?.addEventListener('input', (e) => {
             this.brushSize = parseInt(e.target.value);
-            if (sizeValue) sizeValue.textContent = e.target.value;
+            if (sizeValue) sizeValue.textContent = `${e.target.value}px`;
         });
         
         document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
+            btn.addEventListener('click', (e) => {
                 document.querySelector('.tool-btn.active')?.classList.remove('active');
                 btn.classList.add('active');
                 this.currentTool = btn.dataset.tool;
@@ -97,6 +114,11 @@ export class DrawingCanvas {
         if (this.currentTool === 'eraser') {
             this.ctx.globalCompositeOperation = 'destination-out';
             this.ctx.strokeStyle = 'rgba(0,0,0,1)';
+        } else if (this.currentTool === 'spray') {
+            this.ctx.globalCompositeOperation = 'source-over';
+            this.ctx.fillStyle = this.brushColor;
+            this.sprayPaint(pos.x, pos.y);
+            return;
         } else {
             this.ctx.globalCompositeOperation = 'source-over';
             this.ctx.strokeStyle = this.brushColor;
@@ -108,6 +130,19 @@ export class DrawingCanvas {
         
         this.ctx.lineTo(pos.x, pos.y);
         this.ctx.stroke();
+    }
+
+    sprayPaint(x, y) {
+        const density = 50;
+        for (let i = 0; i < density; i++) {
+            const offsetX = (Math.random() - 0.5) * this.brushSize * 2;
+            const offsetY = (Math.random() - 0.5) * this.brushSize * 2;
+            const radius = Math.random() * 2;
+            
+            this.ctx.beginPath();
+            this.ctx.arc(x + offsetX, y + offsetY, radius, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
     }
 
     stopDrawing() {
@@ -123,14 +158,16 @@ export class DrawingCanvas {
 
     setBackground(color) {
         this.bgColor = color;
+        const imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
         this.ctx.fillStyle = color;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.putImageData(imageData, 0, 0);
         this.saveState();
     }
 
     saveState() {
         this.undoStack.push(this.canvas.toDataURL());
-        if (this.undoStack.length > 20) {
+        if (this.undoStack.length > 50) {
             this.undoStack.shift();
         }
     }
@@ -142,7 +179,7 @@ export class DrawingCanvas {
         img.src = this.undoStack[this.undoStack.length - 1];
         img.onload = () => {
             this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.drawImage(img, 0, 0);
+            this.ctx.drawImage(img, 0, 0, this.canvas.width, this.canvas.height);
         };
     }
 
