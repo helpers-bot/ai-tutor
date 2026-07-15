@@ -7,6 +7,17 @@ let currentIndex = 0;
 let feedData = [];
 let touchStartY = 0;
 let touchEndY = 0;
+let viewingUserId = null;
+
+function toast(msg) {
+    const existing = document.querySelector('.toast-msg');
+    if (existing) existing.remove();
+    const t = document.createElement('div');
+    t.className = 'toast-msg';
+    t.textContent = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+}
 
 // Google редирект
 if (window.location.hash.includes('access_token')) {
@@ -47,6 +58,7 @@ function renderNav(active) {
 function attachNav() {
     document.querySelectorAll('.nav-item').forEach(btn => {
         btn.onclick = () => {
+            viewingUserId = null;
             const p = btn.dataset.page;
             if (p === 'feed') showFeed();
             else if (p === 'upload') showUpload();
@@ -76,19 +88,25 @@ async function renderCurrentVideo(user) {
     if (item.is_premium) { try { canAccess = await supabase.canAccess(item.id, user.id); } catch(e) { canAccess = false; } }
     const likes = await supabase.getLikesCount(item.id);
     const comments = await supabase.getComments(item.id);
+    const avatarUrl = item.users?.avatar_url || '';
+    const initial = (item.users?.username || 'U')[0].toUpperCase();
 
     appEl.innerHTML = `<div class="video-container" id="videoContainer">
         <div class="video-wrapper">
             ${canAccess ? renderMediaFull(item) : renderBlurredMedia(item)}
             <div class="video-overlay">
                 <div class="video-info">
-                    <div class="user-row"><div class="user-avatar-small">${(item.users?.username||'U')[0].toUpperCase()}</div><span class="username">@${item.users?.username||'user'}</span></div>
+                    <div class="user-row" id="profileLink" data-uid="${item.user_id}" style="cursor:pointer">
+                        ${avatarUrl ? `<img src="${avatarUrl}" class="user-avatar-small" style="object-fit:cover">` : `<div class="user-avatar-small">${initial}</div>`}
+                        <span class="username">@${item.users?.username||'user'}</span>
+                        ${item.is_premium ? '<span style="color:gold;font-size:12px">⭐</span>' : ''}
+                    </div>
                     <div class="desc-text">${item.description || ''}</div>
                 </div>
                 <div class="actions-right">
                     <button class="action-btn like-btn" data-id="${item.id}"><div style="font-size:28px">❤️</div><span>${likes}</span></button>
                     <button class="action-btn comment-btn" data-id="${item.id}"><div style="font-size:28px">💬</div><span>${comments.length}</span></button>
-                    <button class="action-btn repost-btn" data-id="${item.id}"><div style="font-size:28px">🔄</div></button>
+                    <button class="action-btn share-btn" data-id="${item.id}"><div style="font-size:28px">📤</div></button>
                     ${item.is_premium ? '<div style="font-size:28px;text-align:center">⭐</div>' : ''}
                 </div>
                 ${!canAccess ? `<div class="premium-lock" data-id="${item.id}" data-price="${item.price_stars}">
@@ -105,6 +123,7 @@ async function renderCurrentVideo(user) {
         ${renderNav('feed')}
     </div>`;
 
+    // Свайпы
     const container = document.getElementById('videoContainer');
     container.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
     container.addEventListener('touchend', (e) => {
@@ -117,8 +136,14 @@ async function renderCurrentVideo(user) {
         else if (e.deltaY < -30 && currentIndex > 0) { currentIndex--; renderCurrentVideo(user); }
     }, { passive: true });
 
+    // Клик на профиль
+    const profileLink = document.getElementById('profileLink');
+    if (profileLink) {
+        profileLink.onclick = () => showUserProfile(item.user_id);
+    }
+
     attachNav();
-    attachActions(user);
+    attachActions(user, item);
 }
 
 function renderMediaFull(item) {
@@ -131,7 +156,7 @@ function renderBlurredMedia(item) {
     return `<img src="${item.media_url}" class="full-media blurred-heavy">`;
 }
 
-function attachActions(user) {
+function attachActions(user, item) {
     document.querySelectorAll('.like-btn').forEach(btn => {
         btn.onclick = async () => {
             await supabase.toggleLike(btn.dataset.id, user.id);
@@ -139,8 +164,10 @@ function attachActions(user) {
         };
     });
     document.querySelectorAll('.comment-btn').forEach(btn => btn.onclick = () => showComments(btn.dataset.id));
-    document.querySelectorAll('.repost-btn').forEach(btn => {
-        btn.onclick = async () => { await supabase.repost(user.id, btn.dataset.id); alert('✅ Поделились!'); };
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.onclick = async () => {
+            await supabase.shareContent(item);
+        };
     });
     const lock = document.querySelector('.premium-lock');
     if (lock) {
@@ -148,12 +175,51 @@ function attachActions(user) {
             const cid = lock.dataset.id, price = parseInt(lock.dataset.price);
             if (!confirm(`Открыть за ${price} ⭐?`)) return;
             const bal = await supabase.getUserBalance(user.id);
-            if (bal.stars_balance < price) return alert('Недостаточно звёзд!');
+            if (bal.stars_balance < price) return toast('Недостаточно звёзд!');
             await supabase.buyContent(user.id, cid, price);
-            alert('✅ Открыто!');
+            toast('✅ Открыто!');
             renderCurrentVideo(user);
         };
     }
+}
+
+// ====== ПРОФИЛЬ ПОЛЬЗОВАТЕЛЯ ======
+async function showUserProfile(uid) {
+    viewingUserId = uid;
+    const user = supabase.getUser();
+    const profile = await supabase.getUserById(uid);
+    if (!profile) return toast('Пользователь не найден');
+    const myContent = await supabase.getUserContent(uid);
+    const avatarUrl = profile.avatar_url || '';
+    const initial = (profile.username || 'U')[0].toUpperCase();
+
+    let contentGrid = '';
+    if (myContent.length === 0) {
+        contentGrid = '<p style="color:#888;text-align:center;padding:20px">Нет публикаций</p>';
+    } else {
+        contentGrid = '<div class="profile-grid">';
+        myContent.forEach(item => {
+            contentGrid += `<div class="profile-grid-item">
+                ${item.media_type === 'video' 
+                    ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` 
+                    : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
+                ${item.is_premium ? '<span style="position:absolute;top:5px;left:5px;background:gold;color:#000;padding:2px 6px;border-radius:8px;font-size:10px">⭐</span>' : ''}
+            </div>`;
+        });
+        contentGrid += '</div>';
+    }
+
+    appEl.innerHTML = `<div class="page-container">
+        <div style="text-align:center;padding:40px 20px 20px">
+            <button class="btn btn-secondary" id="backBtn" style="position:absolute;top:20px;left:20px">← Назад</button>
+            ${avatarUrl ? `<img src="${avatarUrl}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;margin:0 auto">` : `<div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>`}
+            <h2 style="margin-top:15px">@${profile.username||'user'}</h2>
+            <h3 style="text-align:left;margin-top:30px;margin-bottom:15px">📱 Публикации</h3>
+            ${contentGrid}
+        </div>${renderNav('feed')}</div>`;
+
+    document.getElementById('backBtn').onclick = () => { viewingUserId = null; showFeed(); };
+    attachNav();
 }
 
 // ====== ЗАГРУЗКА ======
@@ -182,16 +248,16 @@ function showUpload() {
         document.getElementById('charCount').textContent = e.target.value.length;
     };
     document.getElementById('doUpload').onclick = async () => {
-        if (!selectedFile) return alert('Выберите файл');
+        if (!selectedFile) return toast('Выберите файл');
         const user = supabase.getUser();
         const desc = document.getElementById('description').value;
         const tags = document.getElementById('hashtags').value;
-        if (desc.length > 2000) return alert('Максимум 2000 символов');
+        if (desc.length > 2000) return toast('Максимум 2000 символов');
         const tagCount = tags.split(' ').filter(t => t.startsWith('#')).length;
-        if (tagCount > 5) return alert('Максимум 5 хештегов');
+        if (tagCount > 5) return toast('Максимум 5 хештегов');
         if (selectedFile.type.startsWith('video/')) {
             const d = await getVideoDuration(selectedFile);
-            if (d > CONFIG.content.maxVideoDuration) return alert('Видео не длиннее 15с');
+            if (d > CONFIG.content.maxVideoDuration) return toast('Видео не длиннее 15с');
         }
         const btn = document.getElementById('doUpload');
         btn.disabled = true; btn.textContent = 'Загрузка...';
@@ -204,8 +270,9 @@ function showUpload() {
                 is_premium: document.getElementById('isPremium').checked,
                 price_stars: parseInt(document.getElementById('priceStars').value) || 10
             });
-            alert('✅ Загружено!'); showFeed();
-        } catch (err) { alert('Ошибка: ' + err.message); btn.disabled = false; btn.textContent = 'Загрузить'; }
+            toast('✅ Загружено!');
+            showFeed();
+        } catch (err) { toast('Ошибка: ' + err.message); btn.disabled = false; btn.textContent = 'Загрузить'; }
     };
     attachNav();
 }
@@ -224,6 +291,7 @@ async function showProfile() {
     if (!user || !user.id) { supabase.signOut(); showAuth(); return; }
     const profile = await supabase.getUserBalance(user.id);
     const myContent = await supabase.getUserContent(user.id);
+    const avatarUrl = profile.avatar_url || '';
     const initial = (profile.username || user.email || 'U')[0].toUpperCase();
     const username = profile.username || user.email?.split('@')[0] || 'user';
 
@@ -233,7 +301,7 @@ async function showProfile() {
     } else {
         contentGrid = '<div class="profile-grid">';
         myContent.forEach(item => {
-            contentGrid += `<div class="profile-grid-item" data-id="${item.id}" style="position:relative;cursor:pointer">
+            contentGrid += `<div class="profile-grid-item" style="position:relative">
                 ${item.media_type === 'video' 
                     ? `<video src="${item.media_url}" muted style="width:100%;height:100%;object-fit:cover"></video>` 
                     : `<img src="${item.media_url}" style="width:100%;height:100%;object-fit:cover">`}
@@ -246,7 +314,11 @@ async function showProfile() {
 
     appEl.innerHTML = `<div class="page-container">
         <div style="text-align:center;padding:40px 20px 20px">
-            <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>
+            <div style="position:relative;display:inline-block">
+                ${avatarUrl ? `<img src="${avatarUrl}" style="width:90px;height:90px;border-radius:50%;object-fit:cover">` : `<div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#ff0050,#ff6b6b);display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto;font-weight:bold">${initial}</div>`}
+                <button id="changeAvatarBtn" style="position:absolute;bottom:0;right:0;background:#333;color:#fff;border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:14px">📷</button>
+                <input type="file" id="avatarInput" accept="image/*" style="display:none">
+            </div>
             <h2 style="margin-top:15px">@${username}</h2>
             <p style="color:#888">${user.email}</p>
             <button class="btn btn-secondary" id="editNameBtn" style="margin:10px">✏️ Сменить ник</button>
@@ -256,10 +328,21 @@ async function showProfile() {
             ${contentGrid}
         </div>${renderNav('profile')}</div>`;
 
+    document.getElementById('changeAvatarBtn').onclick = () => document.getElementById('avatarInput').click();
+    document.getElementById('avatarInput').onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+            const url = await uploadToCloudinary(file);
+            await supabase.updateAvatar(user.id, url);
+            toast('✅ Аватар обновлён!');
+            showProfile();
+        } catch (err) { toast('❌ Ошибка загрузки'); }
+    };
     document.getElementById('editNameBtn').onclick = async () => {
         const newName = prompt('Новый никнейм:', username);
-        if (!newName || newName.length < 3) return alert('Минимум 3 символа');
-        try { await supabase.updateUsername(user.id, newName); alert('✅ Готово!'); showProfile(); } catch (e) { alert('❌ Ошибка'); }
+        if (!newName || newName.length < 3) return toast('Минимум 3 символа');
+        try { await supabase.updateUsername(user.id, newName); toast('✅ Готово!'); showProfile(); } catch (e) { toast('❌ Ошибка'); }
     };
     document.getElementById('buyBtn').onclick = showBuyStars;
     document.getElementById('logoutBtn').onclick = async () => { await supabase.signOut(); showAuth(); };
@@ -267,10 +350,9 @@ async function showProfile() {
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.onclick = async (e) => {
             e.stopPropagation();
-            const cid = btn.dataset.id;
             if (confirm('Удалить публикацию?')) {
-                await supabase.deleteContent(cid);
-                alert('✅ Удалено');
+                await supabase.deleteContent(btn.dataset.id);
+                toast('✅ Удалено');
                 showProfile();
             }
         };
@@ -309,7 +391,7 @@ function showBuyStars() {
     document.getElementById('closeMod').onclick = () => document.getElementById('mod').remove();
     pkgs.forEach(p => document.getElementById(`pkg${p.s}`).onclick = async () => {
         await supabase.addStars(supabase.getUser().id, p.s);
-        alert(`✅ +${p.s} ⭐!`);
+        toast(`✅ +${p.s} ⭐!`);
         document.getElementById('mod').remove();
         showProfile();
     });
