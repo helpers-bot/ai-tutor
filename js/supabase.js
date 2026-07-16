@@ -215,28 +215,6 @@ async function claimDailyStar(userId) {
     return true;
 }
 
-async function claimViewStar(userId) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const views = await getTodayViews(userId);
-    
-    if (views < 5) return { success: false, message: `Нужно 5 просмотров, сейчас ${views}` };
-    
-    const existing = await request(`star_claims?user_id=eq.${userId}&claim_type=eq.views&claimed_at=gte.${today.toISOString()}`);
-    
-    if (existing.length > 0) return { success: false, message: 'Уже получена звезда за просмотры сегодня' };
-    
-    await updateUserBalance(userId, 1);
-    
-    await request('star_claims', {
-        method: 'POST',
-        body: JSON.stringify({ user_id: userId, claim_type: 'views', stars_claimed: 1 })
-    });
-    
-    return { success: true, message: 'Звезда получена!' };
-}
-
 // Winner
 async function getLastWinner() {
     const data = await request('auction_winners?select=*,users(username,avatar_url)&order=won_at.desc&limit=1');
@@ -252,33 +230,6 @@ async function isAdmin(userId) {
 async function getAllUsers() {
     return request('users?select=*&order=created_at.desc');
 }
-
-export {
-    signInWithGoogle,
-    checkAuth,
-    getUser,
-    getFeed,
-    getArtwork,
-    getCurrentBank,
-    getUserProfile,
-    updateUserProfile,
-    updateUserBalance,
-    saveArtwork,
-    updateArtwork,
-    deleteArtwork,
-    publishArtwork,
-    getUserArtworks,
-    likeArtwork,
-    recordView,
-    getTodayViews,
-    claimDailyStar,
-    claimViewStar,
-    getLastWinner,
-    isAdmin,
-    getAllUsers
-};
-
-// Добавьте эти функции перед export в конце файла:
 
 // Ad functions
 async function recordAdView(userId) {
@@ -310,7 +261,6 @@ async function claimAdStar(userId) {
     
     if (adViews < 5) return { success: false, message: `Нужно 5 просмотров рекламы, сейчас ${adViews}` };
     
-    // Проверяем, не получал ли уже звезду за рекламу сегодня
     const existing = await request(`star_claims?user_id=eq.${userId}&claim_type=eq.ads&claimed_at=gte.${today.toISOString()}`);
     
     if (existing.length > 0) return { success: false, message: 'Уже получена звезда за рекламу сегодня' };
@@ -322,12 +272,31 @@ async function claimAdStar(userId) {
         body: JSON.stringify({ user_id: userId, claim_type: 'ads', stars_claimed: 1 })
     });
     
-    return { success: true, message: 'Звезда за рекламу получена!' };
+    return { success: true, message: '⭐ Звезда за рекламу получена!' };
 }
 
-// Добавьте в export:
 export {
-    // ... все существующие экспорты ...
+    signInWithGoogle,
+    checkAuth,
+    getUser,
+    getFeed,
+    getArtwork,
+    getCurrentBank,
+    getUserProfile,
+    updateUserProfile,
+    updateUserBalance,
+    saveArtwork,
+    updateArtwork,
+    deleteArtwork,
+    publishArtwork,
+    getUserArtworks,
+    likeArtwork,
+    recordView,
+    getTodayViews,
+    claimDailyStar,
+    getLastWinner,
+    isAdmin,
+    getAllUsers,
     recordAdView,
     getTodayAdViews,
     claimAdStar
