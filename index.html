@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ArtStars — Рисуй и побеждай | Платформа для художников</title>
     <meta name="description" content="ArtStars — платформа для рисования и творчества. Создавай рисунки, участвуй в еженедельных аукционах, получай звёзды и выигрывай призы. Рисуй, публикуй, побеждай!">
-    <meta name="keywords" content="рисование, рисовать онлайн, аукцион рисунков, арт, художник, творчество, звёзды, конкурс рисунков, рисовалка, canvas, art, drawing">
+    <meta name="keywords" content="рисование, рисовать онлайн, аукцион рисунков, арт, художник, творчество, звёзды, конкурс рисунков">
     <meta name="author" content="ArtStars">
     <meta name="robots" content="index, follow">
     <meta name="theme-color" content="#0a0a2e">
@@ -35,9 +35,6 @@
     <link rel="manifest" href="manifest.json">
     <link rel="canonical" href="https://vds-game.ink">
     
-    <!-- Monetag Light Tag -->
-    <script src="https://quge5.com/88/tag.min.js" data-zone="260208" async data-cfasync="false"></script>
-    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -47,6 +44,10 @@
             <p class="loading-text">ArtStars</p>
         </div>
     </div>
+    
+    <!-- Уведомления -->
+    <div id="notificationContainer" style="position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px;"></div>
+    
     <script type="module" src="js/config.js"></script>
     <script type="module" src="js/supabase.js"></script>
     <script type="module" src="js/canvas.js"></script>
