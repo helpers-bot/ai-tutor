@@ -146,16 +146,6 @@ async function likeArtwork(userId, artworkId) {
         });
     }
     
-    await request('purchases', {
-        method: 'POST',
-        body: JSON.stringify({
-            user_id: userId,
-            artwork_id: artworkId,
-            stars_spent: 1,
-            purchase_type: 'like'
-        })
-    });
-    
     return true;
 }
 
@@ -212,7 +202,6 @@ async function getAllUsers() {
     return request('users?select=*&order=created_at.desc');
 }
 
-// Таймер бонус
 async function claimTimerBonus(userId) {
     await updateUserBalance(userId, 1);
     
@@ -224,32 +213,6 @@ async function claimTimerBonus(userId) {
     return true;
 }
 
-export {
-    signInWithGoogle,
-    checkAuth,
-    getUser,
-    getFeed,
-    getArtwork,
-    getCurrentBank,
-    getUserProfile,
-    updateUserProfile,
-    updateUserBalance,
-    saveArtwork,
-    updateArtwork,
-    deleteArtwork,
-    publishArtwork,
-    getUserArtworks,
-    likeArtwork,
-    recordView,
-    claimDailyStar,
-    getLastWinner,
-    isAdmin,
-    getAllUsers,
-    claimTimerBonus
-};
-// Добавьте в существующий файл перед export:
-
-// Timer functions
 async function saveTimerState(userId, seconds) {
     const existing = await request(`user_timers?user_id=eq.${userId}`);
     
@@ -277,24 +240,37 @@ async function getTimerState(userId) {
     const data = await request(`user_timers?user_id=eq.${userId}`);
     
     if (data.length > 0) {
-        const saved = data[0];
-        const savedTime = new Date(saved.last_updated).getTime();
-        const now = Date.now();
-        const elapsedSeconds = Math.floor((now - savedTime) / 1000);
-        const remainingSeconds = Math.max(0, saved.timer_seconds - elapsedSeconds);
-        
         return {
-            timer_seconds: remainingSeconds,
-            last_updated: saved.last_updated
+            timer_seconds: data[0].timer_seconds,
+            last_updated: data[0].last_updated
         };
     }
     
     return { timer_seconds: 1800, last_updated: new Date().toISOString() };
 }
 
-// Добавьте в export:
 export {
-    // ... все существующие экспорты ...
+    signInWithGoogle,
+    checkAuth,
+    getUser,
+    getFeed,
+    getArtwork,
+    getCurrentBank,
+    getUserProfile,
+    updateUserProfile,
+    updateUserBalance,
+    saveArtwork,
+    updateArtwork,
+    deleteArtwork,
+    publishArtwork,
+    getUserArtworks,
+    likeArtwork,
+    recordView,
+    claimDailyStar,
+    getLastWinner,
+    isAdmin,
+    getAllUsers,
+    claimTimerBonus,
     saveTimerState,
     getTimerState
 };
