@@ -247,3 +247,54 @@ export {
     getAllUsers,
     claimTimerBonus
 };
+// Добавьте в существующий файл перед export:
+
+// Timer functions
+async function saveTimerState(userId, seconds) {
+    const existing = await request(`user_timers?user_id=eq.${userId}`);
+    
+    if (existing.length > 0) {
+        return request(`user_timers?user_id=eq.${userId}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ 
+                timer_seconds: seconds,
+                last_updated: new Date().toISOString()
+            })
+        });
+    } else {
+        return request('user_timers', {
+            method: 'POST',
+            body: JSON.stringify({ 
+                user_id: userId,
+                timer_seconds: seconds,
+                last_updated: new Date().toISOString()
+            })
+        });
+    }
+}
+
+async function getTimerState(userId) {
+    const data = await request(`user_timers?user_id=eq.${userId}`);
+    
+    if (data.length > 0) {
+        const saved = data[0];
+        const savedTime = new Date(saved.last_updated).getTime();
+        const now = Date.now();
+        const elapsedSeconds = Math.floor((now - savedTime) / 1000);
+        const remainingSeconds = Math.max(0, saved.timer_seconds - elapsedSeconds);
+        
+        return {
+            timer_seconds: remainingSeconds,
+            last_updated: saved.last_updated
+        };
+    }
+    
+    return { timer_seconds: 1800, last_updated: new Date().toISOString() };
+}
+
+// Добавьте в export:
+export {
+    // ... все существующие экспорты ...
+    saveTimerState,
+    getTimerState
+};
