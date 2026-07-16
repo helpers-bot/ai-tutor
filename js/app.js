@@ -31,26 +31,18 @@ class ArtStarsApp {
         this.user = await checkAuth();
         
         if (this.user) {
-            await this.loadTimerState();
+            await this.restoreTimerState();
             await this.loadMainApp();
         } else {
             this.showAuthScreen();
         }
     }
 
-    async loadTimerState() {
+    async restoreTimerState() {
         if (!this.user) return;
         
         const state = await getTimerState(this.user.id);
         this.timerSeconds = state.timer_seconds;
-        
-        // Если таймер истек, начисляем звезду
-        if (this.timerSeconds <= 0) {
-            await claimTimerBonus(this.user.id);
-            this.showNotification('⭐ Бонус!', 'Получена 1 звезда за время на сайте!', 'success');
-            this.timerSeconds = 1800;
-            await saveTimerState(this.user.id, this.timerSeconds);
-        }
     }
 
     showNotification(title, message, type = 'success') {
@@ -76,7 +68,6 @@ class ArtStarsApp {
             box-shadow: 0 0 20px ${colors[type]}44;
             animation: slideIn 0.3s ease;
             cursor: pointer;
-            margin-bottom: 10px;
         `;
         
         notification.innerHTML = `
@@ -219,59 +210,55 @@ class ArtStarsApp {
     }
 
     setupVisibilityTracking() {
+        // Сохраняем таймер когда страница скрыта
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 this.isPageVisible = false;
-                // Сохраняем состояние таймера
                 this.saveTimerToServer();
             } else {
                 this.isPageVisible = true;
-                // Восстанавливаем таймер
-                this.restoreTimerFromServer();
+                this.restoreTimerState();
             }
         });
         
+        // Сохраняем при уходе со страницы
         window.addEventListener('beforeunload', () => {
             this.saveTimerToServer();
         });
     }
 
     async saveTimerToServer() {
-        if (this.user && this.timerActive) {
+        if (this.user) {
             await saveTimerState(this.user.id, this.timerSeconds);
         }
     }
 
-    async restoreTimerFromServer() {
-        if (this.user) {
-            const state = await getTimerState(this.user.id);
-            this.timerSeconds = state.timer_seconds;
-            
-            // Если таймер истек пока страница была неактивна
-            if (this.timerSeconds <= 0) {
-                const bonuses = Math.floor(Math.abs(this.timerSeconds) / 1800) + 1;
-                for (let i = 0; i < bonuses; i++) {
-                    await claimTimerBonus(this.user.id);
-                }
-                this.showNotification('⭐ Бонус!', `Получено ${bonuses} звёзд за время отсутствия!`, 'success');
-                this.timerSeconds = 1800 - (Math.abs(this.timerSeconds) % 1800);
-                await this.updateDisplay();
-            }
-        }
+    async restoreTimerState() {
+        if (!this.user) return;
+        
+        const state = await getTimerState(this.user.id);
+        // Просто восстанавливаем сохраненное значение, не меняем его
+        this.timerSeconds = state.timer_seconds;
     }
 
     startBonusTimer() {
         this.timerActive = true;
         
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+        }
+        
         this.timerInterval = setInterval(async () => {
+            // Таймер тикает только когда страница активна
             if (this.isPageVisible) {
                 this.timerSeconds--;
                 
-                // Сохраняем состояние каждые 30 секунд
-                if (this.timerSeconds % 30 === 0) {
+                // Сохраняем состояние каждые 10 секунд
+                if (this.timerSeconds % 10 === 0) {
                     this.saveTimerToServer();
                 }
                 
+                // Когда таймер истек
                 if (this.timerSeconds <= 0) {
                     if (this.user) {
                         await claimTimerBonus(this.user.id);
@@ -282,6 +269,7 @@ class ArtStarsApp {
                     this.timerSeconds = 1800;
                     await this.saveTimerToServer();
                     
+                    // Обновляем профиль если мы на нем
                     if (this.currentPage === 'profile') {
                         await this.loadProfile();
                     }
@@ -453,7 +441,6 @@ class ArtStarsApp {
             await likeArtwork(this.user.id, artworkId);
             await this.updateDisplay();
             await this.loadFeed();
-            await this.updateBankDisplay();
         };
     }
 
@@ -558,10 +545,9 @@ class ArtStarsApp {
                 }
             }
             
-            // Списываем звёзды
             await updateUserBalance(this.user.id, -50);
             
-            // Добавляем в банк (записываем покупку)
+            // Добавляем в банк (ТОЛЬКО публикации)
             if (artworkId) {
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
@@ -580,7 +566,7 @@ class ArtStarsApp {
                 });
             }
             
-            this.showNotification('🚀 Опубликовано', 'Рисунок появился в ленте! +50 звёзд в банк', 'success');
+            this.showNotification('🚀 Опубликовано', 'Рисунок в ленте! +50 звёзд в банк', 'success');
             await this.updateDisplay();
             await this.updateBankDisplay();
             this.closeCanvas();
@@ -593,7 +579,7 @@ class ArtStarsApp {
     async deleteCurrentArtwork() {
         if (!this.editingArtworkId) return;
         
-        if (confirm('Удалить этот рисунок? Это действие нельзя отменить.')) {
+        if (confirm('Удалить этот рисунок?')) {
             await deleteArtwork(this.editingArtworkId);
             this.closeCanvas();
             await this.loadProfile();
@@ -637,7 +623,7 @@ class ArtStarsApp {
                         <div style="text-align:center; padding:20px; background:var(--bg-secondary); border-radius:15px; margin:10px 0;">
                             <p style="font-size:14px; color:var(--text-secondary);">До следующей звезды:</p>
                             <p style="font-size:48px; color:var(--neon-yellow); font-weight:bold; margin:10px 0;">${this.getTimerDisplay()}</p>
-                            <p style="font-size:12px; color:var(--text-secondary);">Каждые 30 минут на сайте вы получаете 1 звезду автоматически!</p>
+                            <p style="font-size:12px; color:var(--text-secondary);">Каждые 30 минут на сайте — 1 звезда!</p>
                         </div>
                     </div>
                 ` : ''}
@@ -724,7 +710,7 @@ class ArtStarsApp {
                 })
             });
             
-            this.showNotification('🚀 Готово', 'Рисунок опубликован! +50 в банк', 'success');
+            this.showNotification('🚀 Готово', 'Опубликовано! +50 в банк', 'success');
             await this.updateDisplay();
             await this.updateBankDisplay();
             await this.loadProfile();
@@ -743,7 +729,7 @@ class ArtStarsApp {
         const container = document.getElementById('pageContainer');
         if (!container) return;
         
-        container.innerHTML = '<div style="text-align:center; padding: 40px;">Загрузка админ-панели...</div>';
+        container.innerHTML = '<div style="text-align:center; padding: 40px;">Загрузка...</div>';
         
         try {
             const users = await getAllUsers();
@@ -755,23 +741,21 @@ class ArtStarsApp {
                         <h3>📊 Статистика</h3>
                         <p>Всего пользователей: ${users.length}</p>
                     </div>
-                    
                     <div style="max-height:70vh; overflow-y:auto;">
                         ${users.map(u => `
-                            <div style="background: var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1);">
-                                <div style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+                            <div style="background: var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px;">
+                                <div style="display:flex; align-items:center; gap:15px;">
                                     <img src="${u.avatar_url || 'icon.svg'}" style="width:50px;height:50px;border-radius:50%;border:2px solid var(--neon-purple);">
                                     <div style="flex:1;">
                                         <strong>${u.username || 'Без имени'}</strong>
-                                        <p style="font-size:12px; color:var(--text-secondary);">ID: ${u.id}</p>
-                                        <p style="color:var(--neon-yellow);">⭐ ${u.stars_balance} звёзд</p>
+                                        <p style="font-size:12px;">ID: ${u.id}</p>
+                                        <p style="color:var(--neon-yellow);">⭐ ${u.stars_balance}</p>
                                     </div>
                                 </div>
-                                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                                    <button class="mini-btn" onclick="window.editUserField('${u.id}', 'username', 'Имя')">✏️ Имя</button>
-                                    <button class="mini-btn" onclick="window.editUserField('${u.id}', 'avatar_url', 'URL аватара')">📷 Аватар</button>
-                                    <button class="mini-btn" onclick="window.editUserStars('${u.id}', ${u.stars_balance})">⭐ Звёзды</button>
-                                    <button class="mini-btn" style="border-color:red; color:red;" onclick="window.deleteUser('${u.id}', '${u.username}')">🗑️ Удалить</button>
+                                <div style="display:flex; gap:5px; margin-top:10px;">
+                                    <button class="mini-btn" onclick="window.editUserField('${u.id}', 'username', 'Имя')">✏️</button>
+                                    <button class="mini-btn" onclick="window.editUserStars('${u.id}', ${u.stars_balance})">⭐</button>
+                                    <button class="mini-btn" style="border-color:red; color:red;" onclick="window.deleteUser('${u.id}')">🗑️</button>
                                 </div>
                             </div>
                         `).join('')}
@@ -780,49 +764,39 @@ class ArtStarsApp {
             `;
             
             window.editUserField = async (userId, field, label) => {
-                const value = prompt(`Введите новое значение для ${label}:`);
-                if (value !== null) {
+                const value = prompt(`Новое значение ${label}:`);
+                if (value) {
                     await updateUserProfile(userId, { [field]: value });
                     await this.loadAdminPanel();
                 }
             };
             
-            window.editUserStars = async (userId, currentStars) => {
-                const action = prompt('Введите "+50" чтобы начислить, "-50" чтобы снять, или число для установки:');
-                if (action !== null) {
-                    let newBalance = currentStars;
+            window.editUserStars = async (userId, current) => {
+                const val = prompt('+начислить, -снять, или число:');
+                if (val) {
+                    let newVal = current;
+                    if (val.startsWith('+')) newVal = current + parseInt(val.substring(1));
+                    else if (val.startsWith('-')) newVal = current - parseInt(val.substring(1));
+                    else newVal = parseInt(val);
                     
-                    if (action.startsWith('+')) {
-                        newBalance = currentStars + parseInt(action.substring(1));
-                    } else if (action.startsWith('-')) {
-                        newBalance = currentStars - parseInt(action.substring(1));
-                    } else {
-                        newBalance = parseInt(action);
-                    }
-                    
-                    if (!isNaN(newBalance)) {
-                        await updateUserProfile(userId, { stars_balance: newBalance });
+                    if (!isNaN(newVal)) {
+                        await updateUserProfile(userId, { stars_balance: newVal });
                         await this.loadAdminPanel();
                     }
                 }
             };
             
-            window.deleteUser = async (userId, username) => {
-                if (confirm(`Удалить пользователя ${username}? Это действие нельзя отменить!`)) {
+            window.deleteUser = async (userId) => {
+                if (confirm('Удалить пользователя?')) {
                     await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`, {
                         method: 'DELETE',
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
+                        headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                     });
                     await this.loadAdminPanel();
                 }
             };
-            
         } catch (error) {
-            console.error('Error loading admin panel:', error);
-            container.innerHTML = '<div style="text-align:center; padding: 40px;">Ошибка загрузки админ-панели</div>';
+            console.error('Error:', error);
         }
     }
 }
