@@ -2,7 +2,7 @@ import {
     signInWithGoogle, checkAuth, getUser, getFeed, getCurrentBank,
     getUserProfile, updateUserProfile, updateUserBalance, saveArtwork,
     updateArtwork, deleteArtwork, publishArtwork, getUserArtworks,
-    likeArtwork, recordView, getTodayViews, claimDailyStar,
+    likeArtwork, recordView, claimDailyStar,
     getLastWinner, isAdmin, getAllUsers, recordAdView,
     getTodayAdViews, claimAdStar
 } from './supabase.js';
@@ -97,21 +97,11 @@ class ArtStarsApp {
             
             <div id="canvasContainer" class="canvas-container">
                 <div class="canvas-toolbar">
-                    <button class="tool-btn" onclick="window.closeCanvas()" style="background: var(--neon-pink); border-color: var(--neon-pink);" title="Закрыть редактор">
-                        ✕
-                    </button>
-                    <button class="tool-btn active" data-tool="brush" title="Кисть">
-                        ✏️
-                    </button>
-                    <button class="tool-btn" data-tool="spray" title="Распылитель">
-                        💨
-                    </button>
-                    <button class="tool-btn" data-tool="eraser" title="Ластик">
-                        🧹
-                    </button>
-                    <button class="tool-btn" data-tool="fill" title="Заливка">
-                        🪣
-                    </button>
+                    <button class="tool-btn" onclick="window.closeCanvas()" style="background: var(--neon-pink); border-color: var(--neon-pink);" title="Закрыть редактор">✕</button>
+                    <button class="tool-btn active" data-tool="brush" title="Кисть">✏️</button>
+                    <button class="tool-btn" data-tool="spray" title="Распылитель">💨</button>
+                    <button class="tool-btn" data-tool="eraser" title="Ластик">🧹</button>
+                    <button class="tool-btn" data-tool="fill" title="Заливка">🪣</button>
                     <div style="display:flex; align-items:center; gap:5px;">
                         <span style="color:white; font-size:11px;">Цвет:</span>
                         <input type="color" id="colorPicker" class="color-picker" value="#ff2d95" title="Цвет кисти">
@@ -125,12 +115,8 @@ class ArtStarsApp {
                         <input type="range" id="sizeSlider" class="size-slider" min="1" max="30" value="5" title="Размер кисти">
                         <span id="sizeValue" style="color:white; font-size:11px;">5px</span>
                     </div>
-                    <button class="tool-btn" onclick="window.undoCanvas()" title="Отменить действие">
-                        ↩️
-                    </button>
-                    <button class="tool-btn" onclick="window.clearCanvas()" title="Очистить всё">
-                        🗑️
-                    </button>
+                    <button class="tool-btn" onclick="window.undoCanvas()" title="Отменить действие">↩️</button>
+                    <button class="tool-btn" onclick="window.clearCanvas()" title="Очистить всё">🗑️</button>
                 </div>
                 <div style="display:flex; justify-content:center; align-items:center; flex:1; background:#2a2a2a; overflow:hidden;">
                     <canvas id="drawCanvas"></canvas>
@@ -148,15 +134,12 @@ class ArtStarsApp {
             <div id="adContainer" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:300; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
                 <div style="text-align:center; color:white; margin-bottom:20px;">
                     <h3>📺 Поддержи проект</h3>
-                    <p style="margin:10px 0;">Посмотри рекламу и получи награду</p>
+                    <p style="margin:10px 0;">Посмотри рекламу 30 секунд и получи награду</p>
                     <div style="background:var(--glass-bg); padding:15px; border-radius:15px; display:inline-block; margin:10px 0;">
                         <p style="font-size:14px;">Осталось секунд:</p>
                         <p id="adTimerDisplay" style="font-size:36px; color:var(--neon-yellow); font-weight:bold;">30</p>
                     </div>
-                    <p style="font-size:12px; color:var(--text-secondary);">Не закрывайте это окно, пока идет реклама</p>
-                </div>
-                <div id="monetagAd" style="width:100%; max-width:400px; min-height:250px; background:rgba(255,255,255,0.05); border-radius:15px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
-                    <p style="color:var(--text-secondary);">Загрузка рекламы...</p>
+                    <p style="font-size:12px; color:var(--text-secondary);">Не закрывайте окно, пока идет отсчет</p>
                 </div>
                 <button class="neon-btn danger" onclick="window.closeAd()" style="margin-top:20px; max-width:250px; font-size:14px;">
                     ❌ Закрыть (прогресс не засчитается)
@@ -395,9 +378,7 @@ class ArtStarsApp {
         
         try {
             if (this.editingArtworkId) {
-                await updateArtwork(this.editingArtworkId, {
-                    image_url: imageData
-                });
+                await updateArtwork(this.editingArtworkId, { image_url: imageData });
                 alert('Рисунок обновлён!');
             } else {
                 await saveArtwork({
@@ -505,37 +486,6 @@ class ArtStarsApp {
         
         adContainer.style.display = 'flex';
         
-        // Загружаем рекламу Monetag в iframe для изоляции
-        const monetagAd = document.getElementById('monetagAd');
-        if (monetagAd) {
-            monetagAd.innerHTML = `
-                <iframe 
-                    srcdoc="
-                        <html>
-                        <head>
-                            <style>
-                                body { margin:0; padding:0; background:#000; display:flex; align-items:center; justify-content:center; min-height:250px; }
-                                .ad-label { color:#666; font-family:Arial; font-size:12px; text-align:center; }
-                            </style>
-                        </head>
-                        <body>
-                            <div style='width:100%; max-width:400px;'>
-                                <div class='ad-label'>Реклама</div>
-                                <script src='https://quge5.com/88/tag.min.js' data-zone='260208' async data-cfasync='false'></script>
-                            </div>
-                        </body>
-                        </html>
-                    " 
-                    style="width:100%; height:250px; border:none; border-radius:15px;"
-                    sandbox="allow-scripts allow-same-origin"
-                    scrolling="no"
-                ></iframe>
-            `;
-        }
-        
-        // Блокируем всплывающие окна
-        this.blockPopups();
-        
         // Таймер обратного отсчета
         this.adTimer = setInterval(() => {
             this.adTimerSeconds--;
@@ -550,47 +500,6 @@ class ArtStarsApp {
         }, 1000);
     }
 
-    blockPopups() {
-        // Перехватываем попытки открытия новых окон
-        window.open = function() {
-            console.log('Всплывающее окно заблокировано');
-            return null;
-        };
-        
-        // Блокируем редиректы
-        const originalSetTimeout = window.setTimeout;
-        window.setTimeout = function(callback, delay) {
-            if (typeof callback === 'string' && (
-                callback.includes('location') || 
-                callback.includes('window.open') ||
-                callback.includes('href')
-            )) {
-                console.log('Потенциально опасный setTimeout заблокирован');
-                return 0;
-            }
-            return originalSetTimeout(callback, delay);
-        };
-        
-        // Блокируем изменение location
-        let blocked = false;
-        Object.defineProperty(window, 'location', {
-            set: function(val) {
-                if (blocked) {
-                    console.log('Редирект заблокирован');
-                    return;
-                }
-                window.document.location = val;
-            }
-        });
-        
-        // Восстанавливаем через 35 секунд
-        setTimeout(() => {
-            blocked = false;
-            window.open = window.open;
-            window.setTimeout = originalSetTimeout;
-        }, 35000);
-    }
-
     async completeAd() {
         clearInterval(this.adTimer);
         this.adTimer = null;
@@ -601,11 +510,6 @@ class ArtStarsApp {
         if (adContainer) {
             adContainer.style.display = 'none';
         }
-        
-        // Восстанавливаем нормальную работу
-        window.open = function(url, target, features) {
-            return window.document.defaultView.open(url, target, features);
-        };
         
         if (this.user) {
             await recordAdView(this.user.id);
@@ -625,11 +529,6 @@ class ArtStarsApp {
         if (adContainer) {
             adContainer.style.display = 'none';
         }
-        
-        // Восстанавливаем нормальную работу
-        window.open = function(url, target, features) {
-            return window.document.defaultView.open(url, target, features);
-        };
         
         alert('❌ Реклама не досмотрена. Прогресс не засчитан.');
     }
@@ -876,5 +775,4 @@ class ArtStarsApp {
     }
 }
 
-// Запускаем приложение
 window.app = new ArtStarsApp();
