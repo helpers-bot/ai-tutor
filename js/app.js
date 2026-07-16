@@ -3,7 +3,7 @@ import {
     getUserProfile, updateUserProfile, updateUserBalance, saveArtwork,
     updateArtwork, deleteArtwork, publishArtwork, getUserArtworks,
     likeArtwork, recordView, getTodayViews, claimDailyStar,
-    claimViewStar, getLastWinner, isAdmin, getAllUsers, recordAdView,
+    getLastWinner, isAdmin, getAllUsers, recordAdView,
     getTodayAdViews, claimAdStar
 } from './supabase.js';
 
@@ -18,12 +18,11 @@ class ArtStarsApp {
         this.currentPage = 'feed';
         this.drawingCanvas = null;
         this.editingArtworkId = null;
-        this.viewTimer = null;
-        this.viewTimerSeconds = 0;
         this.viewedUser = null;
         this.adTimer = null;
         this.adTimerSeconds = 0;
         this.isWatchingAd = false;
+        this.adCompleted = false;
         
         this.init();
     }
@@ -145,15 +144,23 @@ class ArtStarsApp {
             
             <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="window.handleAvatarUpload(event)">
             
-            <!-- Рекламный блок (скрыт) -->
-            <div id="adContainer" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:300; flex-direction:column; align-items:center; justify-content:center;">
+            <!-- Рекламный блок -->
+            <div id="adContainer" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:300; flex-direction:column; align-items:center; justify-content:center; padding:20px;">
                 <div style="text-align:center; color:white; margin-bottom:20px;">
-                    <h3>📺 Просмотр рекламы</h3>
-                    <p>Досмотрите рекламу до конца для получения награды</p>
-                    <p id="adTimerDisplay" style="font-size:24px; margin:20px 0; color:var(--neon-yellow);">30</p>
+                    <h3>📺 Поддержи проект</h3>
+                    <p style="margin:10px 0;">Посмотри рекламу и получи награду</p>
+                    <div style="background:var(--glass-bg); padding:15px; border-radius:15px; display:inline-block; margin:10px 0;">
+                        <p style="font-size:14px;">Осталось секунд:</p>
+                        <p id="adTimerDisplay" style="font-size:36px; color:var(--neon-yellow); font-weight:bold;">30</p>
+                    </div>
+                    <p style="font-size:12px; color:var(--text-secondary);">Не закрывайте это окно, пока идет реклама</p>
                 </div>
-                <div id="monetagAd" style="width:100%; max-width:400px; min-height:300px;"></div>
-                <button class="neon-btn" onclick="window.closeAd()" style="margin-top:20px; max-width:200px;">Закрыть рекламу</button>
+                <div id="monetagAd" style="width:100%; max-width:400px; min-height:250px; background:rgba(255,255,255,0.05); border-radius:15px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+                    <p style="color:var(--text-secondary);">Загрузка рекламы...</p>
+                </div>
+                <button class="neon-btn danger" onclick="window.closeAd()" style="margin-top:20px; max-width:250px; font-size:14px;">
+                    ❌ Закрыть (прогресс не засчитается)
+                </button>
             </div>
         `;
         
@@ -449,7 +456,6 @@ class ArtStarsApp {
             await updateUserBalance(this.user.id, -50);
             
             if (artworkId) {
-                // Записываем покупку для увеличения банка
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
                     headers: {
@@ -491,24 +497,44 @@ class ArtStarsApp {
 
     startAd() {
         const adContainer = document.getElementById('adContainer');
-        if (!adContainer) return;
+        if (!adContainer || this.isWatchingAd) return;
         
         this.isWatchingAd = true;
+        this.adCompleted = false;
         this.adTimerSeconds = 30;
         
         adContainer.style.display = 'flex';
         
-        // Загружаем рекламу Monetag
+        // Загружаем рекламу Monetag в iframe для изоляции
         const monetagAd = document.getElementById('monetagAd');
         if (monetagAd) {
-            monetagAd.innerHTML = '';
-            const script = document.createElement('script');
-            script.src = 'https://quge5.com/88/tag.min.js';
-            script.setAttribute('data-zone', '260208');
-            script.async = true;
-            script.setAttribute('data-cfasync', 'false');
-            monetagAd.appendChild(script);
+            monetagAd.innerHTML = `
+                <iframe 
+                    srcdoc="
+                        <html>
+                        <head>
+                            <style>
+                                body { margin:0; padding:0; background:#000; display:flex; align-items:center; justify-content:center; min-height:250px; }
+                                .ad-label { color:#666; font-family:Arial; font-size:12px; text-align:center; }
+                            </style>
+                        </head>
+                        <body>
+                            <div style='width:100%; max-width:400px;'>
+                                <div class='ad-label'>Реклама</div>
+                                <script src='https://quge5.com/88/tag.min.js' data-zone='260208' async data-cfasync='false'></script>
+                            </div>
+                        </body>
+                        </html>
+                    " 
+                    style="width:100%; height:250px; border:none; border-radius:15px;"
+                    sandbox="allow-scripts allow-same-origin"
+                    scrolling="no"
+                ></iframe>
+            `;
         }
+        
+        // Блокируем всплывающие окна
+        this.blockPopups();
         
         // Таймер обратного отсчета
         this.adTimer = setInterval(() => {
@@ -524,24 +550,73 @@ class ArtStarsApp {
         }, 1000);
     }
 
+    blockPopups() {
+        // Перехватываем попытки открытия новых окон
+        window.open = function() {
+            console.log('Всплывающее окно заблокировано');
+            return null;
+        };
+        
+        // Блокируем редиректы
+        const originalSetTimeout = window.setTimeout;
+        window.setTimeout = function(callback, delay) {
+            if (typeof callback === 'string' && (
+                callback.includes('location') || 
+                callback.includes('window.open') ||
+                callback.includes('href')
+            )) {
+                console.log('Потенциально опасный setTimeout заблокирован');
+                return 0;
+            }
+            return originalSetTimeout(callback, delay);
+        };
+        
+        // Блокируем изменение location
+        let blocked = false;
+        Object.defineProperty(window, 'location', {
+            set: function(val) {
+                if (blocked) {
+                    console.log('Редирект заблокирован');
+                    return;
+                }
+                window.document.location = val;
+            }
+        });
+        
+        // Восстанавливаем через 35 секунд
+        setTimeout(() => {
+            blocked = false;
+            window.open = window.open;
+            window.setTimeout = originalSetTimeout;
+        }, 35000);
+    }
+
     async completeAd() {
         clearInterval(this.adTimer);
         this.adTimer = null;
         this.isWatchingAd = false;
+        this.adCompleted = true;
         
         const adContainer = document.getElementById('adContainer');
         if (adContainer) {
             adContainer.style.display = 'none';
         }
         
+        // Восстанавливаем нормальную работу
+        window.open = function(url, target, features) {
+            return window.document.defaultView.open(url, target, features);
+        };
+        
         if (this.user) {
             await recordAdView(this.user.id);
-            alert('Реклама просмотрена! +1 к прогрессу.');
+            alert('✅ Реклама просмотрена! +1 к прогрессу.');
             await this.loadProfile();
         }
     }
 
     closeAd() {
+        if (this.adCompleted) return;
+        
         clearInterval(this.adTimer);
         this.adTimer = null;
         this.isWatchingAd = false;
@@ -551,7 +626,12 @@ class ArtStarsApp {
             adContainer.style.display = 'none';
         }
         
-        alert('Реклама не досмотрена. Прогресс не засчитан.');
+        // Восстанавливаем нормальную работу
+        window.open = function(url, target, features) {
+            return window.document.defaultView.open(url, target, features);
+        };
+        
+        alert('❌ Реклама не досмотрена. Прогресс не засчитан.');
     }
 
     async loadProfile() {
@@ -563,7 +643,6 @@ class ArtStarsApp {
         
         const profile = await getUserProfile(userId);
         const artworks = await getUserArtworks(userId);
-        const todayViews = await getTodayViews(userId);
         const todayAdViews = await getTodayAdViews(userId);
         const lastWinner = await getLastWinner();
         
@@ -590,8 +669,8 @@ class ArtStarsApp {
                         <h3>📺 Звезда за рекламу</h3>
                         <div class="claim-progress">
                             ${Array.from({length: 5}, (_, i) => `
-                                <div class="progress-cell ${i < (todayAdViews % 5) ? 'filled' : ''}" style="position:relative; display:flex; align-items:center; justify-content:center;">
-                                    ${i < (todayAdViews % 5) ? '<span style="color:white; font-size:20px;">✓</span>' : ''}
+                                <div class="progress-cell ${i < (todayAdViews % 5) ? 'filled' : ''}" style="position:relative; display:flex; align-items:center; justify-content:center; width:35px; height:35px;">
+                                    ${i < (todayAdViews % 5) ? '<span style="color:white; font-size:16px;">✓</span>' : ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -600,28 +679,10 @@ class ArtStarsApp {
                             📺 Смотреть рекламу
                         </button>
                         ${todayAdViews >= 5 ? `
-                            <button class="neon-btn" onclick="window.claimAdStar()" style="margin:10px 0; background:var(--neon-green);">
+                            <button class="neon-btn" onclick="window.claimAdStar()" style="margin:10px 0; background:var(--neon-green); border-color:var(--neon-green);">
                                 ⭐ Получить звезду за рекламу
                             </button>
                         ` : ''}
-                    </div>
-                    
-                    <div class="star-claim-section">
-                        <h3>👁 Звезда за просмотры</h3>
-                        <div class="claim-progress">
-                            ${Array.from({length: 5}, (_, i) => `
-                                <div class="progress-cell ${i < (todayViews % 5) ? 'filled' : ''}" style="position:relative; display:flex; align-items:center; justify-content:center;">
-                                    ${i < (todayViews % 5) ? '<span style="color:white; font-size:20px;">✓</span>' : ''}
-                                </div>
-                            `).join('')}
-                        </div>
-                        <p>Просмотрено рисунков сегодня: ${todayViews}/5</p>
-                        ${this.viewTimerSeconds > 0 ? `
-                            <p class="view-timer">⏰ Таймер: ${Math.floor(this.viewTimerSeconds / 60)}:${(this.viewTimerSeconds % 60).toString().padStart(2, '0')}</p>
-                        ` : ''}
-                        <button class="neon-btn" onclick="window.claimViewStar()" style="margin:10px 0;" ${todayViews >= 5 ? '' : 'disabled'}>
-                            ⭐ Получить звезду за просмотры
-                        </button>
                     </div>
                 ` : ''}
                 
@@ -670,15 +731,6 @@ class ArtStarsApp {
             }
         };
         
-        window.claimViewStar = async () => {
-            const result = await claimViewStar(this.user.id);
-            alert(result.message);
-            if (result.success) {
-                await this.updateDisplay();
-                await this.loadProfile();
-            }
-        };
-        
         window.claimAdStar = async () => {
             const result = await claimAdStar(this.user.id);
             alert(result.message);
@@ -707,7 +759,6 @@ class ArtStarsApp {
             await publishArtwork(artworkId);
             await updateUserBalance(this.user.id, -50);
             
-            // Записываем покупку для увеличения банка
             await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                 method: 'POST',
                 headers: {
