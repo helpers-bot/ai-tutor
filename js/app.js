@@ -3,7 +3,8 @@ import {
     getUserProfile, updateUserProfile, updateUserBalance, saveArtwork,
     updateArtwork, deleteArtwork, publishArtwork, getUserArtworks,
     likeArtwork, recordView, getTodayViews, claimDailyStar,
-    claimViewStar, getLastWinner, isAdmin, getAllUsers
+    claimViewStar, getLastWinner, isAdmin, getAllUsers, recordAdView,
+    getTodayAdViews, claimAdStar
 } from './supabase.js';
 
 import { DrawingCanvas } from './canvas.js';
@@ -20,6 +21,9 @@ class ArtStarsApp {
         this.viewTimer = null;
         this.viewTimerSeconds = 0;
         this.viewedUser = null;
+        this.adTimer = null;
+        this.adTimerSeconds = 0;
+        this.isWatchingAd = false;
         
         this.init();
     }
@@ -94,31 +98,63 @@ class ArtStarsApp {
             
             <div id="canvasContainer" class="canvas-container">
                 <div class="canvas-toolbar">
-                    <button class="tool-btn" onclick="window.closeCanvas()" style="background: var(--neon-pink); border-color: var(--neon-pink);">
+                    <button class="tool-btn" onclick="window.closeCanvas()" style="background: var(--neon-pink); border-color: var(--neon-pink);" title="Закрыть редактор">
                         ✕
                     </button>
-                    <button class="tool-btn active" data-tool="brush" title="Кисть">✏️</button>
-                    <button class="tool-btn" data-tool="spray" title="Распылитель">💨</button>
-                    <button class="tool-btn" data-tool="eraser" title="Ластик">🧹</button>
-                    <input type="color" id="colorPicker" class="color-picker" value="#ff2d95" title="Цвет кисти">
-                    <span style="color:white; font-size:12px;">Фон:</span>
-                    <input type="color" id="bgColorPicker" class="color-picker" value="#ffffff" title="Цвет фона">
-                    <input type="range" id="sizeSlider" class="size-slider" min="1" max="30" value="5" title="Размер кисти">
-                    <span id="sizeValue" style="color:white; font-size:12px;">5px</span>
-                    <button class="tool-btn" onclick="window.undoCanvas()" title="Отменить">↩️</button>
-                    <button class="tool-btn" onclick="window.clearCanvas()" title="Очистить">🗑️</button>
+                    <button class="tool-btn active" data-tool="brush" title="Кисть">
+                        ✏️
+                    </button>
+                    <button class="tool-btn" data-tool="spray" title="Распылитель">
+                        💨
+                    </button>
+                    <button class="tool-btn" data-tool="eraser" title="Ластик">
+                        🧹
+                    </button>
+                    <button class="tool-btn" data-tool="fill" title="Заливка">
+                        🪣
+                    </button>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <span style="color:white; font-size:11px;">Цвет:</span>
+                        <input type="color" id="colorPicker" class="color-picker" value="#ff2d95" title="Цвет кисти">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <span style="color:white; font-size:11px;">Фон:</span>
+                        <input type="color" id="bgColorPicker" class="color-picker" value="#ffffff" title="Цвет фона">
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <span style="color:white; font-size:11px;">Размер:</span>
+                        <input type="range" id="sizeSlider" class="size-slider" min="1" max="30" value="5" title="Размер кисти">
+                        <span id="sizeValue" style="color:white; font-size:11px;">5px</span>
+                    </div>
+                    <button class="tool-btn" onclick="window.undoCanvas()" title="Отменить действие">
+                        ↩️
+                    </button>
+                    <button class="tool-btn" onclick="window.clearCanvas()" title="Очистить всё">
+                        🗑️
+                    </button>
                 </div>
                 <div style="display:flex; justify-content:center; align-items:center; flex:1; background:#2a2a2a; overflow:hidden;">
                     <canvas id="drawCanvas"></canvas>
                 </div>
                 <div class="canvas-actions">
-                    <button class="neon-btn" onclick="window.saveCanvas()">💾 Сохранить</button>
+                    <button class="neon-btn" onclick="window.saveCanvas()">💾 Сохранить в профиль</button>
                     <button class="neon-btn publish" onclick="window.publishCanvas()">🚀 Опубликовать (50 ⭐)</button>
-                    <button class="neon-btn danger" id="deleteArtworkBtn" style="display:none;" onclick="window.deleteCurrentArtwork()">❌ Удалить</button>
+                    <button class="neon-btn danger" id="deleteArtworkBtn" style="display:none;" onclick="window.deleteCurrentArtwork()">❌ Удалить рисунок</button>
                 </div>
             </div>
             
             <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="window.handleAvatarUpload(event)">
+            
+            <!-- Рекламный блок (скрыт) -->
+            <div id="adContainer" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.95); z-index:300; flex-direction:column; align-items:center; justify-content:center;">
+                <div style="text-align:center; color:white; margin-bottom:20px;">
+                    <h3>📺 Просмотр рекламы</h3>
+                    <p>Досмотрите рекламу до конца для получения награды</p>
+                    <p id="adTimerDisplay" style="font-size:24px; margin:20px 0; color:var(--neon-yellow);">30</p>
+                </div>
+                <div id="monetagAd" style="width:100%; max-width:400px; min-height:300px;"></div>
+                <button class="neon-btn" onclick="window.closeAd()" style="margin-top:20px; max-width:200px;">Закрыть рекламу</button>
+            </div>
         `;
         
         await this.initApp();
@@ -139,6 +175,8 @@ class ArtStarsApp {
         window.undoCanvas = () => this.drawingCanvas?.undo();
         window.clearCanvas = () => this.drawingCanvas?.clear();
         window.handleAvatarUpload = (e) => this.handleAvatarUpload(e);
+        window.closeAd = () => this.closeAd();
+        window.startAd = () => this.startAd();
     }
 
     setupNavigation() {
@@ -191,9 +229,7 @@ class ArtStarsApp {
             
             if (response.ok) {
                 const avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/avatars/${fileName}`;
-                
                 await updateUserProfile(this.user.id, { avatar_url: avatarUrl });
-                
                 await this.loadProfile();
                 alert('Аватар обновлен!');
             } else {
@@ -413,6 +449,7 @@ class ArtStarsApp {
             await updateUserBalance(this.user.id, -50);
             
             if (artworkId) {
+                // Записываем покупку для увеличения банка
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
                     headers: {
@@ -452,6 +489,71 @@ class ArtStarsApp {
         }
     }
 
+    startAd() {
+        const adContainer = document.getElementById('adContainer');
+        if (!adContainer) return;
+        
+        this.isWatchingAd = true;
+        this.adTimerSeconds = 30;
+        
+        adContainer.style.display = 'flex';
+        
+        // Загружаем рекламу Monetag
+        const monetagAd = document.getElementById('monetagAd');
+        if (monetagAd) {
+            monetagAd.innerHTML = '';
+            const script = document.createElement('script');
+            script.src = 'https://quge5.com/88/tag.min.js';
+            script.setAttribute('data-zone', '260208');
+            script.async = true;
+            script.setAttribute('data-cfasync', 'false');
+            monetagAd.appendChild(script);
+        }
+        
+        // Таймер обратного отсчета
+        this.adTimer = setInterval(() => {
+            this.adTimerSeconds--;
+            const timerDisplay = document.getElementById('adTimerDisplay');
+            if (timerDisplay) {
+                timerDisplay.textContent = this.adTimerSeconds;
+            }
+            
+            if (this.adTimerSeconds <= 0) {
+                this.completeAd();
+            }
+        }, 1000);
+    }
+
+    async completeAd() {
+        clearInterval(this.adTimer);
+        this.adTimer = null;
+        this.isWatchingAd = false;
+        
+        const adContainer = document.getElementById('adContainer');
+        if (adContainer) {
+            adContainer.style.display = 'none';
+        }
+        
+        if (this.user) {
+            await recordAdView(this.user.id);
+            alert('Реклама просмотрена! +1 к прогрессу.');
+            await this.loadProfile();
+        }
+    }
+
+    closeAd() {
+        clearInterval(this.adTimer);
+        this.adTimer = null;
+        this.isWatchingAd = false;
+        
+        const adContainer = document.getElementById('adContainer');
+        if (adContainer) {
+            adContainer.style.display = 'none';
+        }
+        
+        alert('Реклама не досмотрена. Прогресс не засчитан.');
+    }
+
     async loadProfile() {
         const container = document.getElementById('pageContainer');
         if (!container) return;
@@ -462,6 +564,7 @@ class ArtStarsApp {
         const profile = await getUserProfile(userId);
         const artworks = await getUserArtworks(userId);
         const todayViews = await getTodayViews(userId);
+        const todayAdViews = await getTodayAdViews(userId);
         const lastWinner = await getLastWinner();
         
         container.innerHTML = `
@@ -484,13 +587,35 @@ class ArtStarsApp {
                         <h3>🎁 Ежедневная звезда</h3>
                         <button class="neon-btn" onclick="window.claimDaily()" style="margin:10px 0;">🎁 Получить 1 звезду (раз в сутки)</button>
                         
+                        <h3>📺 Звезда за рекламу</h3>
+                        <div class="claim-progress">
+                            ${Array.from({length: 5}, (_, i) => `
+                                <div class="progress-cell ${i < (todayAdViews % 5) ? 'filled' : ''}" style="position:relative; display:flex; align-items:center; justify-content:center;">
+                                    ${i < (todayAdViews % 5) ? '<span style="color:white; font-size:20px;">✓</span>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <p>Просмотрено рекламы сегодня: ${todayAdViews}/5</p>
+                        <button class="neon-btn" onclick="window.startAd()" style="margin:10px 0;">
+                            📺 Смотреть рекламу
+                        </button>
+                        ${todayAdViews >= 5 ? `
+                            <button class="neon-btn" onclick="window.claimAdStar()" style="margin:10px 0; background:var(--neon-green);">
+                                ⭐ Получить звезду за рекламу
+                            </button>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="star-claim-section">
                         <h3>👁 Звезда за просмотры</h3>
                         <div class="claim-progress">
                             ${Array.from({length: 5}, (_, i) => `
-                                <div class="progress-cell ${i < (todayViews % 5) ? 'filled' : ''}"></div>
+                                <div class="progress-cell ${i < (todayViews % 5) ? 'filled' : ''}" style="position:relative; display:flex; align-items:center; justify-content:center;">
+                                    ${i < (todayViews % 5) ? '<span style="color:white; font-size:20px;">✓</span>' : ''}
+                                </div>
                             `).join('')}
                         </div>
-                        <p>Просмотрено сегодня: ${todayViews}/5 видео</p>
+                        <p>Просмотрено рисунков сегодня: ${todayViews}/5</p>
                         ${this.viewTimerSeconds > 0 ? `
                             <p class="view-timer">⏰ Таймер: ${Math.floor(this.viewTimerSeconds / 60)}:${(this.viewTimerSeconds % 60).toString().padStart(2, '0')}</p>
                         ` : ''}
@@ -554,6 +679,15 @@ class ArtStarsApp {
             }
         };
         
+        window.claimAdStar = async () => {
+            const result = await claimAdStar(this.user.id);
+            alert(result.message);
+            if (result.success) {
+                await this.updateDisplay();
+                await this.loadProfile();
+            }
+        };
+        
         window.editArtwork = async (artworkId) => {
             const { getArtwork } = await import('./supabase.js');
             const artwork = await getArtwork(artworkId);
@@ -573,6 +707,7 @@ class ArtStarsApp {
             await publishArtwork(artworkId);
             await updateUserBalance(this.user.id, -50);
             
+            // Записываем покупку для увеличения банка
             await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                 method: 'POST',
                 headers: {
