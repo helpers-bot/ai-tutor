@@ -3,7 +3,8 @@ import {
     getUserProfile, updateUserProfile, updateUserBalance, saveArtwork,
     updateArtwork, deleteArtwork, publishArtwork, getUserArtworks,
     likeArtwork, recordView, claimDailyStar,
-    getLastWinner, isAdmin, getAllUsers, claimTimerBonus
+    getLastWinner, isAdmin, getAllUsers, claimTimerBonus,
+    saveTimerState, getTimerState
 } from './supabase.js';
 
 import { DrawingCanvas } from './canvas.js';
@@ -19,8 +20,9 @@ class ArtStarsApp {
         this.editingArtworkId = null;
         this.viewedUser = null;
         this.timerInterval = null;
-        this.timerSeconds = 1800; // 30 минут
+        this.timerSeconds = 1800;
         this.timerActive = false;
+        this.isPageVisible = true;
         
         this.init();
     }
@@ -29,9 +31,25 @@ class ArtStarsApp {
         this.user = await checkAuth();
         
         if (this.user) {
+            await this.loadTimerState();
             await this.loadMainApp();
         } else {
             this.showAuthScreen();
+        }
+    }
+
+    async loadTimerState() {
+        if (!this.user) return;
+        
+        const state = await getTimerState(this.user.id);
+        this.timerSeconds = state.timer_seconds;
+        
+        // Если таймер истек, начисляем звезду
+        if (this.timerSeconds <= 0) {
+            await claimTimerBonus(this.user.id);
+            this.showNotification('⭐ Бонус!', 'Получена 1 звезда за время на сайте!', 'success');
+            this.timerSeconds = 1800;
+            await saveTimerState(this.user.id, this.timerSeconds);
         }
     }
 
@@ -58,6 +76,7 @@ class ArtStarsApp {
             box-shadow: 0 0 20px ${colors[type]}44;
             animation: slideIn 0.3s ease;
             cursor: pointer;
+            margin-bottom: 10px;
         `;
         
         notification.innerHTML = `
@@ -187,6 +206,9 @@ class ArtStarsApp {
         // Запускаем таймер бонуса
         this.startBonusTimer();
         
+        // Отслеживаем видимость страницы
+        this.setupVisibilityTracking();
+        
         window.closeCanvas = () => this.closeCanvas();
         window.saveCanvas = () => this.saveCanvas();
         window.publishCanvas = () => this.publishCanvas();
@@ -196,27 +218,73 @@ class ArtStarsApp {
         window.handleAvatarUpload = (e) => this.handleAvatarUpload(e);
     }
 
+    setupVisibilityTracking() {
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                this.isPageVisible = false;
+                // Сохраняем состояние таймера
+                this.saveTimerToServer();
+            } else {
+                this.isPageVisible = true;
+                // Восстанавливаем таймер
+                this.restoreTimerFromServer();
+            }
+        });
+        
+        window.addEventListener('beforeunload', () => {
+            this.saveTimerToServer();
+        });
+    }
+
+    async saveTimerToServer() {
+        if (this.user && this.timerActive) {
+            await saveTimerState(this.user.id, this.timerSeconds);
+        }
+    }
+
+    async restoreTimerFromServer() {
+        if (this.user) {
+            const state = await getTimerState(this.user.id);
+            this.timerSeconds = state.timer_seconds;
+            
+            // Если таймер истек пока страница была неактивна
+            if (this.timerSeconds <= 0) {
+                const bonuses = Math.floor(Math.abs(this.timerSeconds) / 1800) + 1;
+                for (let i = 0; i < bonuses; i++) {
+                    await claimTimerBonus(this.user.id);
+                }
+                this.showNotification('⭐ Бонус!', `Получено ${bonuses} звёзд за время отсутствия!`, 'success');
+                this.timerSeconds = 1800 - (Math.abs(this.timerSeconds) % 1800);
+                await this.updateDisplay();
+            }
+        }
+    }
+
     startBonusTimer() {
         this.timerActive = true;
-        this.timerSeconds = 1800;
         
         this.timerInterval = setInterval(async () => {
-            this.timerSeconds--;
-            
-            if (this.timerSeconds <= 0) {
-                // Начисляем звезду
-                if (this.user) {
-                    await claimTimerBonus(this.user.id);
-                    await this.updateDisplay();
-                    this.showNotification('⭐ Бонус!', 'Получена 1 звезда за 30 минут на сайте!', 'success');
+            if (this.isPageVisible) {
+                this.timerSeconds--;
+                
+                // Сохраняем состояние каждые 30 секунд
+                if (this.timerSeconds % 30 === 0) {
+                    this.saveTimerToServer();
                 }
                 
-                // Сбрасываем таймер
-                this.timerSeconds = 1800;
-                
-                // Обновляем отображение в профиле
-                if (this.currentPage === 'profile') {
-                    await this.loadProfile();
+                if (this.timerSeconds <= 0) {
+                    if (this.user) {
+                        await claimTimerBonus(this.user.id);
+                        await this.updateDisplay();
+                        this.showNotification('⭐ Бонус!', 'Получена 1 звезда за 30 минут на сайте!', 'success');
+                    }
+                    
+                    this.timerSeconds = 1800;
+                    await this.saveTimerToServer();
+                    
+                    if (this.currentPage === 'profile') {
+                        await this.loadProfile();
+                    }
                 }
             }
         }, 1000);
@@ -385,7 +453,7 @@ class ArtStarsApp {
             await likeArtwork(this.user.id, artworkId);
             await this.updateDisplay();
             await this.loadFeed();
-            this.showNotification('❤️ Лайк', 'Лайк поставлен!', 'success');
+            await this.updateBankDisplay();
         };
     }
 
@@ -490,8 +558,10 @@ class ArtStarsApp {
                 }
             }
             
+            // Списываем звёзды
             await updateUserBalance(this.user.id, -50);
             
+            // Добавляем в банк (записываем покупку)
             if (artworkId) {
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
@@ -510,7 +580,7 @@ class ArtStarsApp {
                 });
             }
             
-            this.showNotification('🚀 Опубликовано', 'Рисунок появился в ленте!', 'success');
+            this.showNotification('🚀 Опубликовано', 'Рисунок появился в ленте! +50 звёзд в банк', 'success');
             await this.updateDisplay();
             await this.updateBankDisplay();
             this.closeCanvas();
@@ -637,6 +707,7 @@ class ArtStarsApp {
             await publishArtwork(artworkId);
             await updateUserBalance(this.user.id, -50);
             
+            // Добавляем в банк
             await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                 method: 'POST',
                 headers: {
@@ -653,7 +724,7 @@ class ArtStarsApp {
                 })
             });
             
-            this.showNotification('🚀 Готово', 'Рисунок опубликован!', 'success');
+            this.showNotification('🚀 Готово', 'Рисунок опубликован! +50 в банк', 'success');
             await this.updateDisplay();
             await this.updateBankDisplay();
             await this.loadProfile();
