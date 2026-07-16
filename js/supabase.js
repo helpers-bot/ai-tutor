@@ -26,7 +26,6 @@ async function request(endpoint, options = {}) {
     }
 }
 
-// Auth functions
 async function signInWithGoogle() {
     window.location.href = `${SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=${REDIRECT_URL}`;
 }
@@ -60,7 +59,6 @@ async function checkAuth() {
     return getUser();
 }
 
-// Feed functions
 async function getFeed() {
     return request('artworks?is_published=eq.true&select=*,users(username,avatar_url)&order=created_at.desc&limit=50');
 }
@@ -70,13 +68,11 @@ async function getArtwork(id) {
     return data[0] || null;
 }
 
-// Bank functions
 async function getCurrentBank() {
     const data = await request('rpc/get_current_bank');
     return data?.[0]?.get_current_bank || 0;
 }
 
-// User functions
 async function getUserProfile(userId) {
     const data = await request(`users?id=eq.${userId}&select=*`);
     return data[0] || null;
@@ -101,7 +97,6 @@ async function updateUserBalance(userId, amount) {
     return true;
 }
 
-// Artwork functions
 async function saveArtwork(data) {
     return request('artworks', {
         method: 'POST',
@@ -133,7 +128,6 @@ async function getUserArtworks(userId) {
     return request(`artworks?user_id=eq.${userId}&order=created_at.desc`);
 }
 
-// Likes
 async function likeArtwork(userId, artworkId) {
     const existing = await request(`likes?user_id=eq.${userId}&artwork_id=eq.${artworkId}`);
     
@@ -165,7 +159,6 @@ async function likeArtwork(userId, artworkId) {
     return true;
 }
 
-// Views
 async function recordView(userId, artworkId) {
     try {
         await request('view_rewards', {
@@ -187,16 +180,6 @@ async function recordView(userId, artworkId) {
     }
 }
 
-async function getTodayViews(userId) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const todayISO = today.toISOString();
-    
-    const data = await request(`view_rewards?user_id=eq.${userId}&viewed_at=gte.${todayISO}&select=count`);
-    return data[0]?.count || 0;
-}
-
-// Stars
 async function claimDailyStar(userId) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -215,13 +198,11 @@ async function claimDailyStar(userId) {
     return true;
 }
 
-// Winner
 async function getLastWinner() {
     const data = await request('auction_winners?select=*,users(username,avatar_url)&order=won_at.desc&limit=1');
     return data[0] || null;
 }
 
-// Admin functions
 async function isAdmin(userId) {
     const data = await request(`admins?user_id=eq.${userId}&select=*`);
     return data.length > 0;
@@ -231,7 +212,6 @@ async function getAllUsers() {
     return request('users?select=*&order=created_at.desc');
 }
 
-// Ad functions
 async function recordAdView(userId) {
     try {
         await request('ad_views', {
@@ -292,7 +272,6 @@ export {
     getUserArtworks,
     likeArtwork,
     recordView,
-    getTodayViews,
     claimDailyStar,
     getLastWinner,
     isAdmin,
