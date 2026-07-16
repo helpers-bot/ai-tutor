@@ -277,3 +277,58 @@ export {
     isAdmin,
     getAllUsers
 };
+
+// Добавьте эти функции перед export в конце файла:
+
+// Ad functions
+async function recordAdView(userId) {
+    try {
+        await request('ad_views', {
+            method: 'POST',
+            body: JSON.stringify({ user_id: userId })
+        });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function getTodayAdViews(userId) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayISO = today.toISOString();
+    
+    const data = await request(`ad_views?user_id=eq.${userId}&viewed_at=gte.${todayISO}&select=count`);
+    return data[0]?.count || 0;
+}
+
+async function claimAdStar(userId) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const adViews = await getTodayAdViews(userId);
+    
+    if (adViews < 5) return { success: false, message: `Нужно 5 просмотров рекламы, сейчас ${adViews}` };
+    
+    // Проверяем, не получал ли уже звезду за рекламу сегодня
+    const existing = await request(`star_claims?user_id=eq.${userId}&claim_type=eq.ads&claimed_at=gte.${today.toISOString()}`);
+    
+    if (existing.length > 0) return { success: false, message: 'Уже получена звезда за рекламу сегодня' };
+    
+    await updateUserBalance(userId, 1);
+    
+    await request('star_claims', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: userId, claim_type: 'ads', stars_claimed: 1 })
+    });
+    
+    return { success: true, message: 'Звезда за рекламу получена!' };
+}
+
+// Добавьте в export:
+export {
+    // ... все существующие экспорты ...
+    recordAdView,
+    getTodayAdViews,
+    claimAdStar
+};
