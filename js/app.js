@@ -21,7 +21,6 @@ class ArtStarsApp {
         this.viewedUser = null;
         this.timerInterval = null;
         this.timerSeconds = 1800;
-        this.timerActive = false;
         this.isPageVisible = true;
         
         this.init();
@@ -43,6 +42,18 @@ class ArtStarsApp {
         
         const state = await getTimerState(this.user.id);
         this.timerSeconds = state.timer_seconds;
+        
+        // Если таймер истек пока пользователя не было - начисляем бонусы
+        if (this.timerSeconds <= 0) {
+            const bonuses = Math.floor(Math.abs(this.timerSeconds) / 1800) + 1;
+            for (let i = 0; i < bonuses; i++) {
+                await claimTimerBonus(this.user.id);
+            }
+            this.showNotification('⭐ Бонус!', `Начислено ${bonuses} звёзд за ваше отсутствие!`, 'success');
+            this.timerSeconds = 1800;
+            await saveTimerState(this.user.id, this.timerSeconds);
+            await this.updateDisplay();
+        }
     }
 
     showNotification(title, message, type = 'success') {
@@ -63,11 +74,12 @@ class ArtStarsApp {
             border-radius: 15px;
             padding: 15px 20px;
             color: white;
-            min-width: 250px;
+            min-width: 280px;
             max-width: 350px;
             box-shadow: 0 0 20px ${colors[type]}44;
-            animation: slideIn 0.3s ease;
+            animation: slideIn 0.3s ease forwards;
             cursor: pointer;
+            pointer-events: auto;
         `;
         
         notification.innerHTML = `
@@ -80,12 +92,18 @@ class ArtStarsApp {
             </div>
         `;
         
-        notification.onclick = () => notification.remove();
+        notification.onclick = () => {
+            notification.style.animation = 'slideOut 0.3s ease forwards';
+            setTimeout(() => notification.remove(), 300);
+        };
+        
         container.appendChild(notification);
         
         setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease forwards';
-            setTimeout(() => notification.remove(), 300);
+            if (notification.parentNode) {
+                notification.style.animation = 'slideOut 0.3s ease forwards';
+                setTimeout(() => notification.remove(), 300);
+            }
         }, 5000);
     }
 
@@ -194,10 +212,7 @@ class ArtStarsApp {
         setInterval(() => this.updateBankDisplay(), 10000);
         this.updateBankDisplay();
         
-        // Запускаем таймер бонуса
         this.startBonusTimer();
-        
-        // Отслеживаем видимость страницы
         this.setupVisibilityTracking();
         
         window.closeCanvas = () => this.closeCanvas();
@@ -210,7 +225,6 @@ class ArtStarsApp {
     }
 
     setupVisibilityTracking() {
-        // Сохраняем таймер когда страница скрыта
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 this.isPageVisible = false;
@@ -221,7 +235,6 @@ class ArtStarsApp {
             }
         });
         
-        // Сохраняем при уходе со страницы
         window.addEventListener('beforeunload', () => {
             this.saveTimerToServer();
         });
@@ -233,32 +246,19 @@ class ArtStarsApp {
         }
     }
 
-    async restoreTimerState() {
-        if (!this.user) return;
-        
-        const state = await getTimerState(this.user.id);
-        // Просто восстанавливаем сохраненное значение, не меняем его
-        this.timerSeconds = state.timer_seconds;
-    }
-
     startBonusTimer() {
-        this.timerActive = true;
-        
         if (this.timerInterval) {
             clearInterval(this.timerInterval);
         }
         
         this.timerInterval = setInterval(async () => {
-            // Таймер тикает только когда страница активна
             if (this.isPageVisible) {
                 this.timerSeconds--;
                 
-                // Сохраняем состояние каждые 10 секунд
-                if (this.timerSeconds % 10 === 0) {
+                if (this.timerSeconds % 30 === 0) {
                     this.saveTimerToServer();
                 }
                 
-                // Когда таймер истек
                 if (this.timerSeconds <= 0) {
                     if (this.user) {
                         await claimTimerBonus(this.user.id);
@@ -269,7 +269,6 @@ class ArtStarsApp {
                     this.timerSeconds = 1800;
                     await this.saveTimerToServer();
                     
-                    // Обновляем профиль если мы на нем
                     if (this.currentPage === 'profile') {
                         await this.loadProfile();
                     }
@@ -516,7 +515,7 @@ class ArtStarsApp {
         const profile = await getUserProfile(this.user.id);
         
         if (profile.stars_balance < 50) {
-            this.showNotification('❌ Ошибка', 'Недостаточно звёзд! Нужно 50 звёзд.', 'warning');
+            this.showNotification('❌ Ошибка', 'Недостаточно звёзд! Нужно 50.', 'warning');
             return;
         }
         
@@ -547,7 +546,6 @@ class ArtStarsApp {
             
             await updateUserBalance(this.user.id, -50);
             
-            // Добавляем в банк (ТОЛЬКО публикации)
             if (artworkId) {
                 await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                     method: 'POST',
@@ -572,7 +570,7 @@ class ArtStarsApp {
             this.closeCanvas();
             document.querySelector('.nav-btn[data-page="feed"]')?.click();
         } catch (error) {
-            console.error('Error publishing artwork:', error);
+            console.error('Error publishing:', error);
         }
     }
 
@@ -606,8 +604,8 @@ class ArtStarsApp {
                          ${isOwnProfile ? 'onclick="document.getElementById(\'avatarInput\').click()" style="cursor:pointer;"' : ''}>
                     ${isOwnProfile ? `
                         <div style="margin-top:10px;">
-                            <button class="neon-btn" onclick="document.getElementById('avatarInput').click()" style="font-size:12px; padding:5px 15px;">📷 Загрузить аватар</button>
-                            <button class="neon-btn" onclick="window.changeUsername()" style="font-size:12px; padding:5px 15px;">✏️ Сменить имя</button>
+                            <button class="neon-btn" onclick="document.getElementById('avatarInput').click()" style="font-size:12px; padding:5px 15px;">📷 Аватар</button>
+                            <button class="neon-btn" onclick="window.changeUsername()" style="font-size:12px; padding:5px 15px;">✏️ Имя</button>
                         </div>
                     ` : ''}
                     <h2>${profile?.username || 'Пользователь'}</h2>
@@ -619,11 +617,11 @@ class ArtStarsApp {
                         <h3>🎁 Ежедневная звезда</h3>
                         <button class="neon-btn" onclick="window.claimDaily()" style="margin:10px 0;">🎁 Получить 1 звезду (раз в сутки)</button>
                         
-                        <h3>⏰ Бонус за время на сайте</h3>
+                        <h3>⏰ Бонус за время</h3>
                         <div style="text-align:center; padding:20px; background:var(--bg-secondary); border-radius:15px; margin:10px 0;">
                             <p style="font-size:14px; color:var(--text-secondary);">До следующей звезды:</p>
                             <p style="font-size:48px; color:var(--neon-yellow); font-weight:bold; margin:10px 0;">${this.getTimerDisplay()}</p>
-                            <p style="font-size:12px; color:var(--text-secondary);">Каждые 30 минут на сайте — 1 звезда!</p>
+                            <p style="font-size:12px; color:var(--text-secondary);">30 минут на сайте = 1 звезда</p>
                         </div>
                     </div>
                 ` : ''}
@@ -632,7 +630,6 @@ class ArtStarsApp {
                     <div class="star-claim-section" style="border-color: var(--neon-yellow); box-shadow: 0 0 20px var(--neon-yellow);">
                         <h3>🏆 Последний победитель</h3>
                         <p>${lastWinner.users?.username} — ${lastWinner.total_bank} звёзд!</p>
-                        <p>${lastWinner.likes_count} лайков</p>
                     </div>
                 ` : ''}
                 
@@ -643,9 +640,7 @@ class ArtStarsApp {
                             <img src="${art.image_url}" alt="${art.title}">
                             ${art.is_published ? '<div style="position:absolute;top:5px;right:5px;background:var(--neon-purple);padding:2px 8px;border-radius:10px;font-size:10px;">Опубл.</div>' : ''}
                             <div class="artwork-actions">
-                                ${!art.is_published ? `
-                                    <button class="mini-btn" onclick="event.stopPropagation(); window.publishExistingArtwork('${art.id}')">🚀 Опубликовать</button>
-                                ` : ''}
+                                ${!art.is_published ? `<button class="mini-btn" onclick="event.stopPropagation(); window.publishExistingArtwork('${art.id}')">🚀</button>` : ''}
                                 <button class="mini-btn" style="border-color:red; color:red;" onclick="event.stopPropagation(); window.deleteUserArtwork('${art.id}')">🗑️</button>
                             </div>
                         </div>
@@ -655,7 +650,7 @@ class ArtStarsApp {
         `;
         
         window.changeUsername = async () => {
-            const name = prompt('Введите новое имя:');
+            const name = prompt('Новое имя:');
             if (name) {
                 await updateUserProfile(this.user.id, { username: name });
                 await this.loadProfile();
@@ -666,11 +661,11 @@ class ArtStarsApp {
         window.claimDaily = async () => {
             const result = await claimDailyStar(this.user.id);
             if (result) {
-                this.showNotification('⭐ Получено!', 'Ежедневная звезда начислена!', 'success');
+                this.showNotification('⭐ Успех!', 'Звезда получена!', 'success');
                 await this.updateDisplay();
                 await this.loadProfile();
             } else {
-                this.showNotification('⏰ Подождите', 'Вы уже получили звезду сегодня!', 'warning');
+                this.showNotification('⏰ Подождите', 'Уже получена сегодня', 'warning');
             }
         };
         
@@ -686,14 +681,13 @@ class ArtStarsApp {
         window.publishExistingArtwork = async (artworkId) => {
             const profile = await getUserProfile(this.user.id);
             if (profile.stars_balance < 50) {
-                this.showNotification('❌ Ошибка', 'Недостаточно звёзд! Нужно 50.', 'warning');
+                this.showNotification('❌ Ошибка', 'Нужно 50 звёзд', 'warning');
                 return;
             }
             
             await publishArtwork(artworkId);
             await updateUserBalance(this.user.id, -50);
             
-            // Добавляем в банк
             await fetch(`${SUPABASE_URL}/rest/v1/purchases`, {
                 method: 'POST',
                 headers: {
@@ -710,17 +704,16 @@ class ArtStarsApp {
                 })
             });
             
-            this.showNotification('🚀 Готово', 'Опубликовано! +50 в банк', 'success');
+            this.showNotification('🚀 Готово', '+50 в банк!', 'success');
             await this.updateDisplay();
             await this.updateBankDisplay();
             await this.loadProfile();
         };
         
         window.deleteUserArtwork = async (artworkId) => {
-            if (confirm('Удалить этот рисунок?')) {
+            if (confirm('Удалить?')) {
                 await deleteArtwork(artworkId);
                 await this.loadProfile();
-                this.showNotification('🗑️ Удалено', 'Рисунок удален', 'info');
             }
         };
     }
@@ -729,74 +722,53 @@ class ArtStarsApp {
         const container = document.getElementById('pageContainer');
         if (!container) return;
         
-        container.innerHTML = '<div style="text-align:center; padding: 40px;">Загрузка...</div>';
+        container.innerHTML = '<div style="text-align:center; padding:40px;">Загрузка...</div>';
         
         try {
             const users = await getAllUsers();
-            
             container.innerHTML = `
-                <div class="admin-panel" style="padding:20px;">
-                    <h2 style="text-align:center; margin-bottom:20px;">👑 Админ-панель</h2>
-                    <div style="background: var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:20px;">
-                        <h3>📊 Статистика</h3>
-                        <p>Всего пользователей: ${users.length}</p>
-                    </div>
-                    <div style="max-height:70vh; overflow-y:auto;">
-                        ${users.map(u => `
-                            <div style="background: var(--glass-bg); padding:15px; border-radius:15px; margin-bottom:10px;">
-                                <div style="display:flex; align-items:center; gap:15px;">
-                                    <img src="${u.avatar_url || 'icon.svg'}" style="width:50px;height:50px;border-radius:50%;border:2px solid var(--neon-purple);">
-                                    <div style="flex:1;">
-                                        <strong>${u.username || 'Без имени'}</strong>
-                                        <p style="font-size:12px;">ID: ${u.id}</p>
-                                        <p style="color:var(--neon-yellow);">⭐ ${u.stars_balance}</p>
-                                    </div>
-                                </div>
-                                <div style="display:flex; gap:5px; margin-top:10px;">
-                                    <button class="mini-btn" onclick="window.editUserField('${u.id}', 'username', 'Имя')">✏️</button>
-                                    <button class="mini-btn" onclick="window.editUserStars('${u.id}', ${u.stars_balance})">⭐</button>
-                                    <button class="mini-btn" style="border-color:red; color:red;" onclick="window.deleteUser('${u.id}')">🗑️</button>
-                                </div>
+                <div style="padding:20px;">
+                    <h2 style="text-align:center;">👑 Админ</h2>
+                    <p>Пользователей: ${users.length}</p>
+                    ${users.map(u => `
+                        <div style="background:var(--glass-bg); padding:10px; border-radius:10px; margin:5px 0; display:flex; align-items:center; gap:10px;">
+                            <img src="${u.avatar_url || 'icon.svg'}" style="width:40px;height:40px;border-radius:50%;">
+                            <div style="flex:1;">
+                                <strong>${u.username || 'Нет имени'}</strong>
+                                <p style="font-size:11px;">⭐ ${u.stars_balance}</p>
                             </div>
-                        `).join('')}
-                    </div>
+                            <button class="mini-btn" onclick="window.editStars('${u.id}',${u.stars_balance})">⭐</button>
+                            <button class="mini-btn" style="border-color:red;color:red;" onclick="window.delUser('${u.id}')">🗑️</button>
+                        </div>
+                    `).join('')}
                 </div>
             `;
             
-            window.editUserField = async (userId, field, label) => {
-                const value = prompt(`Новое значение ${label}:`);
-                if (value) {
-                    await updateUserProfile(userId, { [field]: value });
-                    await this.loadAdminPanel();
-                }
-            };
-            
-            window.editUserStars = async (userId, current) => {
-                const val = prompt('+начислить, -снять, или число:');
-                if (val) {
-                    let newVal = current;
-                    if (val.startsWith('+')) newVal = current + parseInt(val.substring(1));
-                    else if (val.startsWith('-')) newVal = current - parseInt(val.substring(1));
-                    else newVal = parseInt(val);
-                    
-                    if (!isNaN(newVal)) {
-                        await updateUserProfile(userId, { stars_balance: newVal });
+            window.editStars = async (id, cur) => {
+                const v = prompt('+/- или число:');
+                if (v) {
+                    let n = cur;
+                    if (v.startsWith('+')) n = cur + parseInt(v.substring(1));
+                    else if (v.startsWith('-')) n = cur - parseInt(v.substring(1));
+                    else n = parseInt(v);
+                    if (!isNaN(n)) {
+                        await updateUserProfile(id, { stars_balance: n });
                         await this.loadAdminPanel();
                     }
                 }
             };
             
-            window.deleteUser = async (userId) => {
-                if (confirm('Удалить пользователя?')) {
-                    await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`, {
+            window.delUser = async (id) => {
+                if (confirm('Удалить?')) {
+                    await fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${id}`, {
                         method: 'DELETE',
                         headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                     });
                     await this.loadAdminPanel();
                 }
             };
-        } catch (error) {
-            console.error('Error:', error);
+        } catch (e) {
+            console.error(e);
         }
     }
 }
