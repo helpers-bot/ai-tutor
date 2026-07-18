@@ -33,7 +33,6 @@
             overflow-x: hidden;
         }
 
-        /* Частицы */
         .particles {
             position: fixed;
             top: 0;
@@ -134,7 +133,6 @@
             margin-bottom: 20px;
         }
 
-        /* Кнопка Google */
         .google-btn {
             display: flex;
             align-items: center;
@@ -166,7 +164,6 @@
             height: 24px;
         }
 
-        /* Профиль */
         .profile {
             margin-bottom: 30px;
         }
@@ -240,7 +237,6 @@
             box-shadow: 0 5px 20px rgba(0, 243, 255, 0.4);
         }
 
-        /* Баланс */
         .balance {
             background: rgba(0, 243, 255, 0.05);
             border: 1px solid rgba(0, 243, 255, 0.2);
@@ -285,7 +281,6 @@
             color: rgba(255, 255, 255, 0.6);
         }
 
-        /* Кнопки */
         .speed-btn, .game-btn, .logout-btn {
             width: 100%;
             max-width: 300px;
@@ -333,7 +328,6 @@
             color: #ff6b6b;
         }
 
-        /* Модальные окна */
         .modal {
             display: none;
             position: fixed;
@@ -436,7 +430,6 @@
             transform: translateY(-2px);
         }
 
-        /* Реклама */
         .ad-container {
             position: fixed;
             bottom: 0;
@@ -470,7 +463,6 @@
             font-size: 12px;
         }
 
-        /* Уведомления */
         .notification {
             position: fixed;
             top: 20px;
@@ -502,19 +494,15 @@
     </style>
 </head>
 <body>
-    <!-- Частицы -->
     <div class="particles" id="particles"></div>
 
-    <!-- Главный контейнер -->
     <div class="main-container">
         <div class="neon-border"></div>
         
         <div class="container" id="app">
-            <!-- Логотип -->
             <div class="logo-text">VDS</div>
             <div class="logo-subtitle">vds-game.ink</div>
 
-            <!-- Экран входа -->
             <div id="loginScreen">
                 <div class="welcome-text">
                     <h2>⚡ Добро пожаловать в VDS Miner</h2>
@@ -531,7 +519,6 @@
                 </button>
             </div>
 
-            <!-- Экран майнинга -->
             <div id="miningScreen" style="display: none;">
                 <div class="profile">
                     <div class="avatar-ring">
@@ -561,7 +548,6 @@
         </div>
     </div>
 
-    <!-- Модальные окна -->
     <div class="modal" id="speedModal">
         <div class="modal-content">
             <h3>🚀 Увеличение скорости майнинга</h3>
@@ -591,7 +577,6 @@
         </div>
     </div>
 
-    <!-- Рекламный контейнер -->
     <div id="adContainer" class="ad-container" style="display: none;">
         <div class="ad-banner">
             <h3>📢 Рекламный блок</h3>
@@ -600,22 +585,34 @@
     </div>
 
     <script>
-        // Ждем загрузку страницы
         document.addEventListener('DOMContentLoaded', function() {
             
-            // ========== НАСТРОЙКИ ==========
+            // ПРАВИЛЬНЫЙ URL С УЧЕТОМ РЕГИСТРА!
             const SUPABASE_URL = 'https://l2ls0oS3ZwF9GUTochw.supabase.co'
             const SUPABASE_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y'
             
-            // ========== ПЕРЕМЕННЫЕ ==========
+            console.log('🚀 Запуск VDS Miner...')
+            
+            // Проверяем URL
+            console.log('Supabase URL:', SUPABASE_URL)
+            
             let supabase
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+                console.log('✅ Supabase клиент создан')
+            } catch (error) {
+                console.error('❌ Ошибка создания клиента:', error)
+                alert('Ошибка подключения к серверу. Проверьте URL Supabase.')
+                return
+            }
+            
             let currentUser = null
             let miningInterval = null
             let currentBalance = 0
             let isAdsEnabled = false
             let miningSpeed = 0.0000001
             
-            // ========== DOM ЭЛЕМЕНТЫ ==========
+            // DOM элементы
             const loginScreen = document.getElementById('loginScreen')
             const miningScreen = document.getElementById('miningScreen')
             const googleLoginBtn = document.getElementById('googleLoginBtn')
@@ -625,75 +622,51 @@
             const disableBtn = document.getElementById('disableBtn')
             const logoutBtn = document.getElementById('logoutBtn')
             const saveNicknameBtn = document.getElementById('saveNicknameBtn')
-            const enableAdsBtn = document.getElementById('enableAdsBtn')
-            const cancelSpeedBtn = document.getElementById('cancelSpeedBtn')
-            const disableAdsBtn = document.getElementById('disableAdsBtn')
-            const cancelDisableBtn = document.getElementById('cancelDisableBtn')
             const speedModal = document.getElementById('speedModal')
             const disableModal = document.getElementById('disableModal')
             const adContainer = document.getElementById('adContainer')
             
-            // ========== ИНИЦИАЛИЗАЦИЯ ==========
-            function init() {
-                console.log('🚀 Запуск VDS Miner...')
-                
-                // Создаем частицы
-                createParticles()
-                
-                // Инициализируем Supabase
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
-                console.log('✅ Supabase подключен')
-                
-                // Вешаем обработчики
-                googleLoginBtn.addEventListener('click', loginWithGoogle)
-                logoutBtn.addEventListener('click', logout)
-                saveNicknameBtn.addEventListener('click', updateNickname)
-                
-                speedBtn.addEventListener('click', () => speedModal.classList.add('active'))
-                cancelSpeedBtn.addEventListener('click', () => speedModal.classList.remove('active'))
-                enableAdsBtn.addEventListener('click', enableAds)
-                
-                disableBtn.addEventListener('click', () => disableModal.classList.add('active'))
-                cancelDisableBtn.addEventListener('click', () => disableModal.classList.remove('active'))
-                disableAdsBtn.addEventListener('click', disableAds)
-                
-                // Закрытие модалок по клику вне
-                window.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('modal')) {
-                        e.target.classList.remove('active')
-                    }
-                })
-                
-                // Проверяем, не вернулись ли мы после OAuth
-                checkOAuthCallback()
-                
-                // Проверяем существующую сессию
-                checkSession()
+            // Частицы
+            const container = document.getElementById('particles')
+            const colors = ['#00f3ff', '#b347ea', '#ff6b9d', '#39ff14']
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div')
+                particle.className = 'particle'
+                particle.style.width = `${Math.random() * 4 + 2}px`
+                particle.style.height = particle.style.width
+                particle.style.left = `${Math.random() * 100}%`
+                particle.style.top = `${Math.random() * 100}%`
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)]
+                particle.style.animationDelay = `${Math.random() * 3}s`
+                particle.style.animationDuration = `${Math.random() * 2 + 2}s`
+                container.appendChild(particle)
             }
             
-            // ========== ЧАСТИЦЫ ==========
-            function createParticles() {
-                const container = document.getElementById('particles')
-                const colors = ['#00f3ff', '#b347ea', '#ff6b9d', '#39ff14']
-                
-                for (let i = 0; i < 50; i++) {
-                    const particle = document.createElement('div')
-                    particle.className = 'particle'
-                    particle.style.width = `${Math.random() * 4 + 2}px`
-                    particle.style.height = particle.style.width
-                    particle.style.left = `${Math.random() * 100}%`
-                    particle.style.top = `${Math.random() * 100}%`
-                    particle.style.background = colors[Math.floor(Math.random() * colors.length)]
-                    particle.style.animationDelay = `${Math.random() * 3}s`
-                    particle.style.animationDuration = `${Math.random() * 2 + 2}s`
-                    container.appendChild(particle)
+            // Обработчики кнопок
+            googleLoginBtn.addEventListener('click', loginWithGoogle)
+            logoutBtn.addEventListener('click', logout)
+            saveNicknameBtn.addEventListener('click', updateNickname)
+            
+            speedBtn.addEventListener('click', () => speedModal.classList.add('active'))
+            document.getElementById('cancelSpeedBtn').addEventListener('click', () => speedModal.classList.remove('active'))
+            document.getElementById('enableAdsBtn').addEventListener('click', enableAds)
+            
+            disableBtn.addEventListener('click', () => disableModal.classList.add('active'))
+            document.getElementById('cancelDisableBtn').addEventListener('click', () => disableModal.classList.remove('active'))
+            document.getElementById('disableAdsBtn').addEventListener('click', disableAds)
+            
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    e.target.classList.remove('active')
                 }
-            }
+            })
             
-            // ========== АВТОРИЗАЦИЯ ==========
+            // Вход через Google
             async function loginWithGoogle() {
                 try {
                     console.log('🔑 Вход через Google...')
+                    console.log('Redirect URL:', window.location.origin + window.location.pathname)
                     
                     const { data, error } = await supabase.auth.signInWithOAuth({
                         provider: 'google',
@@ -704,12 +677,12 @@
                     
                     if (error) {
                         console.error('❌ Ошибка входа:', error)
-                        showNotification('Ошибка входа: ' + error.message, 'error')
+                        alert('Ошибка входа: ' + error.message)
                     }
                     
                 } catch (error) {
                     console.error('❌ Ошибка:', error)
-                    showNotification('Ошибка соединения', 'error')
+                    alert('Ошибка соединения')
                 }
             }
             
@@ -718,7 +691,7 @@
                 const params = new URLSearchParams(window.location.search)
                 
                 if (params.has('code')) {
-                    console.log('🔄 Обнаружен OAuth колбэк...')
+                    console.log('🔄 Обработка OAuth колбэка...')
                     
                     try {
                         const { data, error } = await supabase.auth.exchangeCodeForSession(params.get('code'))
@@ -727,26 +700,25 @@
                         
                         if (data.session) {
                             currentUser = data.session.user
-                            console.log('✅ Пользователь авторизован:', currentUser.email)
+                            console.log('✅ Пользователь:', currentUser.email)
                             await loadUserData()
                             showMiningScreen()
-                            
-                            // Очищаем URL
                             window.history.replaceState({}, document.title, window.location.pathname)
                         }
                     } catch (error) {
                         console.error('❌ Ошибка колбэка:', error)
+                        alert('Ошибка авторизации. Попробуйте еще раз.')
                     }
                 }
             }
             
-            // Проверка существующей сессии
+            // Проверка сессии
             async function checkSession() {
                 try {
                     const { data: { session } } = await supabase.auth.getSession()
                     
                     if (session) {
-                        console.log('✅ Найдена активная сессия')
+                        console.log('✅ Найдена сессия')
                         currentUser = session.user
                         await loadUserData()
                         showMiningScreen()
@@ -756,12 +728,12 @@
                 }
             }
             
-            // ========== ДАННЫЕ ПОЛЬЗОВАТЕЛЯ ==========
+            // Загрузка данных
             async function loadUserData() {
                 if (!currentUser) return
                 
                 try {
-                    console.log('📂 Загрузка данных пользователя...')
+                    console.log('📂 Загрузка данных...')
                     
                     let { data: userData, error } = await supabase
                         .from('users')
@@ -770,15 +742,14 @@
                         .single()
                     
                     if (error || !userData) {
-                        // Создаем нового пользователя
-                        console.log('📝 Создание нового пользователя...')
+                        console.log('📝 Создание пользователя...')
                         
                         const newUser = {
                             id: currentUser.id,
                             email: currentUser.email,
                             nickname: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Miner',
                             avatar_url: currentUser.user_metadata?.avatar_url || '',
-                            balance: 0.0000000,
+                            balance: 0,
                             ads_enabled: false,
                             mining_speed: 0.0000001,
                             created_at: new Date().toISOString(),
@@ -792,21 +763,18 @@
                             .single()
                         
                         if (createError) {
-                            console.error('❌ Ошибка создания пользователя:', createError)
-                            // Используем локальные данные если не удалось создать в БД
+                            console.error('❌ Ошибка создания:', createError)
                             userData = newUser
                         } else {
                             userData = createdUser
                         }
                     }
                     
-                    // Обновляем интерфейс
                     updateUI(userData)
                     startMining()
                     
                 } catch (error) {
-                    console.error('❌ Ошибка загрузки данных:', error)
-                    // Используем базовые значения
+                    console.error('❌ Ошибка:', error)
                     updateUI({
                         nickname: currentUser.email?.split('@')[0] || 'Miner',
                         avatar_url: '',
@@ -841,7 +809,6 @@
                 }
             }
             
-            // ========== МАЙНИНГ ==========
             function startMining() {
                 if (miningInterval) clearInterval(miningInterval)
                 
@@ -850,7 +817,6 @@
                     updateBalanceDisplay()
                 }, 1000)
                 
-                // Сохранение в БД каждые 15 секунд
                 setInterval(saveBalance, 15000)
             }
             
@@ -880,11 +846,10 @@
                 }
             }
             
-            // ========== ДЕЙСТВИЯ ==========
             async function updateNickname() {
                 const newNickname = document.getElementById('nicknameInput').value.trim()
                 if (!newNickname || !currentUser) {
-                    showNotification('Введите никнейм', 'error')
+                    alert('Введите никнейм')
                     return
                 }
                 
@@ -947,7 +912,6 @@
                 miningScreen.style.display = 'block'
             }
             
-            // ========== УВЕДОМЛЕНИЯ ==========
             function showNotification(message, type = 'info') {
                 const notification = document.createElement('div')
                 notification.className = `notification notification-${type}`
@@ -959,8 +923,9 @@
                 }, 3000)
             }
             
-            // ========== ЗАПУСК ==========
-            init()
+            // Запуск
+            checkOAuthCallback()
+            checkSession()
             
         })
     </script>
