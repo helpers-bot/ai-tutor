@@ -77,7 +77,7 @@
             margin: 0 auto 32px;
         }
 
-        #loginPage .g_id_signin {
+        .g_id_signin {
             display: flex;
             justify-content: center;
         }
@@ -458,13 +458,13 @@
             <p style="color: #8a9bb8; margin-bottom: 28px; font-size: 14px; line-height: 1.6;">
                 Войдите через Google, чтобы начать майнить TRX
             </p>
-            
-            <!-- Кнопка входа через Google (POPUP режим) -->
+
             <div id="g_id_onload"
                 data-client_id="12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com"
                 data-callback="handleCredentialResponse"
                 data-auto_select="false">
             </div>
+
             <div class="g_id_signin"
                 data-type="standard"
                 data-shape="rectangular"
@@ -473,7 +473,7 @@
                 data-size="large"
                 data-logo_alignment="left">
             </div>
-            
+
             <p id="loginError" style="color: #ef4444; font-size: 13px; margin-top: 16px; display: none;"></p>
         </div>
 
@@ -669,7 +669,6 @@
 
             async function saveUserToSupabase(googleUser) {
                 try {
-                    // Проверяем, есть ли пользователь
                     const { data: existing, error: findError } = await supabase
                         .from('users')
                         .select('*')
@@ -682,7 +681,6 @@
                     }
 
                     if (existing) {
-                        // Обновляем существующего
                         const { data: updated, error: updateError } = await supabase
                             .from('users')
                             .update({
@@ -703,7 +701,6 @@
                         userUid = updated.user_uid;
                         return updated;
                     } else {
-                        // Создаём нового
                         const newUserUid = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
                         const { data: created, error: createError } = await supabase
                             .from('users')
@@ -929,7 +926,7 @@
             }
 
             // ================================================================
-            // 10. АВТОРИЗАЦИЯ (POPUP режим — НЕТ РЕДИРЕКТА!)
+            // 10. АВТОРИЗАЦИЯ
             // ================================================================
             window.handleCredentialResponse = async function(response) {
                 try {
@@ -944,7 +941,6 @@
                     loginError.style.display = 'none';
                     console.log('🔑 Вход через Google:', googleUser.name);
 
-                    // Сохраняем в Supabase
                     const savedUser = await saveUserToSupabase(googleUser);
                     if (!savedUser) {
                         loginError.textContent = 'Ошибка сохранения данных. Попробуйте ещё раз.';
@@ -955,7 +951,6 @@
                     user = savedUser;
                     userUid = savedUser.user_uid;
 
-                    // Загружаем баланс
                     const userData = await loadBalanceFromSupabase(userUid);
                     if (userData) {
                         balance = userData.balance || 0.0000001;
@@ -972,7 +967,6 @@
                         }
                     }
 
-                    // Сохраняем в localStorage
                     localStorage.setItem('trxMinerUser', JSON.stringify({
                         user_uid: userUid,
                         google_id: googleUser.id,
