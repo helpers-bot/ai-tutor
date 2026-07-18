@@ -7,7 +7,8 @@
 
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
@@ -43,7 +44,7 @@
             transition: all 0.2s;
         }
 
-        /* ----- Страница входа (Login Page) ----- */
+        /* ----- Страница входа ----- */
         #loginPage {
             display: flex;
             flex-direction: column;
@@ -81,7 +82,7 @@
             justify-content: center;
         }
 
-        /* ----- Основная панель (Dashboard) ----- */
+        /* ----- Основная панель ----- */
         #dashboardPage {
             display: none;
         }
@@ -477,7 +478,7 @@
         </div>
 
         <!-- ============================================================ -->
-        <!-- ОСНОВНАЯ ПАНЕЛЬ (появляется после входа) -->
+        <!-- ОСНОВНАЯ ПАНЕЛЬ -->
         <!-- ============================================================ -->
         <div id="dashboardPage">
             <!-- Profile -->
@@ -580,7 +581,18 @@
         (function() {
             'use strict';
 
-            // ---------- DOM refs ----------
+            // ================================================================
+            // 1. ПОДКЛЮЧЕНИЕ К SUPABASE
+            // ================================================================
+            const SUPABASE_URL = 'https://l2ls0oS3ZwF9GUTochw.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
+
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase подключён');
+
+            // ================================================================
+            // 2. DOM-ЭЛЕМЕНТЫ
+            // ================================================================
             const loginPage = document.getElementById('loginPage');
             const dashboardPage = document.getElementById('dashboardPage');
             const loginError = document.getElementById('loginError');
@@ -613,7 +625,9 @@
             const logoutBtn = document.getElementById('logoutBtn');
             const adContainer = document.getElementById('adContainer');
 
-            // ---------- State ----------
+            // ================================================================
+            // 3. СОСТОЯНИЕ
+            // ================================================================
             let balance = 0.0000001;
             const BASE_RATE = 0.0000001;
             let currentRate = BASE_RATE;
@@ -622,8 +636,12 @@
             let lastTimestamp = 0;
             let adScriptLoaded = false;
             let user = null;
+            let userUid = null; // уникальный ID пользователя в Supabase
+            let saveTimeout = null;
 
-            // ---------- Helpers ----------
+            // ================================================================
+            // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+            // ================================================================
             function formatBalance(val) {
                 return val.toFixed(7);
             }
@@ -633,7 +651,6 @@
                 rateEl.textContent = `+${formatBalance(currentRate)}`;
             }
 
-            // ---------- Показ страниц ----------
             function showLoginPage() {
                 loginPage.style.display = 'flex';
                 dashboardPage.classList.remove('visible');
@@ -646,7 +663,171 @@
                 dashboardPage.classList.add('visible');
             }
 
-            // ---------- Реклама ----------
+            // ================================================================
+            // 5. РАБОТА С SUPABASE
+            // ================================================================
+
+            // Сохранение пользователя
+            async function saveUserToSupabase(googleUser) {
+                try {
+                    // Проверяем, есть ли пользователь
+                    const { data: existing, error: findError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('google_id', googleUser.id)
+                        .single();
+
+                    if (findError && findError.code !== 'PGRST116') {
+                        console.error('Ошибка поиска:', findError);
+                        return null;
+                    }
+
+                    if (existing) {
+                        // Обновляем существующего
+                        const { data: updated, error: updateError } = await supabase
+                            .from('users')
+                            .update({
+                                email: googleUser.email,
+                                name: googleUser.name,
+                                picture: googleUser.picture,
+                                last_login: new Date().toISOString()
+                            })
+                            .eq('google_id', googleUser.id)
+                            .select()
+                            .single();
+
+                        if (updateError) {
+                            console.error('Ошибка обновления:', updateError);
+                            return existing;
+                        }
+
+                        userUid = updated.user_uid;
+                        return updated;
+                    } else {
+                        // Создаём нового
+                        const newUserUid = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                        const { data: created, error: createError } = await supabase
+                            .from('users')
+                            .insert({
+                                google_id: googleUser.id,
+                                user_uid: newUserUid,
+                                email: googleUser.email,
+                                name: googleUser.name,
+                                nickname: googleUser.name || 'Игрок',
+                                picture: googleUser.picture,
+                                balance: 0.0000001,
+                                rate_multiplier: 1,
+                                is_ads_enabled: false,
+                                created_at: new Date().toISOString(),
+                                last_login: new Date().toISOString()
+                            })
+                            .select()
+                            .single();
+
+                        if (createError) {
+                            console.error('Ошибка создания:', createError);
+                            return null;
+                        }
+
+                        userUid = created.user_uid;
+                        return created;
+                    }
+                } catch (e) {
+                    console.error('Ошибка сохранения пользователя:', e);
+                    return null;
+                }
+            }
+
+            // Загрузка баланса
+            async function loadBalanceFromSupabase(uid) {
+                try {
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('balance, rate_multiplier, is_ads_enabled')
+                        .eq('user_uid', uid)
+                        .single();
+
+                    if (error) {
+                        console.error('Ошибка загрузки баланса:', error);
+                        return null;
+                    }
+
+                    return data;
+                } catch (e) {
+                    console.error('Ошибка:', e);
+                    return null;
+                }
+            }
+
+            // Сохранение баланса
+            async function saveBalanceToSupabase(uid, newBalance, rate, adsEnabled) {
+                try {
+                    // Обновляем баланс
+                    const { error } = await supabase
+                        .from('users')
+                        .update({
+                            balance: newBalance,
+                            rate_multiplier: adsEnabled ? 3 : 1,
+                            is_ads_enabled: adsEnabled,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_uid', uid);
+
+                    if (error) {
+                        console.error('Ошибка сохранения баланса:', error);
+                        return false;
+                    }
+
+                    // Сохраняем транзакцию
+                    await supabase
+                        .from('transactions')
+                        .insert({
+                            user_uid: uid,
+                            amount: currentRate * 10, // примерная сумма за 10 секунд
+                            type: adsEnabled ? 'speed_boost' : 'mining',
+                            rate: currentRate
+                        });
+
+                    return true;
+                } catch (e) {
+                    console.error('Ошибка:', e);
+                    return false;
+                }
+            }
+
+            // Сохранение никнейма
+            async function updateNicknameInSupabase(uid, newNickname) {
+                try {
+                    const { error } = await supabase
+                        .from('users')
+                        .update({ nickname: newNickname })
+                        .eq('user_uid', uid);
+
+                    if (error) {
+                        console.error('Ошибка обновления никнейма:', error);
+                        return false;
+                    }
+                    return true;
+                } catch (e) {
+                    console.error('Ошибка:', e);
+                    return false;
+                }
+            }
+
+            // Отложенное сохранение (раз в 10 секунд)
+            function debouncedSave() {
+                if (saveTimeout) clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(async function() {
+                    if (userUid) {
+                        await saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
+                        console.log('💾 Баланс сохранён в Supabase:', balance);
+                    }
+                }, 10000);
+            }
+
+            // ================================================================
+            // 6. РЕКЛАМА
+            // ================================================================
             function loadAdScript() {
                 if (adScriptLoaded) return;
                 adContainer.innerHTML = '';
@@ -673,10 +854,12 @@
                 adContainer.innerHTML = '';
                 adContainer.style.display = 'none';
                 adScriptLoaded = false;
-                console.log('🔄 Реклама выгружена (требуется обновление)');
+                console.log('🔄 Реклама выгружена');
             }
 
-            // ---------- Mining loop ----------
+            // ================================================================
+            // 7. МАЙНИНГ
+            // ================================================================
             function startMining() {
                 if (animationFrame) return;
                 lastTimestamp = performance.now();
@@ -686,6 +869,7 @@
                     lastTimestamp = now;
                     balance += currentRate * delta;
                     updateUI();
+                    debouncedSave();
                     animationFrame = requestAnimationFrame(tick);
                 }
 
@@ -697,9 +881,15 @@
                     cancelAnimationFrame(animationFrame);
                     animationFrame = null;
                 }
+                // Сохраняем финальный баланс
+                if (userUid) {
+                    saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
+                }
             }
 
-            // ---------- Speed / Ads ----------
+            // ================================================================
+            // 8. СКОРОСТЬ / РЕКЛАМА
+            // ================================================================
             function enableSpeedBoost() {
                 if (isSpeedBoosted) return;
                 isSpeedBoosted = true;
@@ -709,6 +899,9 @@
                 speedBtn.querySelector('i').className = 'fas fa-stop-circle';
                 loadAdScript();
                 updateUI();
+                if (userUid) {
+                    saveBalanceToSupabase(userUid, balance, currentRate, true);
+                }
             }
 
             function disableSpeedBoost() {
@@ -720,17 +913,23 @@
                 speedBtn.querySelector('i').className = 'fas fa-rocket';
                 unloadAdScript();
                 updateUI();
+                if (userUid) {
+                    saveBalanceToSupabase(userUid, balance, currentRate, false);
+                }
             }
 
-            // ---------- Profile ----------
-            function updateProfileUI() {
-                if (user) {
-                    userNameEl.textContent = user.name || 'Игрок';
-                    userEmailEl.textContent = user.email || '—';
-                    userIdEl.textContent = 'ID: ' + (user.id ? user.id.slice(0, 10) : '---');
+            // ================================================================
+            // 9. ПРОФИЛЬ
+            // ================================================================
+            function updateProfileUI(userData) {
+                if (userData) {
+                    const displayName = userData.nickname || userData.name || 'Игрок';
+                    userNameEl.textContent = displayName;
+                    userEmailEl.textContent = userData.email || '—';
+                    userIdEl.textContent = 'ID: ' + (userData.user_uid ? userData.user_uid.slice(0, 10) : '---');
 
-                    if (user.picture) {
-                        userAvatar.src = user.picture;
+                    if (userData.picture) {
+                        userAvatar.src = userData.picture;
                         userAvatar.classList.remove('hidden');
                         avatarPlaceholder.classList.add('hidden');
                     } else {
@@ -746,21 +945,63 @@
                 }
             }
 
-            // ---------- Google Auth ----------
-            window.handleCredentialResponse = function(response) {
+            // ================================================================
+            // 10. АВТОРИЗАЦИЯ
+            // ================================================================
+            window.handleCredentialResponse = async function(response) {
                 try {
                     const payload = JSON.parse(atob(response.credential.split('.')[1]));
-                    user = {
+                    const googleUser = {
                         id: payload.sub,
                         name: payload.name || 'Игрок',
                         email: payload.email || '',
                         picture: payload.picture || null,
                     };
-                    localStorage.setItem('trxMinerUser', JSON.stringify(user));
+
                     loginError.style.display = 'none';
-                    updateProfileUI();
+
+                    // Сохраняем в Supabase
+                    const savedUser = await saveUserToSupabase(googleUser);
+                    if (!savedUser) {
+                        loginError.textContent = 'Ошибка сохранения данных. Попробуйте ещё раз.';
+                        loginError.style.display = 'block';
+                        return;
+                    }
+
+                    user = savedUser;
+                    userUid = savedUser.user_uid;
+
+                    // Загружаем баланс
+                    const userData = await loadBalanceFromSupabase(userUid);
+                    if (userData) {
+                        balance = userData.balance || 0.0000001;
+                        if (userData.is_ads_enabled) {
+                            isSpeedBoosted = true;
+                            currentRate = BASE_RATE * 3;
+                            speedBtn.classList.add('active');
+                            speedBtnText.textContent = 'Выключить рекламу';
+                            speedBtn.querySelector('i').className = 'fas fa-stop-circle';
+                            loadAdScript();
+                        } else {
+                            isSpeedBoosted = false;
+                            currentRate = BASE_RATE;
+                        }
+                    }
+
+                    // Сохраняем в localStorage
+                    localStorage.setItem('trxMinerUser', JSON.stringify({
+                        user_uid: userUid,
+                        google_id: googleUser.id,
+                        name: googleUser.name,
+                        email: googleUser.email,
+                        picture: googleUser.picture
+                    }));
+
+                    updateProfileUI(savedUser);
+                    updateUI();
                     showDashboard();
                     startMining();
+
                 } catch (e) {
                     loginError.textContent = 'Ошибка входа. Попробуйте ещё раз.';
                     loginError.style.display = 'block';
@@ -768,37 +1009,88 @@
                 }
             };
 
-            function restoreUser() {
+            // Восстановление пользователя
+            async function restoreUser() {
                 const saved = localStorage.getItem('trxMinerUser');
-                if (saved) {
-                    try {
-                        user = JSON.parse(saved);
-                        updateProfileUI();
-                        showDashboard();
-                        startMining();
-                        return true;
-                    } catch (e) { /* ignore */ }
+                if (!saved) return false;
+
+                try {
+                    const savedData = JSON.parse(saved);
+                    userUid = savedData.user_uid;
+
+                    // Загружаем данные из Supabase
+                    const { data: userData, error } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('user_uid', userUid)
+                        .single();
+
+                    if (error || !userData) {
+                        localStorage.removeItem('trxMinerUser');
+                        return false;
+                    }
+
+                    user = userData;
+
+                    // Загружаем баланс
+                    const balanceData = await loadBalanceFromSupabase(userUid);
+                    if (balanceData) {
+                        balance = balanceData.balance || 0.0000001;
+                        if (balanceData.is_ads_enabled) {
+                            isSpeedBoosted = true;
+                            currentRate = BASE_RATE * 3;
+                            speedBtn.classList.add('active');
+                            speedBtnText.textContent = 'Выключить рекламу';
+                            speedBtn.querySelector('i').className = 'fas fa-stop-circle';
+                            loadAdScript();
+                        } else {
+                            isSpeedBoosted = false;
+                            currentRate = BASE_RATE;
+                        }
+                    }
+
+                    updateProfileUI(userData);
+                    updateUI();
+                    showDashboard();
+                    startMining();
+                    return true;
+
+                } catch (e) {
+                    console.error('Ошибка восстановления:', e);
+                    localStorage.removeItem('trxMinerUser');
+                    return false;
                 }
-                return false;
             }
 
-            function logout() {
+            // ================================================================
+            // 11. ВЫХОД
+            // ================================================================
+            async function logout() {
+                // Сохраняем баланс перед выходом
+                if (userUid) {
+                    await saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
+                }
+
                 user = null;
+                userUid = null;
                 localStorage.removeItem('trxMinerUser');
+
                 if (isSpeedBoosted) {
                     disableSpeedBoost();
                 }
+
                 stopMining();
                 balance = 0.0000001;
                 currentRate = BASE_RATE;
                 updateUI();
-                updateProfileUI();
-                showLoginPage();
-                // Сбрасываем рекламу
+                updateProfileUI(null);
                 unloadAdScript();
+                showLoginPage();
             }
 
-            // ---------- Event Listeners ----------
+            // ================================================================
+            // 12. ОБРАБОТЧИКИ СОБЫТИЙ
+            // ================================================================
 
             // Speed button
             speedBtn.addEventListener('click', function() {
@@ -824,6 +1116,10 @@
             });
 
             stopAdsRefreshBtn.addEventListener('click', function() {
+                // Сохраняем баланс перед перезагрузкой
+                if (userUid) {
+                    saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
+                }
                 localStorage.setItem('trxMinerBalance', balance.toString());
                 location.reload();
             });
@@ -847,21 +1143,32 @@
                     alert('Войдите в аккаунт, чтобы редактировать профиль.');
                     return;
                 }
-                editNicknameInput.value = user.name || '';
+                editNicknameInput.value = user.nickname || user.name || '';
                 editProfileModal.classList.add('open');
             });
 
-            saveNicknameBtn.addEventListener('click', function() {
+            saveNicknameBtn.addEventListener('click', async function() {
                 const newName = editNicknameInput.value.trim();
                 if (newName.length < 1) {
                     alert('Введите корректное имя.');
                     return;
                 }
-                if (user) {
-                    user.name = newName;
-                    localStorage.setItem('trxMinerUser', JSON.stringify(user));
-                    updateProfileUI();
-                    editProfileModal.classList.remove('open');
+                if (user && userUid) {
+                    const success = await updateNicknameInSupabase(userUid, newName);
+                    if (success) {
+                        user.nickname = newName;
+                        // Обновляем в localStorage
+                        const saved = localStorage.getItem('trxMinerUser');
+                        if (saved) {
+                            const data = JSON.parse(saved);
+                            data.name = newName;
+                            localStorage.setItem('trxMinerUser', JSON.stringify(data));
+                        }
+                        updateProfileUI(user);
+                        editProfileModal.classList.remove('open');
+                    } else {
+                        alert('Ошибка сохранения никнейма.');
+                    }
                 }
             });
 
@@ -875,7 +1182,11 @@
                 }
             });
 
-            // ---------- Init ----------
+            // ================================================================
+            // 13. ИНИЦИАЛИЗАЦИЯ
+            // ================================================================
+
+            // Восстанавливаем баланс из localStorage (если был сохранён перед перезагрузкой)
             const savedBalance = localStorage.getItem('trxMinerBalance');
             if (savedBalance) {
                 const parsed = parseFloat(savedBalance);
@@ -885,13 +1196,13 @@
                 localStorage.removeItem('trxMinerBalance');
             }
 
-            const hasUser = restoreUser();
+            const hasUser = await restoreUser();
 
             if (!hasUser) {
                 balance = 0.0000001;
                 currentRate = BASE_RATE;
                 updateUI();
-                updateProfileUI();
+                updateProfileUI(null);
                 showLoginPage();
             } else {
                 if (!animationFrame) {
@@ -900,6 +1211,7 @@
             }
 
             console.log('🚀 TRX Miner запущен. Баланс:', balance, 'TRX');
+            console.log('👤 Пользователь:', user ? user.nickname || user.name : 'Гость');
         })();
     </script>
 
