@@ -1,28 +1,842 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>ArtStars — Рисуй и побеждай | Платформа для художников</title>
-    <meta name="description" content="ArtStars — платформа для рисования и творчества. Создавай рисунки, участвуй в еженедельных аукционах, получай звёзды и выигрывай призы.">
-    <meta name="theme-color" content="#0a0a2e">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>TRX Miner</title>
+
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* ----- Reset & Base ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #0b1120 0%, #1a2639 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background: rgba(20, 30, 48, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 30px 24px 35px;
+            box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            transition: all 0.2s;
+        }
+
+        /* ----- Profile ----- */
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 24px;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+        }
+
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #fbbf24;
+            background: #2a3a5a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fbbf24;
+            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.25);
+        }
+
+        .avatar-placeholder {
+            background: #1e2a44;
+            border: 2px solid #4a5a7a;
+        }
+
+        .profile-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .profile-name .edit-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+
+        .profile-name .edit-btn:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fbbf24;
+        }
+
+        .profile-email {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .profile-id {
+            font-size: 11px;
+            color: #4a5a7a;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 2px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* ----- Balance ----- */
+        .balance-card {
+            background: linear-gradient(135deg, #1a2a44, #0f1a2e);
+            border-radius: 28px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #8a9bb8;
+        }
+
+        .balance-amount {
+            font-size: 42px;
+            font-weight: 800;
+            color: #fbbf24;
+            text-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+            transition: all 0.1s;
+            margin: 4px 0;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .balance-amount .currency {
+            font-size: 22px;
+            color: #fbbf24;
+            margin-left: 4px;
+        }
+
+        .balance-rate {
+            font-size: 14px;
+            color: #8a9bb8;
+        }
+
+        .balance-rate span {
+            color: #4ade80;
+            font-weight: 600;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { text-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+            50% { text-shadow: 0 0 40px rgba(251, 191, 36, 0.5); }
+        }
+
+        /* ----- Buttons ----- */
+        .speed-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 60px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0b1120;
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
+            margin-bottom: 12px;
+        }
+
+        .speed-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.45);
+        }
+
+        .speed-btn:active {
+            transform: scale(0.97);
+        }
+
+        .speed-btn.active {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+        }
+
+        .speed-btn.active:hover {
+            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.45);
+        }
+
+        .speed-btn i {
+            font-size: 20px;
+        }
+
+        .logout-btn {
+            background: #2a3a5a;
+            color: #94a3b8;
+            box-shadow: none;
+            margin-top: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #3a4a6a;
+            box-shadow: none;
+        }
+
+        /* ----- Modals ----- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 24px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-card {
+            background: #1a2639;
+            border-radius: 32px;
+            padding: 32px 28px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-card h3 {
+            color: #fbbf24;
+            font-size: 22px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-card p {
+            color: #c8d0dc;
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-card .btn-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-card .btn-group button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .modal-card .btn-primary {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #0b1120;
+        }
+
+        .modal-card .btn-primary:hover {
+            transform: scale(1.02);
+        }
+
+        .modal-card .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: #94a3b8;
+        }
+
+        .modal-card .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .modal-card .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+
+        .modal-card .btn-danger:hover {
+            transform: scale(1.02);
+        }
+
+        /* Edit profile */
+        .edit-profile-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .edit-profile-row input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: #0f1a2e;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+            transition: 0.15s;
+        }
+
+        .edit-profile-row input:focus {
+            border-color: #fbbf24;
+        }
+
+        .edit-profile-row button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 60px;
+            background: #fbbf24;
+            color: #0b1120;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+
+        .edit-profile-row button:hover {
+            background: #f59e0b;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .container { padding: 20px 16px 25px; border-radius: 28px; }
+            .balance-amount { font-size: 34px; }
+            .profile-name { font-size: 18px; }
+            .avatar-wrapper { width: 52px; height: 52px; }
+            .modal-card { padding: 24px 20px; }
+        }
+
+        /* Utility */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mt-12 { margin-top: 12px; }
+        .mt-8 { margin-top: 8px; }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <div class="loading-screen">
-            <div class="neon-spinner"></div>
-            <p class="loading-text">ArtStars</p>
+
+    <div class="container" id="app">
+        <!-- Profile -->
+        <div class="profile-section">
+            <div class="avatar-wrapper">
+                <img id="userAvatar" class="avatar hidden" src="" alt="Avatar" />
+                <div id="avatarPlaceholder" class="avatar avatar-placeholder">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <div class="profile-info">
+                <div class="profile-name">
+                    <span id="userNameDisplay">Гость</span>
+                    <button class="edit-btn" id="editProfileBtn" title="Редактировать профиль">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+                <div class="profile-email" id="userEmailDisplay">Не авторизован</div>
+                <div class="profile-id" id="userIdDisplay">ID: ---</div>
+            </div>
+        </div>
+
+        <!-- Balance -->
+        <div class="balance-card">
+            <div class="balance-label">Баланс TRX</div>
+            <div class="balance-amount" id="balanceDisplay">
+                0.0000001 <span class="currency">TRX</span>
+            </div>
+            <div class="balance-rate">
+                <i class="fas fa-arrow-up" style="color:#4ade80;"></i>
+                Начисление: <span id="rateDisplay">+0.0000001</span> TRX/сек
+            </div>
+        </div>
+
+        <!-- Speed Button -->
+        <button class="speed-btn" id="speedToggleBtn">
+            <i class="fas fa-rocket"></i>
+            <span id="speedBtnText">Увеличить скорость</span>
+        </button>
+
+        <!-- Auth / Google -->
+        <div id="authSection" class="text-center mt-12">
+            <div id="g_id_onload"
+                data-client_id="12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com"
+                data-context="signin"
+                data-ux_mode="popup"
+                data-login_uri="https://vds-game.ink"
+                data-auto_select="false"
+                data-itp_support="true">
+            </div>
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="filled_black"
+                data-text="signin_with"
+                data-size="large"
+                data-logo_alignment="left">
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <button id="logoutBtn" class="speed-btn logout-btn" style="display: none;">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </button>
+
+        <!-- ===== РЕКЛАМНЫЙ ТЕГ ===== -->
+        <!-- Загружается при включении рекламы, данные-зону можно менять -->
+        <div id="adContainer" style="display: none;"></div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Speed / Ads Modal -->
+    <div class="modal-overlay" id="speedModal">
+        <div class="modal-card">
+            <h3><i class="fas fa-bolt" style="color:#fbbf24;"></i> Увеличение скорости</h3>
+            <p>
+                Вы включаете рекламу разных видов для увеличения дохода.<br>
+                В любой момент можете выключить.
+            </p>
+            <div class="btn-group">
+                <button class="btn-primary" id="speedModalConfirm">Включить</button>
+                <button class="btn-secondary" id="speedModalCancel">Отмена</button>
+            </div>
         </div>
     </div>
-    
-    <div id="notificationContainer" style="position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:10px; pointer-events:none;"></div>
-    
-    <script type="module" src="js/config.js"></script>
-    <script type="module" src="js/supabase.js"></script>
-    <script type="module" src="js/canvas.js"></script>
-    <script type="module" src="js/app.js"></script>
+
+    <!-- Stop Ads Modal (refresh) -->
+    <div class="modal-overlay" id="stopAdsModal">
+        <div class="modal-card">
+            <h3><i class="fas fa-pause-circle" style="color:#ef4444;"></i> Остановка рекламы</h3>
+            <p>
+                Обновите страницу, чтобы реклама перестала показываться.
+            </p>
+            <div class="btn-group">
+                <button class="btn-danger" id="stopAdsRefreshBtn">Обновить</button>
+                <button class="btn-secondary" id="stopAdsCancel">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal-overlay" id="editProfileModal">
+        <div class="modal-card">
+            <h3><i class="fas fa-user-edit"></i> Редактировать профиль</h3>
+            <div class="edit-profile-row">
+                <input type="text" id="editNicknameInput" placeholder="Новый никнейм" maxlength="30">
+                <button id="saveNicknameBtn">Сохранить</button>
+            </div>
+            <p style="font-size:13px; color:#6a7a9a; margin-top:12px; margin-bottom:0;">
+                <i class="fas fa-info-circle"></i> Изменится только отображаемое имя.
+            </p>
+            <button class="btn-secondary" id="editProfileClose" style="margin-top:16px; width:100%; padding:12px; border:none; border-radius:60px; background:rgba(255,255,255,0.06); color:#94a3b8; cursor:pointer;">Закрыть</button>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ---------- DOM refs ----------
+            const balanceEl = document.getElementById('balanceDisplay');
+            const rateEl = document.getElementById('rateDisplay');
+            const userNameEl = document.getElementById('userNameDisplay');
+            const userEmailEl = document.getElementById('userEmailDisplay');
+            const userIdEl = document.getElementById('userIdDisplay');
+            const userAvatar = document.getElementById('userAvatar');
+            const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+            const authSection = document.getElementById('authSection');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            const speedBtn = document.getElementById('speedToggleBtn');
+            const speedBtnText = document.getElementById('speedBtnText');
+
+            const speedModal = document.getElementById('speedModal');
+            const speedModalConfirm = document.getElementById('speedModalConfirm');
+            const speedModalCancel = document.getElementById('speedModalCancel');
+
+            const stopAdsModal = document.getElementById('stopAdsModal');
+            const stopAdsRefreshBtn = document.getElementById('stopAdsRefreshBtn');
+            const stopAdsCancel = document.getElementById('stopAdsCancel');
+
+            const editProfileBtn = document.getElementById('editProfileBtn');
+            const editProfileModal = document.getElementById('editProfileModal');
+            const editNicknameInput = document.getElementById('editNicknameInput');
+            const saveNicknameBtn = document.getElementById('saveNicknameBtn');
+            const editProfileClose = document.getElementById('editProfileClose');
+
+            const adContainer = document.getElementById('adContainer');
+
+            // ---------- State ----------
+            let balance = 0.0000001;
+            const BASE_RATE = 0.0000001;
+            let currentRate = BASE_RATE;
+            let isSpeedBoosted = false;
+            let animationFrame = null;
+            let lastTimestamp = 0;
+            let adScriptLoaded = false;
+            let user = null;
+
+            // ---------- Helpers ----------
+            function formatBalance(val) {
+                return val.toFixed(7);
+            }
+
+            function updateUI() {
+                balanceEl.innerHTML = `${formatBalance(balance)} <span class="currency">TRX</span>`;
+                rateEl.textContent = `+${formatBalance(currentRate)}`;
+            }
+
+            // ---------- Реклама ----------
+            function loadAdScript() {
+                if (adScriptLoaded) return;
+                // Очищаем контейнер на случай, если там что-то было
+                adContainer.innerHTML = '';
+                adContainer.style.display = 'block';
+
+                const script = document.createElement('script');
+                script.src = 'https://quge5.com/88/tag.min.js';
+                script.dataset.zone = '260208';
+                script.async = true;
+                script.dataset.cfasync = 'false';
+                script.onload = function() {
+                    adScriptLoaded = true;
+                    console.log('✅ Рекламный скрипт загружен');
+                };
+                script.onerror = function() {
+                    console.warn('⚠️ Не удалось загрузить рекламный скрипт');
+                };
+                adContainer.appendChild(script);
+            }
+
+            function unloadAdScript() {
+                // Удаляем скрипт из DOM
+                const scripts = adContainer.querySelectorAll('script');
+                scripts.forEach(s => s.remove());
+                adContainer.innerHTML = '';
+                adContainer.style.display = 'none';
+                adScriptLoaded = false;
+                // Также удаляем глобальные объекты, если они были созданы
+                // (некоторые рекламные сети создают глобальные переменные)
+                // Можно попробовать очистить, но полная очистка требует перезагрузки
+                console.log('🔄 Реклама выгружена (требуется обновление страницы для полной очистки)');
+            }
+
+            // ---------- Mining loop ----------
+            function startMining() {
+                if (animationFrame) return;
+                lastTimestamp = performance.now();
+
+                function tick(now) {
+                    const delta = (now - lastTimestamp) / 1000;
+                    lastTimestamp = now;
+                    balance += currentRate * delta;
+                    updateUI();
+                    animationFrame = requestAnimationFrame(tick);
+                }
+
+                animationFrame = requestAnimationFrame(tick);
+            }
+
+            function stopMining() {
+                if (animationFrame) {
+                    cancelAnimationFrame(animationFrame);
+                    animationFrame = null;
+                }
+            }
+
+            // ---------- Speed / Ads logic ----------
+            function enableSpeedBoost() {
+                if (isSpeedBoosted) return;
+                isSpeedBoosted = true;
+                currentRate = BASE_RATE * 3;
+                speedBtn.classList.add('active');
+                speedBtnText.textContent = 'Выключить рекламу';
+                speedBtn.querySelector('i').className = 'fas fa-stop-circle';
+                loadAdScript();
+                updateUI();
+            }
+
+            function disableSpeedBoost() {
+                if (!isSpeedBoosted) return;
+                isSpeedBoosted = false;
+                currentRate = BASE_RATE;
+                speedBtn.classList.remove('active');
+                speedBtnText.textContent = 'Увеличить скорость';
+                speedBtn.querySelector('i').className = 'fas fa-rocket';
+                unloadAdScript();
+                updateUI();
+            }
+
+            // ---------- Profile ----------
+            function updateProfileUI() {
+                if (user) {
+                    userNameEl.textContent = user.name || 'Игрок';
+                    userEmailEl.textContent = user.email || '—';
+                    userIdEl.textContent = 'ID: ' + (user.id ? user.id.slice(0, 10) : '---');
+
+                    if (user.picture) {
+                        userAvatar.src = user.picture;
+                        userAvatar.classList.remove('hidden');
+                        avatarPlaceholder.classList.add('hidden');
+                    } else {
+                        userAvatar.classList.add('hidden');
+                        avatarPlaceholder.classList.remove('hidden');
+                    }
+
+                    authSection.style.display = 'none';
+                    logoutBtn.style.display = 'flex';
+                } else {
+                    userNameEl.textContent = 'Гость';
+                    userEmailEl.textContent = 'Не авторизован';
+                    userIdEl.textContent = 'ID: ---';
+                    userAvatar.classList.add('hidden');
+                    avatarPlaceholder.classList.remove('hidden');
+                    authSection.style.display = 'block';
+                    logoutBtn.style.display = 'none';
+                }
+            }
+
+            // ---------- Google Auth ----------
+            window.handleCredentialResponse = function(response) {
+                try {
+                    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+                    user = {
+                        id: payload.sub,
+                        name: payload.name || 'Игрок',
+                        email: payload.email || '',
+                        picture: payload.picture || null,
+                    };
+                    localStorage.setItem('trxMinerUser', JSON.stringify(user));
+                    updateProfileUI();
+                    startMining();
+                } catch (e) {
+                    console.warn('Ошибка декодирования токена', e);
+                }
+            };
+
+            function restoreUser() {
+                const saved = localStorage.getItem('trxMinerUser');
+                if (saved) {
+                    try {
+                        user = JSON.parse(saved);
+                        updateProfileUI();
+                        startMining();
+                        return true;
+                    } catch (e) { /* ignore */ }
+                }
+                return false;
+            }
+
+            function logout() {
+                user = null;
+                localStorage.removeItem('trxMinerUser');
+                if (isSpeedBoosted) {
+                    disableSpeedBoost();
+                }
+                updateProfileUI();
+                stopMining();
+                authSection.style.display = 'block';
+                logoutBtn.style.display = 'none';
+                balance = 0.0000001;
+                currentRate = BASE_RATE;
+                updateUI();
+            }
+
+            // ---------- Event Listeners ----------
+
+            // Speed button
+            speedBtn.addEventListener('click', function() {
+                if (!user) {
+                    alert('Войдите в аккаунт, чтобы использовать ускорение.');
+                    return;
+                }
+
+                if (isSpeedBoosted) {
+                    stopAdsModal.classList.add('open');
+                } else {
+                    speedModal.classList.add('open');
+                }
+            });
+
+            // Speed modal
+            speedModalConfirm.addEventListener('click', function() {
+                speedModal.classList.remove('open');
+                enableSpeedBoost();
+            });
+
+            speedModalCancel.addEventListener('click', function() {
+                speedModal.classList.remove('open');
+            });
+
+            // Stop ads modal
+            stopAdsRefreshBtn.addEventListener('click', function() {
+                // Сохраняем состояние перед перезагрузкой
+                localStorage.setItem('trxMinerBalance', balance.toString());
+                location.reload();
+            });
+
+            stopAdsCancel.addEventListener('click', function() {
+                stopAdsModal.classList.remove('open');
+            });
+
+            // Закрытие модалок по клику вне карточки
+            [speedModal, stopAdsModal, editProfileModal].forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        modal.classList.remove('open');
+                    }
+                });
+            });
+
+            // Edit profile
+            editProfileBtn.addEventListener('click', function() {
+                if (!user) {
+                    alert('Войдите в аккаунт, чтобы редактировать профиль.');
+                    return;
+                }
+                editNicknameInput.value = user.name || '';
+                editProfileModal.classList.add('open');
+            });
+
+            saveNicknameBtn.addEventListener('click', function() {
+                const newName = editNicknameInput.value.trim();
+                if (newName.length < 1) {
+                    alert('Введите корректное имя.');
+                    return;
+                }
+                if (user) {
+                    user.name = newName;
+                    localStorage.setItem('trxMinerUser', JSON.stringify(user));
+                    updateProfileUI();
+                    editProfileModal.classList.remove('open');
+                }
+            });
+
+            editProfileClose.addEventListener('click', function() {
+                editProfileModal.classList.remove('open');
+            });
+
+            logoutBtn.addEventListener('click', function() {
+                if (confirm('Вы уверены, что хотите выйти?')) {
+                    logout();
+                }
+            });
+
+            // ---------- Init ----------
+            // Восстанавливаем баланс, если был сохранён
+            const savedBalance = localStorage.getItem('trxMinerBalance');
+            if (savedBalance) {
+                const parsed = parseFloat(savedBalance);
+                if (!isNaN(parsed) && parsed > 0) {
+                    balance = parsed;
+                }
+                localStorage.removeItem('trxMinerBalance');
+            }
+
+            const hasUser = restoreUser();
+            if (!hasUser) {
+                balance = 0.0000001;
+                currentRate = BASE_RATE;
+                updateUI();
+                updateProfileUI();
+            } else {
+                if (!animationFrame) {
+                    startMining();
+                }
+            }
+
+            console.log('🚀 TRX Miner запущен. Баланс:', balance, 'TRX');
+        })();
+    </script>
+
+    <script>
+        // fallback для Google
+        window.handleCredentialResponse = window.handleCredentialResponse || function(response) {
+            console.warn('handleCredentialResponse вызван, но функция не инициализирована');
+        };
+    </script>
+
 </body>
 </html>
