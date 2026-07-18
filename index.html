@@ -43,6 +43,53 @@
             transition: all 0.2s;
         }
 
+        /* ----- Страница входа (Login Page) ----- */
+        #loginPage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            text-align: center;
+        }
+
+        .login-logo {
+            font-size: 48px;
+            font-weight: 900;
+            color: #fbbf24;
+            text-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            color: #8a9bb8;
+            font-size: 16px;
+            margin-bottom: 32px;
+            letter-spacing: 2px;
+        }
+
+        .login-divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #fbbf24, transparent);
+            border-radius: 4px;
+            margin: 0 auto 32px;
+        }
+
+        #loginPage .g_id_signin {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ----- Основная панель (Dashboard) ----- */
+        #dashboardPage {
+            display: none;
+        }
+
+        #dashboardPage.visible {
+            display: block;
+        }
+
         /* ----- Profile ----- */
         .profile-section {
             display: flex;
@@ -386,6 +433,7 @@
             .profile-name { font-size: 18px; }
             .avatar-wrapper { width: 52px; height: 52px; }
             .modal-card { padding: 24px 20px; }
+            .login-logo { font-size: 36px; }
         }
 
         /* Utility */
@@ -398,46 +446,17 @@
 <body>
 
     <div class="container" id="app">
-        <!-- Profile -->
-        <div class="profile-section">
-            <div class="avatar-wrapper">
-                <img id="userAvatar" class="avatar hidden" src="" alt="Avatar" />
-                <div id="avatarPlaceholder" class="avatar avatar-placeholder">
-                    <i class="fas fa-user"></i>
-                </div>
-            </div>
-            <div class="profile-info">
-                <div class="profile-name">
-                    <span id="userNameDisplay">Гость</span>
-                    <button class="edit-btn" id="editProfileBtn" title="Редактировать профиль">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                </div>
-                <div class="profile-email" id="userEmailDisplay">Не авторизован</div>
-                <div class="profile-id" id="userIdDisplay">ID: ---</div>
-            </div>
-        </div>
 
-        <!-- Balance -->
-        <div class="balance-card">
-            <div class="balance-label">Баланс TRX</div>
-            <div class="balance-amount" id="balanceDisplay">
-                0.0000001 <span class="currency">TRX</span>
-            </div>
-            <div class="balance-rate">
-                <i class="fas fa-arrow-up" style="color:#4ade80;"></i>
-                Начисление: <span id="rateDisplay">+0.0000001</span> TRX/сек
-            </div>
-        </div>
-
-        <!-- Speed Button -->
-        <button class="speed-btn" id="speedToggleBtn">
-            <i class="fas fa-rocket"></i>
-            <span id="speedBtnText">Увеличить скорость</span>
-        </button>
-
-        <!-- Auth / Google -->
-        <div id="authSection" class="text-center mt-12">
+        <!-- ============================================================ -->
+        <!-- СТРАНИЦА ВХОДА -->
+        <!-- ============================================================ -->
+        <div id="loginPage">
+            <div class="login-logo">⛏️</div>
+            <div class="login-subtitle">TRX MINER</div>
+            <div class="login-divider"></div>
+            <p style="color: #8a9bb8; margin-bottom: 28px; font-size: 14px; line-height: 1.6;">
+                Войдите через Google, чтобы начать майнить TRX
+            </p>
             <div id="g_id_onload"
                 data-client_id="12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com"
                 data-context="signin"
@@ -454,16 +473,59 @@
                 data-size="large"
                 data-logo_alignment="left">
             </div>
+            <p id="loginError" style="color: #ef4444; font-size: 13px; margin-top: 16px; display: none;"></p>
         </div>
 
-        <!-- Logout -->
-        <button id="logoutBtn" class="speed-btn logout-btn" style="display: none;">
-            <i class="fas fa-sign-out-alt"></i> Выйти
-        </button>
+        <!-- ============================================================ -->
+        <!-- ОСНОВНАЯ ПАНЕЛЬ (появляется после входа) -->
+        <!-- ============================================================ -->
+        <div id="dashboardPage">
+            <!-- Profile -->
+            <div class="profile-section">
+                <div class="avatar-wrapper">
+                    <img id="userAvatar" class="avatar hidden" src="" alt="Avatar" />
+                    <div id="avatarPlaceholder" class="avatar avatar-placeholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-name">
+                        <span id="userNameDisplay">Гость</span>
+                        <button class="edit-btn" id="editProfileBtn" title="Редактировать профиль">
+                            <i class="fas fa-pen"></i>
+                        </button>
+                    </div>
+                    <div class="profile-email" id="userEmailDisplay">—</div>
+                    <div class="profile-id" id="userIdDisplay">ID: ---</div>
+                </div>
+            </div>
 
-        <!-- ===== РЕКЛАМНЫЙ ТЕГ ===== -->
-        <!-- Загружается при включении рекламы, данные-зону можно менять -->
-        <div id="adContainer" style="display: none;"></div>
+            <!-- Balance -->
+            <div class="balance-card">
+                <div class="balance-label">Баланс TRX</div>
+                <div class="balance-amount" id="balanceDisplay">
+                    0.0000001 <span class="currency">TRX</span>
+                </div>
+                <div class="balance-rate">
+                    <i class="fas fa-arrow-up" style="color:#4ade80;"></i>
+                    Начисление: <span id="rateDisplay">+0.0000001</span> TRX/сек
+                </div>
+            </div>
+
+            <!-- Speed Button -->
+            <button class="speed-btn" id="speedToggleBtn">
+                <i class="fas fa-rocket"></i>
+                <span id="speedBtnText">Увеличить скорость</span>
+            </button>
+
+            <!-- Logout -->
+            <button id="logoutBtn" class="speed-btn logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Выйти
+            </button>
+
+            <!-- Рекламный контейнер -->
+            <div id="adContainer" style="display: none;"></div>
+        </div>
     </div>
 
     <!-- ===== MODALS ===== -->
@@ -519,6 +581,10 @@
             'use strict';
 
             // ---------- DOM refs ----------
+            const loginPage = document.getElementById('loginPage');
+            const dashboardPage = document.getElementById('dashboardPage');
+            const loginError = document.getElementById('loginError');
+
             const balanceEl = document.getElementById('balanceDisplay');
             const rateEl = document.getElementById('rateDisplay');
             const userNameEl = document.getElementById('userNameDisplay');
@@ -526,8 +592,6 @@
             const userIdEl = document.getElementById('userIdDisplay');
             const userAvatar = document.getElementById('userAvatar');
             const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-            const authSection = document.getElementById('authSection');
-            const logoutBtn = document.getElementById('logoutBtn');
 
             const speedBtn = document.getElementById('speedToggleBtn');
             const speedBtnText = document.getElementById('speedBtnText');
@@ -546,6 +610,7 @@
             const saveNicknameBtn = document.getElementById('saveNicknameBtn');
             const editProfileClose = document.getElementById('editProfileClose');
 
+            const logoutBtn = document.getElementById('logoutBtn');
             const adContainer = document.getElementById('adContainer');
 
             // ---------- State ----------
@@ -568,10 +633,22 @@
                 rateEl.textContent = `+${formatBalance(currentRate)}`;
             }
 
+            // ---------- Показ страниц ----------
+            function showLoginPage() {
+                loginPage.style.display = 'flex';
+                dashboardPage.classList.remove('visible');
+                dashboardPage.style.display = 'none';
+            }
+
+            function showDashboard() {
+                loginPage.style.display = 'none';
+                dashboardPage.style.display = 'block';
+                dashboardPage.classList.add('visible');
+            }
+
             // ---------- Реклама ----------
             function loadAdScript() {
                 if (adScriptLoaded) return;
-                // Очищаем контейнер на случай, если там что-то было
                 adContainer.innerHTML = '';
                 adContainer.style.display = 'block';
 
@@ -591,16 +668,12 @@
             }
 
             function unloadAdScript() {
-                // Удаляем скрипт из DOM
                 const scripts = adContainer.querySelectorAll('script');
                 scripts.forEach(s => s.remove());
                 adContainer.innerHTML = '';
                 adContainer.style.display = 'none';
                 adScriptLoaded = false;
-                // Также удаляем глобальные объекты, если они были созданы
-                // (некоторые рекламные сети создают глобальные переменные)
-                // Можно попробовать очистить, но полная очистка требует перезагрузки
-                console.log('🔄 Реклама выгружена (требуется обновление страницы для полной очистки)');
+                console.log('🔄 Реклама выгружена (требуется обновление)');
             }
 
             // ---------- Mining loop ----------
@@ -626,7 +699,7 @@
                 }
             }
 
-            // ---------- Speed / Ads logic ----------
+            // ---------- Speed / Ads ----------
             function enableSpeedBoost() {
                 if (isSpeedBoosted) return;
                 isSpeedBoosted = true;
@@ -664,17 +737,12 @@
                         userAvatar.classList.add('hidden');
                         avatarPlaceholder.classList.remove('hidden');
                     }
-
-                    authSection.style.display = 'none';
-                    logoutBtn.style.display = 'flex';
                 } else {
                     userNameEl.textContent = 'Гость';
-                    userEmailEl.textContent = 'Не авторизован';
+                    userEmailEl.textContent = '—';
                     userIdEl.textContent = 'ID: ---';
                     userAvatar.classList.add('hidden');
                     avatarPlaceholder.classList.remove('hidden');
-                    authSection.style.display = 'block';
-                    logoutBtn.style.display = 'none';
                 }
             }
 
@@ -689,9 +757,13 @@
                         picture: payload.picture || null,
                     };
                     localStorage.setItem('trxMinerUser', JSON.stringify(user));
+                    loginError.style.display = 'none';
                     updateProfileUI();
+                    showDashboard();
                     startMining();
                 } catch (e) {
+                    loginError.textContent = 'Ошибка входа. Попробуйте ещё раз.';
+                    loginError.style.display = 'block';
                     console.warn('Ошибка декодирования токена', e);
                 }
             };
@@ -702,6 +774,7 @@
                     try {
                         user = JSON.parse(saved);
                         updateProfileUI();
+                        showDashboard();
                         startMining();
                         return true;
                     } catch (e) { /* ignore */ }
@@ -715,13 +788,14 @@
                 if (isSpeedBoosted) {
                     disableSpeedBoost();
                 }
-                updateProfileUI();
                 stopMining();
-                authSection.style.display = 'block';
-                logoutBtn.style.display = 'none';
                 balance = 0.0000001;
                 currentRate = BASE_RATE;
                 updateUI();
+                updateProfileUI();
+                showLoginPage();
+                // Сбрасываем рекламу
+                unloadAdScript();
             }
 
             // ---------- Event Listeners ----------
@@ -740,7 +814,6 @@
                 }
             });
 
-            // Speed modal
             speedModalConfirm.addEventListener('click', function() {
                 speedModal.classList.remove('open');
                 enableSpeedBoost();
@@ -750,9 +823,7 @@
                 speedModal.classList.remove('open');
             });
 
-            // Stop ads modal
             stopAdsRefreshBtn.addEventListener('click', function() {
-                // Сохраняем состояние перед перезагрузкой
                 localStorage.setItem('trxMinerBalance', balance.toString());
                 location.reload();
             });
@@ -805,7 +876,6 @@
             });
 
             // ---------- Init ----------
-            // Восстанавливаем баланс, если был сохранён
             const savedBalance = localStorage.getItem('trxMinerBalance');
             if (savedBalance) {
                 const parsed = parseFloat(savedBalance);
@@ -816,11 +886,13 @@
             }
 
             const hasUser = restoreUser();
+
             if (!hasUser) {
                 balance = 0.0000001;
                 currentRate = BASE_RATE;
                 updateUI();
                 updateProfileUI();
+                showLoginPage();
             } else {
                 if (!animationFrame) {
                     startMining();
@@ -831,8 +903,8 @@
         })();
     </script>
 
+    <!-- fallback для Google -->
     <script>
-        // fallback для Google
         window.handleCredentialResponse = window.handleCredentialResponse || function(response) {
             console.warn('handleCredentialResponse вызван, но функция не инициализирована');
         };
