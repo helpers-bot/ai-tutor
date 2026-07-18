@@ -1,1187 +1,731 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TRX Miner</title>
-
-    <!-- Google Identity Services -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
-        /* ----- Reset & Base ----- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            background: linear-gradient(145deg, #0b1120 0%, #1a2639 100%);
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            margin: 0;
         }
 
         .container {
-            max-width: 480px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
             width: 100%;
-            background: rgba(20, 30, 48, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 40px;
-            padding: 30px 24px 35px;
-            box-shadow: 0 25px 50px -8px rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 215, 0, 0.15);
-            transition: all 0.2s;
+            text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
-        /* ----- Страница входа ----- */
-        #loginPage {
+        .login-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            min-height: 400px;
-            text-align: center;
+            gap: 20px;
         }
 
-        .login-logo {
-            font-size: 48px;
-            font-weight: 900;
-            color: #fbbf24;
-            text-shadow: 0 0 40px rgba(251, 191, 36, 0.3);
-            margin-bottom: 8px;
-        }
-
-        .login-subtitle {
-            color: #8a9bb8;
-            font-size: 16px;
-            margin-bottom: 32px;
-            letter-spacing: 2px;
-        }
-
-        .login-divider {
-            width: 60px;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #fbbf24, transparent);
-            border-radius: 4px;
-            margin: 0 auto 32px;
-        }
-
-        .g_id_signin {
-            display: flex;
-            justify-content: center;
-        }
-
-        /* ----- Основная панель ----- */
-        #dashboardPage {
-            display: none;
-        }
-
-        #dashboardPage.visible {
-            display: block;
-        }
-
-        /* ----- Profile ----- */
-        .profile-section {
+        .google-btn {
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-            margin-bottom: 24px;
-        }
-
-        .avatar-wrapper {
-            position: relative;
-            width: 64px;
-            height: 64px;
-            flex-shrink: 0;
-        }
-
-        .avatar {
+            justify-content: center;
+            gap: 10px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
             width: 100%;
-            height: 100%;
+            max-width: 300px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .google-btn img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .profile {
+            margin-bottom: 30px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #fbbf24;
-            background: #2a3a5a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: #fbbf24;
-            box-shadow: 0 4px 12px rgba(251, 191, 36, 0.25);
+            border: 3px solid #667eea;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        .avatar-placeholder {
-            background: #1e2a44;
-            border: 2px solid #4a5a7a;
+        .nickname {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
         }
 
-        .profile-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .profile-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .profile-name .edit-btn {
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 8px;
-            transition: 0.15s;
-        }
-
-        .profile-name .edit-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            color: #fbbf24;
-        }
-
-        .profile-email {
-            font-size: 13px;
-            color: #94a3b8;
-            margin-top: 2px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .profile-id {
-            font-size: 11px;
-            color: #4a5a7a;
-            font-family: monospace;
-            background: rgba(0, 0, 0, 0.25);
-            padding: 2px 10px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 4px;
-        }
-
-        /* ----- Balance ----- */
-        .balance-card {
-            background: linear-gradient(135deg, #1a2a44, #0f1a2e);
-            border-radius: 28px;
-            padding: 20px 24px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(251, 191, 36, 0.2);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
-            text-align: center;
-        }
-
-        .balance-label {
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #8a9bb8;
+        .balance {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
 
         .balance-amount {
-            font-size: 42px;
-            font-weight: 800;
-            color: #fbbf24;
-            text-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+            font-size: 48px;
+            font-weight: bold;
             font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
-            transition: all 0.1s;
-            margin: 4px 0;
-            animation: pulseGlow 3s ease-in-out infinite;
+            animation: pulse 0.5s ease-in-out infinite alternate;
+            word-break: break-all;
         }
 
-        .balance-amount .currency {
-            font-size: 22px;
-            color: #fbbf24;
-            margin-left: 4px;
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.9; transform: scale(1.02); }
         }
 
-        .balance-rate {
-            font-size: 14px;
-            color: #8a9bb8;
-        }
-
-        .balance-rate span {
-            color: #4ade80;
-            font-weight: 600;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { text-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
-            50% { text-shadow: 0 0 40px rgba(251, 191, 36, 0.5); }
-        }
-
-        /* ----- Buttons ----- */
-        .speed-btn {
-            width: 100%;
-            padding: 16px;
-            border: none;
-            border-radius: 60px;
+        .trx-label {
             font-size: 18px;
-            font-weight: 700;
+            margin-top: 5px;
+            opacity: 0.9;
+            letter-spacing: 2px;
+        }
+
+        .mining-status {
+            margin: 10px 0;
+            color: #4CAF50;
+            font-weight: bold;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .speed-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0b1120;
-            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
-            margin-bottom: 12px;
+            transition: all 0.3s;
+            margin: 10px;
+            width: 100%;
+            max-width: 300px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
         }
 
         .speed-btn:hover {
-            transform: scale(1.02);
-            box-shadow: 0 12px 32px rgba(251, 191, 36, 0.45);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.5);
         }
 
-        .speed-btn:active {
-            transform: scale(0.97);
+        .disable-btn {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+            box-shadow: 0 5px 15px rgba(168, 237, 234, 0.3);
         }
 
-        .speed-btn.active {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.3);
+        .disable-btn:hover {
+            box-shadow: 0 8px 20px rgba(168, 237, 234, 0.5);
         }
 
-        .speed-btn.active:hover {
-            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.45);
-        }
-
-        .speed-btn i {
-            font-size: 20px;
-        }
-
-        .logout-btn {
-            background: #2a3a5a;
-            color: #94a3b8;
-            box-shadow: none;
-            margin-top: 8px;
-        }
-
-        .logout-btn:hover {
-            background: #3a4a6a;
-            box-shadow: none;
-        }
-
-        /* ----- Modals ----- */
-        .modal-overlay {
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 24px;
-            animation: fadeIn 0.25s ease;
-        }
-
-        .modal-overlay.open {
-            display: flex;
-        }
-
-        .modal-card {
-            background: #1a2639;
-            border-radius: 32px;
-            padding: 32px 28px;
-            max-width: 400px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7);
-            animation: slideUp 0.3s ease;
-        }
-
-        .modal-card h3 {
-            color: #fbbf24;
-            font-size: 22px;
-            margin-bottom: 12px;
-            display: flex;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
             align-items: center;
-            gap: 10px;
+            backdrop-filter: blur(5px);
         }
 
-        .modal-card p {
-            color: #c8d0dc;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .modal-card .btn-group {
+        .modal.active {
             display: flex;
-            gap: 12px;
         }
 
-        .modal-card .btn-group button {
-            flex: 1;
-            padding: 14px;
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 22px;
+        }
+
+        .modal p {
+            margin-bottom: 20px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             border: none;
-            border-radius: 60px;
-            font-weight: 700;
+            border-radius: 10px;
+            padding: 12px 25px;
             font-size: 16px;
             cursor: pointer;
-            transition: 0.15s;
+            margin: 5px;
+            transition: all 0.3s;
+            font-weight: 500;
         }
 
-        .modal-card .btn-primary {
-            background: linear-gradient(135deg, #fbbf24, #f59e0b);
-            color: #0b1120;
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .modal-card .btn-primary:hover {
-            transform: scale(1.02);
-        }
-
-        .modal-card .btn-secondary {
-            background: rgba(255, 255, 255, 0.06);
-            color: #94a3b8;
-        }
-
-        .modal-card .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .modal-card .btn-danger {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-        }
-
-        .modal-card .btn-danger:hover {
-            transform: scale(1.02);
-        }
-
-        /* Edit profile */
-        .edit-profile-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            margin-top: 8px;
-        }
-
-        .edit-profile-row input {
-            flex: 1;
-            padding: 12px 16px;
-            border-radius: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: #0f1a2e;
-            color: #fff;
-            font-size: 15px;
-            outline: none;
-            transition: 0.15s;
-        }
-
-        .edit-profile-row input:focus {
-            border-color: #fbbf24;
-        }
-
-        .edit-profile-row button {
-            padding: 12px 20px;
+        .logout-btn {
+            background: #ff6b6b;
+            color: white;
             border: none;
-            border-radius: 60px;
-            background: #fbbf24;
-            color: #0b1120;
-            font-weight: 700;
+            border-radius: 10px;
+            padding: 10px 20px;
             cursor: pointer;
-            transition: 0.15s;
+            margin-top: 20px;
+            transition: all 0.3s;
+            font-weight: 500;
         }
 
-        .edit-profile-row button:hover {
-            background: #f59e0b;
+        .logout-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .edit-section {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.96); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .edit-input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.3s;
         }
 
-        /* Responsive */
-        @media (max-width: 480px) {
-            .container { padding: 20px 16px 25px; border-radius: 28px; }
-            .balance-amount { font-size: 34px; }
-            .profile-name { font-size: 18px; }
-            .avatar-wrapper { width: 52px; height: 52px; }
-            .modal-card { padding: 24px 20px; }
-            .login-logo { font-size: 36px; }
+        .edit-input:focus {
+            border-color: #667eea;
         }
 
-        /* Utility */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mt-12 { margin-top: 12px; }
-        .mt-8 { margin-top: 8px; }
+        .save-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .save-btn:hover {
+            background: #5a6fd6;
+            transform: translateY(-1px);
+        }
+
+        #g_id_onload {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Google Sign-In конфигурация -->
+    <div id="g_id_onload"
+         data-client_id="12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleGoogleSignIn"
+         data-auto_prompt="false">
+    </div>
 
     <div class="container" id="app">
-
-        <!-- ============================================================ -->
-        <!-- СТРАНИЦА ВХОДА -->
-        <!-- ============================================================ -->
-        <div id="loginPage">
-            <div class="login-logo">⛏️</div>
-            <div class="login-subtitle">TRX MINER</div>
-            <div class="login-divider"></div>
-            <p style="color: #8a9bb8; margin-bottom: 28px; font-size: 14px; line-height: 1.6;">
-                Войдите через Google, чтобы начать майнить TRX
-            </p>
-
-            <div id="g_id_onload"
-                data-client_id="12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com"
-                data-callback="handleCredentialResponse"
-                data-auto_select="false">
-            </div>
-
-            <div class="g_id_signin"
-                data-type="standard"
-                data-shape="rectangular"
-                data-theme="filled_black"
-                data-text="signin_with"
-                data-size="large"
-                data-logo_alignment="left">
-            </div>
-
-            <p id="loginError" style="color: #ef4444; font-size: 13px; margin-top: 16px; display: none;"></p>
+        <!-- Login Screen -->
+        <div class="login-container" id="loginScreen">
+            <h2>⛏️ TRX Miner</h2>
+            <p>Войдите, чтобы начать майнинг</p>
+            <button class="google-btn" onclick="triggerGoogleSignIn()">
+                <img src="https://www.google.com/favicon.ico" alt="Google">
+                Войти через Google
+            </button>
         </div>
 
-        <!-- ============================================================ -->
-        <!-- ОСНОВНАЯ ПАНЕЛЬ -->
-        <!-- ============================================================ -->
-        <div id="dashboardPage">
-            <!-- Profile -->
-            <div class="profile-section">
-                <div class="avatar-wrapper">
-                    <img id="userAvatar" class="avatar hidden" src="" alt="Avatar" />
-                    <div id="avatarPlaceholder" class="avatar avatar-placeholder">
-                        <i class="fas fa-user"></i>
-                    </div>
-                </div>
-                <div class="profile-info">
-                    <div class="profile-name">
-                        <span id="userNameDisplay">Гость</span>
-                        <button class="edit-btn" id="editProfileBtn" title="Редактировать профиль">
-                            <i class="fas fa-pen"></i>
-                        </button>
-                    </div>
-                    <div class="profile-email" id="userEmailDisplay">—</div>
-                    <div class="profile-id" id="userIdDisplay">ID: ---</div>
+        <!-- Mining Screen -->
+        <div class="mining-container" id="miningScreen" style="display: none;">
+            <div class="profile">
+                <img class="profile-pic" id="profilePic" src="" alt="Profile">
+                <div class="nickname" id="nicknameDisplay">User</div>
+                <div class="edit-section">
+                    <input type="text" class="edit-input" id="nicknameInput" placeholder="Новый никнейм">
+                    <button class="save-btn" onclick="updateNickname()">💾 Сохранить</button>
                 </div>
             </div>
 
-            <!-- Balance -->
-            <div class="balance-card">
-                <div class="balance-label">Баланс TRX</div>
-                <div class="balance-amount" id="balanceDisplay">
-                    0.0000001 <span class="currency">TRX</span>
-                </div>
-                <div class="balance-rate">
-                    <i class="fas fa-arrow-up" style="color:#4ade80;"></i>
-                    Начисление: <span id="rateDisplay">+0.0000001</span> TRX/сек
+            <div class="balance">
+                <div class="mining-status">⚡ Майнинг активен</div>
+                <div class="balance-amount" id="balance">0.0000000</div>
+                <div class="trx-label">TRX</div>
+                <div style="font-size: 12px; margin-top: 5px; opacity: 0.8;">
+                    +<span id="miningSpeed">0.0000001</span> TRX/сек
                 </div>
             </div>
 
-            <!-- Speed Button -->
-            <button class="speed-btn" id="speedToggleBtn">
-                <i class="fas fa-rocket"></i>
-                <span id="speedBtnText">Увеличить скорость</span>
+            <button class="speed-btn" id="speedBtn" onclick="showSpeedModal()">
+                🚀 Увеличить скорость
+            </button>
+            <button class="speed-btn disable-btn" id="disableBtn" style="display: none;" onclick="showDisableModal()">
+                ⏸️ Выключить рекламу
             </button>
 
-            <!-- Logout -->
-            <button id="logoutBtn" class="speed-btn logout-btn">
-                <i class="fas fa-sign-out-alt"></i> Выйти
-            </button>
-
-            <!-- Рекламный контейнер -->
-            <div id="adContainer" style="display: none;"></div>
+            <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
         </div>
-    </div>
 
-    <!-- ===== MODALS ===== -->
+        <!-- Speed Modal -->
+        <div class="modal" id="speedModal">
+            <div class="modal-content">
+                <h3>🚀 Увеличение скорости майнинга</h3>
+                <p>Вы включаете рекламу разных видов для увеличения дохода, в любой момент можете выключить</p>
+                <div style="background: #f0f0f0; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                    <div>Скорость: 0.0000001 → <strong>0.0000005</strong> TRX/сек</div>
+                    <div style="color: #4CAF50; margin-top: 5px;">Увеличение в 5 раз!</div>
+                </div>
+                <button class="modal-btn" onclick="enableAds()">✅ Включить рекламу</button>
+                <button class="modal-btn" style="background: #ccc;" onclick="closeModal('speedModal')">❌ Отмена</button>
+            </div>
+        </div>
 
-    <!-- Speed / Ads Modal -->
-    <div class="modal-overlay" id="speedModal">
-        <div class="modal-card">
-            <h3><i class="fas fa-bolt" style="color:#fbbf24;"></i> Увеличение скорости</h3>
-            <p>
-                Вы включаете рекламу разных видов для увеличения дохода.<br>
-                В любой момент можете выключить.
-            </p>
-            <div class="btn-group">
-                <button class="btn-primary" id="speedModalConfirm">Включить</button>
-                <button class="btn-secondary" id="speedModalCancel">Отмена</button>
+        <!-- Disable Modal -->
+        <div class="modal" id="disableModal">
+            <div class="modal-content">
+                <h3>⏸️ Отключение рекламы</h3>
+                <p>Обновите страницу, чтобы реклама перестала показываться</p>
+                <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin: 15px 0; color: #856404;">
+                    ⚠️ Скорость вернется к базовой: 0.0000001 TRX/сек
+                </div>
+                <button class="modal-btn" onclick="disableAdsAndReload()">🔄 Обновить страницу</button>
+                <button class="modal-btn" style="background: #ccc;" onclick="closeModal('disableModal')">❌ Закрыть</button>
             </div>
         </div>
     </div>
 
-    <!-- Stop Ads Modal (refresh) -->
-    <div class="modal-overlay" id="stopAdsModal">
-        <div class="modal-card">
-            <h3><i class="fas fa-pause-circle" style="color:#ef4444;"></i> Остановка рекламы</h3>
-            <p>
-                Обновите страницу, чтобы реклама перестала показываться.
-            </p>
-            <div class="btn-group">
-                <button class="btn-danger" id="stopAdsRefreshBtn">Обновить</button>
-                <button class="btn-secondary" id="stopAdsCancel">Отмена</button>
+    <!-- Рекламный контейнер -->
+    <div id="adContainer" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 999;">
+        <div style="max-width: 728px; margin: 0 auto; text-align: center;">
+            <!-- Здесь будет ваш рекламный код -->
+            <div id="adBanner" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px;">
+                <h3 style="margin: 0;">📢 Рекламный блок</h3>
+                <p style="margin: 5px 0 0 0; font-size: 12px;">Скорость майнинга увеличена в 5 раз!</p>
             </div>
         </div>
     </div>
-
-    <!-- Edit Profile Modal -->
-    <div class="modal-overlay" id="editProfileModal">
-        <div class="modal-card">
-            <h3><i class="fas fa-user-edit"></i> Редактировать профиль</h3>
-            <div class="edit-profile-row">
-                <input type="text" id="editNicknameInput" placeholder="Новый никнейм" maxlength="30">
-                <button id="saveNicknameBtn">Сохранить</button>
-            </div>
-            <p style="font-size:13px; color:#6a7a9a; margin-top:12px; margin-bottom:0;">
-                <i class="fas fa-info-circle"></i> Изменится только отображаемое имя.
-            </p>
-            <button class="btn-secondary" id="editProfileClose" style="margin-top:16px; width:100%; padding:12px; border:none; border-radius:60px; background:rgba(255,255,255,0.06); color:#94a3b8; cursor:pointer;">Закрыть</button>
-        </div>
-    </div>
-
-    <!-- ============================================================ -->
 
     <script>
-        (function() {
-            'use strict';
+        // Supabase конфигурация
+        const SUPABASE_URL = 'https://l2ls0oS3ZwF9GUTochw.supabase.co'
+        const SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y'
+        
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-            // ================================================================
-            // 1. ПОДКЛЮЧЕНИЕ К SUPABASE
-            // ================================================================
-            const SUPABASE_URL = 'https://l2ls0oS3ZwF9GUTochw.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y';
+        let currentUser = null
+        let miningInterval = null
+        let currentBalance = 0
+        let isAdsEnabled = false
+        let miningSpeed = 0.0000001
+        let lastSaveTime = Date.now()
 
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase подключён');
-
-            // ================================================================
-            // 2. DOM-ЭЛЕМЕНТЫ
-            // ================================================================
-            const loginPage = document.getElementById('loginPage');
-            const dashboardPage = document.getElementById('dashboardPage');
-            const loginError = document.getElementById('loginError');
-
-            const balanceEl = document.getElementById('balanceDisplay');
-            const rateEl = document.getElementById('rateDisplay');
-            const userNameEl = document.getElementById('userNameDisplay');
-            const userEmailEl = document.getElementById('userEmailDisplay');
-            const userIdEl = document.getElementById('userIdDisplay');
-            const userAvatar = document.getElementById('userAvatar');
-            const avatarPlaceholder = document.getElementById('avatarPlaceholder');
-
-            const speedBtn = document.getElementById('speedToggleBtn');
-            const speedBtnText = document.getElementById('speedBtnText');
-
-            const speedModal = document.getElementById('speedModal');
-            const speedModalConfirm = document.getElementById('speedModalConfirm');
-            const speedModalCancel = document.getElementById('speedModalCancel');
-
-            const stopAdsModal = document.getElementById('stopAdsModal');
-            const stopAdsRefreshBtn = document.getElementById('stopAdsRefreshBtn');
-            const stopAdsCancel = document.getElementById('stopAdsCancel');
-
-            const editProfileBtn = document.getElementById('editProfileBtn');
-            const editProfileModal = document.getElementById('editProfileModal');
-            const editNicknameInput = document.getElementById('editNicknameInput');
-            const saveNicknameBtn = document.getElementById('saveNicknameBtn');
-            const editProfileClose = document.getElementById('editProfileClose');
-
-            const logoutBtn = document.getElementById('logoutBtn');
-            const adContainer = document.getElementById('adContainer');
-
-            // ================================================================
-            // 3. СОСТОЯНИЕ
-            // ================================================================
-            let balance = 0.0000001;
-            const BASE_RATE = 0.0000001;
-            let currentRate = BASE_RATE;
-            let isSpeedBoosted = false;
-            let animationFrame = null;
-            let lastTimestamp = 0;
-            let adScriptLoaded = false;
-            let user = null;
-            let userUid = null;
-            let saveTimeout = null;
-
-            // ================================================================
-            // 4. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-            // ================================================================
-            function formatBalance(val) {
-                return val.toFixed(7);
+        // Google Sign-In callback
+        function handleGoogleSignIn(response) {
+            if (response.credential) {
+                signInWithGoogleToken(response.credential)
             }
-
-            function updateUI() {
-                balanceEl.innerHTML = `${formatBalance(balance)} <span class="currency">TRX</span>`;
-                rateEl.textContent = `+${formatBalance(currentRate)}`;
-            }
-
-            function showLoginPage() {
-                loginPage.style.display = 'flex';
-                dashboardPage.classList.remove('visible');
-                dashboardPage.style.display = 'none';
-            }
-
-            function showDashboard() {
-                loginPage.style.display = 'none';
-                dashboardPage.style.display = 'block';
-                dashboardPage.classList.add('visible');
-            }
-
-            // ================================================================
-            // 5. РАБОТА С SUPABASE
-            // ================================================================
-
-            async function saveUserToSupabase(googleUser) {
-                try {
-                    const { data: existing, error: findError } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('google_id', googleUser.id)
-                        .single();
-
-                    if (findError && findError.code !== 'PGRST116') {
-                        console.error('Ошибка поиска:', findError);
-                        return null;
-                    }
-
-                    if (existing) {
-                        const { data: updated, error: updateError } = await supabase
-                            .from('users')
-                            .update({
-                                email: googleUser.email,
-                                name: googleUser.name,
-                                picture: googleUser.picture,
-                                last_login: new Date().toISOString()
-                            })
-                            .eq('google_id', googleUser.id)
-                            .select()
-                            .single();
-
-                        if (updateError) {
-                            console.error('Ошибка обновления:', updateError);
-                            return existing;
-                        }
-
-                        userUid = updated.user_uid;
-                        return updated;
-                    } else {
-                        const newUserUid = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
-                        const { data: created, error: createError } = await supabase
-                            .from('users')
-                            .insert({
-                                google_id: googleUser.id,
-                                user_uid: newUserUid,
-                                email: googleUser.email,
-                                name: googleUser.name,
-                                nickname: googleUser.name || 'Игрок',
-                                picture: googleUser.picture,
-                                balance: 0.0000001,
-                                rate_multiplier: 1,
-                                is_ads_enabled: false,
-                                created_at: new Date().toISOString(),
-                                last_login: new Date().toISOString()
-                            })
-                            .select()
-                            .single();
-
-                        if (createError) {
-                            console.error('Ошибка создания:', createError);
-                            return null;
-                        }
-
-                        userUid = created.user_uid;
-                        return created;
-                    }
-                } catch (e) {
-                    console.error('Ошибка сохранения пользователя:', e);
-                    return null;
-                }
-            }
-
-            async function loadBalanceFromSupabase(uid) {
-                try {
-                    const { data, error } = await supabase
-                        .from('users')
-                        .select('balance, rate_multiplier, is_ads_enabled')
-                        .eq('user_uid', uid)
-                        .single();
-
-                    if (error) {
-                        console.error('Ошибка загрузки баланса:', error);
-                        return null;
-                    }
-
-                    return data;
-                } catch (e) {
-                    console.error('Ошибка:', e);
-                    return null;
-                }
-            }
-
-            async function saveBalanceToSupabase(uid, newBalance, rate, adsEnabled) {
-                try {
-                    const { error } = await supabase
-                        .from('users')
-                        .update({
-                            balance: newBalance,
-                            rate_multiplier: adsEnabled ? 3 : 1,
-                            is_ads_enabled: adsEnabled,
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('user_uid', uid);
-
-                    if (error) {
-                        console.error('Ошибка сохранения баланса:', error);
-                        return false;
-                    }
-
-                    return true;
-                } catch (e) {
-                    console.error('Ошибка:', e);
-                    return false;
-                }
-            }
-
-            async function updateNicknameInSupabase(uid, newNickname) {
-                try {
-                    const { error } = await supabase
-                        .from('users')
-                        .update({ nickname: newNickname })
-                        .eq('user_uid', uid);
-
-                    if (error) {
-                        console.error('Ошибка обновления никнейма:', error);
-                        return false;
-                    }
-                    return true;
-                } catch (e) {
-                    console.error('Ошибка:', e);
-                    return false;
-                }
-            }
-
-            function debouncedSave() {
-                if (saveTimeout) clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(async function() {
-                    if (userUid) {
-                        await saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
-                        console.log('💾 Баланс сохранён в Supabase:', balance);
-                    }
-                }, 10000);
-            }
-
-            // ================================================================
-            // 6. РЕКЛАМА
-            // ================================================================
-            function loadAdScript() {
-                if (adScriptLoaded) return;
-                adContainer.innerHTML = '';
-                adContainer.style.display = 'block';
-
-                const script = document.createElement('script');
-                script.src = 'https://quge5.com/88/tag.min.js';
-                script.dataset.zone = '260208';
-                script.async = true;
-                script.dataset.cfasync = 'false';
-                script.onload = function() {
-                    adScriptLoaded = true;
-                    console.log('✅ Рекламный скрипт загружен');
-                };
-                script.onerror = function() {
-                    console.warn('⚠️ Не удалось загрузить рекламный скрипт');
-                };
-                adContainer.appendChild(script);
-            }
-
-            function unloadAdScript() {
-                const scripts = adContainer.querySelectorAll('script');
-                scripts.forEach(s => s.remove());
-                adContainer.innerHTML = '';
-                adContainer.style.display = 'none';
-                adScriptLoaded = false;
-                console.log('🔄 Реклама выгружена');
-            }
-
-            // ================================================================
-            // 7. МАЙНИНГ
-            // ================================================================
-            function startMining() {
-                if (animationFrame) return;
-                lastTimestamp = performance.now();
-
-                function tick(now) {
-                    const delta = (now - lastTimestamp) / 1000;
-                    lastTimestamp = now;
-                    balance += currentRate * delta;
-                    updateUI();
-                    debouncedSave();
-                    animationFrame = requestAnimationFrame(tick);
-                }
-
-                animationFrame = requestAnimationFrame(tick);
-            }
-
-            function stopMining() {
-                if (animationFrame) {
-                    cancelAnimationFrame(animationFrame);
-                    animationFrame = null;
-                }
-                if (userUid) {
-                    saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
-                }
-            }
-
-            // ================================================================
-            // 8. СКОРОСТЬ / РЕКЛАМА
-            // ================================================================
-            function enableSpeedBoost() {
-                if (isSpeedBoosted) return;
-                isSpeedBoosted = true;
-                currentRate = BASE_RATE * 3;
-                speedBtn.classList.add('active');
-                speedBtnText.textContent = 'Выключить рекламу';
-                speedBtn.querySelector('i').className = 'fas fa-stop-circle';
-                loadAdScript();
-                updateUI();
-                if (userUid) {
-                    saveBalanceToSupabase(userUid, balance, currentRate, true);
-                }
-            }
-
-            function disableSpeedBoost() {
-                if (!isSpeedBoosted) return;
-                isSpeedBoosted = false;
-                currentRate = BASE_RATE;
-                speedBtn.classList.remove('active');
-                speedBtnText.textContent = 'Увеличить скорость';
-                speedBtn.querySelector('i').className = 'fas fa-rocket';
-                unloadAdScript();
-                updateUI();
-                if (userUid) {
-                    saveBalanceToSupabase(userUid, balance, currentRate, false);
-                }
-            }
-
-            // ================================================================
-            // 9. ПРОФИЛЬ
-            // ================================================================
-            function updateProfileUI(userData) {
-                if (userData) {
-                    const displayName = userData.nickname || userData.name || 'Игрок';
-                    userNameEl.textContent = displayName;
-                    userEmailEl.textContent = userData.email || '—';
-                    userIdEl.textContent = 'ID: ' + (userData.user_uid ? userData.user_uid.slice(0, 10) : '---');
-
-                    if (userData.picture) {
-                        userAvatar.src = userData.picture;
-                        userAvatar.classList.remove('hidden');
-                        avatarPlaceholder.classList.add('hidden');
-                    } else {
-                        userAvatar.classList.add('hidden');
-                        avatarPlaceholder.classList.remove('hidden');
-                    }
-                } else {
-                    userNameEl.textContent = 'Гость';
-                    userEmailEl.textContent = '—';
-                    userIdEl.textContent = 'ID: ---';
-                    userAvatar.classList.add('hidden');
-                    avatarPlaceholder.classList.remove('hidden');
-                }
-            }
-
-            // ================================================================
-            // 10. АВТОРИЗАЦИЯ
-            // ================================================================
-            window.handleCredentialResponse = async function(response) {
-                try {
-                    const payload = JSON.parse(atob(response.credential.split('.')[1]));
-                    const googleUser = {
-                        id: payload.sub,
-                        name: payload.name || 'Игрок',
-                        email: payload.email || '',
-                        picture: payload.picture || null,
-                    };
-
-                    loginError.style.display = 'none';
-                    console.log('🔑 Вход через Google:', googleUser.name);
-
-                    const savedUser = await saveUserToSupabase(googleUser);
-                    if (!savedUser) {
-                        loginError.textContent = 'Ошибка сохранения данных. Попробуйте ещё раз.';
-                        loginError.style.display = 'block';
-                        return;
-                    }
-
-                    user = savedUser;
-                    userUid = savedUser.user_uid;
-
-                    const userData = await loadBalanceFromSupabase(userUid);
-                    if (userData) {
-                        balance = userData.balance || 0.0000001;
-                        if (userData.is_ads_enabled) {
-                            isSpeedBoosted = true;
-                            currentRate = BASE_RATE * 3;
-                            speedBtn.classList.add('active');
-                            speedBtnText.textContent = 'Выключить рекламу';
-                            speedBtn.querySelector('i').className = 'fas fa-stop-circle';
-                            loadAdScript();
-                        } else {
-                            isSpeedBoosted = false;
-                            currentRate = BASE_RATE;
-                        }
-                    }
-
-                    localStorage.setItem('trxMinerUser', JSON.stringify({
-                        user_uid: userUid,
-                        google_id: googleUser.id,
-                        name: googleUser.name,
-                        email: googleUser.email,
-                        picture: googleUser.picture
-                    }));
-
-                    updateProfileUI(savedUser);
-                    updateUI();
-                    showDashboard();
-                    startMining();
-
-                } catch (e) {
-                    loginError.textContent = 'Ошибка входа. Попробуйте ещё раз.';
-                    loginError.style.display = 'block';
-                    console.warn('Ошибка декодирования токена', e);
-                }
-            };
-
-            // Восстановление пользователя
-            async function restoreUser() {
-                const saved = localStorage.getItem('trxMinerUser');
-                if (!saved) return false;
-
-                try {
-                    const savedData = JSON.parse(saved);
-                    userUid = savedData.user_uid;
-
-                    const { data: userData, error } = await supabase
-                        .from('users')
-                        .select('*')
-                        .eq('user_uid', userUid)
-                        .single();
-
-                    if (error || !userData) {
-                        localStorage.removeItem('trxMinerUser');
-                        return false;
-                    }
-
-                    user = userData;
-
-                    const balanceData = await loadBalanceFromSupabase(userUid);
-                    if (balanceData) {
-                        balance = balanceData.balance || 0.0000001;
-                        if (balanceData.is_ads_enabled) {
-                            isSpeedBoosted = true;
-                            currentRate = BASE_RATE * 3;
-                            speedBtn.classList.add('active');
-                            speedBtnText.textContent = 'Выключить рекламу';
-                            speedBtn.querySelector('i').className = 'fas fa-stop-circle';
-                            loadAdScript();
-                        } else {
-                            isSpeedBoosted = false;
-                            currentRate = BASE_RATE;
-                        }
-                    }
-
-                    updateProfileUI(userData);
-                    updateUI();
-                    showDashboard();
-                    startMining();
-                    return true;
-
-                } catch (e) {
-                    console.error('Ошибка восстановления:', e);
-                    localStorage.removeItem('trxMinerUser');
-                    return false;
-                }
-            }
-
-            // ================================================================
-            // 11. ВЫХОД
-            // ================================================================
-            async function logout() {
-                if (userUid) {
-                    await saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
-                }
-
-                user = null;
-                userUid = null;
-                localStorage.removeItem('trxMinerUser');
-
-                if (isSpeedBoosted) {
-                    disableSpeedBoost();
-                }
-
-                stopMining();
-                balance = 0.0000001;
-                currentRate = BASE_RATE;
-                updateUI();
-                updateProfileUI(null);
-                unloadAdScript();
-                showLoginPage();
-            }
-
-            // ================================================================
-            // 12. ОБРАБОТЧИКИ СОБЫТИЙ
-            // ================================================================
-
-            speedBtn.addEventListener('click', function() {
-                if (!user) {
-                    alert('Войдите в аккаунт, чтобы использовать ускорение.');
-                    return;
-                }
-
-                if (isSpeedBoosted) {
-                    stopAdsModal.classList.add('open');
-                } else {
-                    speedModal.classList.add('open');
-                }
-            });
-
-            speedModalConfirm.addEventListener('click', function() {
-                speedModal.classList.remove('open');
-                enableSpeedBoost();
-            });
-
-            speedModalCancel.addEventListener('click', function() {
-                speedModal.classList.remove('open');
-            });
-
-            stopAdsRefreshBtn.addEventListener('click', function() {
-                if (userUid) {
-                    saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
-                }
-                localStorage.setItem('trxMinerBalance', balance.toString());
-                location.reload();
-            });
-
-            stopAdsCancel.addEventListener('click', function() {
-                stopAdsModal.classList.remove('open');
-            });
-
-            [speedModal, stopAdsModal, editProfileModal].forEach(modal => {
-                modal.addEventListener('click', function(e) {
-                    if (e.target === modal) {
-                        modal.classList.remove('open');
-                    }
-                });
-            });
-
-            editProfileBtn.addEventListener('click', function() {
-                if (!user) {
-                    alert('Войдите в аккаунт, чтобы редактировать профиль.');
-                    return;
-                }
-                editNicknameInput.value = user.nickname || user.name || '';
-                editProfileModal.classList.add('open');
-            });
-
-            saveNicknameBtn.addEventListener('click', async function() {
-                const newName = editNicknameInput.value.trim();
-                if (newName.length < 1) {
-                    alert('Введите корректное имя.');
-                    return;
-                }
-                if (user && userUid) {
-                    const success = await updateNicknameInSupabase(userUid, newName);
-                    if (success) {
-                        user.nickname = newName;
-                        const saved = localStorage.getItem('trxMinerUser');
-                        if (saved) {
-                            const data = JSON.parse(saved);
-                            data.name = newName;
-                            localStorage.setItem('trxMinerUser', JSON.stringify(data));
-                        }
-                        updateProfileUI(user);
-                        editProfileModal.classList.remove('open');
-                    } else {
-                        alert('Ошибка сохранения никнейма.');
-                    }
-                }
-            });
-
-            editProfileClose.addEventListener('click', function() {
-                editProfileModal.classList.remove('open');
-            });
-
-            logoutBtn.addEventListener('click', function() {
-                if (confirm('Вы уверены, что хотите выйти?')) {
-                    logout();
-                }
-            });
-
-            // ================================================================
-            // 13. ИНИЦИАЛИЗАЦИЯ
-            // ================================================================
-
-            const savedBalance = localStorage.getItem('trxMinerBalance');
-            if (savedBalance) {
-                const parsed = parseFloat(savedBalance);
-                if (!isNaN(parsed) && parsed > 0) {
-                    balance = parsed;
-                }
-                localStorage.removeItem('trxMinerBalance');
-            }
-
-            const hasUser = await restoreUser();
-
-            if (!hasUser) {
-                balance = 0.0000001;
-                currentRate = BASE_RATE;
-                updateUI();
-                updateProfileUI(null);
-                showLoginPage();
+        }
+
+        // Триггер Google Sign-In
+        function triggerGoogleSignIn() {
+            const googleButton = document.querySelector('[data-type="standard"]')
+            if (googleButton) {
+                googleButton.click()
             } else {
-                if (!animationFrame) {
-                    startMining();
+                // Если кнопка не найдена, используем альтернативный метод
+                window.google?.accounts.id.prompt()
+            }
+        }
+
+        // Вход через Google токен
+        async function signInWithGoogleToken(credential) {
+            try {
+                const { data, error } = await supabase.auth.signInWithIdToken({
+                    provider: 'google',
+                    token: credential,
+                })
+
+                if (error) throw error
+
+                if (data.user) {
+                    currentUser = data.user
+                    await loadUserData()
+                    showMiningScreen()
                 }
+            } catch (error) {
+                console.error('Ошибка входа:', error.message)
+                alert('Ошибка входа. Попробуйте еще раз.')
+            }
+        }
+
+        // Инициализация Google Sign-In
+        window.onload = function() {
+            if (window.google?.accounts?.id) {
+                window.google.accounts.id.initialize({
+                    client_id: '12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com',
+                    callback: handleGoogleSignIn,
+                    auto_select: false
+                })
+                
+                window.google.accounts.id.renderButton(
+                    document.getElementById('googleButtonPlaceholder') || document.body,
+                    { theme: 'outline', size: 'large' }
+                )
             }
 
-            console.log('🚀 TRX Miner запущен. Баланс:', balance, 'TRX');
-        })();
-    </script>
+            // Проверяем существующую сессию
+            checkExistingSession()
+        }
 
+        // Проверка существующей сессии
+        async function checkExistingSession() {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+                currentUser = session.user
+                await loadUserData()
+                showMiningScreen()
+            }
+        }
+
+        // Загрузка данных пользователя
+        async function loadUserData() {
+            try {
+                let { data: userData, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single()
+
+                if (!userData) {
+                    // Создаем нового пользователя
+                    const { data: newUser, error: createError } = await supabase
+                        .from('users')
+                        .insert([
+                            {
+                                id: currentUser.id,
+                                email: currentUser.email,
+                                nickname: currentUser.user_metadata?.full_name || 'User',
+                                avatar_url: currentUser.user_metadata?.avatar_url || '',
+                                balance: 0.0000000,
+                                ads_enabled: false,
+                                mining_speed: 0.0000001,
+                                created_at: new Date().toISOString()
+                            }
+                        ])
+                        .select()
+                        .single()
+
+                    if (createError) throw createError
+                    userData = newUser
+                }
+
+                // Обновляем интерфейс
+                document.getElementById('nicknameDisplay').textContent = userData.nickname
+                document.getElementById('profilePic').src = userData.avatar_url || 'https://via.placeholder.com/100'
+                document.getElementById('nicknameInput').value = userData.nickname
+                
+                currentBalance = userData.balance || 0
+                isAdsEnabled = userData.ads_enabled || false
+                miningSpeed = userData.mining_speed || 0.0000001
+
+                updateBalanceDisplay()
+                updateMiningSpeedDisplay()
+                
+                if (isAdsEnabled) {
+                    showAds()
+                    document.getElementById('speedBtn').style.display = 'none'
+                    document.getElementById('disableBtn').style.display = 'inline-block'
+                } else {
+                    hideAds()
+                    document.getElementById('speedBtn').style.display = 'inline-block'
+                    document.getElementById('disableBtn').style.display = 'none'
+                }
+
+                startMining()
+
+            } catch (error) {
+                console.error('Ошибка загрузки данных:', error)
+            }
+        }
+
+        // Обновление никнейма
+        async function updateNickname() {
+            const newNickname = document.getElementById('nicknameInput').value.trim()
+            if (!newNickname) return
+
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ nickname: newNickname })
+                    .eq('id', currentUser.id)
+
+                if (error) throw error
+
+                document.getElementById('nicknameDisplay').textContent = newNickname
+                alert('✅ Никнейм обновлен!')
+            } catch (error) {
+                console.error('Ошибка обновления никнейма:', error)
+                alert('❌ Ошибка обновления никнейма')
+            }
+        }
+
+        // Обновление баланса в базе данных
+        async function updateBalanceInDB() {
+            try {
+                const { error } = await supabase
+                    .from('users')
+                    .update({ 
+                        balance: currentBalance,
+                        ads_enabled: isAdsEnabled,
+                        mining_speed: miningSpeed,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', currentUser.id)
+
+                if (error) throw error
+                lastSaveTime = Date.now()
+            } catch (error) {
+                console.error('Ошибка сохранения:', error)
+            }
+        }
+
+        // Запуск майнинга
+        function startMining() {
+            if (miningInterval) clearInterval(miningInterval)
+            
+            miningInterval = setInterval(() => {
+                currentBalance += miningSpeed
+                updateBalanceDisplay()
+                
+                // Сохраняем баланс каждые 10 секунд
+                if (Date.now() - lastSaveTime > 10000) {
+                    updateBalanceInDB()
+                }
+            }, 1000)
+        }
+
+        // Обновление отображения баланса
+        function updateBalanceDisplay() {
+            const balanceElement = document.getElementById('balance')
+            if (balanceElement) {
+                balanceElement.textContent = currentBalance.toFixed(7)
+                
+                // Анимация изменения
+                balanceElement.style.transform = 'scale(1.05)'
+                setTimeout(() => {
+                    balanceElement.style.transform = 'scale(1)'
+                }, 100)
+            }
+        }
+
+        // Обновление отображения скорости
+        function updateMiningSpeedDisplay() {
+            const speedElement = document.getElementById('miningSpeed')
+            if (speedElement) {
+                speedElement.textContent = miningSpeed.toFixed(7)
+            }
+        }
+
+        // Модальные окна
+        function showSpeedModal() {
+            document.getElementById('speedModal').classList.add('active')
+        }
+
+        function showDisableModal() {
+            document.getElementById('disableModal').classList.add('active')
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active')
+        }
+
+        // Включение рекламы
+        async function enableAds() {
+            isAdsEnabled = true
+            miningSpeed = 0.0000005 // Увеличенная скорость в 5 раз
+            
+            showAds()
+            updateMiningSpeedDisplay()
+            
+            document.getElementById('speedBtn').style.display = 'none'
+            document.getElementById('disableBtn').style.display = 'inline-block'
+            
+            await updateBalanceInDB()
+            closeModal('speedModal')
+            
+            // Перезапускаем майнинг с новой скоростью
+            startMining()
+        }
+
+        // Отключение рекламы и перезагрузка
+        async function disableAdsAndReload() {
+            isAdsEnabled = false
+            miningSpeed = 0.0000001
+            
+            await updateBalanceInDB()
+            hideAds()
+            
+            // Показываем сообщение и перезагружаем
+            alert('Страница будет обновлена для отключения рекламы')
+            window.location.reload()
+        }
+
+        // Показ рекламы
+        function showAds() {
+            const adContainer = document.getElementById('adContainer')
+            if (adContainer) {
+                adContainer.style.display = 'block'
+                initializeAds()
+            }
+        }
+
+        // Скрытие рекламы
+        function hideAds() {
+            const adContainer = document.getElementById('adContainer')
+            if (adContainer) {
+                adContainer.style.display = 'none'
+                disableAdsCode()
+            }
+        }
+
+        // Инициализация рекламы
+        function initializeAds() {
+            // Здесь можно добавить реальный рекламный код
+            console.log('Реклама включена')
+            
+            // Пример: загрузка рекламного скрипта
+            // const adScript = document.createElement('script')
+            // adScript.src = 'ваш-рекламный-скрипт.js'
+            // document.body.appendChild(adScript)
+        }
+
+        // Отключение рекламы
+        function disableAdsCode() {
+            // Полное отключение рекламы
+            console.log('Реклама отключена')
+            
+            // Удаляем рекламные скрипты
+            const adScripts = document.querySelectorAll('script[data-ad]')
+            adScripts.forEach(script => script.remove())
+            
+            // Очищаем рекламные контейнеры
+            const adBanner = document.getElementById('adBanner')
+            if (adBanner) {
+                adBanner.innerHTML = ''
+            }
+        }
+
+        // Показ экрана майнинга
+        function showMiningScreen() {
+            document.getElementById('loginScreen').style.display = 'none'
+            document.getElementById('miningScreen').style.display = 'block'
+        }
+
+        // Выход
+        async function logout() {
+            if (miningInterval) clearInterval(miningInterval)
+            await updateBalanceInDB() // Финальное сохранение
+            
+            const { error } = await supabase.auth.signOut()
+            if (!error) {
+                currentUser = null
+                document.getElementById('loginScreen').style.display = 'flex'
+                document.getElementById('miningScreen').style.display = 'none'
+                hideAds()
+                
+                // Сбрасываем Google Sign-In
+                if (window.google?.accounts?.id) {
+                    window.google.accounts.id.disableAutoSelect()
+                }
+            }
+        }
+
+        // Закрытие модальных окон по клику вне их
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active')
+            }
+        }
+    </script>
 </body>
 </html>
