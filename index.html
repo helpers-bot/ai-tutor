@@ -458,13 +458,12 @@
             <p style="color: #8a9bb8; margin-bottom: 28px; font-size: 14px; line-height: 1.6;">
                 Войдите через Google, чтобы начать майнить TRX
             </p>
+            
+            <!-- Кнопка входа через Google (POPUP режим) -->
             <div id="g_id_onload"
                 data-client_id="12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com"
-                data-context="signin"
-                data-ux_mode="popup"
-                data-login_uri="https://vds-game.ink"
-                data-auto_select="false"
-                data-itp_support="true">
+                data-callback="handleCredentialResponse"
+                data-auto_select="false">
             </div>
             <div class="g_id_signin"
                 data-type="standard"
@@ -474,6 +473,7 @@
                 data-size="large"
                 data-logo_alignment="left">
             </div>
+            
             <p id="loginError" style="color: #ef4444; font-size: 13px; margin-top: 16px; display: none;"></p>
         </div>
 
@@ -636,7 +636,7 @@
             let lastTimestamp = 0;
             let adScriptLoaded = false;
             let user = null;
-            let userUid = null; // уникальный ID пользователя в Supabase
+            let userUid = null;
             let saveTimeout = null;
 
             // ================================================================
@@ -667,7 +667,6 @@
             // 5. РАБОТА С SUPABASE
             // ================================================================
 
-            // Сохранение пользователя
             async function saveUserToSupabase(googleUser) {
                 try {
                     // Проверяем, есть ли пользователь
@@ -738,7 +737,6 @@
                 }
             }
 
-            // Загрузка баланса
             async function loadBalanceFromSupabase(uid) {
                 try {
                     const { data, error } = await supabase
@@ -759,10 +757,8 @@
                 }
             }
 
-            // Сохранение баланса
             async function saveBalanceToSupabase(uid, newBalance, rate, adsEnabled) {
                 try {
-                    // Обновляем баланс
                     const { error } = await supabase
                         .from('users')
                         .update({
@@ -778,16 +774,6 @@
                         return false;
                     }
 
-                    // Сохраняем транзакцию
-                    await supabase
-                        .from('transactions')
-                        .insert({
-                            user_uid: uid,
-                            amount: currentRate * 10, // примерная сумма за 10 секунд
-                            type: adsEnabled ? 'speed_boost' : 'mining',
-                            rate: currentRate
-                        });
-
                     return true;
                 } catch (e) {
                     console.error('Ошибка:', e);
@@ -795,7 +781,6 @@
                 }
             }
 
-            // Сохранение никнейма
             async function updateNicknameInSupabase(uid, newNickname) {
                 try {
                     const { error } = await supabase
@@ -814,7 +799,6 @@
                 }
             }
 
-            // Отложенное сохранение (раз в 10 секунд)
             function debouncedSave() {
                 if (saveTimeout) clearTimeout(saveTimeout);
                 saveTimeout = setTimeout(async function() {
@@ -881,7 +865,6 @@
                     cancelAnimationFrame(animationFrame);
                     animationFrame = null;
                 }
-                // Сохраняем финальный баланс
                 if (userUid) {
                     saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
                 }
@@ -946,7 +929,7 @@
             }
 
             // ================================================================
-            // 10. АВТОРИЗАЦИЯ
+            // 10. АВТОРИЗАЦИЯ (POPUP режим — НЕТ РЕДИРЕКТА!)
             // ================================================================
             window.handleCredentialResponse = async function(response) {
                 try {
@@ -959,6 +942,7 @@
                     };
 
                     loginError.style.display = 'none';
+                    console.log('🔑 Вход через Google:', googleUser.name);
 
                     // Сохраняем в Supabase
                     const savedUser = await saveUserToSupabase(googleUser);
@@ -1018,7 +1002,6 @@
                     const savedData = JSON.parse(saved);
                     userUid = savedData.user_uid;
 
-                    // Загружаем данные из Supabase
                     const { data: userData, error } = await supabase
                         .from('users')
                         .select('*')
@@ -1032,7 +1015,6 @@
 
                     user = userData;
 
-                    // Загружаем баланс
                     const balanceData = await loadBalanceFromSupabase(userUid);
                     if (balanceData) {
                         balance = balanceData.balance || 0.0000001;
@@ -1066,7 +1048,6 @@
             // 11. ВЫХОД
             // ================================================================
             async function logout() {
-                // Сохраняем баланс перед выходом
                 if (userUid) {
                     await saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
                 }
@@ -1092,7 +1073,6 @@
             // 12. ОБРАБОТЧИКИ СОБЫТИЙ
             // ================================================================
 
-            // Speed button
             speedBtn.addEventListener('click', function() {
                 if (!user) {
                     alert('Войдите в аккаунт, чтобы использовать ускорение.');
@@ -1116,7 +1096,6 @@
             });
 
             stopAdsRefreshBtn.addEventListener('click', function() {
-                // Сохраняем баланс перед перезагрузкой
                 if (userUid) {
                     saveBalanceToSupabase(userUid, balance, currentRate, isSpeedBoosted);
                 }
@@ -1128,7 +1107,6 @@
                 stopAdsModal.classList.remove('open');
             });
 
-            // Закрытие модалок по клику вне карточки
             [speedModal, stopAdsModal, editProfileModal].forEach(modal => {
                 modal.addEventListener('click', function(e) {
                     if (e.target === modal) {
@@ -1137,7 +1115,6 @@
                 });
             });
 
-            // Edit profile
             editProfileBtn.addEventListener('click', function() {
                 if (!user) {
                     alert('Войдите в аккаунт, чтобы редактировать профиль.');
@@ -1157,7 +1134,6 @@
                     const success = await updateNicknameInSupabase(userUid, newName);
                     if (success) {
                         user.nickname = newName;
-                        // Обновляем в localStorage
                         const saved = localStorage.getItem('trxMinerUser');
                         if (saved) {
                             const data = JSON.parse(saved);
@@ -1186,7 +1162,6 @@
             // 13. ИНИЦИАЛИЗАЦИЯ
             // ================================================================
 
-            // Восстанавливаем баланс из localStorage (если был сохранён перед перезагрузкой)
             const savedBalance = localStorage.getItem('trxMinerBalance');
             if (savedBalance) {
                 const parsed = parseFloat(savedBalance);
@@ -1211,15 +1186,7 @@
             }
 
             console.log('🚀 TRX Miner запущен. Баланс:', balance, 'TRX');
-            console.log('👤 Пользователь:', user ? user.nickname || user.name : 'Гость');
         })();
-    </script>
-
-    <!-- fallback для Google -->
-    <script>
-        window.handleCredentialResponse = window.handleCredentialResponse || function(response) {
-            console.warn('handleCredentialResponse вызван, но функция не инициализирована');
-        };
     </script>
 
 </body>
