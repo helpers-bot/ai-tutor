@@ -3,674 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRX Miner</title>
+    <title>VDS Miner - Майнинг TRX</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            z-index: 2;
-        }
-
-        .login-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .google-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: white;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            padding: 12px 30px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-            max-width: 300px;
-            color: #333;
-            font-weight: 500;
-        }
-
-        .google-btn:hover {
-            background: #f5f5f5;
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .google-btn img {
-            width: 24px;
-            height: 24px;
-        }
-
-        .profile {
-            margin-bottom: 30px;
-        }
-
-        .profile-pic {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #667eea;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-
-        .nickname {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .balance {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 15px;
-            margin: 20px 0;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        .balance-amount {
-            font-size: 48px;
-            font-weight: bold;
-            font-family: 'Courier New', monospace;
-            animation: pulse 0.5s ease-in-out infinite alternate;
-            word-break: break-all;
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0.9; transform: scale(1.02); }
-        }
-
-        .trx-label {
-            font-size: 18px;
-            margin-top: 5px;
-            opacity: 0.9;
-            letter-spacing: 2px;
-        }
-
-        .mining-status {
-            margin: 10px 0;
-            color: #4CAF50;
-            font-weight: bold;
-            animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .speed-btn {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 15px 30px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 10px;
-            width: 100%;
-            max-width: 300px;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(245, 87, 108, 0.3);
-        }
-
-        .speed-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.5);
-        }
-
-        .disable-btn {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-            color: #333;
-            box-shadow: 0 5px 15px rgba(168, 237, 234, 0.3);
-        }
-
-        .disable-btn:hover {
-            box-shadow: 0 8px 20px rgba(168, 237, 234, 0.5);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateY(-50px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal h3 {
-            margin-bottom: 15px;
-            color: #333;
-            font-size: 22px;
-        }
-
-        .modal p {
-            margin-bottom: 20px;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .modal-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 12px 25px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .logout-btn {
-            background: #ff6b6b;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            padding: 10px 20px;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: all 0.3s;
-            font-weight: 500;
-        }
-
-        .logout-btn:hover {
-            background: #ff5252;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
-        }
-
-        .edit-section {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            align-items: center;
-            margin-top: 10px;
-        }
-
-        .edit-input {
-            padding: 8px 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        .edit-input:focus {
-            border-color: #667eea;
-        }
-
-        .save-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .save-btn:hover {
-            background: #5a6fd6;
-            transform: translateY(-1px);
-        }
-    </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <!-- Login Screen -->
-        <div class="login-container" id="loginScreen">
-            <h2>⛏️ TRX Miner</h2>
-            <p>Войдите, чтобы начать майнинг</p>
-            <div id="googleSignInButton"></div>
+    <!-- Фоновые частицы -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Главный контейнер -->
+    <div class="main-container">
+        <!-- Неоновая рамка -->
+        <div class="neon-border"></div>
+        
+        <!-- Контент -->
+        <div class="container" id="app">
+            <!-- Логотип -->
+            <div class="logo">
+                <h1 class="logo-text">VDS</h1>
+                <p class="logo-subtitle">vds-game.ink</p>
+            </div>
+
+            <!-- Экран входа -->
+            <div class="login-container" id="loginScreen">
+                <div class="welcome-text">
+                    <h2>⚡ Добро пожаловать в VDS Miner</h2>
+                    <p>Подключитесь и начните зарабатывать TRX прямо сейчас!</p>
+                </div>
+                <div id="googleSignInButton" class="google-btn-container"></div>
+            </div>
+
+            <!-- Экран майнинга -->
+            <div class="mining-container" id="miningScreen" style="display: none;">
+                <!-- Профиль -->
+                <div class="profile">
+                    <div class="avatar-ring">
+                        <img class="profile-pic" id="profilePic" src="" alt="Profile">
+                    </div>
+                    <div class="nickname" id="nicknameDisplay">User</div>
+                    <div class="edit-section">
+                        <input type="text" class="edit-input" id="nicknameInput" placeholder="Новый никнейм">
+                        <button class="save-btn" onclick="window.updateNickname()">
+                            <span>💾</span> Сохранить
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Баланс -->
+                <div class="balance">
+                    <div class="mining-status">⚡ Майнинг активен</div>
+                    <div class="balance-amount" id="balance">0.0000000</div>
+                    <div class="trx-label">TRX</div>
+                    <div class="mining-rate">
+                        +<span id="miningSpeed">0.0000001</span> TRX/сек
+                    </div>
+                </div>
+
+                <!-- Кнопки управления -->
+                <button class="speed-btn" id="speedBtn" onclick="window.showSpeedModal()">
+                    🚀 Увеличить скорость
+                </button>
+                <button class="speed-btn disable-btn" id="disableBtn" style="display: none;" onclick="window.showDisableModal()">
+                    ⏸️ Выключить рекламу
+                </button>
+
+                <button class="game-btn" onclick="window.location.href='game.html'">
+                    🎮 Игровой центр
+                </button>
+
+                <button class="logout-btn" onclick="window.logout()">🚪 Выйти</button>
+            </div>
         </div>
+    </div>
 
-        <!-- Mining Screen -->
-        <div class="mining-container" id="miningScreen" style="display: none;">
-            <div class="profile">
-                <img class="profile-pic" id="profilePic" src="" alt="Profile">
-                <div class="nickname" id="nicknameDisplay">User</div>
-                <div class="edit-section">
-                    <input type="text" class="edit-input" id="nicknameInput" placeholder="Новый никнейм">
-                    <button class="save-btn" onclick="window.updateNickname()">💾 Сохранить</button>
+    <!-- Модальные окна -->
+    <div class="modal" id="speedModal">
+        <div class="modal-content">
+            <div class="modal-glow"></div>
+            <h3>🚀 Увеличение скорости майнинга</h3>
+            <p>Вы включаете рекламу разных видов для увеличения дохода, в любой момент можете выключить</p>
+            <div class="speed-comparison">
+                <div class="speed-item">
+                    <span>Базовая:</span>
+                    <strong>0.0000001 TRX/сек</strong>
+                </div>
+                <div class="speed-arrow">→</div>
+                <div class="speed-item boosted">
+                    <span>Ускоренная:</span>
+                    <strong>0.0000005 TRX/сек</strong>
                 </div>
             </div>
-
-            <div class="balance">
-                <div class="mining-status">⚡ Майнинг активен</div>
-                <div class="balance-amount" id="balance">0.0000000</div>
-                <div class="trx-label">TRX</div>
-                <div style="font-size: 12px; margin-top: 5px; opacity: 0.8;">
-                    +<span id="miningSpeed">0.0000001</span> TRX/сек
-                </div>
-            </div>
-
-            <button class="speed-btn" id="speedBtn" onclick="window.showSpeedModal()">
-                🚀 Увеличить скорость
-            </button>
-            <button class="speed-btn disable-btn" id="disableBtn" style="display: none;" onclick="window.showDisableModal()">
-                ⏸️ Выключить рекламу
-            </button>
-
-            <button class="logout-btn" onclick="window.logout()">🚪 Выйти</button>
+            <button class="modal-btn accept" onclick="window.enableAds()">✅ Включить рекламу</button>
+            <button class="modal-btn cancel" onclick="window.closeModal('speedModal')">❌ Отмена</button>
         </div>
+    </div>
 
-        <!-- Speed Modal -->
-        <div class="modal" id="speedModal">
-            <div class="modal-content">
-                <h3>🚀 Увеличение скорости майнинга</h3>
-                <p>Вы включаете рекламу разных видов для увеличения дохода, в любой момент можете выключить</p>
-                <div style="background: #f0f0f0; padding: 15px; border-radius: 10px; margin: 15px 0;">
-                    <div>Скорость: 0.0000001 → <strong>0.0000005</strong> TRX/сек</div>
-                    <div style="color: #4CAF50; margin-top: 5px;">Увеличение в 5 раз!</div>
-                </div>
-                <button class="modal-btn" onclick="window.enableAds()">✅ Включить рекламу</button>
-                <button class="modal-btn" style="background: #ccc;" onclick="window.closeModal('speedModal')">❌ Отмена</button>
-            </div>
-        </div>
-
-        <!-- Disable Modal -->
-        <div class="modal" id="disableModal">
-            <div class="modal-content">
-                <h3>⏸️ Отключение рекламы</h3>
-                <p>Обновите страницу, чтобы реклама перестала показываться</p>
-                <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin: 15px 0; color: #856404;">
-                    ⚠️ Скорость вернется к базовой: 0.0000001 TRX/сек
-                </div>
-                <button class="modal-btn" onclick="window.disableAdsAndReload()">🔄 Обновить страницу</button>
-                <button class="modal-btn" style="background: #ccc;" onclick="window.closeModal('disableModal')">❌ Закрыть</button>
-            </div>
+    <div class="modal" id="disableModal">
+        <div class="modal-content">
+            <div class="modal-glow"></div>
+            <h3>⏸️ Отключение рекламы</h3>
+            <p>Обновите страницу, чтобы реклама перестала показываться</p>
+            <button class="modal-btn accept" onclick="window.disableAdsAndReload()">🔄 Обновить страницу</button>
+            <button class="modal-btn cancel" onclick="window.closeModal('disableModal')">❌ Закрыть</button>
         </div>
     </div>
 
     <!-- Рекламный контейнер -->
-    <div id="adContainer" style="display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 15px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); z-index: 999;">
-        <div style="max-width: 728px; margin: 0 auto; text-align: center;">
-            <div id="adBanner" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; border-radius: 10px;">
-                <h3 style="margin: 0;">📢 Рекламный блок</h3>
-                <p style="margin: 5px 0 0 0; font-size: 12px;">Скорость майнинга увеличена в 5 раз!</p>
+    <div id="adContainer" class="ad-container" style="display: none;">
+        <div class="ad-content">
+            <div id="adBanner" class="ad-banner">
+                <h3>📢 Рекламный блок</h3>
+                <p>Скорость майнинга увеличена в 5 раз!</p>
             </div>
         </div>
     </div>
 
-    <script>
-        (function() {
-            // Supabase конфигурация
-            const SUPABASE_URL = 'https://l2ls0oS3ZwF9GUTochw.supabase.co'
-            const SUPABASE_ANON_KEY = 'sb_publishable_l2ls0oS3ZwF9GUTochw_NQ_FKV4rF6Y'
-            
-            const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-
-            let currentUser = null
-            let miningInterval = null
-            let currentBalance = 0
-            let isAdsEnabled = false
-            let miningSpeed = 0.0000001
-            let lastSaveTime = Date.now()
-
-            // Инициализация Google Sign-In
-            function initializeGoogleSignIn() {
-                if (window.google && window.google.accounts && window.google.accounts.id) {
-                    window.google.accounts.id.initialize({
-                        client_id: '12713380811-j7nrjdovklvm4m6rliklbm5g9chmc8j2.apps.googleusercontent.com',
-                        callback: handleGoogleSignIn,
-                        auto_select: false
-                    })
-                    
-                    window.google.accounts.id.renderButton(
-                        document.getElementById('googleSignInButton'),
-                        { 
-                            theme: 'outline', 
-                            size: 'large',
-                            text: 'signin_with',
-                            shape: 'rectangular',
-                            width: 300
-                        }
-                    )
-                }
-            }
-
-            // Google Sign-In callback
-            async function handleGoogleSignIn(response) {
-                if (response.credential) {
-                    try {
-                        const { data, error } = await supabaseClient.auth.signInWithIdToken({
-                            provider: 'google',
-                            token: response.credential,
-                        })
-
-                        if (error) throw error
-
-                        if (data.user) {
-                            currentUser = data.user
-                            await loadUserData()
-                            showMiningScreen()
-                        }
-                    } catch (error) {
-                        console.error('Ошибка входа:', error.message)
-                        alert('Ошибка входа. Попробуйте еще раз.')
-                    }
-                }
-            }
-
-            // Загрузка данных пользователя
-            async function loadUserData() {
-                try {
-                    let { data: userData, error } = await supabaseClient
-                        .from('users')
-                        .select('*')
-                        .eq('id', currentUser.id)
-                        .single()
-
-                    if (!userData) {
-                        const { data: newUser, error: createError } = await supabaseClient
-                            .from('users')
-                            .insert([
-                                {
-                                    id: currentUser.id,
-                                    email: currentUser.email,
-                                    nickname: currentUser.user_metadata?.full_name || 'User',
-                                    avatar_url: currentUser.user_metadata?.avatar_url || '',
-                                    balance: 0.0000000,
-                                    ads_enabled: false,
-                                    mining_speed: 0.0000001,
-                                    created_at: new Date().toISOString()
-                                }
-                            ])
-                            .select()
-                            .single()
-
-                        if (createError) throw createError
-                        userData = newUser
-                    }
-
-                    document.getElementById('nicknameDisplay').textContent = userData.nickname
-                    document.getElementById('profilePic').src = userData.avatar_url || 'https://via.placeholder.com/100'
-                    document.getElementById('nicknameInput').value = userData.nickname
-                    
-                    currentBalance = userData.balance || 0
-                    isAdsEnabled = userData.ads_enabled || false
-                    miningSpeed = userData.mining_speed || 0.0000001
-
-                    updateBalanceDisplay()
-                    updateMiningSpeedDisplay()
-                    
-                    if (isAdsEnabled) {
-                        showAds()
-                        document.getElementById('speedBtn').style.display = 'none'
-                        document.getElementById('disableBtn').style.display = 'inline-block'
-                    } else {
-                        hideAds()
-                        document.getElementById('speedBtn').style.display = 'inline-block'
-                        document.getElementById('disableBtn').style.display = 'none'
-                    }
-
-                    startMining()
-
-                } catch (error) {
-                    console.error('Ошибка загрузки данных:', error)
-                }
-            }
-
-            // Обновление никнейма
-            window.updateNickname = async function() {
-                const newNickname = document.getElementById('nicknameInput').value.trim()
-                if (!newNickname) return
-
-                try {
-                    const { error } = await supabaseClient
-                        .from('users')
-                        .update({ nickname: newNickname })
-                        .eq('id', currentUser.id)
-
-                    if (error) throw error
-
-                    document.getElementById('nicknameDisplay').textContent = newNickname
-                    alert('✅ Никнейм обновлен!')
-                } catch (error) {
-                    console.error('Ошибка обновления никнейма:', error)
-                    alert('❌ Ошибка обновления никнейма')
-                }
-            }
-
-            // Обновление баланса в базе данных
-            async function updateBalanceInDB() {
-                try {
-                    const { error } = await supabaseClient
-                        .from('users')
-                        .update({ 
-                            balance: currentBalance,
-                            ads_enabled: isAdsEnabled,
-                            mining_speed: miningSpeed,
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('id', currentUser.id)
-
-                    if (error) throw error
-                    lastSaveTime = Date.now()
-                } catch (error) {
-                    console.error('Ошибка сохранения:', error)
-                }
-            }
-
-            // Запуск майнинга
-            function startMining() {
-                if (miningInterval) clearInterval(miningInterval)
-                
-                miningInterval = setInterval(() => {
-                    currentBalance += miningSpeed
-                    updateBalanceDisplay()
-                    
-                    if (Date.now() - lastSaveTime > 10000) {
-                        updateBalanceInDB()
-                    }
-                }, 1000)
-            }
-
-            // Обновление отображения баланса
-            function updateBalanceDisplay() {
-                const balanceElement = document.getElementById('balance')
-                if (balanceElement) {
-                    balanceElement.textContent = currentBalance.toFixed(7)
-                }
-            }
-
-            // Обновление отображения скорости
-            function updateMiningSpeedDisplay() {
-                const speedElement = document.getElementById('miningSpeed')
-                if (speedElement) {
-                    speedElement.textContent = miningSpeed.toFixed(7)
-                }
-            }
-
-            // Модальные окна
-            window.showSpeedModal = function() {
-                document.getElementById('speedModal').classList.add('active')
-            }
-
-            window.showDisableModal = function() {
-                document.getElementById('disableModal').classList.add('active')
-            }
-
-            window.closeModal = function(modalId) {
-                document.getElementById(modalId).classList.remove('active')
-            }
-
-            // Включение рекламы
-            window.enableAds = async function() {
-                isAdsEnabled = true
-                miningSpeed = 0.0000005
-                
-                showAds()
-                updateMiningSpeedDisplay()
-                
-                document.getElementById('speedBtn').style.display = 'none'
-                document.getElementById('disableBtn').style.display = 'inline-block'
-                
-                await updateBalanceInDB()
-                window.closeModal('speedModal')
-                
-                startMining()
-            }
-
-            // Отключение рекламы и перезагрузка
-            window.disableAdsAndReload = async function() {
-                isAdsEnabled = false
-                miningSpeed = 0.0000001
-                
-                await updateBalanceInDB()
-                hideAds()
-                
-                alert('Страница будет обновлена для отключения рекламы')
-                window.location.reload()
-            }
-
-            // Показ рекламы
-            function showAds() {
-                const adContainer = document.getElementById('adContainer')
-                if (adContainer) {
-                    adContainer.style.display = 'block'
-                    initializeAds()
-                }
-            }
-
-            // Скрытие рекламы
-            function hideAds() {
-                const adContainer = document.getElementById('adContainer')
-                if (adContainer) {
-                    adContainer.style.display = 'none'
-                    disableAdsCode()
-                }
-            }
-
-            // Инициализация рекламы
-            function initializeAds() {
-                console.log('Реклама включена')
-            }
-
-            // Отключение рекламы
-            function disableAdsCode() {
-                console.log('Реклама отключена')
-            }
-
-            // Показ экрана майнинга
-            function showMiningScreen() {
-                document.getElementById('loginScreen').style.display = 'none'
-                document.getElementById('miningScreen').style.display = 'block'
-            }
-
-            // Выход
-            window.logout = async function() {
-                if (miningInterval) clearInterval(miningInterval)
-                await updateBalanceInDB()
-                
-                const { error } = await supabaseClient.auth.signOut()
-                if (!error) {
-                    currentUser = null
-                    document.getElementById('loginScreen').style.display = 'flex'
-                    document.getElementById('miningScreen').style.display = 'none'
-                    hideAds()
-                    
-                    if (window.google?.accounts?.id) {
-                        window.google.accounts.id.disableAutoSelect()
-                    }
-                }
-            }
-
-            // Закрытие модальных окон по клику вне их
-            window.onclick = function(event) {
-                if (event.target.classList.contains('modal')) {
-                    event.target.classList.remove('active')
-                }
-            }
-
-            // Инициализация при загрузке
-            window.addEventListener('load', async () => {
-                initializeGoogleSignIn()
-                
-                const { data: { session } } = await supabaseClient.auth.getSession()
-                if (session) {
-                    currentUser = session.user
-                    await loadUserData()
-                    showMiningScreen()
-                }
-            })
-        })()
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
