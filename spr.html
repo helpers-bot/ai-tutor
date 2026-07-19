@@ -12,24 +12,25 @@
     }
 
     body {
-      background: #e5e7eb;
+      background: #ffffff;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
-      padding: 16px;
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      padding: 12px;
+      margin: 0;
     }
 
     .document {
-      max-width: 880px;
+      max-width: 820px;
       width: 100%;
       background: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
-      padding: 32px 36px;
-      transition: all 0.2s;
-      border: 1px solid rgba(0, 0, 0, 0.03);
+      padding: 22px 28px 18px 28px;
+      border: 1px solid #cccccc;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+      page-break-inside: avoid;
+      /* компактний розмір, щоб влізти на екран */
     }
 
     /* верхня смуга з номером */
@@ -37,76 +38,76 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      border-bottom: 2px solid #1e3a5f;
-      padding-bottom: 12px;
-      margin-bottom: 18px;
+      border-bottom: 2px solid #222222;
+      padding-bottom: 8px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
 
     .doc-number {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
-      letter-spacing: 0.4px;
-      color: #0b2b4a;
-      background: #f0f5fc;
-      padding: 4px 18px 4px 14px;
-      border-radius: 30px;
+      letter-spacing: 0.3px;
+      color: #000000;
       font-family: 'Courier New', monospace;
-      border: 1px solid #bdd3e8;
+      background: #f2f2f2;
+      padding: 2px 16px 2px 12px;
+      border-radius: 24px;
+      border: 1px solid #aaaaaa;
     }
 
     .doc-number span {
-      font-weight: 300;
-      color: #2c5779;
+      font-weight: 400;
+      color: #1a1a1a;
       margin-right: 4px;
     }
 
     .doc-badge {
       font-size: 14px;
-      background: #dce7f5;
-      padding: 5px 16px;
-      border-radius: 30px;
-      color: #134074;
+      background: #eaeaea;
+      padding: 4px 16px;
+      border-radius: 24px;
+      color: #000000;
       font-weight: 500;
-      letter-spacing: 0.3px;
+      letter-spacing: 0.2px;
+      border: 1px solid #bbbbbb;
     }
 
-    /* заголовок */
     .doc-title {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      color: #0a2942;
-      margin: 8px 0 20px 0;
-      letter-spacing: 0.5px;
-      border-left: 8px solid #1f6390;
-      padding-left: 18px;
-      background: linear-gradient(to right, #f8fcff, transparent);
+      color: #000000;
+      margin: 6px 0 14px 0;
+      letter-spacing: 0.3px;
+      border-left: 6px solid #444444;
+      padding-left: 16px;
+      background: #fafafa;
     }
 
     /* мета-рядок: дата, дійсність, джерело */
     .meta-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 18px 30px;
-      background: #f4f9fe;
-      padding: 14px 20px;
-      border-radius: 18px;
-      margin-bottom: 28px;
-      border: 1px solid #d9e5f0;
+      gap: 10px 20px;
+      background: #f7f7f7;
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin-bottom: 18px;
+      border: 1px solid #d0d0d0;
     }
 
     .meta-item {
       display: flex;
       align-items: baseline;
       gap: 4px;
-      font-size: 15px;
-      color: #1a3b58;
+      font-size: 14px;
+      color: #000000;
     }
 
     .meta-item strong {
       font-weight: 600;
-      color: #0c2f4b;
-      margin-right: 4px;
+      color: #000000;
+      margin-right: 2px;
     }
 
     .meta-item .highlight {
@@ -114,34 +115,34 @@
       padding: 0 12px 0 8px;
       border-radius: 20px;
       font-weight: 500;
-      color: #003366;
-      border: 1px solid #c0d5eb;
-      line-height: 1.8;
+      color: #000000;
+      border: 1px solid #b0b0b0;
+      line-height: 1.7;
     }
 
     /* таблиця пацієнт + лікар */
     .info-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px 30px;
-      background: #fafdff;
-      padding: 18px 20px;
-      border-radius: 18px;
-      border: 1px solid #e2eef9;
-      margin-bottom: 28px;
+      gap: 12px 20px;
+      background: #fcfcfc;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #d5d5d5;
+      margin-bottom: 18px;
     }
 
     .info-col {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 5px;
     }
 
     .info-row {
       display: flex;
       align-items: baseline;
-      border-bottom: 1px dashed #c9ddec;
-      padding-bottom: 6px;
+      border-bottom: 1px dashed #c0c0c0;
+      padding-bottom: 4px;
     }
 
     .info-row:last-child {
@@ -151,38 +152,37 @@
 
     .info-label {
       font-weight: 600;
-      color: #1d4463;
-      min-width: 130px;
-      font-size: 14px;
-      letter-spacing: 0.2px;
+      color: #000000;
+      min-width: 120px;
+      font-size: 13px;
+      letter-spacing: 0.1px;
     }
 
     .info-value {
-      color: #0f2a40;
+      color: #000000;
       font-weight: 500;
-      font-size: 15px;
+      font-size: 14px;
       word-break: break-word;
     }
 
     .info-value.doctor-name {
       font-weight: 600;
-      color: #003b6f;
+      color: #000000;
     }
 
     .info-value.patient-name {
       font-weight: 600;
-      color: #004080;
-      font-size: 16px;
+      color: #000000;
+      font-size: 15px;
     }
 
     /* блок послуг (аналізи) */
     .service-block {
       background: #ffffff;
-      border-radius: 18px;
-      border: 1px solid #d2e2f2;
-      padding: 18px 20px 14px 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 6px rgba(0, 40, 70, 0.03);
+      border-radius: 12px;
+      border: 1px solid #c5c5c5;
+      padding: 14px 16px 10px 16px;
+      margin-bottom: 16px;
     }
 
     .service-header {
@@ -190,117 +190,106 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .service-header h3 {
       font-weight: 600;
-      color: #133450;
-      font-size: 17px;
-      letter-spacing: 0.3px;
+      color: #000000;
+      font-size: 16px;
+      letter-spacing: 0.2px;
     }
 
     .service-code {
-      background: #e5eff8;
-      padding: 3px 16px;
-      border-radius: 30px;
-      font-size: 14px;
+      background: #ececec;
+      padding: 2px 14px;
+      border-radius: 24px;
+      font-size: 13px;
       font-weight: 500;
-      color: #1a4a70;
+      color: #000000;
+      border: 1px solid #b0b0b0;
     }
 
     .service-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px 24px;
-      padding: 6px 0 2px 0;
+      gap: 6px 16px;
+      padding: 4px 0 2px 0;
     }
 
     .service-item {
-      background: #f1f7fe;
-      padding: 6px 18px 6px 16px;
-      border-radius: 40px;
-      font-size: 15px;
+      background: #f4f4f4;
+      padding: 4px 16px 4px 14px;
+      border-radius: 30px;
+      font-size: 14px;
       font-weight: 500;
-      color: #00325a;
-      border: 1px solid #bed7ee;
+      color: #000000;
+      border: 1px solid #b8b8b8;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
-
-    .service-item::before {
-      content: "🩺";
-      font-size: 14px;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
-    }
-
-    .service-item.blood::before { content: "🩸"; }
-    .service-item.urine::before { content: "🧪"; }
-    .service-item.ultrasound::before { content: "📊"; }
-    .service-item.fgs::before { content: "🔬"; }
 
     .diagnosis-row {
-      margin-top: 18px;
+      margin-top: 12px;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      background: #f3f9ff;
-      padding: 12px 18px;
-      border-radius: 40px;
-      border-left: 6px solid #2b6a95;
+      background: #f5f5f5;
+      padding: 8px 16px;
+      border-radius: 30px;
+      border-left: 5px solid #555555;
     }
 
     .diagnosis-label {
       font-weight: 600;
-      color: #134b71;
-      margin-right: 12px;
-      font-size: 15px;
+      color: #000000;
+      margin-right: 10px;
+      font-size: 14px;
     }
 
     .diagnosis-value {
       background: white;
-      padding: 2px 22px 2px 18px;
+      padding: 0 18px 0 14px;
       border-radius: 30px;
       font-weight: 600;
-      color: #a02c2c;
-      border: 1px solid #f0c0c0;
-      font-size: 15px;
+      color: #000000;
+      border: 1px solid #aaaaaa;
+      font-size: 14px;
     }
 
     .comment-box {
-      margin: 16px 0 12px 0;
-      background: #f7faff;
-      border-radius: 16px;
-      padding: 12px 18px;
-      border: 1px solid #cfe0f0;
+      margin: 12px 0 8px 0;
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 8px 14px;
+      border: 1px solid #cbcbcb;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      gap: 6px 12px;
+      gap: 4px 10px;
     }
 
     .comment-label {
       font-weight: 600;
-      color: #1d4e74;
+      color: #000000;
     }
 
     .comment-text {
-      color: #002b4a;
+      color: #000000;
       font-style: italic;
       background: white;
-      padding: 0 14px 0 10px;
-      border-radius: 30px;
-      border: 1px solid #d1e2f2;
+      padding: 0 12px 0 8px;
+      border-radius: 20px;
+      border: 1px solid #c0c0c0;
     }
 
-    /* нижня частина — заклад + код */
     .footer-institution {
-      background: #ecf3fa;
-      padding: 14px 20px;
-      border-radius: 18px;
-      border: 1px solid #c1d7ec;
-      margin: 20px 0 16px 0;
+      background: #f2f2f2;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid #bdbdbd;
+      margin: 12px 0 10px 0;
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
@@ -309,83 +298,96 @@
 
     .inst-name {
       font-weight: 600;
-      color: #002b50;
-      font-size: 15px;
+      color: #000000;
+      font-size: 14px;
       flex: 2;
-      min-width: 220px;
+      min-width: 200px;
     }
 
     .inst-code {
       background: white;
-      padding: 4px 20px;
-      border-radius: 40px;
+      padding: 2px 18px;
+      border-radius: 30px;
       font-weight: 600;
-      color: #00407a;
-      border: 1px solid #aec7e0;
-      font-size: 15px;
-      letter-spacing: 0.5px;
+      color: #000000;
+      border: 1px solid #a0a0a0;
+      font-size: 14px;
+      letter-spacing: 0.3px;
     }
 
     .confirmation-row {
       display: flex;
       justify-content: flex-end;
       align-items: center;
-      gap: 16px;
-      margin-top: 12px;
+      gap: 12px;
+      margin-top: 6px;
       font-size: 14px;
-      color: #1d3f5e;
-      background: #f5faff;
-      padding: 8px 18px;
-      border-radius: 40px;
-      border: 1px solid #c8ddec;
+      color: #000000;
+      background: #f7f7f7;
+      padding: 6px 16px;
+      border-radius: 30px;
+      border: 1px solid #bdbdbd;
     }
 
     .confirmation-row .code-badge {
-      background: #0b2f4a;
+      background: #222222;
       color: white;
-      padding: 4px 20px;
-      border-radius: 40px;
+      padding: 2px 18px;
+      border-radius: 30px;
       font-weight: 600;
-      letter-spacing: 0.5px;
-      font-size: 14px;
+      letter-spacing: 0.3px;
+      font-size: 13px;
+      border: 1px solid #000000;
     }
 
-    /* дрібні адаптиви */
-    @media (max-width: 700px) {
-      .document { padding: 20px 16px; }
-      .info-grid { grid-template-columns: 1fr; gap: 10px; }
-      .meta-grid { flex-direction: column; gap: 8px; }
-      .info-row { flex-wrap: wrap; }
-      .info-label { min-width: 100px; }
-      .service-list { gap: 8px; }
-    }
-
-    /* імітація підпису / лінії */
+    /* підпис / лінія */
     .signature-line {
-      margin-top: 18px;
+      margin-top: 12px;
       display: flex;
       justify-content: flex-start;
-      gap: 40px;
+      gap: 30px;
       flex-wrap: wrap;
-      border-top: 1px solid #c8d9eb;
-      padding-top: 18px;
+      border-top: 1px solid #b0b0b0;
+      padding-top: 12px;
     }
 
     .signature-item {
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 1px;
     }
     .signature-item .label {
-      font-size: 13px;
-      color: #3c5f7e;
+      font-size: 12px;
+      color: #2a2a2a;
     }
     .signature-item .value {
       font-weight: 500;
-      color: #002642;
-      border-bottom: 1px solid #b3cde0;
+      color: #000000;
+      border-bottom: 1px solid #aaaaaa;
       padding-bottom: 2px;
-      min-width: 140px;
+      min-width: 120px;
+    }
+
+    /* адаптив */
+    @media (max-width: 700px) {
+      .document { padding: 16px 12px; }
+      .info-grid { grid-template-columns: 1fr; gap: 8px; }
+      .meta-grid { flex-direction: column; gap: 4px; }
+      .info-label { min-width: 90px; }
+      .service-list { gap: 4px; }
+    }
+
+    /* додатковий рядок для номера телефону */
+    .phone-note {
+      font-size: 13px;
+      color: #000000;
+      background: #f0f0f0;
+      padding: 2px 16px;
+      border-radius: 30px;
+      border: 1px solid #b0b0b0;
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 500;
     }
   </style>
 </head>
@@ -395,7 +397,7 @@
   <!-- номер направлення -->
   <div class="doc-number-bar">
     <div class="doc-number"><span>Направлення</span> №3440-8563-0715-1820</div>
-    <div class="doc-badge">📋 ІНФОРМАЦІЙНА ДОВІДКА</div>
+    <div class="doc-badge">ІНФОРМАЦІЙНА ДОВІДКА</div>
   </div>
 
   <!-- мета: дата, дійсність, фінансування -->
@@ -405,73 +407,73 @@
     <div class="meta-item"><strong>Джерело фінансування:</strong> <span class="highlight">Програма медичних гарантій 2026</span></div>
   </div>
 
-  <!-- пацієнт + лікар -->
+  <!-- пацієнт + лікар (жінка) -->
   <div class="info-grid">
     <div class="info-col">
-      <div class="info-row"><span class="info-label">Прізвище, ініціали хворого:</span><span class="info-value patient-name">Арестов Кирилл Юрьевич</span></div>
+      <div class="info-row"><span class="info-label">Прізвище, ім'я пацієнта:</span><span class="info-value patient-name">Арестов Кирило Юрійович</span></div>
       <div class="info-row"><span class="info-label">Категорія направлення:</span><span class="info-value">амбулаторна</span></div>
       <div class="info-row"><span class="info-label">Пріоритет:</span><span class="info-value">плановий</span></div>
     </div>
     <div class="info-col">
-      <div class="info-row"><span class="info-label">ПІБ лікаря:</span><span class="info-value doctor-name">Пушкін О.В.</span></div>
+      <div class="info-row"><span class="info-label">ПІБ лікаря:</span><span class="info-value doctor-name">Пушкіна О.В.</span></div>
       <div class="info-row"><span class="info-label">Телефон лікаря:</span><span class="info-value">+380 (67) 555-19-34</span></div>
-      <div class="info-row"><span class="info-label">Спеціальність:</span><span class="info-value">Сімейний лікар</span></div>
+      <div class="info-row"><span class="info-label">Спеціальність:</span><span class="info-value">Сімейна лікарка</span></div>
     </div>
   </div>
 
   <!-- послуги / аналізи -->
   <div class="service-block">
     <div class="service-header">
-      <h3>🔬 Призначені дослідження</h3>
+      <h3>Призначені дослідження</h3>
       <span class="service-code">код послуги: T67002</span>
     </div>
 
     <div class="service-list">
-      <span class="service-item blood">Загальний аналіз крові</span>
-      <span class="service-item urine">Загальний аналіз сечі</span>
-      <span class="service-item ultrasound">УЗД органів черевної порожнини</span>
-      <span class="service-item fgs">ФГДС (гастроскопія)</span>
+      <span class="service-item">Загальний аналіз крові</span>
+      <span class="service-item">Загальний аналіз сечі</span>
+      <span class="service-item">УЗД органів черевної порожнини</span>
+      <span class="service-item">ФГДС (гастроскопія)</span>
     </div>
 
-    <!-- діагноз (згідно з завданням) -->
+    <!-- діагноз -->
     <div class="diagnosis-row">
-      <span class="diagnosis-label">🩺 Діагноз / підозра:</span>
+      <span class="diagnosis-label">Діагноз / підозра:</span>
       <span class="diagnosis-value">K29 / Гастрит, K85 / панкреатит (уточнення)</span>
     </div>
 
-    <!-- коментар лікаря + інструкції -->
+    <!-- коментар + інструкції -->
     <div class="comment-box">
-      <span class="comment-label">📌 Коментар лікаря:</span>
+      <span class="comment-label">Коментар лікаря:</span>
       <span class="comment-text">Для виявлення захворювань шлунка та підшлункової залози. Рекомендовано комплексну діагностику.</span>
     </div>
-    <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 4px 6px;">
-      <span style="font-weight: 500; color: #1d4f74;">📋 Інструкції для пацієнта:</span>
-      <span style="color: #002e4a;">здавати аналізи натще, ФГДС — за попереднім записом, УЗД — з 8:00 до 11:00.</span>
+    <div style="display: flex; flex-wrap: wrap; gap: 4px 14px; padding: 4px 4px 0 4px; font-size: 14px; color: #000000;">
+      <span style="font-weight: 500;">Інструкції для пацієнта:</span>
+      <span>здавати аналізи натще, ФГДС за попереднім записом, УЗД з 8:00 до 11:00.</span>
     </div>
   </div>
 
   <!-- заклад -->
   <div class="footer-institution">
-    <span class="inst-name">🏥 КОМУНАЛЬНЕ ПІДПРИЄМСТВО "ЦЕНТР ПЕРВИННОЇ МЕДИКО-САНІТАРНОЇ ДОПОМОГИ М.ЧЕРВОНОГРАДА"</span>
+    <span class="inst-name">КОМУНАЛЬНЕ ПІДПРИЄМСТВО "ЦЕНТР ПЕРВИННОЇ МЕДИКО-САНІТАРНОЇ ДОПОМОГИ М.ЧЕРВОНОГРАДА"</span>
     <span class="inst-code">ЄДРПОУ 41900490</span>
   </div>
 
-  <!-- код підтвердження -->
+  <!-- код підтвердження + ваш номер -->
   <div class="confirmation-row">
-    <span style="font-weight: 400;">🔐 Код підтвердження:</span>
-    <span class="code-badge">НАДІСЛАНО НА НОМЕР +38098****89</span>
-    <span style="font-size: 13px; opacity: 0.7;">(електронний запис)</span>
+    <span style="font-weight: 400;">Код підтвердження:</span>
+    <span class="code-badge">НАДІСЛАНО НА НОМЕР +380683****70</span>
+    <span style="font-size: 12px; opacity: 0.7; font-weight: 300;">(електронний запис)</span>
   </div>
 
-  <!-- підпис / лінія (для завершеності) -->
+  <!-- підпис -->
   <div class="signature-line">
-    <div class="signature-item"><span class="label">Лікар</span><span class="value">Пушкін О.В.</span></div>
+    <div class="signature-item"><span class="label">Лікарка</span><span class="value">Пушкіна О.В.</span></div>
     <div class="signature-item"><span class="label">Пацієнт</span><span class="value">Арестов К.Ю.</span></div>
     <div class="signature-item"><span class="label">Дата друку</span><span class="value">2026-07-19</span></div>
   </div>
 
-  <!-- маленький додаток: номер направлення повторно -->
-  <div style="margin-top: 12px; font-size: 12px; color: #6688aa; text-align: right; border-top: 1px solid #dce5ef; padding-top: 12px;">
+  <!-- повтор номеру направлення внизу -->
+  <div style="margin-top: 8px; font-size: 11px; color: #333333; text-align: right; border-top: 1px solid #d0d0d0; padding-top: 8px; letter-spacing: 0.2px;">
     Направлення №3440-8563-0715-1820 · сформовано в eHealth
   </div>
 </div>
