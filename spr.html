@@ -2,8 +2,8 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Направлення сімейного лікаря | Арестов К.Ю.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Направлення · Інформаційна довідка</title>
   <style>
     * {
       margin: 0;
@@ -12,360 +12,468 @@
     }
 
     body {
-      background-color: #ffffff;
-      font-family: 'Times New Roman', Times, serif;
-      color: #000000;
+      background: #e5e7eb;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 0.6rem;
-      margin: 0;
+      font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+      padding: 16px;
     }
 
     .document {
-      max-width: 800px;
+      max-width: 880px;
       width: 100%;
       background: #ffffff;
-      padding: 1.4rem 2rem 1.6rem;
-      box-shadow: 0 0 6px rgba(0,0,0,0.03);
-      border: 1px solid #ccc;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
+      padding: 32px 36px;
+      transition: all 0.2s;
+      border: 1px solid rgba(0, 0, 0, 0.03);
     }
 
-    @media print {
-      body {
-        background: white;
-        padding: 0;
-        margin: 0;
-        align-items: flex-start;
-      }
-      .document {
-        box-shadow: none;
-        border: none;
-        padding: 1cm 1.3cm;
-        max-width: 100%;
-        margin: 0 auto;
-      }
-      @page {
-        size: A4;
-        margin: 1cm;
-      }
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 0.8rem;
-      border-bottom: 2px solid #000;
-      padding-bottom: 0.4rem;
-    }
-
-    .clinic-name {
-      font-size: 1.1rem;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      margin-bottom: 0.2rem;
-      line-height: 1.3;
-    }
-
-    .sub-header {
-      font-size: 0.85rem;
+    /* верхня смуга з номером */
+    .doc-number-bar {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: baseline;
+      border-bottom: 2px solid #1e3a5f;
+      padding-bottom: 12px;
+      margin-bottom: 18px;
       flex-wrap: wrap;
-      margin-top: 0.2rem;
     }
 
-    .doc-type {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin: 0.6rem 0 0.4rem;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+    .doc-number {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      color: #0b2b4a;
+      background: #f0f5fc;
+      padding: 4px 18px 4px 14px;
+      border-radius: 30px;
+      font-family: 'Courier New', monospace;
+      border: 1px solid #bdd3e8;
     }
 
-    .patient-info {
-      margin: 1rem 0 0.8rem;
-      font-size: 0.98rem;
-      line-height: 1.6;
+    .doc-number span {
+      font-weight: 300;
+      color: #2c5779;
+      margin-right: 4px;
     }
 
-    .patient-info p {
-      margin-bottom: 0.15rem;
+    .doc-badge {
+      font-size: 14px;
+      background: #dce7f5;
+      padding: 5px 16px;
+      border-radius: 30px;
+      color: #134074;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    /* заголовок */
+    .doc-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0a2942;
+      margin: 8px 0 20px 0;
+      letter-spacing: 0.5px;
+      border-left: 8px solid #1f6390;
+      padding-left: 18px;
+      background: linear-gradient(to right, #f8fcff, transparent);
+    }
+
+    /* мета-рядок: дата, дійсність, джерело */
+    .meta-grid {
       display: flex;
       flex-wrap: wrap;
+      gap: 18px 30px;
+      background: #f4f9fe;
+      padding: 14px 20px;
+      border-radius: 18px;
+      margin-bottom: 28px;
+      border: 1px solid #d9e5f0;
     }
 
-    .patient-info strong {
-      font-weight: 700;
-      display: inline-block;
-      width: 170px;
-      flex-shrink: 0;
-    }
-
-    .filled-value {
-      font-weight: normal;
-      border-bottom: 1px dotted #222;
-      min-width: 200px;
-      padding-bottom: 1px;
-    }
-
-    .section-title {
-      font-weight: bold;
-      font-size: 1.05rem;
-      margin: 1rem 0 0.4rem;
-      border-bottom: 1px solid #000;
-      padding-bottom: 0.1rem;
-    }
-
-    .direction-list {
-      list-style: none;
-      margin: 0.2rem 0 0.8rem;
-    }
-
-    .direction-list li {
-      margin-bottom: 0.7rem;
-      font-size: 0.95rem;
+    .meta-item {
       display: flex;
       align-items: baseline;
-      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 15px;
+      color: #1a3b58;
     }
 
-    .checkbox-custom {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid #000;
-      margin-right: 8px;
-      position: relative;
-      top: 2px;
-      background: white;
-      flex-shrink: 0;
+    .meta-item strong {
+      font-weight: 600;
+      color: #0c2f4b;
+      margin-right: 4px;
     }
 
-    .checked .checkbox-custom {
-      background-color: #000;
-      box-shadow: inset 0 0 0 2px white;
-    }
-
-    .direction-text {
-      flex: 1;
+    .meta-item .highlight {
+      background: #ffffff;
+      padding: 0 12px 0 8px;
+      border-radius: 20px;
       font-weight: 500;
+      color: #003366;
+      border: 1px solid #c0d5eb;
+      line-height: 1.8;
     }
 
-    .details {
-      margin-left: 24px;
-      font-style: italic;
-      margin-top: 0.1rem;
-      width: 100%;
-      color: #111;
-      font-size: 0.88rem;
+    /* таблиця пацієнт + лікар */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 30px;
+      background: #fafdff;
+      padding: 18px 20px;
+      border-radius: 18px;
+      border: 1px solid #e2eef9;
+      margin-bottom: 28px;
     }
 
-    .signature-area {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-top: 1.6rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .doctor-block {
-      text-align: left;
-      font-size: 0.95rem;
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .doctor-block p {
-      margin-bottom: 0.2rem;
-    }
-
-    /* Блок с имитацией рукописной подписи */
-    .signature-image {
-      font-family: 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive;
-      font-size: 2.8rem;
-      font-weight: normal;
-      color: #1a1a8a;
-      margin: 0.1rem 0 0.2rem;
-      line-height: 1;
-      letter-spacing: 1px;
-      transform: rotate(-3deg);
-      display: inline-block;
-      border-bottom: none;
-      text-shadow: 0.5px 0.5px 0 #00000020;
-    }
-
-    .stamp-container {
+    .info-col {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      margin-right: 5px;
+      gap: 8px;
     }
 
-    .round-stamp {
-      width: 88px;
-      height: 88px;
-      border: 3px solid #b30000;
-      border-radius: 50%;
+    .info-row {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-size: 0.58rem;
-      font-weight: bold;
-      color: #b30000;
-      text-transform: uppercase;
-      line-height: 1.2;
-      background: rgba(255, 235, 235, 0.25);
-      letter-spacing: 0.3px;
-      box-shadow: 0 0 0 2px white, 0 0 0 4px #b30000;
-      transform: rotate(-7deg);
-      margin-bottom: 6px;
+      align-items: baseline;
+      border-bottom: 1px dashed #c9ddec;
+      padding-bottom: 6px;
     }
 
-    .round-stamp div {
-      transform: rotate(0deg);
+    .info-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #1d4463;
+      min-width: 130px;
+      font-size: 14px;
+      letter-spacing: 0.2px;
+    }
+
+    .info-value {
+      color: #0f2a40;
+      font-weight: 500;
+      font-size: 15px;
       word-break: break-word;
     }
 
-    .stamp-caption {
-      font-size: 0.65rem;
-      font-weight: bold;
-      color: #b30000;
-      text-align: center;
+    .info-value.doctor-name {
+      font-weight: 600;
+      color: #003b6f;
     }
 
-    hr {
-      border: 0;
-      border-top: 1px solid #000;
-      margin: 0.5rem 0 0.4rem;
+    .info-value.patient-name {
+      font-weight: 600;
+      color: #004080;
+      font-size: 16px;
     }
 
-    .footer-note {
-      font-size: 0.78rem;
-      margin-top: 0.9rem;
-      color: #1a1a1a;
-      border-left: 3px solid #000;
-      padding-left: 0.7rem;
+    /* блок послуг (аналізи) */
+    .service-block {
+      background: #ffffff;
+      border-radius: 18px;
+      border: 1px solid #d2e2f2;
+      padding: 18px 20px 14px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 6px rgba(0, 40, 70, 0.03);
     }
 
-    .date-line {
-      margin-top: 0.5rem;
-      font-size: 0.95rem;
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
     }
 
-    @media (max-width: 550px) {
-      .document {
-        padding: 0.9rem 1rem;
-      }
-      .patient-info strong {
-        width: 135px;
-      }
+    .service-header h3 {
+      font-weight: 600;
+      color: #133450;
+      font-size: 17px;
+      letter-spacing: 0.3px;
+    }
+
+    .service-code {
+      background: #e5eff8;
+      padding: 3px 16px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #1a4a70;
+    }
+
+    .service-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 24px;
+      padding: 6px 0 2px 0;
+    }
+
+    .service-item {
+      background: #f1f7fe;
+      padding: 6px 18px 6px 16px;
+      border-radius: 40px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #00325a;
+      border: 1px solid #bed7ee;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .service-item::before {
+      content: "🩺";
+      font-size: 14px;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+    }
+
+    .service-item.blood::before { content: "🩸"; }
+    .service-item.urine::before { content: "🧪"; }
+    .service-item.ultrasound::before { content: "📊"; }
+    .service-item.fgs::before { content: "🔬"; }
+
+    .diagnosis-row {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      background: #f3f9ff;
+      padding: 12px 18px;
+      border-radius: 40px;
+      border-left: 6px solid #2b6a95;
+    }
+
+    .diagnosis-label {
+      font-weight: 600;
+      color: #134b71;
+      margin-right: 12px;
+      font-size: 15px;
+    }
+
+    .diagnosis-value {
+      background: white;
+      padding: 2px 22px 2px 18px;
+      border-radius: 30px;
+      font-weight: 600;
+      color: #a02c2c;
+      border: 1px solid #f0c0c0;
+      font-size: 15px;
+    }
+
+    .comment-box {
+      margin: 16px 0 12px 0;
+      background: #f7faff;
+      border-radius: 16px;
+      padding: 12px 18px;
+      border: 1px solid #cfe0f0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px 12px;
+    }
+
+    .comment-label {
+      font-weight: 600;
+      color: #1d4e74;
+    }
+
+    .comment-text {
+      color: #002b4a;
+      font-style: italic;
+      background: white;
+      padding: 0 14px 0 10px;
+      border-radius: 30px;
+      border: 1px solid #d1e2f2;
+    }
+
+    /* нижня частина — заклад + код */
+    .footer-institution {
+      background: #ecf3fa;
+      padding: 14px 20px;
+      border-radius: 18px;
+      border: 1px solid #c1d7ec;
+      margin: 20px 0 16px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .inst-name {
+      font-weight: 600;
+      color: #002b50;
+      font-size: 15px;
+      flex: 2;
+      min-width: 220px;
+    }
+
+    .inst-code {
+      background: white;
+      padding: 4px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #00407a;
+      border: 1px solid #aec7e0;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .confirmation-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 16px;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #1d3f5e;
+      background: #f5faff;
+      padding: 8px 18px;
+      border-radius: 40px;
+      border: 1px solid #c8ddec;
+    }
+
+    .confirmation-row .code-badge {
+      background: #0b2f4a;
+      color: white;
+      padding: 4px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      font-size: 14px;
+    }
+
+    /* дрібні адаптиви */
+    @media (max-width: 700px) {
+      .document { padding: 20px 16px; }
+      .info-grid { grid-template-columns: 1fr; gap: 10px; }
+      .meta-grid { flex-direction: column; gap: 8px; }
+      .info-row { flex-wrap: wrap; }
+      .info-label { min-width: 100px; }
+      .service-list { gap: 8px; }
+    }
+
+    /* імітація підпису / лінії */
+    .signature-line {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-start;
+      gap: 40px;
+      flex-wrap: wrap;
+      border-top: 1px solid #c8d9eb;
+      padding-top: 18px;
+    }
+
+    .signature-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .signature-item .label {
+      font-size: 13px;
+      color: #3c5f7e;
+    }
+    .signature-item .value {
+      font-weight: 500;
+      color: #002642;
+      border-bottom: 1px solid #b3cde0;
+      padding-bottom: 2px;
+      min-width: 140px;
     }
   </style>
 </head>
 <body>
-  <div class="document">
-    
-    <!-- Шапка: Синельниковский район, Днепровская область -->
-    <header>
-      <div class="clinic-name">
-        Комунальне некомерційне підприємство<br>
-        «Центр первинної медико-санітарної допомоги<br>
-        Синельниківського району Дніпровської області»
-      </div>
-      <div class="sub-header">
-        <span>Сімейний лікар: <strong>Коваленко Наталія Григорівна</strong></span>
-        <span>Дата: <strong>19 липня 2026 р.</strong></span>
-      </div>
-    </header>
+<div class="document">
 
-    <!-- Название документа -->
-    <div class="doc-type">Направлення</div>
-    
-    <!-- Данные пациента (все на украинском) -->
-    <div class="patient-info">
-      <p><strong>Пацієнт:</strong> <span class="filled-value">Арестов Кирило Юрійович</span></p>
-      <p><strong>Дата народження:</strong> <span class="filled-value">14 березня 1985 року</span></p>
-      <p><strong>Адреса / телефон:</strong> <span class="filled-value">вул. Центральна, 25, м. Синельникове, тел. +380671234567</span></p>
-      <p><strong>Попередній діагноз:</strong> <span class="filled-value">Больовий синдром у ділянці шлунка та підшлункової залози</span></p>
-    </div>
-
-    <!-- Блок обследований -->
-    <div class="section-title">Призначені обстеження:</div>
-    
-    <ul class="direction-list">
-      <!-- УЗИ -->
-      <li class="checked">
-        <span class="checkbox-custom"></span>
-        <span class="direction-text"><strong>Ультразвукове дослідження (УЗД) органів черевної порожнини</strong></span>
-        <div class="details">
-          • Печінка, жовчний міхур, підшлункова залоза, селезінка.<br>
-          • Особлива увага: стан підшлункової залози, виключення структурних змін.
-        </div>
-      </li>
-
-      <!-- Анализы крови -->
-      <li class="checked">
-        <span class="checkbox-custom"></span>
-        <span class="direction-text"><strong>Лабораторні аналізи крові (для визначення причин болю)</strong></span>
-        <div class="details">
-          • Загальний аналіз крові (лейкоцити, ШОЕ).<br>
-          • Біохімічний аналіз крові: амілаза, ліпаза, АЛТ, АСТ, загальний білірубін, лужна фосфатаза, глюкоза.<br>
-          • С-реактивний білок (СРБ) за показаннями.
-        </div>
-      </li>
-
-      <!-- ФГДС -->
-      <li class="checked">
-        <span class="checkbox-custom"></span>
-        <span class="direction-text"><strong>Фіброгастродуоденоскопія (ФГДС)</strong></span>
-        <div class="details">
-          • Езофагогастродуоденоскопія для оцінки слизової оболонки стравоходу, шлунка та дванадцятипалої кишки.<br>
-          • Виключення гастриту, виразкової хвороби, дуоденіту.
-        </div>
-      </li>
-    </ul>
-
-    <hr>
-    
-    <p style="font-size:0.9rem; margin:0.4rem 0 0.2rem;">
-      <strong>Мета обстеження:</strong> уточнення причин абдомінального болю, диференційна діагностика патології шлунка та підшлункової залози.
-    </p>
-    <p style="font-size:0.85rem; font-style:italic;">
-      Направлення дійсне протягом 30 календарних днів із моменту видачі. При собі мати паспорт та медичну картку амбулаторного хворого.
-    </p>
-
-    <!-- Подпись врача + печать -->
-    <div class="signature-area">
-      <div class="doctor-block">
-        <p><strong>Лікар:</strong> Коваленко Н.Г.</p>
-        <!-- Имитация рукописной подписи врача -->
-        <div class="signature-image">Коваленко</div>
-        <p style="font-size:0.8rem; margin-top:-0.2rem;">(підпис сімейного лікаря)</p>
-        <div class="date-line">
-          <strong>Дата видачі:</strong> 19 липня 2026 року
-        </div>
-      </div>
-      
-      <!-- Круглая печать -->
-      <div class="stamp-container">
-        <div class="round-stamp">
-          <div>ЦПМСД<br>Синельниківський<br>район<br>Дніпровська обл.</div>
-        </div>
-        <div class="stamp-caption">М.П.</div>
-      </div>
-    </div>
-
-    <!-- Справочная информация для пациента (украинский) -->
-    <div class="footer-note">
-      <strong>Довідка для пацієнта:</strong> Аналізи крові здаються натщесерце (не менше 8 годин голодування). Перед УЗД органів черевної порожнини рекомендовано за 1–2 доби виключити газоутворювальні продукти. ФГДС виконується суворо натще (не їсти та не пити за 6–8 годин до процедури). Про наявність алергії на лікарські засоби обов’язково повідомити лікаря.
-    </div>
-
+  <!-- номер направлення -->
+  <div class="doc-number-bar">
+    <div class="doc-number"><span>Направлення</span> №3440-8563-0715-1820</div>
+    <div class="doc-badge">📋 ІНФОРМАЦІЙНА ДОВІДКА</div>
   </div>
+
+  <!-- мета: дата, дійсність, фінансування -->
+  <div class="meta-grid">
+    <div class="meta-item"><strong>Дата виписування:</strong> <span class="highlight">2026-07-19</span></div>
+    <div class="meta-item"><strong>Дійсний до:</strong> <span class="highlight">2027-07-19</span></div>
+    <div class="meta-item"><strong>Джерело фінансування:</strong> <span class="highlight">Програма медичних гарантій 2026</span></div>
+  </div>
+
+  <!-- пацієнт + лікар -->
+  <div class="info-grid">
+    <div class="info-col">
+      <div class="info-row"><span class="info-label">Прізвище, ініціали хворого:</span><span class="info-value patient-name">Арестов Кирилл Юрьевич</span></div>
+      <div class="info-row"><span class="info-label">Категорія направлення:</span><span class="info-value">амбулаторна</span></div>
+      <div class="info-row"><span class="info-label">Пріоритет:</span><span class="info-value">плановий</span></div>
+    </div>
+    <div class="info-col">
+      <div class="info-row"><span class="info-label">ПІБ лікаря:</span><span class="info-value doctor-name">Пушкін О.В.</span></div>
+      <div class="info-row"><span class="info-label">Телефон лікаря:</span><span class="info-value">+380 (67) 555-19-34</span></div>
+      <div class="info-row"><span class="info-label">Спеціальність:</span><span class="info-value">Сімейний лікар</span></div>
+    </div>
+  </div>
+
+  <!-- послуги / аналізи -->
+  <div class="service-block">
+    <div class="service-header">
+      <h3>🔬 Призначені дослідження</h3>
+      <span class="service-code">код послуги: T67002</span>
+    </div>
+
+    <div class="service-list">
+      <span class="service-item blood">Загальний аналіз крові</span>
+      <span class="service-item urine">Загальний аналіз сечі</span>
+      <span class="service-item ultrasound">УЗД органів черевної порожнини</span>
+      <span class="service-item fgs">ФГДС (гастроскопія)</span>
+    </div>
+
+    <!-- діагноз (згідно з завданням) -->
+    <div class="diagnosis-row">
+      <span class="diagnosis-label">🩺 Діагноз / підозра:</span>
+      <span class="diagnosis-value">K29 / Гастрит, K85 / панкреатит (уточнення)</span>
+    </div>
+
+    <!-- коментар лікаря + інструкції -->
+    <div class="comment-box">
+      <span class="comment-label">📌 Коментар лікаря:</span>
+      <span class="comment-text">Для виявлення захворювань шлунка та підшлункової залози. Рекомендовано комплексну діагностику.</span>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 4px 6px;">
+      <span style="font-weight: 500; color: #1d4f74;">📋 Інструкції для пацієнта:</span>
+      <span style="color: #002e4a;">здавати аналізи натще, ФГДС — за попереднім записом, УЗД — з 8:00 до 11:00.</span>
+    </div>
+  </div>
+
+  <!-- заклад -->
+  <div class="footer-institution">
+    <span class="inst-name">🏥 КОМУНАЛЬНЕ ПІДПРИЄМСТВО "ЦЕНТР ПЕРВИННОЇ МЕДИКО-САНІТАРНОЇ ДОПОМОГИ М.ЧЕРВОНОГРАДА"</span>
+    <span class="inst-code">ЄДРПОУ 41900490</span>
+  </div>
+
+  <!-- код підтвердження -->
+  <div class="confirmation-row">
+    <span style="font-weight: 400;">🔐 Код підтвердження:</span>
+    <span class="code-badge">НАДІСЛАНО НА НОМЕР +38098****89</span>
+    <span style="font-size: 13px; opacity: 0.7;">(електронний запис)</span>
+  </div>
+
+  <!-- підпис / лінія (для завершеності) -->
+  <div class="signature-line">
+    <div class="signature-item"><span class="label">Лікар</span><span class="value">Пушкін О.В.</span></div>
+    <div class="signature-item"><span class="label">Пацієнт</span><span class="value">Арестов К.Ю.</span></div>
+    <div class="signature-item"><span class="label">Дата друку</span><span class="value">2026-07-19</span></div>
+  </div>
+
+  <!-- маленький додаток: номер направлення повторно -->
+  <div style="margin-top: 12px; font-size: 12px; color: #6688aa; text-align: right; border-top: 1px solid #dce5ef; padding-top: 12px;">
+    Направлення №3440-8563-0715-1820 · сформовано в eHealth
+  </div>
+</div>
 </body>
 </html>
