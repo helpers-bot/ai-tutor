@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>Направлення сімейного лікаря | Арестов К.Ю.</title>
   <style>
-    /* Сброс и базовые стили — белый лист, чёрные буквы, компактно */
     * {
       margin: 0;
       padding: 0;
@@ -20,18 +19,17 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      padding: 0.8rem;
+      padding: 0.6rem;
       margin: 0;
     }
 
     .document {
-      max-width: 780px;
+      max-width: 800px;
       width: 100%;
       background: #ffffff;
-      padding: 1.5rem 2rem;
-      box-shadow: 0 0 8px rgba(0,0,0,0.04);
-      border: 1px solid #ddd;
-      /* всё умещается на экране без скролла за счёт уменьшенных отступов */
+      padding: 1.4rem 2rem 1.6rem;
+      box-shadow: 0 0 6px rgba(0,0,0,0.03);
+      border: 1px solid #ccc;
     }
 
     @media print {
@@ -44,29 +42,30 @@
       .document {
         box-shadow: none;
         border: none;
-        padding: 1.2cm 1.4cm;
+        padding: 1cm 1.3cm;
         max-width: 100%;
         margin: 0 auto;
       }
       @page {
         size: A4;
-        margin: 1.2cm;
+        margin: 1cm;
       }
     }
 
     header {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 0.8rem;
       border-bottom: 2px solid #000;
       padding-bottom: 0.4rem;
     }
 
     .clinic-name {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 0.4px;
-      margin-bottom: 0.1rem;
+      margin-bottom: 0.2rem;
+      line-height: 1.3;
     }
 
     .sub-header {
@@ -75,26 +74,26 @@
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      margin-top: 0.3rem;
+      margin-top: 0.2rem;
     }
 
     .doc-type {
-      font-size: 1.7rem;
+      font-size: 1.8rem;
       font-weight: bold;
-      margin: 0.8rem 0 0.5rem;
+      margin: 0.6rem 0 0.4rem;
       text-align: center;
       text-transform: uppercase;
-      letter-spacing: 1.2px;
+      letter-spacing: 1.5px;
     }
 
     .patient-info {
-      margin: 1.2rem 0 1rem;
-      font-size: 1rem;
+      margin: 1rem 0 0.8rem;
+      font-size: 0.98rem;
       line-height: 1.6;
     }
 
     .patient-info p {
-      margin-bottom: 0.2rem;
+      margin-bottom: 0.15rem;
       display: flex;
       flex-wrap: wrap;
     }
@@ -102,33 +101,33 @@
     .patient-info strong {
       font-weight: 700;
       display: inline-block;
-      width: 165px;
+      width: 170px;
       flex-shrink: 0;
     }
 
     .filled-value {
       font-weight: normal;
-      border-bottom: 1px dotted #333;
+      border-bottom: 1px dotted #222;
       min-width: 200px;
       padding-bottom: 1px;
     }
 
     .section-title {
       font-weight: bold;
-      font-size: 1.1rem;
-      margin: 1.2rem 0 0.5rem;
+      font-size: 1.05rem;
+      margin: 1rem 0 0.4rem;
       border-bottom: 1px solid #000;
-      padding-bottom: 0.15rem;
+      padding-bottom: 0.1rem;
     }
 
     .direction-list {
       list-style: none;
-      margin: 0.3rem 0 1rem;
+      margin: 0.2rem 0 0.8rem;
     }
 
     .direction-list li {
-      margin-bottom: 0.8rem;
-      font-size: 0.98rem;
+      margin-bottom: 0.7rem;
+      font-size: 0.95rem;
       display: flex;
       align-items: baseline;
       flex-wrap: wrap;
@@ -146,7 +145,6 @@
       flex-shrink: 0;
     }
 
-    /* все направления отмечены */
     .checked .checkbox-custom {
       background-color: #000;
       box-shadow: inset 0 0 0 2px white;
@@ -160,56 +158,72 @@
     .details {
       margin-left: 24px;
       font-style: italic;
-      margin-top: 0.15rem;
+      margin-top: 0.1rem;
       width: 100%;
       color: #111;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
 
     .signature-area {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-top: 1.8rem;
+      margin-top: 1.6rem;
       flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .doctor-block {
       text-align: left;
       font-size: 0.95rem;
+      flex: 1;
+      min-width: 220px;
     }
 
     .doctor-block p {
       margin-bottom: 0.2rem;
     }
 
-    /* Стилизованная круглая печать */
+    /* Блок с имитацией рукописной подписи */
+    .signature-image {
+      font-family: 'Brush Script MT', 'Segoe Script', 'Comic Sans MS', cursive;
+      font-size: 2.8rem;
+      font-weight: normal;
+      color: #1a1a8a;
+      margin: 0.1rem 0 0.2rem;
+      line-height: 1;
+      letter-spacing: 1px;
+      transform: rotate(-3deg);
+      display: inline-block;
+      border-bottom: none;
+      text-shadow: 0.5px 0.5px 0 #00000020;
+    }
+
     .stamp-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-right: 10px;
+      margin-right: 5px;
     }
 
     .round-stamp {
-      width: 90px;
-      height: 90px;
-      border: 3px solid #c00;
+      width: 88px;
+      height: 88px;
+      border: 3px solid #b30000;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: bold;
       color: #b30000;
       text-transform: uppercase;
       line-height: 1.2;
-      background: rgba(255, 240, 240, 0.3);
+      background: rgba(255, 235, 235, 0.25);
       letter-spacing: 0.3px;
-      position: relative;
       box-shadow: 0 0 0 2px white, 0 0 0 4px #b30000;
-      transform: rotate(-8deg);
+      transform: rotate(-7deg);
       margin-bottom: 6px;
     }
 
@@ -223,33 +237,33 @@
       font-weight: bold;
       color: #b30000;
       text-align: center;
-      margin-top: 2px;
     }
 
     hr {
       border: 0;
       border-top: 1px solid #000;
-      margin: 0.7rem 0 0.5rem;
+      margin: 0.5rem 0 0.4rem;
     }
 
     .footer-note {
       font-size: 0.78rem;
-      margin-top: 1rem;
+      margin-top: 0.9rem;
       color: #1a1a1a;
       border-left: 3px solid #000;
       padding-left: 0.7rem;
     }
 
     .date-line {
-      margin-top: 0.7rem;
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
     }
 
     @media (max-width: 550px) {
       .document {
-        padding: 1rem 1.2rem;
+        padding: 0.9rem 1rem;
       }
       .patient-info strong {
-        width: 130px;
+        width: 135px;
       }
     }
   </style>
@@ -257,48 +271,52 @@
 <body>
   <div class="document">
     
-    <!-- Шапка -->
+    <!-- Шапка: Синельниковский район, Днепровская область -->
     <header>
-      <div class="clinic-name">КНП «Центр первинної медико-санітарної допомоги №2»</div>
+      <div class="clinic-name">
+        Комунальне некомерційне підприємство<br>
+        «Центр первинної медико-санітарної допомоги<br>
+        Синельниківського району Дніпровської області»
+      </div>
       <div class="sub-header">
-        <span>Сімейний лікар: <strong>Петренко Олена Вікторівна</strong></span>
-        <span>Дата: <strong>19.07.2026</strong></span>
+        <span>Сімейний лікар: <strong>Коваленко Наталія Григорівна</strong></span>
+        <span>Дата: <strong>19 липня 2026 р.</strong></span>
       </div>
     </header>
 
-    <!-- Название -->
-    <div class="doc-type">НАПРАВЛЕННЯ</div>
+    <!-- Название документа -->
+    <div class="doc-type">Направлення</div>
     
-    <!-- Пациент (все поля заполнены) -->
+    <!-- Данные пациента (все на украинском) -->
     <div class="patient-info">
       <p><strong>Пацієнт:</strong> <span class="filled-value">Арестов Кирило Юрійович</span></p>
-      <p><strong>Дата народження:</strong> <span class="filled-value">14.03.1985</span></p>
-      <p><strong>Адреса / тел.:</strong> <span class="filled-value">вул. Шевченка, 17, кв. 5, тел. +380501112233</span></p>
-      <p><strong>Діагноз (попередній):</strong> <span class="filled-value">Больовий синдром епігастрію, підозра на панкреатит</span></p>
+      <p><strong>Дата народження:</strong> <span class="filled-value">14 березня 1985 року</span></p>
+      <p><strong>Адреса / телефон:</strong> <span class="filled-value">вул. Центральна, 25, м. Синельникове, тел. +380671234567</span></p>
+      <p><strong>Попередній діагноз:</strong> <span class="filled-value">Больовий синдром у ділянці шлунка та підшлункової залози</span></p>
     </div>
 
-    <!-- Обследования -->
+    <!-- Блок обследований -->
     <div class="section-title">Призначені обстеження:</div>
     
     <ul class="direction-list">
       <!-- УЗИ -->
       <li class="checked">
         <span class="checkbox-custom"></span>
-        <span class="direction-text"><strong>УЗД органів черевної порожнини</strong></span>
+        <span class="direction-text"><strong>Ультразвукове дослідження (УЗД) органів черевної порожнини</strong></span>
         <div class="details">
           • Печінка, жовчний міхур, підшлункова залоза, селезінка.<br>
-          • Особлива увага: підшлункова залоза, виключення структурних змін.
+          • Особлива увага: стан підшлункової залози, виключення структурних змін.
         </div>
       </li>
 
       <!-- Анализы крови -->
       <li class="checked">
         <span class="checkbox-custom"></span>
-        <span class="direction-text"><strong>Аналізи крові (диференційна діагностика)</strong></span>
+        <span class="direction-text"><strong>Лабораторні аналізи крові (для визначення причин болю)</strong></span>
         <div class="details">
-          • Загальний аналіз крові + ШОЕ.<br>
-          • Біохімія: амілаза, ліпаза, АЛТ, АСТ, білірубін, лужна фосфатаза, глюкоза.<br>
-          • С-реактивний білок (СРБ).
+          • Загальний аналіз крові (лейкоцити, ШОЕ).<br>
+          • Біохімічний аналіз крові: амілаза, ліпаза, АЛТ, АСТ, загальний білірубін, лужна фосфатаза, глюкоза.<br>
+          • С-реактивний білок (СРБ) за показаннями.
         </div>
       </li>
 
@@ -307,43 +325,45 @@
         <span class="checkbox-custom"></span>
         <span class="direction-text"><strong>Фіброгастродуоденоскопія (ФГДС)</strong></span>
         <div class="details">
-          • Оцінка слизової стравоходу, шлунка, дванадцятипалої кишки.<br>
-          • Виключення гастриту, виразки, дуоденіту.
+          • Езофагогастродуоденоскопія для оцінки слизової оболонки стравоходу, шлунка та дванадцятипалої кишки.<br>
+          • Виключення гастриту, виразкової хвороби, дуоденіту.
         </div>
       </li>
     </ul>
 
     <hr>
     
-    <p style="font-size:0.9rem; margin:0.5rem 0 0.3rem;">
-      <strong>Мета:</strong> уточнення причин абдомінального болю, диференційна діагностика патології шлунка та підшлункової залози.
+    <p style="font-size:0.9rem; margin:0.4rem 0 0.2rem;">
+      <strong>Мета обстеження:</strong> уточнення причин абдомінального болю, диференційна діагностика патології шлунка та підшлункової залози.
     </p>
     <p style="font-size:0.85rem; font-style:italic;">
-      Направлення дійсне 30 днів. Мати при собі паспорт та медичну картку.
+      Направлення дійсне протягом 30 календарних днів із моменту видачі. При собі мати паспорт та медичну картку амбулаторного хворого.
     </p>
 
-    <!-- Подпись + печать (заполнено) -->
+    <!-- Подпись врача + печать -->
     <div class="signature-area">
       <div class="doctor-block">
-        <p><strong>Лікар:</strong> Петренко О.В. _________________________</p>
-        <p style="margin-top:0.2rem;">(підпис)</p>
+        <p><strong>Лікар:</strong> Коваленко Н.Г.</p>
+        <!-- Имитация рукописной подписи врача -->
+        <div class="signature-image">Коваленко</div>
+        <p style="font-size:0.8rem; margin-top:-0.2rem;">(підпис сімейного лікаря)</p>
         <div class="date-line">
-          Дата видачі: <strong>19 липня 2026 р.</strong>
+          <strong>Дата видачі:</strong> 19 липня 2026 року
         </div>
       </div>
       
-      <!-- Графическая печать (круглая) -->
+      <!-- Круглая печать -->
       <div class="stamp-container">
         <div class="round-stamp">
-          <div>ЦПМСД №2<br>●<br>Київ<br>Лікар<br>Петренко</div>
+          <div>ЦПМСД<br>Синельниківський<br>район<br>Дніпровська обл.</div>
         </div>
         <div class="stamp-caption">М.П.</div>
       </div>
     </div>
 
-    <!-- Справка для пациента -->
+    <!-- Справочная информация для пациента (украинский) -->
     <div class="footer-note">
-      <strong>Довідково:</strong> Аналізи крові – натщесерце (8 год.). УЗД – дієта, виключити газоутворення. ФГДС – суворо натще (6–8 год.). Алергію на ліки повідомити лікарю.
+      <strong>Довідка для пацієнта:</strong> Аналізи крові здаються натщесерце (не менше 8 годин голодування). Перед УЗД органів черевної порожнини рекомендовано за 1–2 доби виключити газоутворювальні продукти. ФГДС виконується суворо натще (не їсти та не пити за 6–8 годин до процедури). Про наявність алергії на лікарські засоби обов’язково повідомити лікаря.
     </div>
 
   </div>
