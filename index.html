@@ -57,21 +57,53 @@
             50% { opacity: 1; }
         }
 
-        /* Сетка на фоне */
-        body::after {
-            content: '';
+        /* Летающие пули */
+        .bullet {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                linear-gradient(transparent 0%, rgba(0, 243, 255, 0.03) 50%, transparent 100%),
-                repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0, 243, 255, 0.02) 50px, rgba(0, 243, 255, 0.02) 51px),
-                repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(0, 243, 255, 0.02) 50px, rgba(0, 243, 255, 0.02) 51px);
+            width: 20px;
+            height: 6px;
+            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            border-radius: 3px;
             pointer-events: none;
             z-index: 0;
+            animation: flyBullet linear infinite;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
         }
+
+        .bullet::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid #ff6600;
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+        }
+
+        @keyframes flyBullet {
+            0% {
+                left: -100px;
+                transform: rotate(0deg);
+            }
+            100% {
+                left: calc(100% + 100px);
+                transform: rotate(0deg);
+            }
+        }
+
+        .bullet:nth-child(1) { top: 10%; animation-duration: 3s; animation-delay: 0s; }
+        .bullet:nth-child(2) { top: 20%; animation-duration: 4s; animation-delay: 1s; }
+        .bullet:nth-child(3) { top: 30%; animation-duration: 3.5s; animation-delay: 2s; }
+        .bullet:nth-child(4) { top: 40%; animation-duration: 5s; animation-delay: 0.5s; }
+        .bullet:nth-child(5) { top: 50%; animation-duration: 3.8s; animation-delay: 1.5s; }
+        .bullet:nth-child(6) { top: 60%; animation-duration: 4.2s; animation-delay: 2.5s; }
+        .bullet:nth-child(7) { top: 70%; animation-duration: 3.2s; animation-delay: 3s; }
+        .bullet:nth-child(8) { top: 80%; animation-duration: 4.5s; animation-delay: 1.8s; }
+        .bullet:nth-child(9) { top: 90%; animation-duration: 3.6s; animation-delay: 0.8s; }
+        .bullet:nth-child(10) { top: 15%; animation-duration: 4.8s; animation-delay: 2.2s; }
 
         .container {
             width: 100%;
@@ -87,9 +119,11 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
+            height: 100vh;
             text-align: center;
             animation: fadeIn 1s ease-out;
+            position: relative;
+            z-index: 2;
         }
 
         @keyframes fadeIn {
@@ -106,6 +140,7 @@
             background-clip: text;
             animation: gradientShift 3s ease-in-out infinite;
             text-shadow: 0 0 30px rgba(0, 243, 255, 0.5);
+            letter-spacing: 2px;
         }
 
         @keyframes gradientShift {
@@ -598,9 +633,13 @@
             position: fixed;
             bottom: 30px;
             right: 30px;
-            display: flex;
+            display: none;
             gap: 15px;
             z-index: 100;
+        }
+
+        .bottom-buttons.visible {
+            display: flex;
         }
 
         .action-btn {
@@ -797,12 +836,24 @@
     </style>
 </head>
 <body>
+    <!-- Летающие пули -->
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+
     <div class="container">
         <!-- Экран входа -->
         <div id="loginScreen" class="login-screen">
-            <h1>🎮 ТАНКОВЫЙ ПОРТАЛ</h1>
+            <h1>ТАНКОВЫЙ ПОРТАЛ</h1>
             <p>Добро пожаловать! Войдите через Lesta Games</p>
-            <button class="login-btn" onclick="login()">ВХОД</button>
+            <button class="login-btn" id="loginBtn" onclick="login()">ВХОД</button>
         </div>
 
         <!-- Основной контент -->
@@ -847,7 +898,7 @@
         </div>
 
         <!-- Кнопки внизу -->
-        <div class="bottom-buttons">
+        <div class="bottom-buttons" id="bottomButtons">
             <button class="action-btn support-btn" onclick="openSupport()">🛠 ПОДДЕРЖКА</button>
             <button class="action-btn chat-btn" onclick="toggleChat()">💬 ОБЩИЙ ЧАТ</button>
         </div>
@@ -944,39 +995,42 @@
         }
 
         // Функция входа (демо-режим)
-        async function login() {
-            try {
-                currentUser = {
-                    id: 'demo-user-' + Date.now(),
-                    email: 'demo@example.com'
-                };
-                
-                currentProfile = {
-                    id: currentUser.id,
-                    username: 'Танкист_' + Math.floor(Math.random() * 1000),
-                    avatar_url: 'https://www.gravatar.com/avatar/default?d=mp',
-                    balance: 100
-                };
-                
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
-                
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-                
-                await loadUserProfile();
-                await loadTeams();
-                await loadMessages();
-                
-                showNotification('✅ Вы успешно вошли!');
-            } catch (error) {
-                console.error('Ошибка входа:', error);
-                alert('Ошибка входа. Попробуйте еще раз.');
-            }
+        function login() {
+            console.log('Кнопка входа нажата');
+            
+            currentUser = {
+                id: 'demo-user-' + Date.now(),
+                email: 'demo@example.com'
+            };
+            
+            currentProfile = {
+                id: currentUser.id,
+                username: 'Танкист_' + Math.floor(Math.random() * 1000),
+                avatar_url: 'https://www.gravatar.com/avatar/default?d=mp',
+                balance: 100
+            };
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
+            
+            // Скрываем экран входа и показываем основной контент
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            // Показываем кнопки поддержки и чата
+            document.getElementById('bottomButtons').classList.add('visible');
+            
+            // Загружаем данные
+            loadUserProfile();
+            loadTeams();
+            loadMessages();
+            
+            showNotification('✅ Вы успешно вошли!');
         }
 
         // Загрузка профиля
-        async function loadUserProfile() {
+        function loadUserProfile() {
             if (!currentProfile) {
                 const savedProfile = localStorage.getItem('currentProfile');
                 if (savedProfile) {
@@ -1003,7 +1057,7 @@
             document.getElementById('usernameInput').value = currentProfile.username;
         }
 
-        async function saveUsername() {
+        function saveUsername() {
             const newUsername = document.getElementById('usernameInput').value.trim();
             if (!newUsername) {
                 alert('Введите имя пользователя');
@@ -1021,12 +1075,12 @@
         }
 
         // Загрузка аватара
-        document.getElementById('avatarUpload').addEventListener('change', async (e) => {
+        document.getElementById('avatarUpload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
-            reader.onload = async (event) => {
+            reader.onload = function(event) {
                 currentProfile.avatar_url = event.target.result;
                 localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
                 document.getElementById('avatarImg').src = event.target.result;
@@ -1083,7 +1137,7 @@
         }
 
         // Создание команды
-        document.getElementById('createTeamForm').addEventListener('submit', async (e) => {
+        document.getElementById('createTeamForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             if (!currentProfile) {
@@ -1120,11 +1174,11 @@
             
             showNotification('✅ Команда создана!');
             closeCreateTeamModal();
-            await loadTeams();
+            loadTeams();
         });
 
         // Загрузка команд в ленту
-        async function loadTeams() {
+        function loadTeams() {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const teamsFeed = document.getElementById('teamsFeed');
             teamsFeed.innerHTML = '';
@@ -1333,7 +1387,7 @@
         }
 
         // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             const savedUser = localStorage.getItem('currentUser');
             const savedProfile = localStorage.getItem('currentProfile');
             
@@ -1342,6 +1396,7 @@
                 currentProfile = JSON.parse(savedProfile);
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('bottomButtons').classList.add('visible');
                 loadUserProfile();
                 loadTeams();
                 loadMessages();
@@ -1349,7 +1404,7 @@
         });
 
         // Обработка нажатия Escape
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeCreateTeamModal();
                 closeJoinTeamModal();
@@ -1359,6 +1414,9 @@
                 }
             }
         });
+
+        // Добавляем обработчик клика напрямую
+        document.getElementById('loginBtn').addEventListener('click', login);
     </script>
 </body>
 </html>
