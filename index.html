@@ -32,6 +32,8 @@
             color: var(--text-primary);
             overflow-x: hidden;
             position: relative;
+            margin: 0;
+            padding: 0;
         }
 
         body::before {
@@ -172,6 +174,10 @@
 
         .btn:hover {
             transform: scale(1.05);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
         }
 
         .btn-danger {
@@ -635,6 +641,12 @@
             padding: 15px 25px;
             border-radius: 25px;
             z-index: 500;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
     </style>
 </head>
@@ -832,22 +844,12 @@
     </div>
 
     <script>
-        // Конфигурация Supabase
-        const SUPABASE_URL = 'https://scavytmpqhgszatvgfsp.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_TCcyt1VNFASqRjUCe52H1A_z_WA6zoW';
-        
-        let supabase;
+        // Глобальные переменные
         let currentUser = null;
         let currentProfile = null;
-        let chatChannel = null;
+        let currentTeamId = null;
 
-        // Инициализация Supabase
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        } catch (error) {
-            console.error('Supabase initialization error:', error);
-        }
-
+        // Функция показа уведомлений
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -856,152 +858,7 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
-        // Загрузка сообщений из Supabase
-        async function loadChatMessages() {
-            if (!supabase) return;
-            
-            const { data: messages, error } = await supabase
-                .from('chat_messages')
-                .select('*')
-                .order('created_at', { ascending: true })
-                .limit(100);
-            
-            if (error) {
-                console.error('Error loading messages:', error);
-                return;
-            }
-            
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '';
-            
-            if (!messages || messages.length === 0) {
-                chatMessages.innerHTML = '<p style="color: #666;">Нет сообщений</p>';
-                return;
-            }
-            
-            messages.forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'chat-message';
-                msgDiv.innerHTML = `
-                    <span class="chat-message-user">${msg.username}:</span>
-                    <span>${msg.message}</span>
-                `;
-                chatMessages.appendChild(msgDiv);
-            });
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Отправка сообщения в Supabase
-        async function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message || !currentProfile || !supabase) return;
-            
-            const { data, error } = await supabase
-                .from('chat_messages')
-                .insert([{
-                    user_id: currentProfile.id,
-                    username: currentProfile.username,
-                    message: message,
-                    created_at: new Date().toISOString()
-                }]);
-            
-            if (error) {
-                console.error('Error sending message:', error);
-                showNotification('Ошибка отправки сообщения');
-                return;
-            }
-            
-            input.value = '';
-            await loadChatMessages();
-        }
-
-        // Подписка на новые сообщения
-        function subscribeToChat() {
-            if (!supabase) return;
-            
-            chatChannel = supabase
-                .channel('chat-room')
-                .on('postgres_changes', 
-                    { event: 'INSERT', schema: 'public', table: 'chat_messages' },
-                    () => {
-                        loadChatMessages();
-                    }
-                )
-                .subscribe();
-        }
-
-        // Загрузка команд из Supabase
-        async function loadTeams() {
-            if (!supabase) {
-                // Fallback to localStorage
-                loadTeamsFromLocalStorage();
-                return;
-            }
-            
-            const { data: teams, error } = await supabase
-                .from('teams')
-                .select('*')
-                .order('created_at', { ascending: false });
-            
-            if (error) {
-                console.error('Error loading teams:', error);
-                loadTeamsFromLocalStorage();
-                return;
-            }
-            
-            const feed = document.getElementById('teamsFeed');
-            feed.innerHTML = '';
-            
-            if (!teams || teams.length === 0) {
-                feed.innerHTML = '<p style="color: #666; text-align: center;">Нет созданных команд</p>';
-                return;
-            }
-            
-            teams.forEach(team => {
-                const card = document.createElement('div');
-                card.className = 'team-card ' + (team.is_open ? 'open' : 'closed');
-                card.innerHTML = `
-                    <h3>${team.title}</h3>
-                    <p>Создатель: ${team.creator_name}</p>
-                    <p>Карта: ${team.map_name}</p>
-                    <p>Игроки: А: ${team.players_a?.length || 0}/${team.team_a_size} | Б: ${team.players_b?.length || 0}/${team.team_b_size}</p>
-                    <p>Взнос: ${team.team_a_fee} звёзд</p>
-                    <p>Статус: ${team.is_open ? 'Открыта' : 'Закрыта'}</p>
-                `;
-                card.onclick = () => showTeamDetail(team.id);
-                feed.appendChild(card);
-            });
-        }
-
-        function loadTeamsFromLocalStorage() {
-            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-            const feed = document.getElementById('teamsFeed');
-            feed.innerHTML = '';
-            
-            if (teams.length === 0) {
-                feed.innerHTML = '<p style="color: #666; text-align: center;">Нет созданных команд</p>';
-                return;
-            }
-            
-            teams.forEach(team => {
-                const card = document.createElement('div');
-                card.className = 'team-card ' + (team.is_open ? 'open' : 'closed');
-                card.innerHTML = `
-                    <h3>${team.title}</h3>
-                    <p>Создатель: ${team.creator_name}</p>
-                    <p>Карта: ${team.map_name}</p>
-                    <p>Игроки: А: ${team.players_a?.length || 0}/${team.team_a_size} | Б: ${team.players_b?.length || 0}/${team.team_b_size}</p>
-                    <p>Взнос: ${team.team_a_fee} звёзд</p>
-                    <p>Статус: ${team.is_open ? 'Открыта' : 'Закрыта'}</p>
-                `;
-                card.onclick = () => showTeamDetail(team.id);
-                feed.appendChild(card);
-            });
-        }
-
+        // Функция входа
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -1042,12 +899,11 @@
             
             loadUserProfile();
             loadMyTeams();
-            loadChatMessages();
-            subscribeToChat();
             
             showNotification('Добро пожаловать, ' + username + '!');
         }
 
+        // Функция регистрации
         function register() {
             const username = document.getElementById('registerUsername').value.trim();
             const password = document.getElementById('registerPassword').value;
@@ -1109,12 +965,11 @@
             
             loadUserProfile();
             loadMyTeams();
-            loadChatMessages();
-            subscribeToChat();
             
             showNotification('Регистрация успешна! Добро пожаловать, ' + username + '!');
         }
 
+        // Загрузка профиля
         function loadUserProfile() {
             if (!currentProfile) return;
             
@@ -1125,6 +980,7 @@
             }
         }
 
+        // Загрузка моих команд
         function loadMyTeams() {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const myTeams = teams.filter(t => t.creator_id === currentProfile.id || 
@@ -1174,6 +1030,7 @@
             });
         }
 
+        // Переключение чата
         function toggleChat() {
             document.getElementById('chatWindow').classList.toggle('active');
             if (document.getElementById('chatWindow').classList.contains('active')) {
@@ -1181,15 +1038,89 @@
             }
         }
 
+        // Загрузка сообщений чата
+        function loadChatMessages() {
+            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            if (messages.length === 0) {
+                chatMessages.innerHTML = '<p style="color: #666;">Нет сообщений</p>';
+                return;
+            }
+            
+            messages.slice(-50).forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-message';
+                msgDiv.innerHTML = `
+                    <span class="chat-message-user">${msg.username}:</span>
+                    <span>${msg.message}</span>
+                `;
+                chatMessages.appendChild(msgDiv);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Отправка сообщения
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentProfile) return;
+            
+            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+            messages.push({
+                user_id: currentProfile.id,
+                username: currentProfile.username,
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            input.value = '';
+            loadChatMessages();
+        }
+
+        // Открытие ленты команд
         function openFeed() {
             document.getElementById('feedOverlay').classList.add('active');
             loadTeams();
         }
 
+        // Закрытие ленты команд
         function closeFeed() {
             document.getElementById('feedOverlay').classList.remove('active');
         }
 
+        // Загрузка команд
+        function loadTeams() {
+            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
+            const feed = document.getElementById('teamsFeed');
+            feed.innerHTML = '';
+            
+            if (teams.length === 0) {
+                feed.innerHTML = '<p style="color: #666; text-align: center;">Нет созданных команд</p>';
+                return;
+            }
+            
+            teams.forEach(team => {
+                const card = document.createElement('div');
+                card.className = 'team-card ' + (team.is_open ? 'open' : 'closed');
+                card.innerHTML = `
+                    <h3>${team.title}</h3>
+                    <p>Создатель: ${team.creator_name}</p>
+                    <p>Карта: ${team.map_name}</p>
+                    <p>Игроки: А: ${team.players_a?.length || 0}/${team.team_a_size} | Б: ${team.players_b?.length || 0}/${team.team_b_size}</p>
+                    <p>Взнос: ${team.team_a_fee} звёзд</p>
+                    <p>Статус: ${team.is_open ? 'Открыта' : 'Закрыта'}</p>
+                `;
+                card.onclick = () => showTeamDetail(team.id);
+                feed.appendChild(card);
+            });
+        }
+
+        // Показать детали команды
         function showTeamDetail(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const team = teams.find(t => t.id === teamId);
@@ -1256,10 +1187,12 @@
             document.getElementById('teamDetailModal').classList.add('active');
         }
 
+        // Закрыть детали команды
         function closeTeamDetail() {
             document.getElementById('teamDetailModal').classList.remove('active');
         }
 
+        // Присоединиться к команде
         function joinTeam(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const teamIndex = teams.findIndex(t => t.id === teamId);
@@ -1327,6 +1260,7 @@
             showNotification('Вы присоединились к команде! Списано: ' + fee + ' звёзд');
         }
 
+        // Покинуть команду
         function leaveTeam(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const teamIndex = teams.findIndex(t => t.id === teamId);
@@ -1346,6 +1280,7 @@
             showNotification('Вы покинули команду');
         }
 
+        // Удалить игрока
         function removePlayer(teamId, playerId, side) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const teamIndex = teams.findIndex(t => t.id === teamId);
@@ -1368,6 +1303,7 @@
             showNotification('Игрок удален из команды');
         }
 
+        // Удалить команду
         function deleteTeam(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const filteredTeams = teams.filter(t => t.id !== teamId);
@@ -1378,6 +1314,7 @@
             showNotification('Команда удалена');
         }
 
+        // Открыть редактирование команды
         function openEditTeam(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const team = teams.find(t => t.id === teamId);
@@ -1395,30 +1332,37 @@
             document.getElementById('editTeamModal').classList.add('active');
         }
 
+        // Закрыть редактирование
         function closeEditTeam() {
             document.getElementById('editTeamModal').classList.remove('active');
         }
 
+        // Открыть создание команды
         function openCreateTeamModal() {
             document.getElementById('createTeamModal').classList.add('active');
         }
 
+        // Закрыть создание команды
         function closeCreateTeamModal() {
             document.getElementById('createTeamModal').classList.remove('active');
         }
 
+        // Поддержка
         function openSupport() {
             alert('Поддержка:\nEmail: support@tankportal.ru\nTelegram: @tank_support');
         }
 
+        // Политика конфиденциальности
         function showPrivacyPolicy() {
-            alert('ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ\n\n1. ОБЩИЕ ПОЛОЖЕНИЯ\n1.1. Настоящая политика определяет порядок обработки и защиты персональных данных.\n1.2. Используя сервис, вы соглашаетесь с условиями.\n\n2. СБОР ДАННЫХ\n2.1. Мы собираем: никнейм, аватар, игровую статистику.\n2.2. Платежные данные хранятся в зашифрованном виде.\n\n3. ИСПОЛЬЗОВАНИЕ ДАННЫХ\n3.1. Данные используются для работы сервиса.\n3.2. Мы не передаем данные третьим лицам.\n\n4. ЗАЩИТА ДАННЫХ\n4.1. Все данные защищены современными методами шифрования.\n4.2. Доступ имеют только уполномоченные лица.\n\n5. ПРАВА ПОЛЬЗОВАТЕЛЯ\n5.1. Вы можете запросить свои данные.\n5.2. Вы можете удалить аккаунт.\n5.3. Вы можете отозвать согласие на обработку.\n\n6. КОНТАКТЫ\nprivacy@tankportal.ru');
+            alert('ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время');
         }
 
+        // Правила пользования
         function showTermsOfUse() {
-            alert('ПРАВИЛА ПОЛЬЗОВАНИЯ\n\n1. ОБЩИЕ УСЛОВИЯ\n1.1. Регистрируясь, вы соглашаетесь с правилами.\n1.2. Минимальный возраст - 18 лет.\n\n2. ПРАВИЛА ПОВЕДЕНИЯ\n2.1. Запрещено оскорблять пользователей.\n2.2. Запрещено использовать читы.\n2.3. Запрещено мошенничать.\n\n3. ПЛАТЕЖИ\n3.1. Валюта - звёзды.\n3.2. Комиссия сайта - 10%.\n3.3. Минимальный взнос - 10 звёзд.\n\n4. ОТВЕТСТВЕННОСТЬ\n4.1. Пользователь несет ответственность за свои действия.\n4.2. Администрация может блокировать аккаунты.\n\n5. ИЗМЕНЕНИЯ\n5.1. Правила могут меняться.\n5.2. Продолжение использования означает согласие.');
+            alert('ПРАВИЛА ПОЛЬЗОВАНИЯ\n\n1. Уважайте других игроков\n2. Не используйте читы\n3. Комиссия сайта 10%');
         }
 
+        // Редактирование никнейма
         function editUsername() {
             const newUsername = prompt('Введите новый никнейм:', currentProfile?.username || '');
             if (newUsername && newUsername.trim().length >= 3) {
@@ -1439,37 +1383,50 @@
             }
         }
 
+        // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
+            // Кнопки входа и регистрации
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('registerBtn').addEventListener('click', register);
+            
+            // Переключение форм
             document.getElementById('showRegisterBtn').addEventListener('click', function() {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('registerForm').style.display = 'flex';
             });
+            
             document.getElementById('showLoginBtn').addEventListener('click', function() {
                 document.getElementById('registerForm').style.display = 'none';
                 document.getElementById('loginForm').style.display = 'flex';
             });
             
+            // Кнопки команд
             document.getElementById('createTeamBtn').addEventListener('click', openCreateTeamModal);
+            document.getElementById('joinTeamBtn').addEventListener('click', openFeed);
+            
+            // Кнопки закрытия
             document.getElementById('closeCreateTeamBtn').addEventListener('click', closeCreateTeamModal);
             document.getElementById('closeTeamDetailBtn').addEventListener('click', closeTeamDetail);
             document.getElementById('closeEditTeamBtn').addEventListener('click', closeEditTeam);
+            document.getElementById('closeFeedBtn').addEventListener('click', closeFeed);
             
+            // Кнопки чата и поддержки
             document.getElementById('supportBtn').addEventListener('click', openSupport);
             document.getElementById('chatBtn').addEventListener('click', toggleChat);
             document.getElementById('closeChatBtn').addEventListener('click', toggleChat);
             document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
             
+            // Кнопка ленты
             document.getElementById('feedBtn').addEventListener('click', openFeed);
-            document.getElementById('closeFeedBtn').addEventListener('click', closeFeed);
             
+            // Редактирование профиля
             document.getElementById('editAvatarBtn').addEventListener('click', function() {
                 document.getElementById('avatarUpload').click();
             });
             
             document.getElementById('editUsernameBtn').addEventListener('click', editUsername);
             
+            // Загрузка аватара
             document.getElementById('avatarUpload').addEventListener('change', function(e) {
                 const file = e.target.files[0];
                 if (file) {
@@ -1493,9 +1450,11 @@
                 }
             });
             
+            // Политики
             document.getElementById('privacyBtn').addEventListener('click', showPrivacyPolicy);
             document.getElementById('termsBtn').addEventListener('click', showTermsOfUse);
             
+            // Создание команды
             document.getElementById('createTeamForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -1524,22 +1483,9 @@
                     players_b: []
                 };
                 
-                // Сохраняем в Supabase
-                if (supabase) {
-                    supabase.from('teams').insert([teamData]).then(({ error }) => {
-                        if (error) {
-                            console.error('Error creating team:', error);
-                            // Fallback to localStorage
-                            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-                            teams.push(teamData);
-                            localStorage.setItem('teams', JSON.stringify(teams));
-                        }
-                    });
-                } else {
-                    const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-                    teams.push(teamData);
-                    localStorage.setItem('teams', JSON.stringify(teams));
-                }
+                const teams = JSON.parse(localStorage.getItem('teams') || '[]');
+                teams.push(teamData);
+                localStorage.setItem('teams', JSON.stringify(teams));
                 
                 document.getElementById('createTeamForm').reset();
                 closeCreateTeamModal();
@@ -1548,6 +1494,7 @@
                 showNotification('Команда создана!');
             });
             
+            // Редактирование команды
             document.getElementById('editTeamForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -1572,6 +1519,7 @@
                 showNotification('Команда обновлена!');
             });
             
+            // Восстановление сессии
             const savedUser = localStorage.getItem('currentUser');
             const savedProfile = localStorage.getItem('currentProfile');
             
@@ -1584,8 +1532,6 @@
                 document.getElementById('feedBtn').classList.add('visible');
                 loadUserProfile();
                 loadMyTeams();
-                loadChatMessages();
-                subscribeToChat();
             }
         });
     </script>
