@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Танковый портал</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * {
             margin: 0;
@@ -483,27 +484,25 @@
 
         .feed-content {
             flex: 1;
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow-y: auto;
             display: flex;
-            gap: 20px;
-            padding-bottom: 20px;
+            flex-direction: column;
+            gap: 15px;
+            padding: 10px;
         }
 
         .team-card {
-            min-width: 300px;
-            max-width: 350px;
+            width: 100%;
             background: var(--card-bg);
             border: 2px solid #333;
             border-radius: 15px;
             padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
-            flex-shrink: 0;
         }
 
         .team-card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-3px);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
         }
 
@@ -833,10 +832,21 @@
     </div>
 
     <script>
+        // Конфигурация Supabase
+        const SUPABASE_URL = 'https://scavytmpqhgszatvgfsp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TCcyt1VNFASqRjUCe52H1A_z_WA6zoW';
+        
+        let supabase;
         let currentUser = null;
         let currentProfile = null;
-        let chatUpdateInterval = null;
-        let currentTeamId = null;
+        let chatChannel = null;
+
+        // Инициализация Supabase
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        } catch (error) {
+            console.error('Supabase initialization error:', error);
+        }
 
         function showNotification(message) {
             const notification = document.createElement('div');
@@ -844,6 +854,152 @@
             notification.textContent = message;
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Загрузка сообщений из Supabase
+        async function loadChatMessages() {
+            if (!supabase) return;
+            
+            const { data: messages, error } = await supabase
+                .from('chat_messages')
+                .select('*')
+                .order('created_at', { ascending: true })
+                .limit(100);
+            
+            if (error) {
+                console.error('Error loading messages:', error);
+                return;
+            }
+            
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            if (!messages || messages.length === 0) {
+                chatMessages.innerHTML = '<p style="color: #666;">Нет сообщений</p>';
+                return;
+            }
+            
+            messages.forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-message';
+                msgDiv.innerHTML = `
+                    <span class="chat-message-user">${msg.username}:</span>
+                    <span>${msg.message}</span>
+                `;
+                chatMessages.appendChild(msgDiv);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Отправка сообщения в Supabase
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentProfile || !supabase) return;
+            
+            const { data, error } = await supabase
+                .from('chat_messages')
+                .insert([{
+                    user_id: currentProfile.id,
+                    username: currentProfile.username,
+                    message: message,
+                    created_at: new Date().toISOString()
+                }]);
+            
+            if (error) {
+                console.error('Error sending message:', error);
+                showNotification('Ошибка отправки сообщения');
+                return;
+            }
+            
+            input.value = '';
+            await loadChatMessages();
+        }
+
+        // Подписка на новые сообщения
+        function subscribeToChat() {
+            if (!supabase) return;
+            
+            chatChannel = supabase
+                .channel('chat-room')
+                .on('postgres_changes', 
+                    { event: 'INSERT', schema: 'public', table: 'chat_messages' },
+                    () => {
+                        loadChatMessages();
+                    }
+                )
+                .subscribe();
+        }
+
+        // Загрузка команд из Supabase
+        async function loadTeams() {
+            if (!supabase) {
+                // Fallback to localStorage
+                loadTeamsFromLocalStorage();
+                return;
+            }
+            
+            const { data: teams, error } = await supabase
+                .from('teams')
+                .select('*')
+                .order('created_at', { ascending: false });
+            
+            if (error) {
+                console.error('Error loading teams:', error);
+                loadTeamsFromLocalStorage();
+                return;
+            }
+            
+            const feed = document.getElementById('teamsFeed');
+            feed.innerHTML = '';
+            
+            if (!teams || teams.length === 0) {
+                feed.innerHTML = '<p style="color: #666; text-align: center;">Нет созданных команд</p>';
+                return;
+            }
+            
+            teams.forEach(team => {
+                const card = document.createElement('div');
+                card.className = 'team-card ' + (team.is_open ? 'open' : 'closed');
+                card.innerHTML = `
+                    <h3>${team.title}</h3>
+                    <p>Создатель: ${team.creator_name}</p>
+                    <p>Карта: ${team.map_name}</p>
+                    <p>Игроки: А: ${team.players_a?.length || 0}/${team.team_a_size} | Б: ${team.players_b?.length || 0}/${team.team_b_size}</p>
+                    <p>Взнос: ${team.team_a_fee} звёзд</p>
+                    <p>Статус: ${team.is_open ? 'Открыта' : 'Закрыта'}</p>
+                `;
+                card.onclick = () => showTeamDetail(team.id);
+                feed.appendChild(card);
+            });
+        }
+
+        function loadTeamsFromLocalStorage() {
+            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
+            const feed = document.getElementById('teamsFeed');
+            feed.innerHTML = '';
+            
+            if (teams.length === 0) {
+                feed.innerHTML = '<p style="color: #666; text-align: center;">Нет созданных команд</p>';
+                return;
+            }
+            
+            teams.forEach(team => {
+                const card = document.createElement('div');
+                card.className = 'team-card ' + (team.is_open ? 'open' : 'closed');
+                card.innerHTML = `
+                    <h3>${team.title}</h3>
+                    <p>Создатель: ${team.creator_name}</p>
+                    <p>Карта: ${team.map_name}</p>
+                    <p>Игроки: А: ${team.players_a?.length || 0}/${team.team_a_size} | Б: ${team.players_b?.length || 0}/${team.team_b_size}</p>
+                    <p>Взнос: ${team.team_a_fee} звёзд</p>
+                    <p>Статус: ${team.is_open ? 'Открыта' : 'Закрыта'}</p>
+                `;
+                card.onclick = () => showTeamDetail(team.id);
+                feed.appendChild(card);
+            });
         }
 
         function login() {
@@ -886,7 +1042,8 @@
             
             loadUserProfile();
             loadMyTeams();
-            startChatUpdates();
+            loadChatMessages();
+            subscribeToChat();
             
             showNotification('Добро пожаловать, ' + username + '!');
         }
@@ -952,7 +1109,8 @@
             
             loadUserProfile();
             loadMyTeams();
-            startChatUpdates();
+            loadChatMessages();
+            subscribeToChat();
             
             showNotification('Регистрация успешна! Добро пожаловать, ' + username + '!');
         }
@@ -1016,54 +1174,6 @@
             });
         }
 
-        function startChatUpdates() {
-            if (chatUpdateInterval) clearInterval(chatUpdateInterval);
-            chatUpdateInterval = setInterval(loadChatMessages, 1000);
-            loadChatMessages();
-        }
-
-        function loadChatMessages() {
-            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '';
-            
-            if (messages.length === 0) {
-                chatMessages.innerHTML = '<p style="color: #666;">Нет сообщений</p>';
-                return;
-            }
-            
-            messages.slice(-50).forEach(msg => {
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'chat-message';
-                msgDiv.innerHTML = `
-                    <span class="chat-message-user">${msg.username}:</span>
-                    <span>${msg.message}</span>
-                `;
-                chatMessages.appendChild(msgDiv);
-            });
-            
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message || !currentProfile) return;
-            
-            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-            messages.push({
-                user_id: currentProfile.id,
-                username: currentProfile.username,
-                message: message,
-                timestamp: new Date().toISOString()
-            });
-            
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
-            input.value = '';
-            loadChatMessages();
-        }
-
         function toggleChat() {
             document.getElementById('chatWindow').classList.toggle('active');
             if (document.getElementById('chatWindow').classList.contains('active')) {
@@ -1078,32 +1188,6 @@
 
         function closeFeed() {
             document.getElementById('feedOverlay').classList.remove('active');
-        }
-
-        function loadTeams() {
-            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-            const feed = document.getElementById('teamsFeed');
-            feed.innerHTML = '';
-            
-            if (teams.length === 0) {
-                feed.innerHTML = '<p style="color: #666; text-align: center;">Нет созданных команд</p>';
-                return;
-            }
-            
-            teams.forEach(team => {
-                const card = document.createElement('div');
-                card.className = 'team-card ' + (team.is_open ? 'open' : 'closed');
-                card.innerHTML = `
-                    <h3>${team.title}</h3>
-                    <p>Создатель: ${team.creator_name}</p>
-                    <p>Карта: ${team.map_name}</p>
-                    <p>Игроки: А: ${team.players_a?.length || 0}/${team.team_a_size} | Б: ${team.players_b?.length || 0}/${team.team_b_size}</p>
-                    <p>Взнос: ${team.team_a_fee} звёзд</p>
-                    <p>Статус: ${team.is_open ? 'Открыта' : 'Закрыта'}</p>
-                `;
-                card.onclick = () => showTeamDetail(team.id);
-                feed.appendChild(card);
-            });
         }
 
         function showTeamDetail(teamId) {
@@ -1285,8 +1369,6 @@
         }
 
         function deleteTeam(teamId) {
-            if (!confirm('Вы уверены, что хотите удалить команду?')) return;
-            
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const filteredTeams = teams.filter(t => t.id !== teamId);
             localStorage.setItem('teams', JSON.stringify(filteredTeams));
@@ -1442,9 +1524,22 @@
                     players_b: []
                 };
                 
-                const teams = JSON.parse(localStorage.getItem('teams') || '[]');
-                teams.push(teamData);
-                localStorage.setItem('teams', JSON.stringify(teams));
+                // Сохраняем в Supabase
+                if (supabase) {
+                    supabase.from('teams').insert([teamData]).then(({ error }) => {
+                        if (error) {
+                            console.error('Error creating team:', error);
+                            // Fallback to localStorage
+                            const teams = JSON.parse(localStorage.getItem('teams') || '[]');
+                            teams.push(teamData);
+                            localStorage.setItem('teams', JSON.stringify(teams));
+                        }
+                    });
+                } else {
+                    const teams = JSON.parse(localStorage.getItem('teams') || '[]');
+                    teams.push(teamData);
+                    localStorage.setItem('teams', JSON.stringify(teams));
+                }
                 
                 document.getElementById('createTeamForm').reset();
                 closeCreateTeamModal();
@@ -1489,7 +1584,8 @@
                 document.getElementById('feedBtn').classList.add('visible');
                 loadUserProfile();
                 loadMyTeams();
-                startChatUpdates();
+                loadChatMessages();
+                subscribeToChat();
             }
         });
     </script>
