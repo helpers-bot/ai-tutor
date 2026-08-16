@@ -24,12 +24,6 @@
             --text-secondary: #cccccc;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
             font-family: 'Arial', sans-serif;
             background: var(--dark-bg);
@@ -39,7 +33,6 @@
             position: relative;
         }
 
-        /* Анимированный фон */
         body::before {
             content: '';
             position: fixed;
@@ -61,7 +54,6 @@
             50% { opacity: 1; }
         }
 
-        /* Летающие пули */
         .bullet {
             position: fixed;
             width: 20px;
@@ -113,7 +105,6 @@
             flex-direction: column;
         }
 
-        /* Экран входа */
         .login-screen {
             display: flex;
             flex-direction: column;
@@ -121,15 +112,9 @@
             justify-content: center;
             flex: 1;
             text-align: center;
-            animation: fadeIn 1s ease-out;
             position: relative;
             z-index: 2;
             padding: 40px 20px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .login-screen h1 {
@@ -139,13 +124,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
             letter-spacing: 2px;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { filter: hue-rotate(0deg); }
-            50% { filter: hue-rotate(30deg); }
         }
 
         .login-screen p {
@@ -170,17 +149,11 @@
             border-radius: 10px;
             font-size: 1em;
             color: white;
-            transition: all 0.3s;
             outline: none;
         }
 
         .login-form input:focus {
             border-color: var(--neon-pink);
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
-        }
-
-        .login-form input::placeholder {
-            color: #666;
         }
 
         .btn {
@@ -198,11 +171,6 @@
 
         .btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(0, 243, 255, 0.8);
-        }
-
-        .btn:active {
-            transform: scale(0.95);
         }
 
         .link-btn {
@@ -214,80 +182,94 @@
             font-size: 0.9em;
         }
 
-        .link-btn:hover {
-            color: var(--neon-pink);
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
-        /* Основной контент */
-        .profile-header {
+        .top-bar {
             display: flex;
             align-items: center;
-            gap: 20px;
-            padding: 25px;
+            gap: 15px;
+            padding: 15px;
             background: var(--card-bg);
-            border-radius: 20px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .profile-avatar-container {
+            position: relative;
+            display: inline-block;
         }
 
         .profile-avatar {
-            width: 100px;
-            height: 100px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            cursor: pointer;
-            overflow: hidden;
             border: 2px solid var(--neon-blue);
+            object-fit: cover;
         }
 
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        .edit-avatar-btn {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--neon-blue);
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .profile-info {
             flex: 1;
-            min-width: 200px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .profile-info h2 {
-            font-size: 1.8em;
-            margin-bottom: 10px;
+        .profile-username {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+
+        .edit-username-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
             color: var(--neon-blue);
         }
 
-        .balance {
+        .balance-display {
             background: linear-gradient(45deg, #FFD700, #FFA500);
             padding: 10px 20px;
             border-radius: 25px;
             font-weight: bold;
             font-size: 1.1em;
-        }
-
-        .achievements {
-            margin: 20px 0;
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 20px;
-            border: 2px solid var(--neon-purple);
+            margin-right: 10px;
         }
 
         .team-buttons {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .team-btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
             color: white;
+            font-size: 0.9em;
             transition: all 0.3s;
         }
 
@@ -299,33 +281,15 @@
             background: linear-gradient(45deg, var(--neon-orange), var(--neon-red));
         }
 
-        .teams-feed {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .team-card {
-            background: var(--card-bg);
-            border: 2px solid #333;
-            border-radius: 15px;
+        .achievements {
             padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s;
+            background: var(--card-bg);
+            border-radius: 15px;
+            border: 2px solid var(--neon-purple);
         }
 
-        .team-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-        }
-
-        .team-card.open {
-            border-color: var(--neon-green);
-        }
-
-        .team-card.closed {
-            border-color: var(--neon-red);
+        .achievements h3 {
+            margin-bottom: 15px;
         }
 
         .bottom-buttons {
@@ -341,6 +305,18 @@
             display: flex;
         }
 
+        .feed-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            display: none;
+            z-index: 100;
+        }
+
+        .feed-btn.visible {
+            display: block;
+        }
+
         .action-btn {
             padding: 10px 20px;
             border: none;
@@ -348,7 +324,6 @@
             cursor: pointer;
             font-weight: bold;
             color: white;
-            transition: all 0.3s;
         }
 
         .support-btn {
@@ -357,6 +332,11 @@
 
         .chat-btn {
             background: var(--neon-purple);
+        }
+
+        .feed-btn {
+            background: var(--neon-green);
+            color: var(--dark-bg);
         }
 
         .chat-window {
@@ -381,6 +361,9 @@
             background: var(--neon-purple);
             padding: 15px;
             border-radius: 18px 18px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .chat-messages {
@@ -425,6 +408,55 @@
             cursor: pointer;
         }
 
+        .feed-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 300;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .feed-overlay.active {
+            display: flex;
+        }
+
+        .feed-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .feed-content {
+            flex: 1;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .team-card {
+            background: var(--card-bg);
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .team-card.open {
+            border-color: var(--neon-green);
+        }
+
+        .team-card.closed {
+            border-color: var(--neon-red);
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -433,7 +465,7 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
+            z-index: 400;
             justify-content: center;
             align-items: center;
         }
@@ -450,13 +482,19 @@
             max-width: 500px;
             max-height: 80vh;
             overflow-y: auto;
-            position: relative;
             border: 2px solid var(--neon-blue);
+            position: relative;
         }
 
-        .modal-content h2 {
-            margin-bottom: 20px;
-            color: var(--neon-blue);
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            color: #999;
         }
 
         .form-group {
@@ -466,7 +504,6 @@
         .form-group label {
             display: block;
             margin-bottom: 5px;
-            color: var(--text-secondary);
         }
 
         .form-group input,
@@ -479,35 +516,13 @@
             color: white;
         }
 
-        .form-group textarea {
-            height: 80px;
-            resize: vertical;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: #999;
-            background: none;
-            border: none;
-        }
-
-        .close-btn:hover {
-            color: var(--neon-red);
-        }
-
         .footer {
             margin-top: auto;
             padding: 20px;
             text-align: center;
-            border-top: 2px solid #333;
             display: flex;
             gap: 20px;
             justify-content: center;
-            flex-wrap: wrap;
         }
 
         .footer-link {
@@ -515,11 +530,6 @@
             cursor: pointer;
             background: none;
             border: none;
-            font-size: 0.9em;
-        }
-
-        .footer-link:hover {
-            color: var(--neon-blue);
         }
 
         .notification {
@@ -530,18 +540,11 @@
             color: white;
             padding: 15px 25px;
             border-radius: 25px;
-            z-index: 300;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            z-index: 500;
         }
     </style>
 </head>
 <body>
-    <!-- Летающие пули -->
     <div class="bullet"></div>
     <div class="bullet"></div>
     <div class="bullet"></div>
@@ -554,7 +557,6 @@
     <div class="bullet"></div>
 
     <div class="container">
-        <!-- Экран входа -->
         <div id="loginScreen" class="login-screen">
             <h1>ТАНКОВЫЙ ПОРТАЛ</h1>
             <p>Войдите в свой аккаунт</p>
@@ -575,19 +577,22 @@
             </div>
         </div>
 
-        <!-- Основной контент -->
-        <div id="mainContent" style="display: none;">
-            <div class="profile-header">
-                <div class="profile-avatar" id="avatarContainer">
-                    <img id="avatarImg" src="https://www.gravatar.com/avatar/default?d=mp" alt="Avatar">
+        <div id="mainContent" class="main-content" style="display: none;">
+            <div class="top-bar">
+                <div class="profile-avatar-container">
+                    <img id="avatarImg" class="profile-avatar" src="https://www.gravatar.com/avatar/default?d=mp" alt="Avatar">
+                    <button class="edit-avatar-btn" id="editAvatarBtn">✏️</button>
                 </div>
                 <div class="profile-info">
-                    <h2 id="username">Пользователь</h2>
-                    <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-                    <button class="btn" id="changeAvatarBtn" style="margin-top: 10px; font-size: 0.9em;">Изменить фото</button>
+                    <span class="profile-username" id="usernameDisplay">Пользователь</span>
+                    <button class="edit-username-btn" id="editUsernameBtn">✏️</button>
                 </div>
-                <div class="balance">
-                    ⭐ <span id="balanceDisplay">100</span> звёзд
+                <div class="balance-display">
+                    ⭐ <span id="balanceDisplay">0</span> звёзд
+                </div>
+                <div class="team-buttons">
+                    <button class="team-btn create-team-btn" id="createTeamBtn">СОЗДАТЬ КОМАНДУ</button>
+                    <button class="team-btn join-team-btn" id="joinTeamBtn">ПРИСОЕДИНИТЬСЯ</button>
                 </div>
             </div>
 
@@ -597,22 +602,17 @@
                     <p style="color: #666;">Пока нет достижений</p>
                 </div>
             </div>
-
-            <div class="team-buttons">
-                <button class="team-btn create-team-btn" id="createTeamBtn">СОЗДАТЬ КОМАНДУ</button>
-                <button class="team-btn join-team-btn" id="joinTeamBtn">ПРИСОЕДИНИТЬСЯ</button>
-            </div>
-
-            <div class="teams-feed" id="teamsFeed"></div>
         </div>
 
-        <!-- Кнопки внизу -->
+        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+
+        <button class="action-btn feed-btn" id="feedBtn">📋 ЛЕНТА КОМАНД</button>
+
         <div class="bottom-buttons" id="bottomButtons">
             <button class="action-btn support-btn" id="supportBtn">ПОДДЕРЖКА</button>
             <button class="action-btn chat-btn" id="chatBtn">ОБЩИЙ ЧАТ</button>
         </div>
 
-        <!-- Окно чата -->
         <div class="chat-window" id="chatWindow">
             <div class="chat-header">
                 <h3>Общий чат</h3>
@@ -625,7 +625,14 @@
             </div>
         </div>
 
-        <!-- Модальное окно создания команды -->
+        <div class="feed-overlay" id="feedOverlay">
+            <div class="feed-header">
+                <h2>ЛЕНТА КОМАНД</h2>
+                <button class="close-btn" id="closeFeedBtn">×</button>
+            </div>
+            <div class="feed-content" id="teamsFeed"></div>
+        </div>
+
         <div class="modal" id="createTeamModal">
             <div class="modal-content">
                 <button class="close-btn" id="closeCreateTeamBtn">×</button>
@@ -676,7 +683,6 @@
             </div>
         </div>
 
-        <!-- Модальное окно присоединения -->
         <div class="modal" id="joinTeamModal">
             <div class="modal-content">
                 <button class="close-btn" id="closeJoinTeamBtn">×</button>
@@ -685,7 +691,6 @@
             </div>
         </div>
 
-        <!-- Футер -->
         <div class="footer">
             <button class="footer-link" id="privacyBtn">Политика конфиденциальности</button>
             <button class="footer-link" id="termsBtn">Правила пользования</button>
@@ -693,11 +698,10 @@
     </div>
 
     <script>
-        // Глобальные переменные
         let currentUser = null;
         let currentProfile = null;
+        let chatUpdateInterval = null;
 
-        // Функция показа уведомлений
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -706,7 +710,6 @@
             setTimeout(() => notification.remove(), 3000);
         }
 
-        // Функция входа
         function login() {
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value;
@@ -734,23 +737,23 @@
                 id: user.id,
                 username: user.username,
                 avatar_url: user.avatar_url || 'https://www.gravatar.com/avatar/default?d=mp',
-                balance: user.balance || 100
+                balance: user.balance || 0
             };
             
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
             
             document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'flex';
             document.getElementById('bottomButtons').classList.add('visible');
+            document.getElementById('feedBtn').classList.add('visible');
             
             loadUserProfile();
-            loadTeams();
+            startChatUpdates();
             
             showNotification('Добро пожаловать, ' + username + '!');
         }
 
-        // Функция регистрации
         function register() {
             const username = document.getElementById('registerUsername').value.trim();
             const password = document.getElementById('registerPassword').value;
@@ -787,7 +790,7 @@
                 username: username,
                 password: password,
                 avatar_url: 'https://www.gravatar.com/avatar/default?d=mp',
-                balance: 100,
+                balance: 0,
                 created_at: new Date().toISOString()
             };
             
@@ -799,38 +802,97 @@
                 id: newUser.id,
                 username: newUser.username,
                 avatar_url: newUser.avatar_url,
-                balance: newUser.balance
+                balance: 0
             };
             
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
             localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
             
             document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'flex';
             document.getElementById('bottomButtons').classList.add('visible');
+            document.getElementById('feedBtn').classList.add('visible');
             
             loadUserProfile();
-            loadTeams();
+            startChatUpdates();
             
             showNotification('Регистрация успешна! Добро пожаловать, ' + username + '!');
         }
 
-        // Загрузка профиля
         function loadUserProfile() {
-            if (!currentProfile) {
-                const saved = localStorage.getItem('currentProfile');
-                if (saved) currentProfile = JSON.parse(saved);
-                else return;
-            }
+            if (!currentProfile) return;
             
-            document.getElementById('username').textContent = currentProfile.username;
+            document.getElementById('usernameDisplay').textContent = currentProfile.username;
             document.getElementById('balanceDisplay').textContent = currentProfile.balance || 0;
             if (currentProfile.avatar_url) {
                 document.getElementById('avatarImg').src = currentProfile.avatar_url;
             }
         }
 
-        // Загрузка команд
+        function startChatUpdates() {
+            if (chatUpdateInterval) clearInterval(chatUpdateInterval);
+            chatUpdateInterval = setInterval(loadChatMessages, 1000);
+            loadChatMessages();
+        }
+
+        function loadChatMessages() {
+            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            
+            if (messages.length === 0) {
+                chatMessages.innerHTML = '<p style="color: #666;">Нет сообщений</p>';
+                return;
+            }
+            
+            messages.slice(-50).forEach(msg => {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = 'chat-message';
+                msgDiv.innerHTML = `
+                    <span class="chat-message-user">${msg.username}:</span>
+                    <span>${msg.message}</span>
+                `;
+                chatMessages.appendChild(msgDiv);
+            });
+            
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message || !currentProfile) return;
+            
+            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
+            messages.push({
+                user_id: currentProfile.id,
+                username: currentProfile.username,
+                message: message,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('chatMessages', JSON.stringify(messages));
+            input.value = '';
+            loadChatMessages();
+        }
+
+        function toggleChat() {
+            document.getElementById('chatWindow').classList.toggle('active');
+            if (document.getElementById('chatWindow').classList.contains('active')) {
+                loadChatMessages();
+            }
+        }
+
+        function openFeed() {
+            document.getElementById('feedOverlay').classList.add('active');
+            loadTeams();
+        }
+
+        function closeFeed() {
+            document.getElementById('feedOverlay').classList.remove('active');
+        }
+
         function loadTeams() {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const feed = document.getElementById('teamsFeed');
@@ -857,7 +919,6 @@
             });
         }
 
-        // Показать детали команды
         function showTeamDetails(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const team = teams.find(t => t.id === teamId);
@@ -874,7 +935,6 @@
             }
         }
 
-        // Открытие модальных окон
         function openCreateTeamModal() {
             document.getElementById('createTeamModal').classList.add('active');
         }
@@ -910,7 +970,6 @@
             document.getElementById('joinTeamModal').classList.remove('active');
         }
 
-        // Присоединение к команде
         function joinTeam(teamId) {
             const teams = JSON.parse(localStorage.getItem('teams') || '[]');
             const team = teams.find(t => t.id === teamId);
@@ -940,53 +999,39 @@
             }
         }
 
-        // Чат
-        function toggleChat() {
-            document.getElementById('chatWindow').classList.toggle('active');
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message || !currentProfile) return;
-            
-            const messages = JSON.parse(localStorage.getItem('chatMessages') || '[]');
-            messages.push({
-                user_id: currentProfile.id,
-                username: currentProfile.username,
-                message: message,
-                timestamp: new Date().toISOString()
-            });
-            
-            localStorage.setItem('chatMessages', JSON.stringify(messages));
-            input.value = '';
-            
-            const chatMessages = document.getElementById('chatMessages');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'chat-message';
-            msgDiv.innerHTML = `<strong>${currentProfile.username}:</strong> ${message}`;
-            chatMessages.appendChild(msgDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // Поддержка
         function openSupport() {
             alert('Поддержка:\nEmail: support@tankportal.ru\nTelegram: @tank_support');
         }
 
-        // Политики
         function showPrivacyPolicy() {
-            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время');
+            alert('ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ\n\n1. ОБЩИЕ ПОЛОЖЕНИЯ\n1.1. Настоящая политика определяет порядок обработки и защиты персональных данных.\n1.2. Используя сервис, вы соглашаетесь с условиями.\n\n2. СБОР ДАННЫХ\n2.1. Мы собираем: никнейм, аватар, игровую статистику.\n2.2. Платежные данные хранятся в зашифрованном виде.\n\n3. ИСПОЛЬЗОВАНИЕ ДАННЫХ\n3.1. Данные используются для работы сервиса.\n3.2. Мы не передаем данные третьим лицам.\n\n4. ЗАЩИТА ДАННЫХ\n4.1. Все данные защищены современными методами шифрования.\n4.2. Доступ имеют только уполномоченные лица.\n\n5. ПРАВА ПОЛЬЗОВАТЕЛЯ\n5.1. Вы можете запросить свои данные.\n5.2. Вы можете удалить аккаунт.\n5.3. Вы можете отозвать согласие на обработку.\n\n6. КОНТАКТЫ\nprivacy@tankportal.ru');
         }
 
         function showTermsOfUse() {
-            alert('Правила пользования:\n\n1. Уважайте других игроков\n2. Не используйте читы\n3. Комиссия сайта 10%');
+            alert('ПРАВИЛА ПОЛЬЗОВАНИЯ\n\n1. ОБЩИЕ УСЛОВИЯ\n1.1. Регистрируясь, вы соглашаетесь с правилами.\n1.2. Минимальный возраст - 18 лет.\n\n2. ПРАВИЛА ПОВЕДЕНИЯ\n2.1. Запрещено оскорблять пользователей.\n2.2. Запрещено использовать читы.\n2.3. Запрещено мошенничать.\n\n3. ПЛАТЕЖИ\n3.1. Валюта - звёзды.\n3.2. Комиссия сайта - 10%.\n3.3. Минимальный взнос - 10 звёзд.\n\n4. ОТВЕТСТВЕННОСТЬ\n4.1. Пользователь несет ответственность за свои действия.\n4.2. Администрация может блокировать аккаунты.\n\n5. ИЗМЕНЕНИЯ\n5.1. Правила могут меняться.\n5.2. Продолжение использования означает согласие.');
         }
 
-        // Инициализация
+        function editUsername() {
+            const newUsername = prompt('Введите новый никнейм:', currentProfile?.username || '');
+            if (newUsername && newUsername.trim().length >= 3) {
+                currentProfile.username = newUsername.trim();
+                localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
+                
+                const users = JSON.parse(localStorage.getItem('users') || '[]');
+                const userIndex = users.findIndex(u => u.id === currentUser.id);
+                if (userIndex !== -1) {
+                    users[userIndex].username = newUsername.trim();
+                    localStorage.setItem('users', JSON.stringify(users));
+                }
+                
+                loadUserProfile();
+                showNotification('Никнейм обновлен!');
+            } else if (newUsername) {
+                showNotification('Никнейм должен быть не менее 3 символов!');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Обработчики кнопок
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('registerBtn').addEventListener('click', register);
             document.getElementById('showRegisterBtn').addEventListener('click', function() {
@@ -1008,9 +1053,14 @@
             document.getElementById('closeChatBtn').addEventListener('click', toggleChat);
             document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
             
-            document.getElementById('changeAvatarBtn').addEventListener('click', function() {
+            document.getElementById('feedBtn').addEventListener('click', openFeed);
+            document.getElementById('closeFeedBtn').addEventListener('click', closeFeed);
+            
+            document.getElementById('editAvatarBtn').addEventListener('click', function() {
                 document.getElementById('avatarUpload').click();
             });
+            
+            document.getElementById('editUsernameBtn').addEventListener('click', editUsername);
             
             document.getElementById('avatarUpload').addEventListener('change', function(e) {
                 const file = e.target.files[0];
@@ -1021,6 +1071,13 @@
                         if (currentProfile) {
                             currentProfile.avatar_url = event.target.result;
                             localStorage.setItem('currentProfile', JSON.stringify(currentProfile));
+                            
+                            const users = JSON.parse(localStorage.getItem('users') || '[]');
+                            const userIndex = users.findIndex(u => u.id === currentUser.id);
+                            if (userIndex !== -1) {
+                                users[userIndex].avatar_url = event.target.result;
+                                localStorage.setItem('users', JSON.stringify(users));
+                            }
                         }
                         showNotification('Аватар обновлен!');
                     };
@@ -1031,7 +1088,6 @@
             document.getElementById('privacyBtn').addEventListener('click', showPrivacyPolicy);
             document.getElementById('termsBtn').addEventListener('click', showTermsOfUse);
             
-            // Создание команды
             document.getElementById('createTeamForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 
@@ -1070,7 +1126,6 @@
                 showNotification('Команда создана!');
             });
             
-            // Восстановление сессии
             const savedUser = localStorage.getItem('currentUser');
             const savedProfile = localStorage.getItem('currentProfile');
             
@@ -1078,10 +1133,11 @@
                 currentUser = JSON.parse(savedUser);
                 currentProfile = JSON.parse(savedProfile);
                 document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'flex';
                 document.getElementById('bottomButtons').classList.add('visible');
+                document.getElementById('feedBtn').classList.add('visible');
                 loadUserProfile();
-                loadTeams();
+                startChatUpdates();
             }
         });
     </script>
