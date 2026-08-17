@@ -3,7 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesta Challenges</title>
+    
+    <!-- Основные мета теги -->
+    <title>Lesta Challenges - Челленджи для Мир Танков</title>
+    <meta name="description" content="Платформа бесплатных челленджей для игроков Мир Танков (Lesta Games). Создавайте и участвуйте в челленджах, зарабатывайте звёзды и соревнуйтесь с другими игроками.">
+    <meta name="keywords" content="Мир Танков, Lesta Games, челленджи, World of Tanks, танки, соревнования, призы, звёзды">
+    <meta name="author" content="Lesta Challenges">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Russian">
+    <meta name="revisit-after" content="1 day">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Lesta Challenges - Челленджи для Мир Танков">
+    <meta property="og:description" content="Создавайте и участвуйте в челленджах, зарабатывайте звёзды и соревнуйтесь с другими игроками Мир Танков.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-domain.com/">
+    <meta property="og:site_name" content="Lesta Challenges">
+    <meta property="og:locale" content="ru_RU">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Lesta Challenges - Челленджи для Мир Танков">
+    <meta name="twitter:description" content="Платформа бесплатных челленджей для игроков Мир Танков">
+    
+    <!-- Favicon (встроенный SVG) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Cpath d='M8 38 L12 30 L52 30 L56 38 L52 44 L12 44 Z' fill='%233fb950'/%3E%3Cpath d='M22 30 L26 22 L38 22 L42 30 Z' fill='%2358a6ff'/%3E%3Crect x='40' y='20' width='16' height='4' rx='2' fill='%233fb950'/%3E%3Crect x='8' y='40' width='48' height='8' rx='4' fill='%2330363d'/%3E%3Ccircle cx='16' cy='44' r='3' fill='%238b949e'/%3E%3Ccircle cx='26' cy='44' r='3' fill='%238b949e'/%3E%3Ccircle cx='36' cy='44' r='3' fill='%238b949e'/%3E%3Ccircle cx='46' cy='44' r='3' fill='%238b949e'/%3E%3Ctext x='32' y='38' font-size='12' fill='%23ffd700' text-anchor='middle' font-weight='bold'%3E★%3C/text%3E%3C/svg%3E">
+    
+    <!-- Канонический URL -->
+    <link rel="canonical" href="https://your-domain.com/">
+    
+    <!-- Структурированные данные -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Lesta Challenges",
+        "description": "Платформа бесплатных челленджей для игроков Мир Танков (Lesta Games)",
+        "url": "https://your-domain.com/",
+        "applicationCategory": "Game",
+        "operatingSystem": "Web",
+        "inLanguage": "ru-RU",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "RUB"
+        }
+    }
+    </script>
+    
     <style>
         :root {
             --bg-primary: #0d1117;
@@ -17,7 +64,6 @@
             --accent-green: #3fb950;
             --accent-red: #f85149;
             --accent-yellow: #d29922;
-            --accent-purple: #bc8cff;
         }
 
         * {
@@ -47,21 +93,22 @@
         }
 
         @keyframes mobFall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+            0% { transform: translateY(0); opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateY(105vh); opacity: 0; }
         }
 
         .explosion {
             position: fixed;
             pointer-events: none;
             z-index: 1;
+            font-size: 30px;
             animation: explode 0.5s ease-out forwards;
         }
 
         @keyframes explode {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(3); opacity: 0; }
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
         }
 
         .container {
@@ -73,20 +120,20 @@
             z-index: 2;
         }
 
-        /* Вход */
         .login-screen {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 70vh;
+            min-height: 80vh;
         }
 
         .login-screen h1 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 600;
             margin-bottom: 30px;
             color: var(--text-primary);
+            letter-spacing: 1px;
         }
 
         .login-input {
@@ -128,13 +175,27 @@
             color: #fff;
         }
 
+        .btn-primary:hover {
+            background: #2ea043;
+            border-color: #2ea043;
+        }
+
         .btn-danger {
             background: transparent;
             border-color: var(--accent-red);
             color: var(--accent-red);
         }
 
-        /* Профиль */
+        .btn-danger:hover {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .profile-header {
             display: flex;
             align-items: center;
@@ -171,6 +232,10 @@
             height: 20px;
             cursor: pointer;
             font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
         }
 
         .nickname-container {
@@ -191,6 +256,10 @@
             cursor: pointer;
             font-size: 12px;
             color: var(--text-muted);
+        }
+
+        .edit-nickname:hover {
+            color: var(--text-secondary);
         }
 
         .balance {
@@ -218,6 +287,8 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .empty {
@@ -228,7 +299,6 @@
             font-size: 13px;
         }
 
-        /* Принятый челлендж */
         .accepted-challenge {
             background: var(--bg-tertiary);
             border: 1px solid var(--accent-green);
@@ -239,74 +309,20 @@
         }
 
         .accepted-challenge:hover {
-            border-color: var(--accent-green);
             background: var(--bg-secondary);
         }
 
-        /* Модальное окно */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 100;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 25px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-title {
-            font-size: 18px;
+        .challenge-title {
+            font-size: 14px;
             font-weight: 600;
+            margin-bottom: 5px;
         }
 
-        .close-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 20px;
+        .challenge-meta {
+            font-size: 12px;
             color: var(--text-muted);
         }
 
-        .modal-info {
-            margin-bottom: 15px;
-        }
-
-        .modal-info p {
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .modal-info strong {
-            color: var(--text-primary);
-        }
-
-        /* Лента */
         .feed-overlay {
             position: fixed;
             top: 0;
@@ -390,24 +406,78 @@
             min-width: 200px;
         }
 
-        .challenge-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .challenge-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
         .challenge-prize {
             font-size: 14px;
             font-weight: 600;
             color: var(--accent-yellow);
         }
 
-        /* Футер */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-info {
+            margin-bottom: 20px;
+        }
+
+        .modal-info p {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .modal-info strong {
+            color: var(--text-primary);
+        }
+
         .footer {
             margin-top: 30px;
             padding: 20px;
@@ -451,12 +521,13 @@
             border-radius: 6px;
             z-index: 2000;
             font-size: 13px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Вход -->
+        <!-- Экран входа -->
         <div class="login-screen" id="loginScreen">
             <h1>LESTA CHALLENGES</h1>
             <input type="text" class="login-input" id="nicknameInput" placeholder="Ваш никнейм">
@@ -467,7 +538,7 @@
         <div id="profileScreen" style="display: none;">
             <div class="profile-header">
                 <div class="avatar-container">
-                    <img class="avatar" id="avatarImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23161b22'/%3E%3Ctext x='25' y='32' font-size='20' fill='%238b949e' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E" alt="Avatar">
+                    <img class="avatar" id="avatarImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23161b22'/%3E%3Ctext x='25' y='32' font-size='20' fill='%238b949e' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E" alt="Аватар">
                     <button class="avatar-edit" id="editAvatarBtn">✏️</button>
                 </div>
                 <div class="nickname-container">
@@ -506,7 +577,7 @@
         </div>
     </div>
 
-    <!-- Лента -->
+    <!-- Лента челленджей -->
     <div class="feed-overlay" id="feedOverlay">
         <div class="feed-header">
             <div class="feed-title">Лента челленджей</div>
@@ -534,6 +605,7 @@
             </div>
             <div class="modal-info" id="modalInfo"></div>
             <button class="btn btn-primary" id="acceptChallengeBtn" style="width: 100%;">Принять челлендж</button>
+            <button class="btn btn-danger" id="declineChallengeBtn" style="width: 100%; margin-top: 10px; display: none;">Отказаться</button>
         </div>
     </div>
 
@@ -550,6 +622,7 @@
 
         let currentChallenge = null;
         let acceptedChallenge = null;
+        let currentUser = null;
 
         function showNotification(msg) {
             const n = document.createElement('div');
@@ -560,12 +633,13 @@
         }
 
         function spawnMob() {
-            const mobs = ['💥', '🎯', '🔥', '💣', '⚡', '🛡️', '🗡️'];
+            const mobs = ['💥', '🎯', '🔥', '💣', '⚡', '🛡️'];
             const mob = document.createElement('div');
             mob.className = 'mob';
             mob.textContent = mobs[Math.floor(Math.random() * mobs.length)];
             mob.style.left = Math.random() * window.innerWidth + 'px';
-            mob.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            const duration = Math.random() * 3 + 3;
+            mob.style.animationDuration = duration + 's';
             document.body.appendChild(mob);
             
             setTimeout(() => {
@@ -577,38 +651,40 @@
                 document.body.appendChild(explosion);
                 setTimeout(() => explosion.remove(), 500);
                 mob.remove();
-            }, parseFloat(mob.style.animationDuration) * 1000);
+            }, duration * 1000);
         }
 
         function startMobSpawning() {
-            setInterval(spawnMob, 2000);
+            setInterval(spawnMob, 3000);
         }
 
         function login() {
             const nickname = document.getElementById('nicknameInput').value.trim();
             if (!nickname) { showNotification('Введите никнейм!'); return; }
             
-            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
             let user = users.find(u => u.nickname === nickname);
             
             if (!user) {
                 user = {nickname: nickname, balance: 100, avatar: null, acceptedChallenge: null};
                 users.push(user);
-                localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('lesta_users', JSON.stringify(users));
             }
             
-            localStorage.setItem('currentUser', JSON.stringify(user));
+            currentUser = user;
             acceptedChallenge = user.acceptedChallenge || null;
-            showProfile(user);
+            localStorage.setItem('lesta_current_user', JSON.stringify(user));
+            
+            showProfile();
             startMobSpawning();
         }
 
-        function showProfile(user) {
+        function showProfile() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('profileScreen').style.display = 'block';
-            document.getElementById('profileNickname').textContent = user.nickname;
-            document.getElementById('balanceDisplay').textContent = user.balance;
-            if (user.avatar) document.getElementById('avatarImg').src = user.avatar;
+            document.getElementById('profileNickname').textContent = currentUser.nickname;
+            document.getElementById('balanceDisplay').textContent = currentUser.balance || 0;
+            if (currentUser.avatar) document.getElementById('avatarImg').src = currentUser.avatar;
             updateAcceptedChallenge();
         }
 
@@ -672,15 +748,22 @@
                 '<p><strong>Приз:</strong> ' + currentChallenge.prize + ' ⭐</p>' +
                 '<p><strong>Участников:</strong> ' + currentChallenge.participants + '/' + currentChallenge.maxParticipants + '</p>';
             
-            const btn = document.getElementById('acceptChallengeBtn');
-            if (acceptedChallenge) {
-                btn.textContent = 'Вы уже приняли другой челлендж';
-                btn.disabled = true;
-                btn.style.opacity = '0.5';
+            const acceptBtn = document.getElementById('acceptChallengeBtn');
+            const declineBtn = document.getElementById('declineChallengeBtn');
+            
+            if (acceptedChallenge === currentChallenge.id) {
+                acceptBtn.style.display = 'none';
+                declineBtn.style.display = 'block';
+            } else if (acceptedChallenge) {
+                acceptBtn.textContent = 'У вас уже есть активный челлендж';
+                acceptBtn.disabled = true;
+                acceptBtn.style.display = 'block';
+                declineBtn.style.display = 'none';
             } else {
-                btn.textContent = 'Принять челлендж';
-                btn.disabled = false;
-                btn.style.opacity = '1';
+                acceptBtn.textContent = 'Принять челлендж';
+                acceptBtn.disabled = false;
+                acceptBtn.style.display = 'block';
+                declineBtn.style.display = 'none';
             }
             
             document.getElementById('challengeModal').classList.add('active');
@@ -694,11 +777,16 @@
             if (!currentChallenge || acceptedChallenge) return;
             
             acceptedChallenge = currentChallenge.id;
-            const user = JSON.parse(localStorage.getItem('currentUser'));
-            if (user) {
-                user.acceptedChallenge = acceptedChallenge;
-                localStorage.setItem('currentUser', JSON.stringify(user));
+            currentUser.acceptedChallenge = acceptedChallenge;
+            
+            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
+            const idx = users.findIndex(u => u.nickname === currentUser.nickname);
+            if (idx !== -1) {
+                users[idx].acceptedChallenge = acceptedChallenge;
+                localStorage.setItem('lesta_users', JSON.stringify(users));
             }
+            
+            localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
             
             updateAcceptedChallenge();
             closeModal();
@@ -706,33 +794,60 @@
             showNotification('Челлендж принят!');
         }
 
-        function logout() {
-            localStorage.removeItem('currentUser');
+        function declineChallenge() {
             acceptedChallenge = null;
+            currentUser.acceptedChallenge = null;
+            
+            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
+            const idx = users.findIndex(u => u.nickname === currentUser.nickname);
+            if (idx !== -1) {
+                users[idx].acceptedChallenge = null;
+                localStorage.setItem('lesta_users', JSON.stringify(users));
+            }
+            
+            localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
+            
+            updateAcceptedChallenge();
+            closeModal();
+            showNotification('Вы отказались от челленджа');
+        }
+
+        function logout() {
+            currentUser = null;
+            acceptedChallenge = null;
+            localStorage.removeItem('lesta_current_user');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('profileScreen').style.display = 'none';
             document.getElementById('nicknameInput').value = '';
         }
 
         function editNickname() {
-            const newNick = prompt('Введите новый никнейм:');
-            if (newNick && newNick.trim()) {
-                const user = JSON.parse(localStorage.getItem('currentUser'));
-                if (user) {
-                    user.nickname = newNick.trim();
-                    localStorage.setItem('currentUser', JSON.stringify(user));
+            const newNick = prompt('Введите новый никнейм:', currentUser?.nickname || '');
+            if (newNick && newNick.trim() && newNick.trim() !== currentUser.nickname) {
+                currentUser.nickname = newNick.trim();
+                
+                let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
+                const idx = users.findIndex(u => u.nickname === newNick.trim());
+                if (idx === -1) {
+                    const oldIdx = users.findIndex(u => u.nickname === document.getElementById('profileNickname').textContent);
+                    if (oldIdx !== -1) users[oldIdx].nickname = newNick.trim();
+                    localStorage.setItem('lesta_users', JSON.stringify(users));
+                    
+                    localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
                     document.getElementById('profileNickname').textContent = newNick.trim();
                     showNotification('Никнейм обновлен!');
+                } else {
+                    showNotification('Этот никнейм уже занят!');
                 }
             }
         }
 
         function showRules() {
-            alert('Правила пользования:\n\n1. Уважайте других игроков\n2. Запрещено использовать читы\n3. Один активный челлендж одновременно\n4. Комиссия платформы 10%');
+            alert('Правила пользования:\n\n1. Уважайте других игроков\n2. Запрещено использовать читы\n3. Один активный челлендж одновременно\n4. Комиссия платформы 10%\n5. Минимальный возраст - 18 лет');
         }
 
         function showPrivacy() {
-            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время\n4. Мы не передаем данные третьим лицам');
+            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время\n4. Мы не передаем данные третьим лицам\n5. Файлы cookie используются для улучшения работы');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -742,6 +857,7 @@
             document.getElementById('closeFeedBtn').addEventListener('click', closeFeed);
             document.getElementById('closeModalBtn').addEventListener('click', closeModal);
             document.getElementById('acceptChallengeBtn').addEventListener('click', acceptChallenge);
+            document.getElementById('declineChallengeBtn').addEventListener('click', declineChallenge);
             document.getElementById('editNicknameBtn').addEventListener('click', editNickname);
             
             document.getElementById('editAvatarBtn').addEventListener('click', function() {
@@ -754,11 +870,16 @@
                     const reader = new FileReader();
                     reader.onload = function(event) {
                         document.getElementById('avatarImg').src = event.target.result;
-                        const user = JSON.parse(localStorage.getItem('currentUser'));
-                        if (user) {
-                            user.avatar = event.target.result;
-                            localStorage.setItem('currentUser', JSON.stringify(user));
+                        currentUser.avatar = event.target.result;
+                        
+                        let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
+                        const idx = users.findIndex(u => u.nickname === currentUser.nickname);
+                        if (idx !== -1) {
+                            users[idx].avatar = event.target.result;
+                            localStorage.setItem('lesta_users', JSON.stringify(users));
                         }
+                        
+                        localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
                         showNotification('Аватар обновлен!');
                     };
                     reader.readAsDataURL(file);
@@ -773,11 +894,11 @@
                 loadChallenges(this.value, document.getElementById('searchInput').value);
             });
             
-            const savedUser = localStorage.getItem('currentUser');
+            const savedUser = localStorage.getItem('lesta_current_user');
             if (savedUser) {
-                const user = JSON.parse(savedUser);
-                acceptedChallenge = user.acceptedChallenge || null;
-                showProfile(user);
+                currentUser = JSON.parse(savedUser);
+                acceptedChallenge = currentUser.acceptedChallenge || null;
+                showProfile();
                 startMobSpawning();
             }
         });
