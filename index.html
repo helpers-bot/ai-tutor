@@ -3,14 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesta Challenges - Челленджи для Мир Танков</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Lesta Challenges</title>
     <style>
         :root {
             --neon-blue: #00f3ff;
             --neon-purple: #bf00ff;
+            --neon-pink: #ff00ff;
             --neon-green: #00ff88;
+            --neon-orange: #ff6600;
             --neon-red: #ff0033;
+            --neon-yellow: #ffcc00;
             --dark-bg: #0a0a1a;
             --card-bg: rgba(20, 20, 40, 0.9);
             --text-primary: #ffffff;
@@ -29,6 +31,7 @@
             min-height: 100vh;
             color: var(--text-primary);
             overflow-x: hidden;
+            position: relative;
         }
 
         body::before {
@@ -40,290 +43,314 @@
             height: 100%;
             background: 
                 radial-gradient(circle at 20% 20%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(191, 0, 255, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 80% 80%, rgba(191, 0, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
         }
 
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .bullet {
+            position: fixed;
+            width: 25px;
+            height: 8px;
+            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 0;
+            animation: flyBullet linear infinite;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
+        }
+
+        .bullet::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-right: 6px solid #ff6600;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+        }
+
+        @keyframes flyBullet {
+            0% { left: -100px; transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { left: calc(100% + 100px); transform: rotate(360deg); }
+        }
+
+        .bullet:nth-child(1) { top: 5%; animation-duration: 3s; animation-delay: 0s; }
+        .bullet:nth-child(2) { top: 15%; animation-duration: 4s; animation-delay: 1s; }
+        .bullet:nth-child(3) { top: 25%; animation-duration: 3.5s; animation-delay: 2s; }
+        .bullet:nth-child(4) { top: 35%; animation-duration: 5s; animation-delay: 0.5s; }
+        .bullet:nth-child(5) { top: 45%; animation-duration: 3.8s; animation-delay: 1.5s; }
+        .bullet:nth-child(6) { top: 55%; animation-duration: 4.2s; animation-delay: 2.5s; }
+        .bullet:nth-child(7) { top: 65%; animation-duration: 3.2s; animation-delay: 3s; }
+        .bullet:nth-child(8) { top: 75%; animation-duration: 4.5s; animation-delay: 1.8s; }
+        .bullet:nth-child(9) { top: 85%; animation-duration: 3.6s; animation-delay: 0.8s; }
+        .bullet:nth-child(10) { top: 95%; animation-duration: 4.8s; animation-delay: 2.2s; }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            width: 180px;
+            height: 100%;
+            background: rgba(10, 10, 26, 0.95);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            overflow: hidden;
+        }
+
+        .sidebar-left {
+            left: 0;
+            border-right: 2px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .sidebar-right {
+            right: 0;
+            border-left: 2px solid rgba(191, 0, 255, 0.3);
+        }
+
+        .sidebar-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-left .sidebar-title {
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        .sidebar-right .sidebar-title {
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px rgba(191, 0, 255, 0.5);
+        }
+
+        .sponsor-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 0 10px;
+            animation: scrollSponsors 20s linear infinite;
+        }
+
+        @keyframes scrollSponsors {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100%); }
+        }
+
+        .sponsor-item {
+            background: rgba(0, 243, 255, 0.1);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: all 0.3s;
+        }
+
+        .sponsor-item:hover {
+            background: rgba(0, 243, 255, 0.3);
+            transform: scale(1.05);
+        }
+
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
             z-index: 1;
+            margin-left: 200px;
+            margin-right: 200px;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
+            padding: 15px 20px;
             background: var(--card-bg);
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             border: 1px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 10px;
         }
 
         .logo {
-            font-size: 1.5em;
+            font-size: 1.3em;
             font-weight: bold;
             background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .balance {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-        }
-
         .btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 0.9em;
             font-weight: bold;
             transition: all 0.3s;
             color: white;
         }
 
-        .btn-primary {
-            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, var(--neon-green), #00cc6a);
-            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-        }
-
         .btn-danger {
-            background: linear-gradient(45deg, var(--neon-red), #cc0033);
+            background: var(--neon-red);
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 243, 255, 0.8);
+            transform: scale(1.05);
         }
 
         .login-form {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 30px;
+            max-width: 350px;
+            margin: 50px auto;
+            padding: 25px;
             background: var(--card-bg);
-            border-radius: 20px;
+            border-radius: 15px;
             border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
             text-align: center;
         }
 
         .login-form h2 {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: var(--neon-blue);
         }
 
         .login-form input {
             width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
+            padding: 10px;
+            margin-bottom: 10px;
             background: rgba(0, 0, 0, 0.5);
             border: 2px solid var(--neon-blue);
-            border-radius: 10px;
+            border-radius: 8px;
             color: white;
-            font-size: 1em;
+            font-size: 0.9em;
+            outline: none;
         }
 
         .login-form input:focus {
-            outline: none;
             border-color: var(--neon-purple);
-            box-shadow: 0 0 15px rgba(191, 0, 255, 0.3);
         }
 
-        .challenges-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+        .btn-primary {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            width: 100%;
         }
 
-        .challenge-card {
+        .profile-section {
             background: var(--card-bg);
-            border: 2px solid #333;
             border-radius: 15px;
             padding: 20px;
-            transition: all 0.3s;
+            margin-bottom: 20px;
+            border: 2px solid var(--neon-purple);
+            box-shadow: 0 0 30px rgba(191, 0, 255, 0.3);
         }
 
-        .challenge-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--neon-blue);
-            box-shadow: 0 5px 30px rgba(0, 243, 255, 0.3);
-        }
-
-        .challenge-card h3 {
-            margin-bottom: 10px;
-            color: var(--neon-blue);
-        }
-
-        .challenge-info {
-            margin: 10px 0;
-            color: var(--text-secondary);
-        }
-
-        .challenge-prize {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: var(--neon-green);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal.active {
+        .profile-header {
             display: flex;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            border: 2px solid var(--neon-blue);
-            position: relative;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
-            font-size: 1.5em;
-            background: none;
-            border: none;
-            color: #999;
-        }
-
-        .form-group {
+            align-items: center;
+            gap: 15px;
             margin-bottom: 15px;
         }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--text-secondary);
-        }
-
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #444;
-            border-radius: 8px;
-            color: white;
-        }
-
-        .form-group textarea {
-            height: 100px;
-            resize: vertical;
-        }
-
-        .my-participations {
-            margin-top: 30px;
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 15px;
-            border: 2px solid var(--neon-purple);
-        }
-
-        .participation-item {
+        .profile-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple));
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
         }
 
-        .status-badge {
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 0.9em;
-        }
-
-        .status-in_progress {
-            background: rgba(0, 243, 255, 0.2);
+        .profile-nickname {
+            font-size: 1.3em;
+            font-weight: bold;
             color: var(--neon-blue);
         }
 
-        .status-success {
-            background: rgba(0, 255, 136, 0.2);
-            color: var(--neon-green);
+        .balance-display {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
         }
 
-        .status-failed {
-            background: rgba(255, 0, 51, 0.2);
-            color: var(--neon-red);
+        .section-title {
+            font-size: 1em;
+            margin-bottom: 10px;
+            color: var(--neon-purple);
         }
 
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 5px;
-            margin: 10px 0;
-            overflow: hidden;
+        .achievements-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-green));
-            border-radius: 5px;
-            transition: width 0.3s;
+        .achievement-badge {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--neon-purple);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.8em;
+            text-align: center;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.9em;
         }
 
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background: var(--neon-green);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 25px;
+            color: var(--dark-bg);
+            padding: 10px 20px;
+            border-radius: 20px;
             z-index: 2000;
+            font-weight: bold;
             animation: slideIn 0.3s ease-out;
-        }
-
-        .notification-error {
-            background: var(--neon-red);
         }
 
         @keyframes slideIn {
@@ -333,422 +360,143 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header" id="header" style="display: none;">
-            <div class="logo">LESTA CHALLENGES</div>
-            <div class="user-info">
-                <span id="nicknameDisplay"></span>
-                <div class="balance">
-                    ⭐ <span id="balanceDisplay">0</span>
-                </div>
-                <button class="btn btn-primary" onclick="showCreateChallenge()">Создать челлендж</button>
-                <button class="btn btn-danger" onclick="logout()">Выйти</button>
-            </div>
-        </div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
 
+    <div class="sidebar sidebar-left">
+        <div class="sidebar-title">Спонсоры</div>
+        <div class="sponsor-list" id="sponsorsList"></div>
+    </div>
+
+    <div class="sidebar sidebar-right">
+        <div class="sidebar-title">Топ 3</div>
+        <div class="sponsor-list" id="topSponsorsList"></div>
+    </div>
+
+    <div class="container">
         <div class="login-form" id="loginForm">
-            <h2>Вход в Lesta Challenges</h2>
-            <p style="margin-bottom: 20px; color: #ccc;">Введите ваш никнейм из игры</p>
-            <input type="text" id="nicknameInput" placeholder="Никнейм в Мир Танков">
-            <button class="btn btn-primary" id="loginBtn" style="width: 100%;">ВОЙТИ</button>
+            <h2>LESTA CHALLENGES</h2>
+            <input type="text" id="nicknameInput" placeholder="Ваш никнейм">
+            <button class="btn btn-primary" id="loginBtn">ВОЙТИ</button>
         </div>
 
         <div id="mainContent" style="display: none;">
-            <h2 style="margin-bottom: 20px;">Активные челленджи</h2>
-            <div class="challenges-grid" id="challengesGrid"></div>
-
-            <div class="my-participations" id="myParticipations" style="display: none;">
-                <h3>Мои участия</h3>
-                <div id="participationsList"></div>
+            <div class="header">
+                <div class="logo">LESTA CHALLENGES</div>
+                <button class="btn btn-danger" id="logoutBtn">Выйти</button>
             </div>
-        </div>
 
-        <div class="modal" id="createChallengeModal">
-            <div class="modal-content">
-                <button class="close-btn" onclick="closeCreateChallenge()">&times;</button>
-                <h2 style="margin-bottom: 20px;">Создать челлендж</h2>
-                <form id="createChallengeForm">
-                    <div class="form-group">
-                        <label>Название челленджа</label>
-                        <input type="text" id="challengeTitle" required>
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="avatarLetter">?</div>
+                    <div>
+                        <div class="profile-nickname" id="profileNickname"></div>
+                        <div class="balance-display">⭐ <span id="balanceDisplay">0</span></div>
                     </div>
-                    <div class="form-group">
-                        <label>Описание</label>
-                        <textarea id="challengeDescription" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Тип цели</label>
-                        <select id="targetType">
-                            <option value="damage">Урон</option>
-                            <option value="frags">Фраги</option>
-                            <option value="xp">Опыт</option>
-                            <option value="wins">Победы</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Целевое значение</label>
-                        <input type="number" id="targetValue" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Количество боев</label>
-                        <input type="number" id="battlesLimit" value="5" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Призовой фонд (звёзды)</label>
-                        <input type="number" id="prizePool" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Класс техники (опционально)</label>
-                        <select id="tankClass">
-                            <option value="">Любой</option>
-                            <option value="HT">Тяжелые танки</option>
-                            <option value="MT">Средние танки</option>
-                            <option value="LT">Легкие танки</option>
-                            <option value="TD">ПТ-САУ</option>
-                            <option value="SPG">Артиллерия</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-success" style="width: 100%;">СОЗДАТЬ</button>
-                </form>
+                </div>
+
+                <div class="section-title">🏆 Достижения</div>
+                <div class="achievements-row" id="achievementsRow">
+                    <div class="achievement-badge">🎯 Первый вход</div>
+                    <div class="achievement-badge">💎 1000 урона</div>
+                    <div class="achievement-badge">🔥 5 побед</div>
+                </div>
+
+                <div class="section-title">📜 История</div>
+                <div class="history-list" id="historyList">
+                    <div class="history-item">Выполнен челлендж: 5000 урона</div>
+                    <div class="history-item">Создан челлендж: 3 победы</div>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Конфигурация Supabase
-        const SUPABASE_URL = 'https://scavytmpqhgszatvgfsp.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_TCcyt1VNFASqRjUCe52H1A_z_WA6zoW';
-        
-        // Создаем клиент Supabase
-        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        let currentUser = null;
+        const sponsors = [
+            'TankMaster_77', 'SteelWarrior', 'ProGamer_Lesta', 'TankDestroyer', 
+            'BattleHero_2024', 'IronCommander', 'ShadowTank', 'Victory_Road', 
+            'TankAce_99', 'WarLegend', 'SteelStorm', 'TankHunter_X', 
+            'BlitzKrieg', 'ArmoredCore', 'TankElite'
+        ];
 
-        function showNotification(message, isError = false) {
-            const notification = document.createElement('div');
-            notification.className = 'notification' + (isError ? ' notification-error' : '');
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+        const topSponsors = ['🏆 TankMaster_77', '🥈 SteelWarrior', '🥉 ProGamer_Lesta'];
+
+        function initSponsors() {
+            document.getElementById('sponsorsList').innerHTML = 
+                sponsors.map(s => '<div class="sponsor-item">' + s + '</div>').join('');
+            
+            document.getElementById('topSponsorsList').innerHTML = 
+                topSponsors.map(s => '<div class="sponsor-item">' + s + '</div>').join('');
         }
 
-        async function login() {
-            const nickname = document.getElementById('nicknameInput').value.trim();
+        function showNotification(message) {
+            var n = document.createElement('div');
+            n.className = 'notification';
+            n.textContent = message;
+            document.body.appendChild(n);
+            setTimeout(function() { n.remove(); }, 3000);
+        }
+
+        function login() {
+            var nickname = document.getElementById('nicknameInput').value.trim();
             
             if (!nickname) {
-                showNotification('Введите никнейм!', true);
+                showNotification('Введите никнейм!');
                 return;
             }
             
-            try {
-                // Проверяем существующего пользователя
-                const { data: existingUser, error: selectError } = await sbClient
-                    .from('users')
-                    .select('*')
-                    .eq('nickname', nickname)
-                    .single();
-                
-                if (selectError && selectError.code !== 'PGRST116') {
-                    console.error('Select error:', selectError);
-                    showNotification('Ошибка проверки пользователя: ' + selectError.message, true);
-                    return;
-                }
-                
-                let user = existingUser;
-                
-                if (!user) {
-                    // Создаем нового пользователя
-                    const { data: newUser, error: insertError } = await sbClient
-                        .from('users')
-                        .insert({
-                            nickname: nickname,
-                            balance: 100
-                        })
-                        .select()
-                        .single();
-                    
-                    if (insertError) {
-                        console.error('Insert error:', insertError);
-                        showNotification('Ошибка создания пользователя: ' + insertError.message, true);
-                        return;
-                    }
-                    
-                    user = newUser;
-                }
-                
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                
-                // Показываем основной контент
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('header').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'block';
-                
-                loadUserInfo();
-                loadChallenges();
-                loadMyParticipations();
-                
-                showNotification('Добро пожаловать, ' + currentUser.nickname + '!');
-            } catch (error) {
-                console.error('Login error:', error);
-                showNotification('Ошибка входа: ' + error.message, true);
+            var users = JSON.parse(localStorage.getItem('users') || '[]');
+            var user = users.find(function(u) { return u.nickname === nickname; });
+            
+            if (!user) {
+                user = {
+                    nickname: nickname,
+                    balance: 100
+                };
+                users.push(user);
+                localStorage.setItem('users', JSON.stringify(users));
             }
+            
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            
+            document.getElementById('profileNickname').textContent = user.nickname;
+            document.getElementById('avatarLetter').textContent = user.nickname[0].toUpperCase();
+            document.getElementById('balanceDisplay').textContent = user.balance;
+            
+            showNotification('Добро пожаловать, ' + nickname + '!');
         }
 
         function logout() {
-            currentUser = null;
             localStorage.removeItem('currentUser');
             document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('header').style.display = 'none';
             document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('nicknameInput').value = '';
         }
 
-        function loadUserInfo() {
-            document.getElementById('nicknameDisplay').textContent = currentUser.nickname;
-            document.getElementById('balanceDisplay').textContent = currentUser.balance || 0;
-        }
-
-        async function loadChallenges() {
-            try {
-                const { data: challenges, error } = await sbClient
-                    .from('challenges')
-                    .select('*')
-                    .eq('status', 'active')
-                    .order('created_at', { ascending: false });
-                
-                if (error) {
-                    console.error('Error loading challenges:', error);
-                    return;
-                }
-                
-                const grid = document.getElementById('challengesGrid');
-                grid.innerHTML = '';
-                
-                if (!challenges || challenges.length === 0) {
-                    grid.innerHTML = '<p style="color: #666;">Нет активных челленджей</p>';
-                    return;
-                }
-                
-                challenges.forEach(challenge => {
-                    const card = document.createElement('div');
-                    card.className = 'challenge-card';
-                    card.innerHTML = `
-                        <h3>${challenge.title}</h3>
-                        <p class="challenge-info">${challenge.description}</p>
-                        <p class="challenge-info">Цель: ${challenge.target_value} ${getTargetLabel(challenge.target_type)}</p>
-                        <p class="challenge-info">Боев: ${challenge.battles_limit}</p>
-                        <p class="challenge-prize">Приз: ${challenge.prize_pool} ⭐</p>
-                        <p class="challenge-info">Создатель: ${challenge.creator_name}</p>
-                        <button class="btn btn-success" style="margin-top: 10px; width: 100%;" onclick="participate('${challenge.id}')">Участвовать</button>
-                    `;
-                    grid.appendChild(card);
-                });
-            } catch (error) {
-                console.error('Load challenges error:', error);
-            }
-        }
-
-        async function loadMyParticipations() {
-            if (!currentUser) return;
-            
-            try {
-                const { data: participations, error } = await sbClient
-                    .from('participations')
-                    .select(`
-                        *,
-                        challenge:challenges(*)
-                    `)
-                    .eq('user_id', currentUser.id)
-                    .order('created_at', { ascending: false });
-                
-                if (error) {
-                    console.error('Error loading participations:', error);
-                    return;
-                }
-                
-                if (!participations || participations.length === 0) {
-                    document.getElementById('myParticipations').style.display = 'none';
-                    return;
-                }
-                
-                document.getElementById('myParticipations').style.display = 'block';
-                const list = document.getElementById('participationsList');
-                list.innerHTML = '';
-                
-                participations.forEach(p => {
-                    const item = document.createElement('div');
-                    item.className = 'participation-item';
-                    
-                    const statusClass = `status-${p.status}`;
-                    const statusLabel = {
-                        'in_progress': 'В процессе',
-                        'success': 'Выполнен',
-                        'failed': 'Провален'
-                    }[p.status] || p.status;
-                    
-                    item.innerHTML = `
-                        <div style="flex: 1;">
-                            <strong>${p.challenge?.title || 'Челлендж'}</strong>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${p.progress_percentage || 0}%"></div>
-                            </div>
-                            <p>Прогресс: ${p.progress_percentage || 0}%</p>
-                        </div>
-                        <span class="status-badge ${statusClass}">${statusLabel}</span>
-                        <button class="btn btn-primary" onclick="checkProgress('${p.id}')">Проверить</button>
-                    `;
-                    list.appendChild(item);
-                });
-            } catch (error) {
-                console.error('Load participations error:', error);
-            }
-        }
-
-        async function participate(challengeId) {
-            if (!currentUser) {
-                showNotification('Войдите в систему!', true);
-                return;
-            }
-            
-            try {
-                const { data: existing } = await sbClient
-                    .from('participations')
-                    .select('*')
-                    .eq('challenge_id', challengeId)
-                    .eq('user_id', currentUser.id)
-                    .single();
-                
-                if (existing) {
-                    showNotification('Вы уже участвуете в этом челлендже!', true);
-                    return;
-                }
-                
-                const { error } = await sbClient
-                    .from('participations')
-                    .insert({
-                        challenge_id: challengeId,
-                        user_id: currentUser.id,
-                        start_battles: 0,
-                        start_value: 0,
-                        status: 'in_progress'
-                    });
-                
-                if (error) {
-                    showNotification('Ошибка участия: ' + error.message, true);
-                    return;
-                }
-                
-                showNotification('Вы присоединились к челленджу!');
-                loadMyParticipations();
-            } catch (error) {
-                console.error('Participate error:', error);
-                showNotification('Ошибка: ' + error.message, true);
-            }
-        }
-
-        async function checkProgress(participationId) {
-            const progress = Math.floor(Math.random() * 100);
-            
-            try {
-                const { error } = await sbClient
-                    .from('participations')
-                    .update({
-                        progress_percentage: progress,
-                        current_battles: Math.floor(Math.random() * 10),
-                        current_value: Math.floor(Math.random() * 10000)
-                    })
-                    .eq('id', participationId);
-                
-                if (error) {
-                    showNotification('Ошибка обновления', true);
-                    return;
-                }
-                
-                showNotification('Прогресс обновлен!');
-                loadMyParticipations();
-            } catch (error) {
-                console.error('Check progress error:', error);
-            }
-        }
-
-        function showCreateChallenge() {
-            document.getElementById('createChallengeModal').classList.add('active');
-        }
-
-        function closeCreateChallenge() {
-            document.getElementById('createChallengeModal').classList.remove('active');
-        }
-
-        function getTargetLabel(type) {
-            const labels = {
-                damage: 'урона',
-                frags: 'фрагов',
-                xp: 'опыта',
-                wins: 'побед'
-            };
-            return labels[type] || type;
-        }
-
-        // Назначаем обработчики событий
         document.addEventListener('DOMContentLoaded', function() {
+            initSponsors();
             document.getElementById('loginBtn').addEventListener('click', login);
+            document.getElementById('logoutBtn').addEventListener('click', logout);
             
-            document.getElementById('createChallengeForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
-                
-                if (!currentUser) {
-                    showNotification('Войдите в систему!', true);
-                    return;
-                }
-                
-                try {
-                    const challengeData = {
-                        creator_id: currentUser.id,
-                        creator_name: currentUser.nickname,
-                        title: document.getElementById('challengeTitle').value,
-                        description: document.getElementById('challengeDescription').value,
-                        target_type: document.getElementById('targetType').value,
-                        target_value: parseFloat(document.getElementById('targetValue').value),
-                        battles_limit: parseInt(document.getElementById('battlesLimit').value),
-                        prize_pool: parseFloat(document.getElementById('prizePool').value),
-                        tank_class: document.getElementById('tankClass').value || null,
-                        status: 'active'
-                    };
-                    
-                    const { error } = await sbClient
-                        .from('challenges')
-                        .insert(challengeData);
-                    
-                    if (error) {
-                        showNotification('Ошибка создания: ' + error.message, true);
-                        return;
-                    }
-                    
-                    showNotification('Челлендж создан!');
-                    closeCreateChallenge();
-                    document.getElementById('createChallengeForm').reset();
-                    loadChallenges();
-                } catch (error) {
-                    console.error('Create challenge error:', error);
-                    showNotification('Ошибка: ' + error.message, true);
-                }
-            });
-            
-            // Восстановление сессии
-            const savedUser = localStorage.getItem('currentUser');
+            var savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
-                try {
-                    currentUser = JSON.parse(savedUser);
-                    document.getElementById('loginForm').style.display = 'none';
-                    document.getElementById('header').style.display = 'flex';
-                    document.getElementById('mainContent').style.display = 'block';
-                    loadUserInfo();
-                    loadChallenges();
-                    loadMyParticipations();
-                } catch (error) {
-                    console.error('Restore session error:', error);
-                    localStorage.removeItem('currentUser');
-                }
+                var user = JSON.parse(savedUser);
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('profileNickname').textContent = user.nickname;
+                document.getElementById('avatarLetter').textContent = user.nickname[0].toUpperCase();
+                document.getElementById('balanceDisplay').textContent = user.balance;
             }
         });
     </script>
