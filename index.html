@@ -89,8 +89,8 @@
             min-height: 100vh;
             position: relative;
             z-index: 2;
-            padding: 0;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .login-screen {
@@ -155,6 +155,7 @@
             font-size: 12px;
         }
 
+        /* ШАПКА - НА ВЕСЬ ЭКРАН */
         .profile-header {
             display: flex;
             align-items: center;
@@ -164,7 +165,6 @@
             border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
             width: 100%;
-            margin: 0;
         }
 
         .avatar-container {
@@ -220,9 +220,13 @@
             border-radius: 6px;
         }
 
+        /* СЕКЦИИ - С ОТСТУПАМИ */
         .sections-wrapper {
             width: 100%;
-            padding: 20px 30px;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
         }
 
         .sections {
@@ -444,7 +448,7 @@
             min-width: 150px;
         }
 
-        /* Футер НА ВЕСЬ ЭКРАН */
+        /* ФУТЕР - НА ВЕСЬ ЭКРАН */
         .footer {
             width: 100%;
             padding: 15px 30px;
@@ -524,6 +528,7 @@
 
         <!-- Профиль -->
         <div id="profileScreen" style="display: none;">
+            <!-- ШАПКА НА ВЕСЬ ЭКРАН -->
             <div class="profile-header">
                 <div class="avatar-container">
                     <img class="avatar" id="avatarImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50'%3E%3Crect width='50' height='50' fill='%23161b22'/%3E%3Ctext x='25' y='32' font-size='20' fill='%238b949e' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E" alt="Аватар">
@@ -539,8 +544,13 @@
                 <button class="btn btn-danger" id="logoutBtn">Выйти</button>
             </div>
 
+            <!-- СЕКЦИИ С ОТСТУПАМИ -->
             <div class="sections-wrapper">
                 <div class="sections">
+                    <div class="section">
+                        <div class="section-title">Достижения</div>
+                        <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
+                    </div>
                     <div class="section">
                         <div class="section-title">Принятые челленджи</div>
                         <div id="acceptedChallenges"><p class="empty">Нет принятых челленджей</p></div>
@@ -550,16 +560,13 @@
                         <div id="myChallenges"><p class="empty">Вы еще не создали ни одного челленджа</p></div>
                     </div>
                     <div class="section">
-                        <div class="section-title">Достижения</div>
-                        <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
-                    </div>
-                    <div class="section">
                         <div class="section-title">История челленджей</div>
                         <div id="historyList"><p class="empty">Пока нет выполненных челленджей</p></div>
                     </div>
                 </div>
             </div>
 
+            <!-- ФУТЕР НА ВЕСЬ ЭКРАН -->
             <div class="footer">
                 <div class="footer-sponsors">
                     <span class="footer-sponsors-title">Спонсоры:</span>
