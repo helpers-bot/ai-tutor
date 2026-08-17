@@ -350,7 +350,7 @@
             <h2>Вход в Lesta Challenges</h2>
             <p style="margin-bottom: 20px; color: #ccc;">Введите ваш никнейм из игры</p>
             <input type="text" id="nicknameInput" placeholder="Никнейм в Мир Танков">
-            <button class="btn btn-primary" onclick="login()" style="width: 100%;">ВОЙТИ</button>
+            <button class="btn btn-primary" id="loginBtn" style="width: 100%;">ВОЙТИ</button>
         </div>
 
         <div id="mainContent" style="display: none;">
@@ -419,7 +419,8 @@
         const SUPABASE_URL = 'https://scavytmpqhgszatvgfsp.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_TCcyt1VNFASqRjUCe52H1A_z_WA6zoW';
         
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Создаем клиент Supabase
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         let currentUser = null;
 
@@ -441,7 +442,7 @@
             
             try {
                 // Проверяем существующего пользователя
-                const { data: existingUser, error: selectError } = await supabase
+                const { data: existingUser, error: selectError } = await sbClient
                     .from('users')
                     .select('*')
                     .eq('nickname', nickname)
@@ -457,7 +458,7 @@
                 
                 if (!user) {
                     // Создаем нового пользователя
-                    const { data: newUser, error: insertError } = await supabase
+                    const { data: newUser, error: insertError } = await sbClient
                         .from('users')
                         .insert({
                             nickname: nickname,
@@ -509,7 +510,7 @@
 
         async function loadChallenges() {
             try {
-                const { data: challenges, error } = await supabase
+                const { data: challenges, error } = await sbClient
                     .from('challenges')
                     .select('*')
                     .eq('status', 'active')
@@ -551,7 +552,7 @@
             if (!currentUser) return;
             
             try {
-                const { data: participations, error } = await supabase
+                const { data: participations, error } = await sbClient
                     .from('participations')
                     .select(`
                         *,
@@ -610,7 +611,7 @@
             }
             
             try {
-                const { data: existing } = await supabase
+                const { data: existing } = await sbClient
                     .from('participations')
                     .select('*')
                     .eq('challenge_id', challengeId)
@@ -622,7 +623,7 @@
                     return;
                 }
                 
-                const { error } = await supabase
+                const { error } = await sbClient
                     .from('participations')
                     .insert({
                         challenge_id: challengeId,
@@ -649,7 +650,7 @@
             const progress = Math.floor(Math.random() * 100);
             
             try {
-                const { error } = await supabase
+                const { error } = await sbClient
                     .from('participations')
                     .update({
                         progress_percentage: progress,
@@ -678,47 +679,6 @@
             document.getElementById('createChallengeModal').classList.remove('active');
         }
 
-        document.getElementById('createChallengeForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!currentUser) {
-                showNotification('Войдите в систему!', true);
-                return;
-            }
-            
-            try {
-                const challengeData = {
-                    creator_id: currentUser.id,
-                    creator_name: currentUser.nickname,
-                    title: document.getElementById('challengeTitle').value,
-                    description: document.getElementById('challengeDescription').value,
-                    target_type: document.getElementById('targetType').value,
-                    target_value: parseFloat(document.getElementById('targetValue').value),
-                    battles_limit: parseInt(document.getElementById('battlesLimit').value),
-                    prize_pool: parseFloat(document.getElementById('prizePool').value),
-                    tank_class: document.getElementById('tankClass').value || null,
-                    status: 'active'
-                };
-                
-                const { error } = await supabase
-                    .from('challenges')
-                    .insert(challengeData);
-                
-                if (error) {
-                    showNotification('Ошибка создания: ' + error.message, true);
-                    return;
-                }
-                
-                showNotification('Челлендж создан!');
-                closeCreateChallenge();
-                document.getElementById('createChallengeForm').reset();
-                loadChallenges();
-            } catch (error) {
-                console.error('Create challenge error:', error);
-                showNotification('Ошибка: ' + error.message, true);
-            }
-        });
-
         function getTargetLabel(type) {
             const labels = {
                 damage: 'урона',
@@ -729,8 +689,52 @@
             return labels[type] || type;
         }
 
-        // Восстановление сессии при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
+        // Назначаем обработчики событий
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginBtn').addEventListener('click', login);
+            
+            document.getElementById('createChallengeForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!currentUser) {
+                    showNotification('Войдите в систему!', true);
+                    return;
+                }
+                
+                try {
+                    const challengeData = {
+                        creator_id: currentUser.id,
+                        creator_name: currentUser.nickname,
+                        title: document.getElementById('challengeTitle').value,
+                        description: document.getElementById('challengeDescription').value,
+                        target_type: document.getElementById('targetType').value,
+                        target_value: parseFloat(document.getElementById('targetValue').value),
+                        battles_limit: parseInt(document.getElementById('battlesLimit').value),
+                        prize_pool: parseFloat(document.getElementById('prizePool').value),
+                        tank_class: document.getElementById('tankClass').value || null,
+                        status: 'active'
+                    };
+                    
+                    const { error } = await sbClient
+                        .from('challenges')
+                        .insert(challengeData);
+                    
+                    if (error) {
+                        showNotification('Ошибка создания: ' + error.message, true);
+                        return;
+                    }
+                    
+                    showNotification('Челлендж создан!');
+                    closeCreateChallenge();
+                    document.getElementById('createChallengeForm').reset();
+                    loadChallenges();
+                } catch (error) {
+                    console.error('Create challenge error:', error);
+                    showNotification('Ошибка: ' + error.message, true);
+                }
+            });
+            
+            // Восстановление сессии
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 try {
