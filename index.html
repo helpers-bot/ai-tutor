@@ -4,20 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Основные мета теги -->
     <title>Lesta Challenges - Челленджи для Мир Танков</title>
     <meta name="description" content="Платформа бесплатных челленджей для игроков Мир Танков (Lesta Games). Создавайте и участвуйте в челленджах, зарабатывайте звёзды и соревнуйтесь с другими игроками.">
     <meta name="keywords" content="Мир Танков, Lesta Games, челленджи, World of Tanks, танки, соревнования, призы, звёзды">
-    <meta name="author" content="Lesta Challenges">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="Russian">
     
-    <!-- Open Graph -->
-    <meta property="og:title" content="Lesta Challenges - Челленджи для Мир Танков">
-    <meta property="og:description" content="Создавайте и участвуйте в челленджах, зарабатывайте звёзды и соревнуйтесь с другими игроками Мир Танков.">
-    <meta property="og:type" content="website">
-    
-    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Cpath d='M8 38 L12 30 L52 30 L56 38 L52 44 L12 44 Z' fill='%233fb950'/%3E%3Cpath d='M22 30 L26 22 L38 22 L42 30 Z' fill='%2358a6ff'/%3E%3Crect x='40' y='20' width='16' height='4' rx='2' fill='%233fb950'/%3E%3Crect x='8' y='40' width='48' height='8' rx='4' fill='%2330363d'/%3E%3C/svg%3E">
     
     <style>
@@ -55,7 +45,6 @@
             position: relative;
         }
 
-        /* Пули летящие слева направо */
         .bullet {
             position: fixed;
             width: 25px;
@@ -131,10 +120,6 @@
             outline: none;
             width: 300px;
             margin-bottom: 15px;
-        }
-
-        .login-input:focus {
-            border-color: var(--accent-blue);
         }
 
         .btn {
@@ -266,12 +251,30 @@
             font-size: 13px;
         }
 
-        .accepted-challenge {
+        .challenge-item {
             background: var(--bg-tertiary);
-            border: 1px solid var(--accent-green);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 15px;
             cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .challenge-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .challenge-item.accepted {
+            border-color: var(--accent-green);
+        }
+
+        .challenge-item.created {
+            border-color: var(--accent-yellow);
         }
 
         .challenge-title {
@@ -283,6 +286,14 @@
         .challenge-meta {
             font-size: 12px;
             color: var(--text-muted);
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
         .feed-overlay {
@@ -471,55 +482,52 @@
             min-width: 150px;
         }
 
+        /* Компактный футер на всю ширину */
         .footer {
-            margin-top: 30px;
-            padding: 30px;
+            margin-top: 20px;
+            padding: 15px 20px;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
             width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
-        .footer-sponsors-section {
-            margin-bottom: 25px;
-            text-align: center;
+        .footer-sponsors {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .footer-sponsors-title {
-            font-size: 16px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--accent-yellow);
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-
-        .footer-sponsors-list {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
         }
 
         .footer-sponsor-item {
             background: var(--bg-tertiary);
             border: 1px solid var(--accent-yellow);
-            border-radius: 6px;
-            padding: 8px 15px;
-            font-size: 13px;
-            font-weight: 500;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 12px;
         }
 
         .footer-links {
             display: flex;
-            gap: 20px;
-            justify-content: center;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
         .footer-link {
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .footer-link:hover {
@@ -583,6 +591,10 @@
                     <div id="acceptedChallenges"><p class="empty">Нет принятых челленджей</p></div>
                 </div>
                 <div class="section">
+                    <div class="section-title">Мои челленджи</div>
+                    <div id="myChallenges"><p class="empty">Вы еще не создали ни одного челленджа</p></div>
+                </div>
+                <div class="section">
                     <div class="section-title">Достижения</div>
                     <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
                 </div>
@@ -592,20 +604,19 @@
                 </div>
             </div>
 
+            <!-- Компактный футер -->
             <div class="footer">
-                <div class="footer-sponsors-section">
-                    <div class="footer-sponsors-title">НАШИ СПОНСОРЫ</div>
-                    <div class="footer-sponsors-list">
-                        <div class="footer-sponsor-item">TankMaster_77</div>
-                        <div class="footer-sponsor-item">SteelWarrior</div>
-                        <div class="footer-sponsor-item">ProGamer_Lesta</div>
-                        <div class="footer-sponsor-item">IronCommander</div>
-                        <div class="footer-sponsor-item">ShadowTank</div>
-                    </div>
+                <div class="footer-sponsors">
+                    <span class="footer-sponsors-title">Спонсоры:</span>
+                    <span class="footer-sponsor-item">TankMaster_77</span>
+                    <span class="footer-sponsor-item">SteelWarrior</span>
+                    <span class="footer-sponsor-item">ProGamer_Lesta</span>
+                    <span class="footer-sponsor-item">IronCommander</span>
+                    <span class="footer-sponsor-item">ShadowTank</span>
                 </div>
                 <div class="footer-links">
-                    <a class="footer-link" onclick="showRules()">Правила пользования</a>
-                    <a class="footer-link" onclick="showPrivacy()">Политика конфиденциальности</a>
+                    <a class="footer-link" onclick="showRules()">Правила</a>
+                    <a class="footer-link" onclick="showPrivacy()">Конфиденциальность</a>
                 </div>
             </div>
         </div>
@@ -661,17 +672,17 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Тип цели *</label>
+                        <label>Что нужно сделать *</label>
                         <select id="chType" required>
-                            <option value="damage">Урон</option>
-                            <option value="frags">Фраги</option>
-                            <option value="xp">Опыт</option>
-                            <option value="wins">Победы</option>
+                            <option value="damage">Нанести урон</option>
+                            <option value="frags">Уничтожить танки</option>
+                            <option value="xp">Заработать опыт</option>
+                            <option value="wins">Одержать победы</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Целевое значение *</label>
-                        <input type="number" id="chTarget" min="1" required>
+                        <label>Сколько нужно (значение) *</label>
+                        <input type="number" id="chTarget" min="1" required placeholder="Например: 5000">
                     </div>
                 </div>
                 <div class="form-row">
@@ -713,30 +724,13 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Нация техники</label>
-                        <select id="chNation">
-                            <option value="">Любая</option>
-                            <option value="ussr">СССР</option>
-                            <option value="germany">Германия</option>
-                            <option value="usa">США</option>
-                            <option value="france">Франция</option>
-                            <option value="uk">Великобритания</option>
-                            <option value="china">Китай</option>
-                            <option value="japan">Япония</option>
-                            <option value="czech">Чехословакия</option>
-                            <option value="sweden">Швеция</option>
-                            <option value="poland">Польша</option>
-                            <option value="italy">Италия</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label>Вступительный взнос (⭐)</label>
                         <input type="number" id="chEntryFee" min="0" value="0">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Срок действия (дней)</label>
-                    <input type="number" id="chDuration" min="1" max="30" value="7">
+                    <div class="form-group">
+                        <label>Срок действия (дней)</label>
+                        <input type="number" id="chDuration" min="1" max="30" value="7">
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Создать челлендж</button>
             </form>
@@ -757,6 +751,7 @@
         let currentChallenge = null;
         let acceptedChallenge = null;
         let currentUser = null;
+        let myCreatedChallenges = [];
 
         function showNotification(msg) {
             const n = document.createElement('div');
@@ -772,12 +767,13 @@
             let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
             let user = users.find(u => u.nickname === nickname);
             if (!user) {
-                user = {nickname: nickname, balance: 100, avatar: null, acceptedChallenge: null};
+                user = {nickname: nickname, balance: 100, avatar: null, acceptedChallenge: null, myChallenges: []};
                 users.push(user);
                 localStorage.setItem('lesta_users', JSON.stringify(users));
             }
             currentUser = user;
             acceptedChallenge = user.acceptedChallenge || null;
+            myCreatedChallenges = user.myChallenges || [];
             localStorage.setItem('lesta_current_user', JSON.stringify(user));
             showProfile();
         }
@@ -789,6 +785,7 @@
             document.getElementById('balanceDisplay').textContent = currentUser.balance || 0;
             if (currentUser.avatar) document.getElementById('avatarImg').src = currentUser.avatar;
             updateAcceptedChallenge();
+            updateMyChallenges();
         }
 
         function updateAcceptedChallenge() {
@@ -796,14 +793,40 @@
             if (acceptedChallenge) {
                 const challenge = demoChallenges.find(c => c.id === acceptedChallenge);
                 if (challenge) {
-                    container.innerHTML = '<div class="accepted-challenge" onclick="openChallengeModal(' + challenge.id + ')">' +
-                        '<div class="challenge-title">' + challenge.title + '</div>' +
-                        '<div class="challenge-meta">Приз: ' + challenge.prize + ' ⭐ | Участников: ' + challenge.participants + '/' + challenge.maxParticipants + '</div>' +
+                    container.innerHTML = '<div class="challenge-item accepted" onclick="openChallengeModal(' + challenge.id + ')">' +
+                        '<div><div class="challenge-title">' + challenge.title + '</div>' +
+                        '<div class="challenge-meta">Приз: ' + challenge.prize + ' ⭐ | Участников: ' + challenge.participants + '/' + challenge.maxParticipants + '</div></div>' +
                         '</div>';
                 }
             } else {
                 container.innerHTML = '<p class="empty">Нет принятых челленджей</p>';
             }
+        }
+
+        function updateMyChallenges() {
+            const container = document.getElementById('myChallenges');
+            if (myCreatedChallenges.length === 0) {
+                container.innerHTML = '<p class="empty">Вы еще не создали ни одного челленджа</p>';
+                return;
+            }
+            container.innerHTML = myCreatedChallenges.map(c => 
+                '<div class="challenge-item created">' +
+                '<div><div class="challenge-title">' + c.title + '</div>' +
+                '<div class="challenge-meta">Приз: ' + c.prize + ' ⭐ | Участников: ' + c.participants + '/' + c.maxParticipants + '</div></div>' +
+                '<button class="btn btn-cancel" onclick="cancelChallenge(' + c.id + ')">Отменить</button>' +
+                '</div>'
+            ).join('');
+        }
+
+        function cancelChallenge(id) {
+            myCreatedChallenges = myCreatedChallenges.filter(c => c.id !== id);
+            currentUser.myChallenges = myCreatedChallenges;
+            localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
+            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
+            const idx = users.findIndex(u => u.nickname === currentUser.nickname);
+            if (idx !== -1) { users[idx].myChallenges = myCreatedChallenges; localStorage.setItem('lesta_users', JSON.stringify(users)); }
+            updateMyChallenges();
+            showNotification('Челлендж отменен');
         }
 
         function openFeed() {
@@ -834,8 +857,8 @@
             document.getElementById('modalTitle').textContent = currentChallenge.title;
             document.getElementById('modalInfo').innerHTML = 
                 '<p><strong>Создатель:</strong> ' + currentChallenge.creator + '</p>' +
-                '<p><strong>Тип:</strong> ' + currentChallenge.type + '</p>' +
-                '<p><strong>Цель:</strong> ' + currentChallenge.target + '</p>' +
+                '<p><strong>Задача:</strong> ' + getTypeLabel(currentChallenge.type) + '</p>' +
+                '<p><strong>Значение:</strong> ' + currentChallenge.target + '</p>' +
                 '<p><strong>Боев:</strong> ' + currentChallenge.battles + '</p>' +
                 '<p><strong>Приз:</strong> ' + currentChallenge.prize + ' ⭐</p>' +
                 '<p><strong>Участников:</strong> ' + currentChallenge.participants + '/' + currentChallenge.maxParticipants + '</p>';
@@ -856,6 +879,11 @@
                 declineBtn.style.display = 'none';
             }
             document.getElementById('challengeModal').classList.add('active');
+        }
+
+        function getTypeLabel(type) {
+            const labels = {damage: 'Нанести урон', frags: 'Уничтожить танки', xp: 'Заработать опыт', wins: 'Одержать победы'};
+            return labels[type] || type;
         }
 
         function closeModal() {
@@ -899,6 +927,7 @@
         function logout() {
             currentUser = null;
             acceptedChallenge = null;
+            myCreatedChallenges = [];
             localStorage.removeItem('lesta_current_user');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('profileScreen').style.display = 'none';
@@ -927,7 +956,7 @@
         }
 
         function showPrivacy() {
-            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время\n4. Мы не передаем данные третьим лицам\n5. Файлы cookie используются для улучшения работы');
+            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -955,9 +984,15 @@
                     participants: 0,
                     maxParticipants: parseInt(document.getElementById('chMaxParticipants').value) || 10
                 };
-                demoChallenges.unshift(newChallenge);
+                myCreatedChallenges.push(newChallenge);
+                currentUser.myChallenges = myCreatedChallenges;
+                localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
+                let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
+                const idx = users.findIndex(u => u.nickname === currentUser.nickname);
+                if (idx !== -1) { users[idx].myChallenges = myCreatedChallenges; localStorage.setItem('lesta_users', JSON.stringify(users)); }
                 closeCreateModal();
                 document.getElementById('createChallengeForm').reset();
+                updateMyChallenges();
                 showNotification('Челлендж создан!');
             });
             
@@ -994,6 +1029,7 @@
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 acceptedChallenge = currentUser.acceptedChallenge || null;
+                myCreatedChallenges = currentUser.myChallenges || [];
                 showProfile();
             }
         });
