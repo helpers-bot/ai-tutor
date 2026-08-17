@@ -43,7 +43,6 @@
 
         html {
             overflow-x: hidden;
-            overflow-y: auto;
         }
 
         body {
@@ -56,48 +55,47 @@
             position: relative;
         }
 
-        .shake {
-            animation: shake 0.3s ease-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translate(0, 0); }
-            20% { transform: translate(-3px, 2px); }
-            40% { transform: translate(3px, -2px); }
-            60% { transform: translate(-2px, 1px); }
-            80% { transform: translate(2px, -1px); }
-        }
-
-        .bomb {
+        /* Пули летящие слева направо */
+        .bullet {
             position: fixed;
-            top: -40px;
-            font-size: 28px;
+            width: 25px;
+            height: 3px;
+            background: linear-gradient(90deg, #ffcc00, #ff6600);
+            border-radius: 2px;
             pointer-events: none;
             z-index: 1;
-            animation: bombFall linear forwards;
-            will-change: transform;
+            animation: bulletFly linear infinite;
+            opacity: 0.7;
         }
 
-        @keyframes bombFall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+        .bullet::after {
+            content: '';
+            position: absolute;
+            right: -5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid #ff6600;
+            border-top: 2px solid transparent;
+            border-bottom: 2px solid transparent;
         }
 
-        .explosion {
-            position: fixed;
-            pointer-events: none;
-            z-index: 1;
-            font-size: 40px;
-            animation: explode 0.4s ease-out forwards;
-            will-change: transform, opacity;
-            transform-origin: center bottom;
+        @keyframes bulletFly {
+            0% { left: -50px; }
+            100% { left: calc(100% + 50px); }
         }
 
-        @keyframes explode {
-            0% { transform: scale(0.5); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
+        .bullet:nth-child(1) { top: 5%; animation-duration: 3s; animation-delay: 0s; }
+        .bullet:nth-child(2) { top: 15%; animation-duration: 4s; animation-delay: 0.5s; }
+        .bullet:nth-child(3) { top: 25%; animation-duration: 3.5s; animation-delay: 1s; }
+        .bullet:nth-child(4) { top: 35%; animation-duration: 4.5s; animation-delay: 1.5s; }
+        .bullet:nth-child(5) { top: 45%; animation-duration: 3.8s; animation-delay: 2s; }
+        .bullet:nth-child(6) { top: 55%; animation-duration: 4.2s; animation-delay: 0.3s; }
+        .bullet:nth-child(7) { top: 65%; animation-duration: 3.2s; animation-delay: 0.8s; }
+        .bullet:nth-child(8) { top: 75%; animation-duration: 4.8s; animation-delay: 1.2s; }
+        .bullet:nth-child(9) { top: 85%; animation-duration: 3.6s; animation-delay: 1.8s; }
+        .bullet:nth-child(10) { top: 95%; animation-duration: 4.4s; animation-delay: 2.3s; }
 
         .container {
             max-width: 900px;
@@ -462,12 +460,6 @@
             resize: vertical;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            border-color: var(--accent-blue);
-        }
-
         .form-row {
             display: flex;
             gap: 15px;
@@ -514,7 +506,6 @@
             border-radius: 6px;
             padding: 8px 15px;
             font-size: 13px;
-            color: var(--text-primary);
             font-weight: 500;
         }
 
@@ -529,8 +520,6 @@
             color: var(--text-secondary);
             cursor: pointer;
             font-size: 13px;
-            text-decoration: none;
-            transition: color 0.2s;
         }
 
         .footer-link:hover {
@@ -551,6 +540,18 @@
     </style>
 </head>
 <body>
+    <!-- Пули -->
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+    <div class="bullet"></div>
+
     <div class="container" id="mainContainer">
         <!-- Экран входа -->
         <div class="login-screen" id="loginScreen">
@@ -765,40 +766,6 @@
             setTimeout(() => n.remove(), 3000);
         }
 
-        function shakeSite() {
-            document.getElementById('mainContainer').classList.add('shake');
-            setTimeout(() => document.getElementById('mainContainer').classList.remove('shake'), 300);
-        }
-
-        function spawnBomb() {
-            const bomb = document.createElement('div');
-            bomb.className = 'bomb';
-            bomb.textContent = '💣';
-            const side = Math.random() < 0.5 ? 'left' : 'right';
-            if (side === 'left') bomb.style.left = (Math.random() * 100) + 'px';
-            else bomb.style.right = (Math.random() * 100) + 'px';
-            const duration = Math.random() * 2 + 3;
-            bomb.style.animationDuration = duration + 's';
-            document.body.appendChild(bomb);
-            setTimeout(() => {
-                const explosion = document.createElement('div');
-                explosion.className = 'explosion';
-                explosion.textContent = '💥';
-                if (side === 'left') explosion.style.left = bomb.style.left;
-                else explosion.style.right = bomb.style.right;
-                explosion.style.bottom = '0px';
-                explosion.style.transform = 'translateY(0)';
-                document.body.appendChild(explosion);
-                shakeSite();
-                setTimeout(() => explosion.remove(), 400);
-                bomb.remove();
-            }, duration * 1000);
-        }
-
-        function startBombSpawning() {
-            setInterval(spawnBomb, 2500);
-        }
-
         function login() {
             const nickname = document.getElementById('nicknameInput').value.trim();
             if (!nickname) { showNotification('Введите никнейм!'); return; }
@@ -813,7 +780,6 @@
             acceptedChallenge = user.acceptedChallenge || null;
             localStorage.setItem('lesta_current_user', JSON.stringify(user));
             showProfile();
-            startBombSpawning();
         }
 
         function showProfile() {
@@ -1029,7 +995,6 @@
                 currentUser = JSON.parse(savedUser);
                 acceptedChallenge = currentUser.acceptedChallenge || null;
                 showProfile();
-                startBombSpawning();
             }
         });
     </script>
