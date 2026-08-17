@@ -27,86 +27,50 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background: var(--bg-primary);
             min-height: 100vh;
             color: var(--text-primary);
             overflow-x: hidden;
             font-size: 14px;
-            line-height: 1.5;
-        }
-
-        /* Бегущие строки сверху */
-        .ticker-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .ticker-row {
-            display: flex;
-            align-items: center;
-            height: 36px;
-            overflow: hidden;
-            border-bottom: 1px solid var(--border-color);
             position: relative;
         }
 
-        .ticker-row:last-child {
-            border-bottom: none;
+        /* Падающие мобы */
+        .mob {
+            position: fixed;
+            top: -50px;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 1;
+            animation: mobFall linear forwards;
         }
 
-        .ticker-label {
-            flex-shrink: 0;
-            padding: 0 15px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-secondary);
-            border-right: 1px solid var(--border-color);
-            height: 100%;
-            display: flex;
-            align-items: center;
-            background: var(--bg-tertiary);
-            z-index: 2;
+        @keyframes mobFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
 
-        .ticker-track {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            white-space: nowrap;
-            animation: tickerScroll 20s linear infinite;
-            flex-shrink: 0;
+        .explosion {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            animation: explode 0.5s ease-out forwards;
         }
 
-        @keyframes tickerScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
         }
 
-        .ticker-item {
-            font-size: 13px;
-            color: var(--text-secondary);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-
-        .ticker-item:hover {
-            color: var(--text-primary);
-        }
-
-        /* Основной контейнер */
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 90px 20px 20px;
+            padding: 20px;
             min-height: 100vh;
+            position: relative;
+            z-index: 2;
         }
 
         /* Вход */
@@ -123,7 +87,6 @@
             font-weight: 600;
             margin-bottom: 30px;
             color: var(--text-primary);
-            letter-spacing: 1px;
         }
 
         .login-input {
@@ -136,7 +99,6 @@
             outline: none;
             width: 300px;
             margin-bottom: 15px;
-            transition: border-color 0.2s;
         }
 
         .login-input:focus {
@@ -144,7 +106,7 @@
         }
 
         .btn {
-            padding: 10px 25px;
+            padding: 10px 20px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             cursor: pointer;
@@ -166,20 +128,10 @@
             color: #fff;
         }
 
-        .btn-primary:hover {
-            background: #2ea043;
-            border-color: #2ea043;
-        }
-
         .btn-danger {
             background: transparent;
             border-color: var(--accent-red);
             color: var(--accent-red);
-        }
-
-        .btn-danger:hover {
-            background: var(--accent-red);
-            color: #fff;
         }
 
         /* Профиль */
@@ -219,10 +171,6 @@
             height: 20px;
             cursor: pointer;
             font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-secondary);
         }
 
         .nickname-container {
@@ -235,7 +183,6 @@
         .nickname {
             font-size: 16px;
             font-weight: 600;
-            color: var(--text-primary);
         }
 
         .edit-nickname {
@@ -244,11 +191,6 @@
             cursor: pointer;
             font-size: 12px;
             color: var(--text-muted);
-            padding: 2px;
-        }
-
-        .edit-nickname:hover {
-            color: var(--text-secondary);
         }
 
         .balance {
@@ -256,7 +198,6 @@
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 14px;
             font-weight: 500;
         }
 
@@ -277,9 +218,6 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 15px;
-            color: var(--text-primary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .empty {
@@ -290,10 +228,88 @@
             font-size: 13px;
         }
 
+        /* Принятый челлендж */
+        .accepted-challenge {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--accent-green);
+            border-radius: 6px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .accepted-challenge:hover {
+            border-color: var(--accent-green);
+            background: var(--bg-secondary);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--text-muted);
+        }
+
+        .modal-info {
+            margin-bottom: 15px;
+        }
+
+        .modal-info p {
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .modal-info strong {
+            color: var(--text-primary);
+        }
+
         /* Лента */
         .feed-overlay {
             position: fixed;
-            top: 72px;
+            top: 0;
             left: 0;
             right: 0;
             bottom: 0;
@@ -320,7 +336,6 @@
         .feed-title {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text-primary);
         }
 
         .feed-controls {
@@ -330,8 +345,7 @@
             max-width: 400px;
         }
 
-        .search-input {
-            flex: 1;
+        .search-input, .filter-select {
             padding: 8px 15px;
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -341,18 +355,8 @@
             outline: none;
         }
 
-        .search-input:focus {
-            border-color: var(--accent-blue);
-        }
-
-        .filter-select {
-            padding: 8px 10px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 13px;
-            outline: none;
+        .search-input {
+            flex: 1;
         }
 
         .challenges-list {
@@ -363,7 +367,7 @@
             gap: 10px;
         }
 
-        .challenge-card-horizontal {
+        .challenge-card {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -376,7 +380,7 @@
             transition: all 0.2s;
         }
 
-        .challenge-card-horizontal:hover {
+        .challenge-card:hover {
             border-color: var(--text-muted);
             background: var(--bg-tertiary);
         }
@@ -389,7 +393,6 @@
         .challenge-title {
             font-size: 14px;
             font-weight: 600;
-            color: var(--text-primary);
             margin-bottom: 5px;
         }
 
@@ -402,10 +405,40 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--accent-yellow);
-            padding: 5px 10px;
-            background: var(--bg-tertiary);
+        }
+
+        /* Футер */
+        .footer {
+            margin-top: 30px;
+            padding: 20px;
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-blue);
+        }
+
+        .footer-sponsors {
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
         .notification {
@@ -418,25 +451,10 @@
             border-radius: 6px;
             z-index: 2000;
             font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
-    <!-- Бегущие строки -->
-    <div class="ticker-container">
-        <div class="ticker-row">
-            <div class="ticker-label">Спонсоры</div>
-            <div class="ticker-track" id="sponsorsTicker"></div>
-        </div>
-        <div class="ticker-row">
-            <div class="ticker-label">Топ 3 спонсора</div>
-            <div class="ticker-track" id="topTicker"></div>
-        </div>
-    </div>
-
-    <!-- Основной контент -->
     <div class="container">
         <!-- Вход -->
         <div class="login-screen" id="loginScreen">
@@ -463,12 +481,26 @@
 
             <div class="sections">
                 <div class="section">
+                    <div class="section-title">Принятые челленджи</div>
+                    <div id="acceptedChallenges"><p class="empty">Нет принятых челленджей</p></div>
+                </div>
+                <div class="section">
                     <div class="section-title">Достижения</div>
                     <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
                 </div>
                 <div class="section">
                     <div class="section-title">История челленджей</div>
                     <div id="historyList"><p class="empty">Пока нет выполненных челленджей</p></div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <div class="footer-links">
+                    <a class="footer-link" onclick="showRules()">Правила пользования</a>
+                    <a class="footer-link" onclick="showPrivacy()">Политика конфиденциальности</a>
+                </div>
+                <div class="footer-sponsors">
+                    Спонсоры проекта: TankMaster_77, SteelWarrior, ProGamer_Lesta, IronCommander, ShadowTank
                 </div>
             </div>
         </div>
@@ -493,39 +525,31 @@
         <div class="challenges-list" id="challengesGrid"></div>
     </div>
 
+    <!-- Модальное окно челленджа -->
+    <div class="modal" id="challengeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle"></div>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-info" id="modalInfo"></div>
+            <button class="btn btn-primary" id="acceptChallengeBtn" style="width: 100%;">Принять челлендж</button>
+        </div>
+    </div>
+
     <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
 
     <script>
-        // Данные спонсоров
-        const sponsors = [
-            'TankMaster_77', 'SteelWarrior', 'ProGamer_Lesta', 'TankDestroyer', 
-            'BattleHero_2024', 'IronCommander', 'ShadowTank', 'Victory_Road', 
-            'TankAce_99', 'WarLegend', 'SteelStorm', 'TankHunter_X',
-            'BlitzKrieg', 'ArmoredCore', 'TankElite', 'NightWolf'
-        ];
-        
-        const topSponsors = ['TankMaster_77', 'SteelWarrior', 'ProGamer_Lesta'];
-
-        // Демо челленджи
         const demoChallenges = [
-            {id: 1, title: '5000 урона за 5 боев', type: 'damage', prize: 500, creator: 'TankMaster_77', battles: 5, target: 5000},
-            {id: 2, title: '10 фрагов за 3 боя', type: 'frags', prize: 300, creator: 'SteelWarrior', battles: 3, target: 10},
-            {id: 3, title: '20000 опыта за 10 боев', type: 'xp', prize: 800, creator: 'ProGamer_Lesta', battles: 10, target: 20000},
-            {id: 4, title: '3 победы подряд', type: 'wins', prize: 200, creator: 'IronCommander', battles: 3, target: 3},
-            {id: 5, title: '15000 урона на ТТ', type: 'damage', prize: 1000, creator: 'WarLegend', battles: 7, target: 15000}
+            {id: 1, title: '5000 урона за 5 боев', type: 'damage', prize: 500, creator: 'TankMaster_77', battles: 5, target: 5000, participants: 12, maxParticipants: 20},
+            {id: 2, title: '10 фрагов за 3 боя', type: 'frags', prize: 300, creator: 'SteelWarrior', battles: 3, target: 10, participants: 8, maxParticipants: 15},
+            {id: 3, title: '20000 опыта за 10 боев', type: 'xp', prize: 800, creator: 'ProGamer_Lesta', battles: 10, target: 20000, participants: 5, maxParticipants: 10},
+            {id: 4, title: '3 победы подряд', type: 'wins', prize: 200, creator: 'IronCommander', battles: 3, target: 3, participants: 15, maxParticipants: 25},
+            {id: 5, title: '15000 урона на ТТ', type: 'damage', prize: 1000, creator: 'WarLegend', battles: 7, target: 15000, participants: 3, maxParticipants: 8}
         ];
 
-        function initTickers() {
-            // Спонсоры (дублируем для бесконечной прокрутки)
-            const doubledSponsors = [...sponsors, ...sponsors];
-            document.getElementById('sponsorsTicker').innerHTML = 
-                doubledSponsors.map(s => '<span class="ticker-item">' + s + '</span>').join('');
-            
-            // Топ 3 (дублируем несколько раз)
-            const doubledTop = [...topSponsors, ...topSponsors, ...topSponsors, ...topSponsors, ...topSponsors, ...topSponsors];
-            document.getElementById('topTicker').innerHTML = 
-                doubledTop.map(s => '<span class="ticker-item">' + s + '</span>').join('');
-        }
+        let currentChallenge = null;
+        let acceptedChallenge = null;
 
         function showNotification(msg) {
             const n = document.createElement('div');
@@ -535,24 +559,48 @@
             setTimeout(() => n.remove(), 3000);
         }
 
+        function spawnMob() {
+            const mobs = ['💥', '🎯', '🔥', '💣', '⚡', '🛡️', '🗡️'];
+            const mob = document.createElement('div');
+            mob.className = 'mob';
+            mob.textContent = mobs[Math.floor(Math.random() * mobs.length)];
+            mob.style.left = Math.random() * window.innerWidth + 'px';
+            mob.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.body.appendChild(mob);
+            
+            setTimeout(() => {
+                const explosion = document.createElement('div');
+                explosion.className = 'explosion';
+                explosion.textContent = '💥';
+                explosion.style.left = mob.style.left;
+                explosion.style.bottom = '0px';
+                document.body.appendChild(explosion);
+                setTimeout(() => explosion.remove(), 500);
+                mob.remove();
+            }, parseFloat(mob.style.animationDuration) * 1000);
+        }
+
+        function startMobSpawning() {
+            setInterval(spawnMob, 2000);
+        }
+
         function login() {
             const nickname = document.getElementById('nicknameInput').value.trim();
-            if (!nickname) {
-                showNotification('Введите никнейм!');
-                return;
-            }
+            if (!nickname) { showNotification('Введите никнейм!'); return; }
             
             let users = JSON.parse(localStorage.getItem('users') || '[]');
             let user = users.find(u => u.nickname === nickname);
             
             if (!user) {
-                user = {nickname: nickname, balance: 100, avatar: null};
+                user = {nickname: nickname, balance: 100, avatar: null, acceptedChallenge: null};
                 users.push(user);
                 localStorage.setItem('users', JSON.stringify(users));
             }
             
             localStorage.setItem('currentUser', JSON.stringify(user));
+            acceptedChallenge = user.acceptedChallenge || null;
             showProfile(user);
+            startMobSpawning();
         }
 
         function showProfile(user) {
@@ -561,13 +609,22 @@
             document.getElementById('profileNickname').textContent = user.nickname;
             document.getElementById('balanceDisplay').textContent = user.balance;
             if (user.avatar) document.getElementById('avatarImg').src = user.avatar;
+            updateAcceptedChallenge();
         }
 
-        function logout() {
-            localStorage.removeItem('currentUser');
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('profileScreen').style.display = 'none';
-            document.getElementById('nicknameInput').value = '';
+        function updateAcceptedChallenge() {
+            const container = document.getElementById('acceptedChallenges');
+            if (acceptedChallenge) {
+                const challenge = demoChallenges.find(c => c.id === acceptedChallenge);
+                if (challenge) {
+                    container.innerHTML = '<div class="accepted-challenge" onclick="openChallengeModal(' + challenge.id + ')">' +
+                        '<div class="challenge-title">' + challenge.title + '</div>' +
+                        '<div class="challenge-meta">Приз: ' + challenge.prize + ' ⭐ | Участников: ' + challenge.participants + '/' + challenge.maxParticipants + '</div>' +
+                        '</div>';
+                }
+            } else {
+                container.innerHTML = '<p class="empty">Нет принятых челленджей</p>';
+            }
         }
 
         function openFeed() {
@@ -592,22 +649,69 @@
             }
             
             grid.innerHTML = filtered.map(c => 
-                '<div class="challenge-card-horizontal" onclick="acceptChallenge(' + c.id + ')">' +
+                '<div class="challenge-card" onclick="openChallengeModal(' + c.id + ')">' +
                 '<div class="challenge-info">' +
                 '<div class="challenge-title">' + c.title + '</div>' +
-                '<div class="challenge-meta">Создатель: ' + c.creator + ' | Тип: ' + c.type + ' | Боев: ' + c.battles + ' | Цель: ' + c.target + '</div>' +
+                '<div class="challenge-meta">Создатель: ' + c.creator + ' | Участников: ' + c.participants + '/' + c.maxParticipants + '</div>' +
                 '</div>' +
                 '<div class="challenge-prize">' + c.prize + ' ⭐</div>' +
                 '</div>'
             ).join('');
         }
 
-        function acceptChallenge(id) {
-            const challenge = demoChallenges.find(c => c.id === id);
-            if (challenge) {
-                showNotification('Вы приняли челлендж: ' + challenge.title);
-                closeFeed();
+        function openChallengeModal(id) {
+            currentChallenge = demoChallenges.find(c => c.id === id);
+            if (!currentChallenge) return;
+            
+            document.getElementById('modalTitle').textContent = currentChallenge.title;
+            document.getElementById('modalInfo').innerHTML = 
+                '<p><strong>Создатель:</strong> ' + currentChallenge.creator + '</p>' +
+                '<p><strong>Тип:</strong> ' + currentChallenge.type + '</p>' +
+                '<p><strong>Цель:</strong> ' + currentChallenge.target + '</p>' +
+                '<p><strong>Боев:</strong> ' + currentChallenge.battles + '</p>' +
+                '<p><strong>Приз:</strong> ' + currentChallenge.prize + ' ⭐</p>' +
+                '<p><strong>Участников:</strong> ' + currentChallenge.participants + '/' + currentChallenge.maxParticipants + '</p>';
+            
+            const btn = document.getElementById('acceptChallengeBtn');
+            if (acceptedChallenge) {
+                btn.textContent = 'Вы уже приняли другой челлендж';
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            } else {
+                btn.textContent = 'Принять челлендж';
+                btn.disabled = false;
+                btn.style.opacity = '1';
             }
+            
+            document.getElementById('challengeModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('challengeModal').classList.remove('active');
+        }
+
+        function acceptChallenge() {
+            if (!currentChallenge || acceptedChallenge) return;
+            
+            acceptedChallenge = currentChallenge.id;
+            const user = JSON.parse(localStorage.getItem('currentUser'));
+            if (user) {
+                user.acceptedChallenge = acceptedChallenge;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+            }
+            
+            updateAcceptedChallenge();
+            closeModal();
+            closeFeed();
+            showNotification('Челлендж принят!');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            acceptedChallenge = null;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('profileScreen').style.display = 'none';
+            document.getElementById('nicknameInput').value = '';
         }
 
         function editNickname() {
@@ -623,13 +727,21 @@
             }
         }
 
+        function showRules() {
+            alert('Правила пользования:\n\n1. Уважайте других игроков\n2. Запрещено использовать читы\n3. Один активный челлендж одновременно\n4. Комиссия платформы 10%');
+        }
+
+        function showPrivacy() {
+            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время\n4. Мы не передаем данные третьим лицам');
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            initTickers();
-            
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('logoutBtn').addEventListener('click', logout);
             document.getElementById('feedBtn').addEventListener('click', openFeed);
             document.getElementById('closeFeedBtn').addEventListener('click', closeFeed);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('acceptChallengeBtn').addEventListener('click', acceptChallenge);
             document.getElementById('editNicknameBtn').addEventListener('click', editNickname);
             
             document.getElementById('editAvatarBtn').addEventListener('click', function() {
@@ -663,7 +775,10 @@
             
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
-                showProfile(JSON.parse(savedUser));
+                const user = JSON.parse(savedUser);
+                acceptedChallenge = user.acceptedChallenge || null;
+                showProfile(user);
+                startMobSpawning();
             }
         });
     </script>
