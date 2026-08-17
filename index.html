@@ -10,7 +10,6 @@
             --neon-blue: #00f3ff;
             --neon-purple: #bf00ff;
             --neon-green: #00ff88;
-            --neon-orange: #ff6600;
             --neon-red: #ff0033;
             --dark-bg: #0a0a1a;
             --card-bg: rgba(20, 20, 40, 0.9);
@@ -323,6 +322,10 @@
             animation: slideIn 0.3s ease-out;
         }
 
+        .notification-error {
+            background: var(--neon-red);
+        }
+
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
@@ -420,9 +423,9 @@
         
         let currentUser = null;
 
-        function showNotification(message) {
+        function showNotification(message, isError = false) {
             const notification = document.createElement('div');
-            notification.className = 'notification';
+            notification.className = 'notification' + (isError ? ' notification-error' : '');
             notification.textContent = message;
             document.body.appendChild(notification);
             setTimeout(() => notification.remove(), 3000);
@@ -432,48 +435,63 @@
             const nickname = document.getElementById('nicknameInput').value.trim();
             
             if (!nickname) {
-                showNotification('Введите никнейм!');
+                showNotification('Введите никнейм!', true);
                 return;
             }
             
-            // Проверяем существует ли пользователь
-            let { data: existingUser } = await supabase
-                .from('users')
-                .select('*')
-                .eq('nickname', nickname)
-                .single();
-            
-            if (!existingUser) {
-                // Создаем нового пользователя
-                const { data: newUser, error } = await supabase
+            try {
+                // Проверяем существующего пользователя
+                const { data: existingUser, error: selectError } = await supabase
                     .from('users')
-                    .insert({
-                        nickname: nickname,
-                        balance: 100
-                    })
-                    .select()
+                    .select('*')
+                    .eq('nickname', nickname)
                     .single();
                 
-                if (error) {
-                    showNotification('Ошибка создания пользователя: ' + error.message);
+                if (selectError && selectError.code !== 'PGRST116') {
+                    console.error('Select error:', selectError);
+                    showNotification('Ошибка проверки пользователя: ' + selectError.message, true);
                     return;
                 }
                 
-                existingUser = newUser;
+                let user = existingUser;
+                
+                if (!user) {
+                    // Создаем нового пользователя
+                    const { data: newUser, error: insertError } = await supabase
+                        .from('users')
+                        .insert({
+                            nickname: nickname,
+                            balance: 100
+                        })
+                        .select()
+                        .single();
+                    
+                    if (insertError) {
+                        console.error('Insert error:', insertError);
+                        showNotification('Ошибка создания пользователя: ' + insertError.message, true);
+                        return;
+                    }
+                    
+                    user = newUser;
+                }
+                
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                
+                // Показываем основной контент
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('header').style.display = 'flex';
+                document.getElementById('mainContent').style.display = 'block';
+                
+                loadUserInfo();
+                loadChallenges();
+                loadMyParticipations();
+                
+                showNotification('Добро пожаловать, ' + currentUser.nickname + '!');
+            } catch (error) {
+                console.error('Login error:', error);
+                showNotification('Ошибка входа: ' + error.message, true);
             }
-            
-            currentUser = existingUser;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('header').style.display = 'flex';
-            document.getElementById('mainContent').style.display = 'block';
-            
-            loadUserInfo();
-            loadChallenges();
-            loadMyParticipations();
-            
-            showNotification('Добро пожаловать, ' + currentUser.nickname + '!');
         }
 
         function logout() {
@@ -486,148 +504,170 @@
 
         function loadUserInfo() {
             document.getElementById('nicknameDisplay').textContent = currentUser.nickname;
-            document.getElementById('balanceDisplay').textContent = currentUser.balance;
+            document.getElementById('balanceDisplay').textContent = currentUser.balance || 0;
         }
 
         async function loadChallenges() {
-            const { data: challenges, error } = await supabase
-                .from('challenges')
-                .select('*')
-                .eq('status', 'active')
-                .order('created_at', { ascending: false });
-            
-            if (error) {
-                console.error('Error loading challenges:', error);
-                return;
+            try {
+                const { data: challenges, error } = await supabase
+                    .from('challenges')
+                    .select('*')
+                    .eq('status', 'active')
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error loading challenges:', error);
+                    return;
+                }
+                
+                const grid = document.getElementById('challengesGrid');
+                grid.innerHTML = '';
+                
+                if (!challenges || challenges.length === 0) {
+                    grid.innerHTML = '<p style="color: #666;">Нет активных челленджей</p>';
+                    return;
+                }
+                
+                challenges.forEach(challenge => {
+                    const card = document.createElement('div');
+                    card.className = 'challenge-card';
+                    card.innerHTML = `
+                        <h3>${challenge.title}</h3>
+                        <p class="challenge-info">${challenge.description}</p>
+                        <p class="challenge-info">Цель: ${challenge.target_value} ${getTargetLabel(challenge.target_type)}</p>
+                        <p class="challenge-info">Боев: ${challenge.battles_limit}</p>
+                        <p class="challenge-prize">Приз: ${challenge.prize_pool} ⭐</p>
+                        <p class="challenge-info">Создатель: ${challenge.creator_name}</p>
+                        <button class="btn btn-success" style="margin-top: 10px; width: 100%;" onclick="participate('${challenge.id}')">Участвовать</button>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Load challenges error:', error);
             }
-            
-            const grid = document.getElementById('challengesGrid');
-            grid.innerHTML = '';
-            
-            if (!challenges || challenges.length === 0) {
-                grid.innerHTML = '<p style="color: #666;">Нет активных челленджей</p>';
-                return;
-            }
-            
-            challenges.forEach(challenge => {
-                const card = document.createElement('div');
-                card.className = 'challenge-card';
-                card.innerHTML = `
-                    <h3>${challenge.title}</h3>
-                    <p class="challenge-info">${challenge.description}</p>
-                    <p class="challenge-info">Цель: ${challenge.target_value} ${getTargetLabel(challenge.target_type)}</p>
-                    <p class="challenge-info">Боев: ${challenge.battles_limit}</p>
-                    <p class="challenge-prize">Приз: ${challenge.prize_pool} ⭐</p>
-                    <p class="challenge-info">Создатель: ${challenge.creator_name}</p>
-                    <button class="btn btn-success" style="margin-top: 10px; width: 100%;" onclick="participate('${challenge.id}')">Участвовать</button>
-                `;
-                grid.appendChild(card);
-            });
         }
 
         async function loadMyParticipations() {
             if (!currentUser) return;
             
-            const { data: participations, error } = await supabase
-                .from('participations')
-                .select(`
-                    *,
-                    challenge:challenges(*)
-                `)
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-            
-            if (error || !participations || participations.length === 0) {
-                document.getElementById('myParticipations').style.display = 'none';
-                return;
-            }
-            
-            document.getElementById('myParticipations').style.display = 'block';
-            const list = document.getElementById('participationsList');
-            list.innerHTML = '';
-            
-            participations.forEach(p => {
-                const item = document.createElement('div');
-                item.className = 'participation-item';
+            try {
+                const { data: participations, error } = await supabase
+                    .from('participations')
+                    .select(`
+                        *,
+                        challenge:challenges(*)
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false });
                 
-                const statusClass = `status-${p.status}`;
-                const statusLabel = {
-                    'in_progress': 'В процессе',
-                    'success': 'Выполнен',
-                    'failed': 'Провален'
-                }[p.status] || p.status;
+                if (error) {
+                    console.error('Error loading participations:', error);
+                    return;
+                }
                 
-                item.innerHTML = `
-                    <div style="flex: 1;">
-                        <strong>${p.challenge.title}</strong>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${p.progress_percentage || 0}%"></div>
+                if (!participations || participations.length === 0) {
+                    document.getElementById('myParticipations').style.display = 'none';
+                    return;
+                }
+                
+                document.getElementById('myParticipations').style.display = 'block';
+                const list = document.getElementById('participationsList');
+                list.innerHTML = '';
+                
+                participations.forEach(p => {
+                    const item = document.createElement('div');
+                    item.className = 'participation-item';
+                    
+                    const statusClass = `status-${p.status}`;
+                    const statusLabel = {
+                        'in_progress': 'В процессе',
+                        'success': 'Выполнен',
+                        'failed': 'Провален'
+                    }[p.status] || p.status;
+                    
+                    item.innerHTML = `
+                        <div style="flex: 1;">
+                            <strong>${p.challenge?.title || 'Челлендж'}</strong>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${p.progress_percentage || 0}%"></div>
+                            </div>
+                            <p>Прогресс: ${p.progress_percentage || 0}%</p>
                         </div>
-                        <p>Прогресс: ${p.progress_percentage || 0}%</p>
-                    </div>
-                    <span class="status-badge ${statusClass}">${statusLabel}</span>
-                    <button class="btn btn-primary" onclick="checkProgress('${p.id}')">Проверить</button>
-                `;
-                list.appendChild(item);
-            });
+                        <span class="status-badge ${statusClass}">${statusLabel}</span>
+                        <button class="btn btn-primary" onclick="checkProgress('${p.id}')">Проверить</button>
+                    `;
+                    list.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Load participations error:', error);
+            }
         }
 
         async function participate(challengeId) {
             if (!currentUser) {
-                showNotification('Войдите в систему!');
+                showNotification('Войдите в систему!', true);
                 return;
             }
             
-            const { data: existing } = await supabase
-                .from('participations')
-                .select('*')
-                .eq('challenge_id', challengeId)
-                .eq('user_id', currentUser.id)
-                .single();
-            
-            if (existing) {
-                showNotification('Вы уже участвуете в этом челлендже!');
-                return;
+            try {
+                const { data: existing } = await supabase
+                    .from('participations')
+                    .select('*')
+                    .eq('challenge_id', challengeId)
+                    .eq('user_id', currentUser.id)
+                    .single();
+                
+                if (existing) {
+                    showNotification('Вы уже участвуете в этом челлендже!', true);
+                    return;
+                }
+                
+                const { error } = await supabase
+                    .from('participations')
+                    .insert({
+                        challenge_id: challengeId,
+                        user_id: currentUser.id,
+                        start_battles: 0,
+                        start_value: 0,
+                        status: 'in_progress'
+                    });
+                
+                if (error) {
+                    showNotification('Ошибка участия: ' + error.message, true);
+                    return;
+                }
+                
+                showNotification('Вы присоединились к челленджу!');
+                loadMyParticipations();
+            } catch (error) {
+                console.error('Participate error:', error);
+                showNotification('Ошибка: ' + error.message, true);
             }
-            
-            const { error } = await supabase
-                .from('participations')
-                .insert({
-                    challenge_id: challengeId,
-                    user_id: currentUser.id,
-                    start_battles: 0,
-                    start_value: 0,
-                    status: 'in_progress'
-                });
-            
-            if (error) {
-                showNotification('Ошибка участия: ' + error.message);
-                return;
-            }
-            
-            showNotification('Вы присоединились к челленджу!');
-            loadMyParticipations();
         }
 
         async function checkProgress(participationId) {
             const progress = Math.floor(Math.random() * 100);
             
-            const { error } = await supabase
-                .from('participations')
-                .update({
-                    progress_percentage: progress,
-                    current_battles: Math.floor(Math.random() * 10),
-                    current_value: Math.floor(Math.random() * 10000)
-                })
-                .eq('id', participationId);
-            
-            if (error) {
-                showNotification('Ошибка обновления');
-                return;
+            try {
+                const { error } = await supabase
+                    .from('participations')
+                    .update({
+                        progress_percentage: progress,
+                        current_battles: Math.floor(Math.random() * 10),
+                        current_value: Math.floor(Math.random() * 10000)
+                    })
+                    .eq('id', participationId);
+                
+                if (error) {
+                    showNotification('Ошибка обновления', true);
+                    return;
+                }
+                
+                showNotification('Прогресс обновлен!');
+                loadMyParticipations();
+            } catch (error) {
+                console.error('Check progress error:', error);
             }
-            
-            showNotification('Прогресс обновлен!');
-            loadMyParticipations();
         }
 
         function showCreateChallenge() {
@@ -641,32 +681,42 @@
         document.getElementById('createChallengeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const challengeData = {
-                creator_id: currentUser.id,
-                creator_name: currentUser.nickname,
-                title: document.getElementById('challengeTitle').value,
-                description: document.getElementById('challengeDescription').value,
-                target_type: document.getElementById('targetType').value,
-                target_value: parseFloat(document.getElementById('targetValue').value),
-                battles_limit: parseInt(document.getElementById('battlesLimit').value),
-                prize_pool: parseFloat(document.getElementById('prizePool').value),
-                tank_class: document.getElementById('tankClass').value || null,
-                status: 'active'
-            };
-            
-            const { error } = await supabase
-                .from('challenges')
-                .insert(challengeData);
-            
-            if (error) {
-                showNotification('Ошибка создания: ' + error.message);
+            if (!currentUser) {
+                showNotification('Войдите в систему!', true);
                 return;
             }
             
-            showNotification('Челлендж создан!');
-            closeCreateChallenge();
-            document.getElementById('createChallengeForm').reset();
-            loadChallenges();
+            try {
+                const challengeData = {
+                    creator_id: currentUser.id,
+                    creator_name: currentUser.nickname,
+                    title: document.getElementById('challengeTitle').value,
+                    description: document.getElementById('challengeDescription').value,
+                    target_type: document.getElementById('targetType').value,
+                    target_value: parseFloat(document.getElementById('targetValue').value),
+                    battles_limit: parseInt(document.getElementById('battlesLimit').value),
+                    prize_pool: parseFloat(document.getElementById('prizePool').value),
+                    tank_class: document.getElementById('tankClass').value || null,
+                    status: 'active'
+                };
+                
+                const { error } = await supabase
+                    .from('challenges')
+                    .insert(challengeData);
+                
+                if (error) {
+                    showNotification('Ошибка создания: ' + error.message, true);
+                    return;
+                }
+                
+                showNotification('Челлендж создан!');
+                closeCreateChallenge();
+                document.getElementById('createChallengeForm').reset();
+                loadChallenges();
+            } catch (error) {
+                console.error('Create challenge error:', error);
+                showNotification('Ошибка: ' + error.message, true);
+            }
         });
 
         function getTargetLabel(type) {
@@ -679,16 +729,22 @@
             return labels[type] || type;
         }
 
+        // Восстановление сессии при загрузке
         document.addEventListener('DOMContentLoaded', () => {
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                document.getElementById('loginForm').style.display = 'none';
-                document.getElementById('header').style.display = 'flex';
-                document.getElementById('mainContent').style.display = 'block';
-                loadUserInfo();
-                loadChallenges();
-                loadMyParticipations();
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('header').style.display = 'flex';
+                    document.getElementById('mainContent').style.display = 'block';
+                    loadUserInfo();
+                    loadChallenges();
+                    loadMyParticipations();
+                } catch (error) {
+                    console.error('Restore session error:', error);
+                    localStorage.removeItem('currentUser');
+                }
             }
         });
     </script>
