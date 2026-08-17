@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WOT Challenges - Челленджи для World of Tanks</title>
+    <title>Lesta Challenges - Челленджи для Мир Танков</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -332,7 +332,7 @@
 <body>
     <div class="container">
         <div class="header" id="header" style="display: none;">
-            <div class="logo">WOT CHALLENGES</div>
+            <div class="logo">LESTA CHALLENGES</div>
             <div class="user-info">
                 <span id="nicknameDisplay"></span>
                 <div class="balance">
@@ -344,14 +344,10 @@
         </div>
 
         <div class="login-form" id="loginForm">
-            <h2>Вход в WOT Challenges</h2>
-            <p style="margin-bottom: 20px; color: #ccc;">Введите ваш ID аккаунта Lesta</p>
-            <input type="text" id="accountIdInput" placeholder="Account ID (например: 123456789)">
-            <input type="text" id="nicknameInput" placeholder="Никнейм в игре">
+            <h2>Вход в Lesta Challenges</h2>
+            <p style="margin-bottom: 20px; color: #ccc;">Введите ваш никнейм из игры</p>
+            <input type="text" id="nicknameInput" placeholder="Никнейм в Мир Танков">
             <button class="btn btn-primary" onclick="login()" style="width: 100%;">ВОЙТИ</button>
-            <p style="margin-top: 15px; color: #666;">
-                Не знаете свой ID? <a href="https://api.lesta.ru/wot/account/list/?application_id=demo&search=ВАШ_НИК&type=exact" target="_blank" style="color: var(--neon-blue);">Узнать здесь</a>
-            </p>
         </div>
 
         <div id="mainContent" style="display: none;">
@@ -433,11 +429,10 @@
         }
 
         async function login() {
-            const accountId = document.getElementById('accountIdInput').value.trim();
             const nickname = document.getElementById('nicknameInput').value.trim();
             
-            if (!accountId || !nickname) {
-                showNotification('Заполните все поля!');
+            if (!nickname) {
+                showNotification('Введите никнейм!');
                 return;
             }
             
@@ -445,7 +440,7 @@
             let { data: existingUser } = await supabase
                 .from('users')
                 .select('*')
-                .eq('account_id', parseInt(accountId))
+                .eq('nickname', nickname)
                 .single();
             
             if (!existingUser) {
@@ -453,7 +448,6 @@
                 const { data: newUser, error } = await supabase
                     .from('users')
                     .insert({
-                        account_id: parseInt(accountId),
                         nickname: nickname,
                         balance: 100
                     })
