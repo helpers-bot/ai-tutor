@@ -42,13 +42,12 @@
             height: 100%;
             background: 
                 radial-gradient(circle at 20% 20%, rgba(0, 243, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(191, 0, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 80% 80%, rgba(191, 0, 255, 0.1) 0%, transparent 50%);
             pointer-events: none;
             z-index: 0;
         }
 
-        /* Пули - ровные */
+        /* Пули */
         .bullet {
             position: fixed;
             width: 30px;
@@ -94,8 +93,8 @@
         .sidebar {
             position: fixed;
             top: 0;
-            width: 180px;
-            height: 100%;
+            width: 200px;
+            height: 100vh;
             background: rgba(10, 10, 26, 0.95);
             border: 1px solid rgba(0, 243, 255, 0.2);
             z-index: 10;
@@ -117,11 +116,12 @@
         }
 
         .sidebar-title {
-            font-size: 1.1em;
+            font-size: 1.2em;
             font-weight: bold;
-            margin-bottom: 20px;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         .sidebar-left .sidebar-title {
@@ -136,7 +136,7 @@
 
         .sponsor-track {
             width: 100%;
-            height: calc(100% - 60px);
+            height: calc(100vh - 80px);
             overflow: hidden;
             position: relative;
         }
@@ -144,67 +144,135 @@
         .sponsor-list {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            animation: scrollDown 20s linear infinite;
+            gap: 20px;
+            animation: scrollLoop 15s linear infinite;
             position: absolute;
             width: 100%;
-            padding: 0 10px;
+            padding: 0 15px;
+            top: 0;
         }
 
-        @keyframes scrollDown {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
+        @keyframes scrollLoop {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
         }
 
         .sponsor-item {
             background: rgba(0, 243, 255, 0.1);
             border: 1px solid rgba(0, 243, 255, 0.3);
             border-radius: 8px;
-            padding: 10px;
+            padding: 12px 10px;
             text-align: center;
             font-size: 0.9em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            flex-shrink: 0;
         }
 
-        /* Основной контент */
+        /* Основной контейнер */
         .container {
-            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
             position: relative;
             z-index: 1;
-            margin-left: 200px;
-            margin-right: 200px;
+            margin-left: 220px;
+            margin-right: 220px;
             min-height: 100vh;
+            width: calc(100% - 440px);
         }
 
-        /* Шапка */
-        .header {
+        /* Вход */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            width: 100%;
+        }
+
+        .login-screen h1 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 3px;
+        }
+
+        .login-input {
+            padding: 15px 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--neon-blue);
+            border-radius: 30px;
+            color: white;
+            font-size: 1.1em;
+            outline: none;
+            width: 350px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 20px rgba(191, 0, 255, 0.3);
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+        }
+
+        .btn-danger {
+            background: var(--neon-red);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Профиль */
+        .profile-screen {
+            width: 100%;
+        }
+
+        .profile-header {
             display: flex;
             align-items: center;
             gap: 20px;
-            padding: 20px;
+            padding: 25px;
             background: var(--card-bg);
             border-radius: 15px;
             margin-bottom: 20px;
             border: 1px solid rgba(0, 243, 255, 0.3);
             flex-wrap: wrap;
+            width: 100%;
         }
 
-        .profile-avatar-container {
+        .avatar-container {
             position: relative;
             cursor: pointer;
         }
 
-        .profile-avatar {
-            width: 70px;
-            height: 70px;
+        .avatar {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             border: 2px solid var(--neon-blue);
             object-fit: cover;
-            background: var(--card-bg);
         }
 
         .avatar-edit {
@@ -214,190 +282,68 @@
             background: var(--neon-blue);
             border: none;
             border-radius: 50%;
-            width: 25px;
-            height: 25px;
+            width: 28px;
+            height: 28px;
             cursor: pointer;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 14px;
         }
 
-        .profile-info {
-            flex: 1;
+        .nickname-container {
             display: flex;
             align-items: center;
             gap: 10px;
+            flex: 1;
         }
 
-        .profile-nickname {
-            font-size: 1.5em;
+        .nickname {
+            font-size: 1.8em;
             font-weight: bold;
             color: var(--neon-blue);
         }
 
-        .edit-nickname-btn {
+        .edit-nickname {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1em;
+            font-size: 1.2em;
             color: var(--neon-blue);
         }
 
-        .balance-display {
+        .balance {
             background: linear-gradient(45deg, #FFD700, #FFA500);
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 12px 25px;
+            border-radius: 30px;
             font-weight: bold;
+            font-size: 1.2em;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9em;
-            font-weight: bold;
-            transition: all 0.3s;
-            color: white;
-        }
-
-        .btn-primary {
-            background: var(--neon-blue);
-            color: var(--dark-bg);
-        }
-
-        .btn-danger {
-            background: var(--neon-red);
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-        }
-
-        /* Лента челленджей */
-        .feed-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            z-index: 100;
-            display: none;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .feed-overlay.active {
-            display: flex;
-        }
-
-        .feed-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .feed-title {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: var(--neon-blue);
-        }
-
-        .feed-controls {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--neon-blue);
-            border-radius: 20px;
-            color: white;
-            font-size: 0.9em;
-            outline: none;
-            width: 200px;
-        }
-
-        .filter-select {
-            padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 2px solid var(--neon-purple);
-            border-radius: 20px;
-            color: white;
-            font-size: 0.9em;
-            outline: none;
-        }
-
-        .challenges-grid {
-            flex: 1;
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
-            padding: 10px;
-        }
-
-        .challenge-card {
-            background: var(--card-bg);
-            border: 2px solid #333;
-            border-radius: 12px;
-            padding: 15px;
-            transition: all 0.3s;
-        }
-
-        .challenge-card:hover {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-        }
-
-        .challenge-card h4 {
-            color: var(--neon-blue);
-            margin-bottom: 8px;
-        }
-
-        .challenge-card p {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .challenge-prize {
-            color: var(--neon-green) !important;
-            font-weight: bold;
-        }
-
-        /* Секции профиля */
-        .profile-sections {
+        .sections {
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
         }
 
-        .section-card {
+        .section {
             background: var(--card-bg);
             border-radius: 15px;
-            padding: 20px;
+            padding: 25px;
             border: 1px solid rgba(191, 0, 255, 0.3);
+            width: 100%;
         }
 
         .section-title {
-            font-size: 1.2em;
-            margin-bottom: 15px;
+            font-size: 1.5em;
+            margin-bottom: 20px;
             color: var(--neon-purple);
         }
 
-        .empty-state {
+        .empty {
             color: #666;
             font-style: italic;
             text-align: center;
-            padding: 20px;
+            padding: 30px;
+            font-size: 1.1em;
         }
 
         .notification {
@@ -406,8 +352,8 @@
             right: 15px;
             background: var(--neon-green);
             color: var(--dark-bg);
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 15px 25px;
+            border-radius: 25px;
             z-index: 2000;
             font-weight: bold;
         }
@@ -425,6 +371,7 @@
     <div class="bullet"></div>
     <div class="bullet"></div>
 
+    <!-- Левая панель -->
     <div class="sidebar sidebar-left">
         <div class="sidebar-title">Спонсоры</div>
         <div class="sponsor-track">
@@ -432,105 +379,92 @@
         </div>
     </div>
 
+    <!-- Правая панель -->
     <div class="sidebar sidebar-right">
-        <div class="sidebar-title">Топ 3</div>
+        <div class="sidebar-title">Топ 3 спонсора</div>
         <div class="sponsor-track">
             <div class="sponsor-list" id="topSponsorsList"></div>
         </div>
     </div>
 
+    <!-- Основной контент -->
     <div class="container">
         <!-- Вход -->
-        <div id="loginScreen" style="text-align: center; padding-top: 100px;">
-            <h1 style="font-size: 2.5em; margin-bottom: 30px; background: linear-gradient(45deg, var(--neon-blue), var(--neon-purple), var(--neon-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">LESTA CHALLENGES</h1>
-            <input type="text" id="nicknameInput" placeholder="Ваш никнейм" style="padding: 12px 20px; background: rgba(0,0,0,0.5); border: 2px solid var(--neon-blue); border-radius: 25px; color: white; font-size: 1em; outline: none; width: 300px; margin-bottom: 15px;">
-            <br>
-            <button class="btn btn-primary" id="loginBtn" style="padding: 12px 40px; font-size: 1.1em;">ВОЙТИ</button>
+        <div class="login-screen" id="loginScreen">
+            <h1>LESTA CHALLENGES</h1>
+            <input type="text" class="login-input" id="nicknameInput" placeholder="Ваш никнейм">
+            <button class="btn btn-primary" id="loginBtn">ВОЙТИ</button>
         </div>
 
         <!-- Профиль -->
-        <div id="profileScreen" style="display: none;">
-            <div class="header">
-                <div class="profile-avatar-container">
-                    <img class="profile-avatar" id="avatarImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Crect width='70' height='70' fill='%231a1a2e'/%3E%3Ctext x='35' y='45' font-size='30' fill='%2300f3ff' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E" alt="Avatar">
+        <div class="profile-screen" id="profileScreen" style="display: none;">
+            <div class="profile-header">
+                <div class="avatar-container">
+                    <img class="avatar" id="avatarImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%231a1a2e'/%3E%3Ctext x='40' y='50' font-size='35' fill='%2300f3ff' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E" alt="Avatar">
                     <button class="avatar-edit" id="editAvatarBtn">✏️</button>
                 </div>
-                <div class="profile-info">
-                    <span class="profile-nickname" id="profileNickname"></span>
-                    <button class="edit-nickname-btn" id="editNicknameBtn">✏️</button>
+                <div class="nickname-container">
+                    <span class="nickname" id="profileNickname"></span>
+                    <button class="edit-nickname" id="editNicknameBtn">✏️</button>
                 </div>
-                <div class="balance-display">⭐ <span id="balanceDisplay">0</span></div>
+                <div class="balance">⭐ <span id="balanceDisplay">0</span></div>
                 <button class="btn btn-primary" id="feedBtn">📋 Лента</button>
                 <button class="btn btn-danger" id="logoutBtn">Выйти</button>
             </div>
 
-            <div class="profile-sections">
-                <div class="section-card">
+            <div class="sections">
+                <div class="section">
                     <div class="section-title">🏆 Достижения</div>
-                    <div id="achievementsList"><p class="empty-state">Пока нет достижений</p></div>
+                    <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
                 </div>
-                <div class="section-card">
+                <div class="section">
                     <div class="section-title">📜 История челленджей</div>
-                    <div id="historyList"><p class="empty-state">Пока нет выполненных челленджей</p></div>
+                    <div id="historyList"><p class="empty">Пока нет выполненных челленджей</p></div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Лента -->
-    <div class="feed-overlay" id="feedOverlay">
-        <div class="feed-header">
-            <div class="feed-title">Лента челленджей</div>
-            <div class="feed-controls">
-                <input type="text" class="search-input" id="searchInput" placeholder="Поиск...">
-                <select class="filter-select" id="filterSelect">
-                    <option value="all">Все</option>
-                    <option value="damage">Урон</option>
-                    <option value="frags">Фраги</option>
-                    <option value="xp">Опыт</option>
-                    <option value="wins">Победы</option>
-                </select>
-            </div>
-            <button class="btn btn-danger" id="closeFeedBtn">✕</button>
-        </div>
-        <div class="challenges-grid" id="challengesGrid">
-            <p style="color: #666; text-align: center; grid-column: 1/-1;">Загрузка...</p>
         </div>
     </div>
 
     <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
 
     <script>
-        const sponsors = ['TankMaster_77', 'SteelWarrior', 'ProGamer_Lesta', 'TankDestroyer', 'BattleHero_2024', 'IronCommander', 'ShadowTank', 'Victory_Road', 'TankAce_99', 'WarLegend', 'SteelStorm', 'TankHunter_X', 'BlitzKrieg', 'ArmoredCore', 'TankElite'];
+        // Спонсоры (продублированы для бесконечной прокрутки)
+        const sponsors = [
+            'TankMaster_77', 'SteelWarrior', 'ProGamer_Lesta', 'TankDestroyer', 
+            'BattleHero_2024', 'IronCommander', 'ShadowTank', 'Victory_Road', 
+            'TankAce_99', 'WarLegend', 'SteelStorm', 'TankHunter_X'
+        ];
+        
         const topSponsors = ['🏆 TankMaster_77', '🥈 SteelWarrior', '🥉 ProGamer_Lesta'];
 
-        const demoChallenges = [
-            {id: 1, title: '5000 урона за 5 боев', type: 'damage', prize: 500, creator: 'TankMaster_77'},
-            {id: 2, title: '10 фрагов за 3 боя', type: 'frags', prize: 300, creator: 'SteelWarrior'},
-            {id: 3, title: '20000 опыта за 10 боев', type: 'xp', prize: 800, creator: 'ProGamer_Lesta'},
-            {id: 4, title: '3 победы подряд', type: 'wins', prize: 200, creator: 'IronCommander'},
-            {id: 5, title: '15000 урона на ТТ', type: 'damage', prize: 1000, creator: 'WarLegend'}
-        ];
-
         function initSponsors() {
-            document.getElementById('sponsorsList').innerHTML = sponsors.map(s => '<div class="sponsor-item">' + s + '</div>').join('');
-            document.getElementById('topSponsorsList').innerHTML = topSponsors.map(s => '<div class="sponsor-item">' + s + '</div>').join('');
+            // Дублируем список для бесконечной прокрутки
+            const doubledSponsors = [...sponsors, ...sponsors];
+            document.getElementById('sponsorsList').innerHTML = 
+                doubledSponsors.map(s => '<div class="sponsor-item">' + s + '</div>').join('');
+            
+            const doubledTop = [...topSponsors, ...topSponsors, ...topSponsors, ...topSponsors];
+            document.getElementById('topSponsorsList').innerHTML = 
+                doubledTop.map(s => '<div class="sponsor-item">' + s + '</div>').join('');
         }
 
         function showNotification(msg) {
-            var n = document.createElement('div');
+            const n = document.createElement('div');
             n.className = 'notification';
             n.textContent = msg;
             document.body.appendChild(n);
-            setTimeout(function() { n.remove(); }, 3000);
+            setTimeout(() => n.remove(), 3000);
         }
 
         function login() {
-            var nickname = document.getElementById('nicknameInput').value.trim();
-            if (!nickname) { showNotification('Введите никнейм!'); return; }
+            const nickname = document.getElementById('nicknameInput').value.trim();
+            if (!nickname) {
+                showNotification('Введите никнейм!');
+                return;
+            }
             
-            var users = JSON.parse(localStorage.getItem('users') || '[]');
-            var user = users.find(u => u.nickname === nickname);
+            let users = JSON.parse(localStorage.getItem('users') || '[]');
+            let user = users.find(u => u.nickname === nickname);
             
             if (!user) {
                 user = {nickname: nickname, balance: 100, avatar: null};
@@ -547,56 +481,33 @@
             document.getElementById('profileScreen').style.display = 'block';
             document.getElementById('profileNickname').textContent = user.nickname;
             document.getElementById('balanceDisplay').textContent = user.balance;
-            if (user.avatar) document.getElementById('avatarImg').src = user.avatar;
+            if (user.avatar) {
+                document.getElementById('avatarImg').src = user.avatar;
+            }
         }
 
         function logout() {
             localStorage.removeItem('currentUser');
-            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('profileScreen').style.display = 'none';
             document.getElementById('nicknameInput').value = '';
         }
 
-        function openFeed() {
-            document.getElementById('feedOverlay').classList.add('active');
-            loadChallenges();
-        }
-
-        function closeFeed() {
-            document.getElementById('feedOverlay').classList.remove('active');
-        }
-
-        function loadChallenges(filter, search) {
-            var grid = document.getElementById('challengesGrid');
-            var filtered = demoChallenges;
-            
-            if (filter && filter !== 'all') {
-                filtered = filtered.filter(c => c.type === filter);
-            }
-            
-            if (search) {
-                filtered = filtered.filter(c => c.title.toLowerCase().includes(search.toLowerCase()));
-            }
-            
-            grid.innerHTML = filtered.map(c => 
-                '<div class="challenge-card">' +
-                '<h4>' + c.title + '</h4>' +
-                '<p>Создатель: ' + c.creator + '</p>' +
-                '<p>Тип: ' + c.type + '</p>' +
-                '<p class="challenge-prize">Приз: ' + c.prize + ' ⭐</p>' +
-                '</div>'
-            ).join('');
-        }
-
         function editNickname() {
-            var newNick = prompt('Введите новый никнейм:', '');
+            const newNick = prompt('Введите новый никнейм:');
             if (newNick && newNick.trim()) {
-                var users = JSON.parse(localStorage.getItem('users') || '[]');
-                var user = users.find(u => u.nickname === JSON.parse(localStorage.getItem('currentUser')).nickname);
+                const user = JSON.parse(localStorage.getItem('currentUser'));
                 if (user) {
                     user.nickname = newNick.trim();
-                    localStorage.setItem('users', JSON.stringify(users));
                     localStorage.setItem('currentUser', JSON.stringify(user));
+                    
+                    let users = JSON.parse(localStorage.getItem('users') || '[]');
+                    const idx = users.findIndex(u => u.nickname === user.nickname);
+                    if (idx !== -1) {
+                        users[idx].nickname = newNick.trim();
+                        localStorage.setItem('users', JSON.stringify(users));
+                    }
+                    
                     document.getElementById('profileNickname').textContent = newNick.trim();
                     showNotification('Никнейм обновлен!');
                 }
@@ -608,8 +519,6 @@
             
             document.getElementById('loginBtn').addEventListener('click', login);
             document.getElementById('logoutBtn').addEventListener('click', logout);
-            document.getElementById('feedBtn').addEventListener('click', openFeed);
-            document.getElementById('closeFeedBtn').addEventListener('click', closeFeed);
             document.getElementById('editNicknameBtn').addEventListener('click', editNickname);
             
             document.getElementById('editAvatarBtn').addEventListener('click', function() {
@@ -617,12 +526,12 @@
             });
             
             document.getElementById('avatarUpload').addEventListener('change', function(e) {
-                var file = e.target.files[0];
+                const file = e.target.files[0];
                 if (file) {
-                    var reader = new FileReader();
+                    const reader = new FileReader();
                     reader.onload = function(event) {
                         document.getElementById('avatarImg').src = event.target.result;
-                        var user = JSON.parse(localStorage.getItem('currentUser'));
+                        const user = JSON.parse(localStorage.getItem('currentUser'));
                         if (user) {
                             user.avatar = event.target.result;
                             localStorage.setItem('currentUser', JSON.stringify(user));
@@ -633,15 +542,7 @@
                 }
             });
             
-            document.getElementById('searchInput').addEventListener('input', function() {
-                loadChallenges(document.getElementById('filterSelect').value, this.value);
-            });
-            
-            document.getElementById('filterSelect').addEventListener('change', function() {
-                loadChallenges(this.value, document.getElementById('searchInput').value);
-            });
-            
-            var savedUser = localStorage.getItem('currentUser');
+            const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 showProfile(JSON.parse(savedUser));
             }
