@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Lesta Challenges - Челленджи для Мир Танков</title>
-    <meta name="description" content="Платформа бесплатных челленджей для игроков Мир Танков (Lesta Games). Создавайте и участвуйте в челленджах, зарабатывайте звёзды и соревнуйтесь с другими игроками.">
-    <meta name="keywords" content="Мир Танков, Lesta Games, челленджи, World of Tanks, танки, соревнования, призы, звёзды">
+    <meta name="description" content="Платформа бесплатных челленджей для игроков Мир Танков (Lesta Games).">
     
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Cpath d='M8 38 L12 30 L52 30 L56 38 L52 44 L12 44 Z' fill='%233fb950'/%3E%3Cpath d='M22 30 L26 22 L38 22 L42 30 Z' fill='%2358a6ff'/%3E%3Crect x='40' y='20' width='16' height='4' rx='2' fill='%233fb950'/%3E%3Crect x='8' y='40' width='48' height='8' rx='4' fill='%2330363d'/%3E%3C/svg%3E">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d1117'/%3E%3Cpath d='M8 38 L12 30 L52 30 L56 38 L52 44 L12 44 Z' fill='%233fb950'/%3E%3C/svg%3E">
     
     <style>
         :root {
@@ -40,7 +39,6 @@
             background: var(--bg-primary);
             min-height: 100vh;
             color: var(--text-primary);
-            overflow-x: hidden;
             font-size: 14px;
             position: relative;
         }
@@ -87,12 +85,12 @@
         .bullet:nth-child(10) { top: 95%; animation-duration: 4.4s; animation-delay: 2.3s; }
 
         .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
+            width: 100%;
             min-height: 100vh;
             position: relative;
             z-index: 2;
+            padding: 0;
+            margin: 0;
         }
 
         .login-screen {
@@ -100,14 +98,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 80vh;
+            min-height: 100vh;
+            width: 100%;
         }
 
         .login-screen h1 {
             font-size: 28px;
             font-weight: 600;
             margin-bottom: 30px;
-            letter-spacing: 1px;
         }
 
         .login-input {
@@ -129,14 +127,12 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 500;
-            transition: all 0.2s;
             background: var(--bg-tertiary);
             color: var(--text-primary);
         }
 
         .btn:hover {
             background: var(--bg-secondary);
-            border-color: var(--text-muted);
         }
 
         .btn-primary {
@@ -151,21 +147,24 @@
             color: var(--accent-red);
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .btn-cancel {
+            background: transparent;
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+            padding: 5px 10px;
+            font-size: 12px;
         }
 
         .profile-header {
             display: flex;
             align-items: center;
             gap: 15px;
-            padding: 20px;
+            padding: 15px 30px;
             background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
             flex-wrap: wrap;
+            width: 100%;
+            margin: 0;
         }
 
         .avatar-container {
@@ -219,13 +218,18 @@
             background: var(--bg-tertiary);
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-weight: 500;
+        }
+
+        .sections-wrapper {
+            width: 100%;
+            padding: 20px 30px;
         }
 
         .sections {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            width: 100%;
         }
 
         .section {
@@ -233,6 +237,7 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
+            width: 100%;
         }
 
         .section-title {
@@ -240,7 +245,6 @@
             font-weight: 600;
             margin-bottom: 15px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .empty {
@@ -248,7 +252,6 @@
             font-style: italic;
             text-align: center;
             padding: 20px;
-            font-size: 13px;
         }
 
         .challenge-item {
@@ -256,17 +259,12 @@
             border: 1px solid var(--border-color);
             border-radius: 6px;
             padding: 15px;
-            cursor: pointer;
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
-        }
-
-        .challenge-item:last-child {
-            margin-bottom: 0;
         }
 
         .challenge-item.accepted {
@@ -286,14 +284,6 @@
         .challenge-meta {
             font-size: 12px;
             color: var(--text-muted);
-        }
-
-        .btn-cancel {
-            background: transparent;
-            border-color: var(--accent-red);
-            color: var(--accent-red);
-            padding: 5px 10px;
-            font-size: 12px;
         }
 
         .feed-overlay {
@@ -322,16 +312,10 @@
             flex-wrap: wrap;
         }
 
-        .feed-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
         .feed-controls {
             display: flex;
             gap: 10px;
             flex: 1;
-            max-width: 400px;
         }
 
         .search-input, .filter-select {
@@ -364,18 +348,11 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            flex-wrap: wrap;
             cursor: pointer;
-        }
-
-        .challenge-card:hover {
-            border-color: var(--text-muted);
-            background: var(--bg-tertiary);
         }
 
         .challenge-info {
             flex: 1;
-            min-width: 200px;
         }
 
         .challenge-prize {
@@ -419,27 +396,12 @@
             margin-bottom: 20px;
         }
 
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
         .close-btn {
             background: none;
             border: none;
             cursor: pointer;
             font-size: 20px;
             color: var(--text-muted);
-        }
-
-        .modal-info p {
-            margin-bottom: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .modal-info strong {
-            color: var(--text-primary);
         }
 
         .form-group {
@@ -482,14 +444,12 @@
             min-width: 150px;
         }
 
-        /* Компактный футер на всю ширину */
+        /* Футер НА ВЕСЬ ЭКРАН */
         .footer {
-            margin-top: 20px;
-            padding: 15px 20px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
             width: 100%;
+            padding: 15px 30px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -521,17 +481,12 @@
         .footer-links {
             display: flex;
             gap: 15px;
-            flex-wrap: wrap;
         }
 
         .footer-link {
             color: var(--text-secondary);
             cursor: pointer;
             font-size: 12px;
-        }
-
-        .footer-link:hover {
-            color: var(--accent-blue);
         }
 
         .notification {
@@ -548,7 +503,6 @@
     </style>
 </head>
 <body>
-    <!-- Пули -->
     <div class="bullet"></div>
     <div class="bullet"></div>
     <div class="bullet"></div>
@@ -560,8 +514,8 @@
     <div class="bullet"></div>
     <div class="bullet"></div>
 
-    <div class="container" id="mainContainer">
-        <!-- Экран входа -->
+    <div class="container">
+        <!-- Вход -->
         <div class="login-screen" id="loginScreen">
             <h1>LESTA CHALLENGES</h1>
             <input type="text" class="login-input" id="nicknameInput" placeholder="Ваш никнейм">
@@ -580,31 +534,32 @@
                     <button class="edit-nickname" id="editNicknameBtn">✏️</button>
                 </div>
                 <div class="balance">⭐ <span id="balanceDisplay">0</span></div>
-                <button class="btn btn-primary" id="createChallengeBtn">+ Создать челлендж</button>
+                <button class="btn btn-primary" id="createChallengeBtn">+ Создать</button>
                 <button class="btn" id="feedBtn">Лента</button>
                 <button class="btn btn-danger" id="logoutBtn">Выйти</button>
             </div>
 
-            <div class="sections">
-                <div class="section">
-                    <div class="section-title">Принятые челленджи</div>
-                    <div id="acceptedChallenges"><p class="empty">Нет принятых челленджей</p></div>
-                </div>
-                <div class="section">
-                    <div class="section-title">Мои челленджи</div>
-                    <div id="myChallenges"><p class="empty">Вы еще не создали ни одного челленджа</p></div>
-                </div>
-                <div class="section">
-                    <div class="section-title">Достижения</div>
-                    <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
-                </div>
-                <div class="section">
-                    <div class="section-title">История челленджей</div>
-                    <div id="historyList"><p class="empty">Пока нет выполненных челленджей</p></div>
+            <div class="sections-wrapper">
+                <div class="sections">
+                    <div class="section">
+                        <div class="section-title">Принятые челленджи</div>
+                        <div id="acceptedChallenges"><p class="empty">Нет принятых челленджей</p></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">Мои челленджи</div>
+                        <div id="myChallenges"><p class="empty">Вы еще не создали ни одного челленджа</p></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">Достижения</div>
+                        <div id="achievementsList"><p class="empty">Пока нет достижений</p></div>
+                    </div>
+                    <div class="section">
+                        <div class="section-title">История челленджей</div>
+                        <div id="historyList"><p class="empty">Пока нет выполненных челленджей</p></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Компактный футер -->
             <div class="footer">
                 <div class="footer-sponsors">
                     <span class="footer-sponsors-title">Спонсоры:</span>
@@ -654,7 +609,7 @@
         </div>
     </div>
 
-    <!-- Модальное окно создания челленджа -->
+    <!-- Модальное окно создания -->
     <div class="modal" id="createChallengeModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -681,17 +636,17 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Сколько нужно (значение) *</label>
-                        <input type="number" id="chTarget" min="1" required placeholder="Например: 5000">
+                        <label>Сколько нужно *</label>
+                        <input type="number" id="chTarget" min="1" required>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Количество боев *</label>
+                        <label>Боев *</label>
                         <input type="number" id="chBattles" min="1" value="5" required>
                     </div>
                     <div class="form-group">
-                        <label>Призовой фонд (⭐) *</label>
+                        <label>Приз (⭐) *</label>
                         <input type="number" id="chPrize" min="1" required>
                     </div>
                 </div>
@@ -714,25 +669,25 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Минимальный уровень техники</label>
+                        <label>Мин. уровень</label>
                         <input type="number" id="chMinTier" min="1" max="10" value="1">
                     </div>
                     <div class="form-group">
-                        <label>Максимальный уровень техники</label>
+                        <label>Макс. уровень</label>
                         <input type="number" id="chMaxTier" min="1" max="10" value="10">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Вступительный взнос (⭐)</label>
+                        <label>Взнос (⭐)</label>
                         <input type="number" id="chEntryFee" min="0" value="0">
                     </div>
                     <div class="form-group">
-                        <label>Срок действия (дней)</label>
+                        <label>Срок (дней)</label>
                         <input type="number" id="chDuration" min="1" max="30" value="7">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Создать челлендж</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Создать</button>
             </form>
         </div>
     </div>
@@ -795,8 +750,7 @@
                 if (challenge) {
                     container.innerHTML = '<div class="challenge-item accepted" onclick="openChallengeModal(' + challenge.id + ')">' +
                         '<div><div class="challenge-title">' + challenge.title + '</div>' +
-                        '<div class="challenge-meta">Приз: ' + challenge.prize + ' ⭐ | Участников: ' + challenge.participants + '/' + challenge.maxParticipants + '</div></div>' +
-                        '</div>';
+                        '<div class="challenge-meta">Приз: ' + challenge.prize + ' ⭐ | Участников: ' + challenge.participants + '/' + challenge.maxParticipants + '</div></div></div>';
                 }
             } else {
                 container.innerHTML = '<p class="empty">Нет принятых челленджей</p>';
@@ -813,8 +767,7 @@
                 '<div class="challenge-item created">' +
                 '<div><div class="challenge-title">' + c.title + '</div>' +
                 '<div class="challenge-meta">Приз: ' + c.prize + ' ⭐ | Участников: ' + c.participants + '/' + c.maxParticipants + '</div></div>' +
-                '<button class="btn btn-cancel" onclick="cancelChallenge(' + c.id + ')">Отменить</button>' +
-                '</div>'
+                '<button class="btn btn-cancel" onclick="cancelChallenge(' + c.id + ')">Отменить</button></div>'
             ).join('');
         }
 
@@ -822,9 +775,6 @@
             myCreatedChallenges = myCreatedChallenges.filter(c => c.id !== id);
             currentUser.myChallenges = myCreatedChallenges;
             localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
-            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
-            const idx = users.findIndex(u => u.nickname === currentUser.nickname);
-            if (idx !== -1) { users[idx].myChallenges = myCreatedChallenges; localStorage.setItem('lesta_users', JSON.stringify(users)); }
             updateMyChallenges();
             showNotification('Челлендж отменен');
         }
@@ -902,9 +852,6 @@
             if (!currentChallenge || acceptedChallenge) return;
             acceptedChallenge = currentChallenge.id;
             currentUser.acceptedChallenge = acceptedChallenge;
-            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
-            const idx = users.findIndex(u => u.nickname === currentUser.nickname);
-            if (idx !== -1) { users[idx].acceptedChallenge = acceptedChallenge; localStorage.setItem('lesta_users', JSON.stringify(users)); }
             localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
             updateAcceptedChallenge();
             closeModal();
@@ -915,9 +862,6 @@
         function declineChallenge() {
             acceptedChallenge = null;
             currentUser.acceptedChallenge = null;
-            let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
-            const idx = users.findIndex(u => u.nickname === currentUser.nickname);
-            if (idx !== -1) { users[idx].acceptedChallenge = null; localStorage.setItem('lesta_users', JSON.stringify(users)); }
             localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
             updateAcceptedChallenge();
             closeModal();
@@ -926,8 +870,6 @@
 
         function logout() {
             currentUser = null;
-            acceptedChallenge = null;
-            myCreatedChallenges = [];
             localStorage.removeItem('lesta_current_user');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('profileScreen').style.display = 'none';
@@ -936,27 +878,20 @@
 
         function editNickname() {
             const newNick = prompt('Введите новый никнейм:', currentUser?.nickname || '');
-            if (newNick && newNick.trim() && newNick.trim() !== currentUser.nickname) {
+            if (newNick && newNick.trim()) {
                 currentUser.nickname = newNick.trim();
-                let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
-                const idx = users.findIndex(u => u.nickname === newNick.trim());
-                if (idx === -1) {
-                    const oldIdx = users.findIndex(u => u.nickname === document.getElementById('profileNickname').textContent);
-                    if (oldIdx !== -1) users[oldIdx].nickname = newNick.trim();
-                    localStorage.setItem('lesta_users', JSON.stringify(users));
-                    localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
-                    document.getElementById('profileNickname').textContent = newNick.trim();
-                    showNotification('Никнейм обновлен!');
-                } else { showNotification('Этот никнейм уже занят!'); }
+                localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
+                document.getElementById('profileNickname').textContent = newNick.trim();
+                showNotification('Никнейм обновлен!');
             }
         }
 
         function showRules() {
-            alert('Правила пользования:\n\n1. Уважайте других игроков\n2. Запрещено использовать читы\n3. Один активный челлендж одновременно\n4. Комиссия платформы 10%\n5. Минимальный возраст - 18 лет');
+            alert('Правила пользования:\n\n1. Уважайте других игроков\n2. Один активный челлендж одновременно');
         }
 
         function showPrivacy() {
-            alert('Политика конфиденциальности:\n\n1. Мы собираем только необходимые данные\n2. Данные защищены\n3. Вы можете удалить аккаунт в любое время');
+            alert('Политика конфиденциальности:\n\n1. Данные защищены');
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -987,9 +922,6 @@
                 myCreatedChallenges.push(newChallenge);
                 currentUser.myChallenges = myCreatedChallenges;
                 localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
-                let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
-                const idx = users.findIndex(u => u.nickname === currentUser.nickname);
-                if (idx !== -1) { users[idx].myChallenges = myCreatedChallenges; localStorage.setItem('lesta_users', JSON.stringify(users)); }
                 closeCreateModal();
                 document.getElementById('createChallengeForm').reset();
                 updateMyChallenges();
@@ -1007,9 +939,6 @@
                     reader.onload = function(event) {
                         document.getElementById('avatarImg').src = event.target.result;
                         currentUser.avatar = event.target.result;
-                        let users = JSON.parse(localStorage.getItem('lesta_users') || '[]');
-                        const idx = users.findIndex(u => u.nickname === currentUser.nickname);
-                        if (idx !== -1) { users[idx].avatar = event.target.result; localStorage.setItem('lesta_users', JSON.stringify(users)); }
                         localStorage.setItem('lesta_current_user', JSON.stringify(currentUser));
                         showNotification('Аватар обновлен!');
                     };
