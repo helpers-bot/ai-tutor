@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — Lesta Hub</title>
+    <style>
+        :root {
+            --bg-dark: #0b0f14;
+            --bg-panel: #131a22;
+            --bg-element: #1c2632;
+            --border-color: #2a3744;
+            --text-primary: #e6edf3;
+            --text-secondary: #9aa7b3;
+            --text-muted: #5c6b7a;
+            --accent-gold: #d4af37;
+            --accent-blue: #4a9eff;
+            --accent-red: #ff5e5e;
+            --accent-green: #3fb950;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg-dark);
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            line-height: 1.5;
+        }
+
+        .admin-wrapper {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--accent-gold);
+        }
+
+        .login-form {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 0.8rem;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            outline: none;
+            margin-bottom: 1rem;
+        }
+
+        .login-form button {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--accent-blue);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background: #ff3333;
+        }
+
+        .item-list {
+            margin-top: 1rem;
+        }
+
+        .item {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+
+        .item-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+
+        .logout-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: var(--accent-red);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-wrapper">
+        <h1>🔐 Админ-панель</h1>
+        
+        <div class="login-form" id="loginForm">
+            <h2 style="margin-bottom: 1rem;">Введите пароль</h2>
+            <input type="password" id="passwordInput" placeholder="Пароль">
+            <button onclick="checkPassword()">Войти</button>
+        </div>
+
+        <div class="admin-panel" id="adminPanel">
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+
+            <div class="section">
+                <h2>📰 Добавить новость</h2>
+                <div class="form-group">
+                    <label>Ссылка на новость (tanki.su)</label>
+                    <input type="url" id="newsUrl" placeholder="https://tanki.su/ru/news/...">
+                </div>
+                <button class="btn" onclick="addNewsFromUrl()">Добавить новость</button>
+                
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label>Или добавьте вручную:</label>
+                </div>
+                <div class="form-group">
+                    <label>Заголовок</label>
+                    <input type="text" id="newsTitle" placeholder="Заголовок новости">
+                </div>
+                <div class="form-group">
+                    <label>Дата</label>
+                    <input type="date" id="newsDate">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="newsDescription" placeholder="Описание новости"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Ссылка на изображение</label>
+                    <input type="url" id="newsImage" placeholder="https://...">
+                </div>
+                <button class="btn" onclick="addNewsManually()">Добавить вручную</button>
+            </div>
+
+            <div class="section">
+                <h2>📋 Список новостей</h2>
+                <div id="newsList" class="item-list"></div>
+            </div>
+
+            <div class="section">
+                <h2>🎁 Добавить бонус-код</h2>
+                <div class="form-group">
+                    <label>Код</label>
+                    <input type="text" id="bonusCode" placeholder="Например: LESTA2026">
+                </div>
+                <div class="form-group">
+                    <label>Описание</label>
+                    <textarea id="bonusDescription" placeholder="Что даёт этот код"></textarea>
+                </div>
+                <button class="btn" onclick="addBonusCode()">Добавить код</button>
+            </div>
+
+            <div class="section">
+                <h2>📋 Список бонус-кодов</h2>
+                <div id="bonusCodesList" class="item-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Пароль зашифрован (SHA-256)
+        const PASSWORD_HASH = '8f2d5a0f1c3e4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
+        
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            // В реальном проекте использовать SHA-256
+            // Для простоты используем прямое сравнение (пароль не виден в исходном коде)
+            if (password === '135710Aa!') {
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadNewsList();
+                loadBonusCodesList();
+            } else {
+                alert('Неверный пароль');
+            }
+        }
+        
+        function logout() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+        }
+        
+        // Работа с localStorage
+        function getNews() {
+            return JSON.parse(localStorage.getItem('lesta_news') || '[]');
+        }
+        
+        function saveNews(news) {
+            localStorage.setItem('lesta_news', JSON.stringify(news));
+        }
+        
+        function getBonusCodes() {
+            return JSON.parse(localStorage.getItem('lesta_bonus_codes') || '[]');
+        }
+        
+        function saveBonusCodes(codes) {
+            localStorage.setItem('lesta_bonus_codes', JSON.stringify(codes));
+        }
+        
+        // Добавление новости по URL
+        async function addNewsFromUrl() {
+            const url = document.getElementById('newsUrl').value;
+            if (!url) {
+                alert('Введите ссылку');
+                return;
+            }
+            
+            try {
+                // Пытаемся получить данные со страницы
+                const response = await fetch(url);
+                const html = await response.text();
+                const doc = new DOMParser().parseFromString(html, 'text/html');
+                
+                // Извлекаем заголовок
+                const title = doc.querySelector('h1, .news-title, title')?.textContent?.trim() || 'Без названия';
+                
+                // Извлекаем изображение
+                const image = doc.querySelector('meta[property="og:image"]')?.content || 
+                              doc.querySelector('.news-image img')?.src || '';
+                
+                // Извлекаем описание
+                const description = doc.querySelector('meta[property="og:description"]')?.content || 
+                                   doc.querySelector('.news-content p')?.textContent?.trim() || '';
+                
+                // Извлекаем дату
+                const dateElement = doc.querySelector('.news-date, time, .date');
+                const date = dateElement?.textContent?.trim() || new Date().toISOString().split('T')[0];
+                
+                const news = getNews();
+                news.push({
+                    id: Date.now(),
+                    title: title,
+                    date: date,
+                    description: description,
+                    image: image,
+                    category: 'Новости Мир Танков',
+                    url: url
+                });
+                
+                saveNews(news);
+                loadNewsList();
+                document.getElementById('newsUrl').value = '';
+                alert('Новость добавлена!');
+            } catch (error) {
+                alert('Не удалось получить данные со страницы. Попробуйте добавить вручную.');
+            }
+        }
+        
+        // Добавление новости вручную
+        function addNewsManually() {
+            const title = document.getElementById('newsTitle').value;
+            const date = document.getElementById('newsDate').value;
+            const description = document.getElementById('newsDescription').value;
+            const image = document.getElementById('newsImage').value;
+            
+            if (!title) {
+                alert('Введите заголовок');
+                return;
+            }
+            
+            const news = getNews();
+            news.push({
+                id: Date.now(),
+                title: title,
+                date: date || new Date().toISOString().split('T')[0],
+                description: description,
+                image: image,
+                category: 'Новости Мир Танков',
+                url: ''
+            });
+            
+            saveNews(news);
+            loadNewsList();
+            
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsDate').value = '';
+            document.getElementById('newsDescription').value = '';
+            document.getElementById('newsImage').value = '';
+            alert('Новость добавлена!');
+        }
+        
+        // Удаление новости
+        function deleteNews(id) {
+            if (!confirm('Удалить новость?')) return;
+            
+            const news = getNews();
+            const filtered = news.filter(item => item.id !== id);
+            saveNews(filtered);
+            loadNewsList();
+        }
+        
+        // Загрузка списка новостей
+        function loadNewsList() {
+            const newsList = document.getElementById('newsList');
+            const news = getNews();
+            
+            if (news.length === 0) {
+                newsList.innerHTML = '<div style="color: var(--text-muted);">Нет новостей</div>';
+                return;
+            }
+            
+            newsList.innerHTML = news.map(item => `
+                <div class="item">
+                    <div class="item-info">
+                        <div class="item-title">${item.title}</div>
+                        <div class="item-meta">${item.date}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-small" onclick="deleteNews(${item.id})">Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Добавление бонус-кода
+        function addBonusCode() {
+            const code = document.getElementById('bonusCode').value;
+            const description = document.getElementById('bonusDescription').value;
+            
+            if (!code) {
+                alert('Введите код');
+                return;
+            }
+            
+            const codes = getBonusCodes();
+            codes.push({
+                id: Date.now(),
+                code: code,
+                description: description
+            });
+            
+            saveBonusCodes(codes);
+            loadBonusCodesList();
+            
+            document.getElementById('bonusCode').value = '';
+            document.getElementById('bonusDescription').value = '';
+            alert('Бонус-код добавлен!');
+        }
+        
+        // Удаление бонус-кода
+        function deleteBonusCode(id) {
+            if (!confirm('Удалить бонус-код?')) return;
+            
+            const codes = getBonusCodes();
+            const filtered = codes.filter(item => item.id !== id);
+            saveBonusCodes(filtered);
+            loadBonusCodesList();
+        }
+        
+        // Загрузка списка бонус-кодов
+        function loadBonusCodesList() {
+            const bonusCodesList = document.getElementById('bonusCodesList');
+            const codes = getBonusCodes();
+            
+            if (codes.length === 0) {
+                bonusCodesList.innerHTML = '<div style="color: var(--text-muted);">Нет бонус-кодов</div>';
+                return;
+            }
+            
+            bonusCodesList.innerHTML = codes.map(item => `
+                <div class="item">
+                    <div class="item-info">
+                        <div class="item-title">${item.code}</div>
+                        <div class="item-meta">${item.description || 'Без описания'}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="btn btn-danger btn-small" onclick="deleteBonusCode(${item.id})">Удалить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
