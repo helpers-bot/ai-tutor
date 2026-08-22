@@ -202,6 +202,12 @@
             border-radius: 8px;
             cursor: pointer;
         }
+
+        .loading {
+            text-align: center;
+            padding: 1rem;
+            color: var(--accent-blue);
+        }
     </style>
 </head>
 <body>
@@ -218,12 +224,13 @@
             <button class="logout-btn" onclick="logout()">Выйти</button>
 
             <div class="section">
-                <h2>📰 Добавить новость</h2>
+                <h2>📰 Добавить новость по ссылке</h2>
                 <div class="form-group">
                     <label>Ссылка на новость (tanki.su)</label>
                     <input type="url" id="newsUrl" placeholder="https://tanki.su/ru/news/...">
                 </div>
                 <button class="btn" onclick="addNewsFromUrl()">Добавить новость</button>
+                <div id="loadingIndicator" class="loading" style="display: none;">Загрузка данных...</div>
                 
                 <div class="form-group" style="margin-top: 1rem;">
                     <label>Или добавьте вручную:</label>
@@ -278,8 +285,6 @@
         
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
-            // В реальном проекте использовать SHA-256
-            // Для простоты используем прямое сравнение (пароль не виден в исходном коде)
             if (password === '135710Aa!') {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
@@ -313,6 +318,119 @@
             localStorage.setItem('lesta_bonus_codes', JSON.stringify(codes));
         }
         
+        // Функция для обхода CORS с использованием прокси
+        async function fetchWithProxy(url) {
+            // Пробуем разные прокси-сервисы
+            const proxies = [
+                `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                `https://cors-anywhere.herokuapp.com/${url}`,
+                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+            ];
+            
+            for (const proxyUrl of proxies) {
+                try {
+                    const response = await fetch(proxyUrl);
+                    if (response.ok) {
+                        return await response.text();
+                    }
+                } catch (error) {
+                    console.warn(`Прокси ${proxyUrl} не сработал:`, error);
+                }
+            }
+            
+            throw new Error('Не удалось получить данные через прокси');
+        }
+        
+        // Функция для извлечения данных из HTML
+        function extractNewsData(html, url) {
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            
+            // Извлекаем заголовок
+            let title = '';
+            const titleSelectors = [
+                'h1',
+                '.news-title',
+                '.article-title',
+                'meta[property="og:title"]',
+                'title'
+            ];
+            
+            for (const selector of titleSelectors) {
+                const element = doc.querySelector(selector);
+                if (element) {
+                    title = element.textContent?.trim() || element.content?.trim() || '';
+                    if (title) break;
+                }
+            }
+            
+            // Извлекаем изображение
+            let image = '';
+            const imageSelectors = [
+                'meta[property="og:image"]',
+                'meta[name="twitter:image"]',
+                '.news-image img',
+                '.article-image img',
+                'article img'
+            ];
+            
+            for (const selector of imageSelectors) {
+                const element = doc.querySelector(selector);
+                if (element) {
+                    image = element.content || element.src || '';
+                    if (image) break;
+                }
+            }
+            
+            // Извлекаем описание
+            let description = '';
+            const descSelectors = [
+                'meta[property="og:description"]',
+                'meta[name="description"]',
+                '.news-description',
+                '.article-content p',
+                '.news-content p'
+            ];
+            
+            for (const selector of descSelectors) {
+                const element = doc.querySelector(selector);
+                if (element) {
+                    description = element.content || element.textContent?.trim() || '';
+                    if (description) break;
+                }
+            }
+            
+            // Извлекаем дату
+            let date = '';
+            const dateSelectors = [
+                '.news-date',
+                '.article-date',
+                'time',
+                '.date',
+                'meta[property="article:published_time"]'
+            ];
+            
+            for (const selector of dateSelectors) {
+                const element = doc.querySelector(selector);
+                if (element) {
+                    date = element.textContent?.trim() || element.content || '';
+                    if (date) break;
+                }
+            }
+            
+            // Если дата не найдена, используем текущую
+            if (!date || date === '') {
+                date = new Date().toISOString().split('T')[0];
+            }
+            
+            return {
+                title: title || 'Без названия',
+                image: image || '',
+                description: description || '',
+                date: date,
+                url: url
+            };
+        }
+        
         // Добавление новости по URL
         async function addNewsFromUrl() {
             const url = document.getElementById('newsUrl').value;
@@ -321,34 +439,21 @@
                 return;
             }
             
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'block';
+            
             try {
-                // Пытаемся получить данные со страницы
-                const response = await fetch(url);
-                const html = await response.text();
-                const doc = new DOMParser().parseFromString(html, 'text/html');
-                
-                // Извлекаем заголовок
-                const title = doc.querySelector('h1, .news-title, title')?.textContent?.trim() || 'Без названия';
-                
-                // Извлекаем изображение
-                const image = doc.querySelector('meta[property="og:image"]')?.content || 
-                              doc.querySelector('.news-image img')?.src || '';
-                
-                // Извлекаем описание
-                const description = doc.querySelector('meta[property="og:description"]')?.content || 
-                                   doc.querySelector('.news-content p')?.textContent?.trim() || '';
-                
-                // Извлекаем дату
-                const dateElement = doc.querySelector('.news-date, time, .date');
-                const date = dateElement?.textContent?.trim() || new Date().toISOString().split('T')[0];
+                // Пытаемся получить данные через прокси
+                const html = await fetchWithProxy(url);
+                const newsData = extractNewsData(html, url);
                 
                 const news = getNews();
                 news.push({
                     id: Date.now(),
-                    title: title,
-                    date: date,
-                    description: description,
-                    image: image,
+                    title: newsData.title,
+                    date: newsData.date,
+                    description: newsData.description,
+                    image: newsData.image,
                     category: 'Новости Мир Танков',
                     url: url
                 });
@@ -356,9 +461,12 @@
                 saveNews(news);
                 loadNewsList();
                 document.getElementById('newsUrl').value = '';
+                loadingIndicator.style.display = 'none';
                 alert('Новость добавлена!');
             } catch (error) {
-                alert('Не удалось получить данные со страницы. Попробуйте добавить вручную.');
+                loadingIndicator.style.display = 'none';
+                console.error('Ошибка при загрузке:', error);
+                alert('Не удалось получить данные со страницы. Попробуйте добавить вручную или проверьте ссылку.');
             }
         }
         
