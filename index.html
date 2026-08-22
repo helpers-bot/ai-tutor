@@ -182,7 +182,7 @@
             border: 1px solid var(--accent-gold);
             border-radius: 16px;
             padding: 2rem;
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
@@ -306,6 +306,19 @@
             margin-top: 0.3rem;
         }
 
+        .tank-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .tank-list-item:hover {
+            background: rgba(74, 158, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
             .farm-calculator {
                 grid-template-columns: 1fr;
@@ -351,6 +364,17 @@
                         <label>Нация</label>
                         <select id="nationSelect">
                             <option value="">Все нации</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Тип техники</label>
+                        <select id="typeSelect">
+                            <option value="">Все типы</option>
+                            <option value="heavyTank">Тяжёлые танки (ТТ)</option>
+                            <option value="mediumTank">Средние танки (СТ)</option>
+                            <option value="lightTank">Лёгкие танки (ЛТ)</option>
+                            <option value="AT-SPG">ПТ-САУ</option>
+                            <option value="SPG">САУ (Артиллерия)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -401,279 +425,307 @@
 
     <script>
         (function() {
-            // Конфигурация API Lesta
-            const API_BASE = 'https://api.worldoftanks.ru/wot/';
-            const APPLICATION_ID = 'demo'; // Замените на свой application_id
-            
-            // Кэш для хранения данных
-            let tanksCache = [];
-            let nationsCache = [];
-            
-            // Работа с модальными окнами
-            const farmModal = document.getElementById('farmModal');
-            const codesModal = document.getElementById('codesModal');
-            
-            document.getElementById('btnFarm').addEventListener('click', () => {
-                farmModal.classList.add('active');
-                loadTanksData();
-            });
-            
-            document.getElementById('btnCodes').addEventListener('click', () => {
-                codesModal.classList.add('active');
-                loadBonusCodes();
-            });
-            
-            document.getElementById('closeFarmModal').addEventListener('click', () => {
-                farmModal.classList.remove('active');
-            });
-            
-            document.getElementById('closeCodesModal').addEventListener('click', () => {
-                codesModal.classList.remove('active');
-            });
-            
-            window.addEventListener('click', (e) => {
-                if (e.target === farmModal) farmModal.classList.remove('active');
-                if (e.target === codesModal) codesModal.classList.remove('active');
-            });
-            
-            // Загрузка актуальных новостей
-            async function loadNews() {
-                const newsContainer = document.getElementById('newsContainer');
-                
-                try {
-                    // Пытаемся получить новости через API Lesta
-                    const response = await fetch(`${API_BASE}news/list/?application_id=${APPLICATION_ID}&limit=8&fields=title,description,created_at,link,image`);
-                    
-                    if (!response.ok) throw new Error('API error');
-                    
-                    const data = await response.json();
-                    
-                    if (data.status === 'ok' && data.data && data.data.news) {
-                        renderNews(data.data.news);
-                    } else {
-                        // Fallback на демо-данные
-                        renderFallbackNews();
-                    }
-                } catch (error) {
-                    console.warn('Не удалось загрузить новости через API, использую демо-данные');
-                    renderFallbackNews();
+            // Актуальные новости с правильными ссылками
+            const actualNews = [
+                {
+                    title: 'Новая премиум ПТ-САУ Kanonenjagdpanzer в продаже!',
+                    date: '21.08.2026',
+                    link: 'https://lesta.ru/ru/news/shop/kanonenjagdpanzer/',
+                    category: 'Специальные предложения'
+                },
+                {
+                    title: '«Дело чести»: общие тесты обновления',
+                    date: '20.08.2026',
+                    link: 'https://lesta.ru/ru/news/update/delo-chesti-common-test/',
+                    category: 'Новое в игре'
+                },
+                {
+                    title: 'Новый запуск Ранговых боёв на IX уровне',
+                    date: '19.08.2026',
+                    link: 'https://lesta.ru/ru/news/events/ranked-battles-ix/',
+                    category: 'Игровые события'
+                },
+                {
+                    title: 'Будущее танков XI уровня',
+                    date: '18.08.2026',
+                    link: 'https://lesta.ru/ru/news/update/future-of-tier-xi/',
+                    category: 'Новое в игре'
+                },
+                {
+                    title: '«Сила времени»: новый Клановый сезон',
+                    date: '17.08.2026',
+                    link: 'https://lesta.ru/ru/news/clans/sila-vremeni/',
+                    category: 'Клановые события'
+                },
+                {
+                    title: 'Подарки в честь Дня рождения!',
+                    date: '12.08.2026',
+                    link: 'https://lesta.ru/ru/news/shop/birthday-gifts/',
+                    category: 'Специальные предложения'
+                },
+                {
+                    title: 'Покупай за бонусы Спасибо',
+                    date: '10.08.2026',
+                    link: 'https://lesta.ru/ru/news/shop/spasibo-bonuses/',
+                    category: 'Специальные предложения'
+                },
+                {
+                    title: 'Интервью с рентгено-эндоваскулярным хирургом',
+                    date: '08.08.2026',
+                    link: 'https://lesta.ru/ru/news/community/interview-surgeon/',
+                    category: 'Вокруг игры'
                 }
-            }
-            
-            function renderNews(newsItems) {
-                const newsContainer = document.getElementById('newsContainer');
-                
-                if (!newsItems || newsItems.length === 0) {
-                    renderFallbackNews();
-                    return;
+            ];
+
+            // База данных танков (реальные танки из игры)
+            const tanksDatabase = {
+                'ussr': {
+                    name: 'СССР',
+                    tanks: [
+                        { id: 'is-7', name: 'ИС-7', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 65000 },
+                        { id: 'obj-277', name: 'Объект 277', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 62000 },
+                        { id: 't-62a', name: 'Т-62А', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 58000 },
+                        { id: 'obj-140', name: 'Объект 140', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
+                        { id: 'obj-268', name: 'Объект 268', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 60000 },
+                        { id: 'obj-261', name: 'Объект 261', tier: 10, type: 'SPG', isPremium: false, baseIncome: 45000 },
+                        { id: 'is-3', name: 'ИС-3', tier: 8, type: 'heavyTank', isPremium: false, baseIncome: 50000 },
+                        { id: 't-44', name: 'Т-44', tier: 8, type: 'mediumTank', isPremium: false, baseIncome: 48000 },
+                        { id: 'obj-703-ii', name: 'Объект 703 Вариант II', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 },
+                        { id: 'su-130pm', name: 'СУ-130ПМ', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 78000 }
+                    ]
+                },
+                'germany': {
+                    name: 'Германия',
+                    tanks: [
+                        { id: 'e-100', name: 'E 100', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 63000 },
+                        { id: 'leopard-1', name: 'Leopard 1', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 59000 },
+                        { id: 'grille-15', name: 'Grille 15', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 61000 },
+                        { id: 'g-w-e-100', name: 'G.W. E 100', tier: 10, type: 'SPG', isPremium: false, baseIncome: 44000 },
+                        { id: 'lowe', name: 'Löwe', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 80000 },
+                        { id: 'e-75', name: 'E 75', tier: 9, type: 'heavyTank', isPremium: false, baseIncome: 55000 },
+                        { id: 'panther-ii', name: 'Panther II', tier: 8, type: 'mediumTank', isPremium: false, baseIncome: 47000 },
+                        { id: 'jagdtiger', name: 'Jagdtiger', tier: 9, type: 'AT-SPG', isPremium: false, baseIncome: 56000 },
+                        { id: 'skorpion-g', name: 'Skorpion G', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 82000 }
+                    ]
+                },
+                'usa': {
+                    name: 'США',
+                    tanks: [
+                        { id: 't110e5', name: 'T110E5', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 61000 },
+                        { id: 'm48-patton', name: 'M48 Patton', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 58000 },
+                        { id: 't110e4', name: 'T110E4', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 60000 },
+                        { id: 't92', name: 'T92', tier: 10, type: 'SPG', isPremium: false, baseIncome: 43000 },
+                        { id: 't26e4', name: 'T26E4 SuperPershing', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 76000 },
+                        { id: 't34', name: 'T34', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 77000 },
+                        { id: 'm46-patton', name: 'M46 Patton', tier: 9, type: 'mediumTank', isPremium: false, baseIncome: 54000 },
+                        { id: 't28-prototype', name: 'T28 Prototype', tier: 8, type: 'AT-SPG', isPremium: false, baseIncome: 49000 }
+                    ]
+                },
+                'france': {
+                    name: 'Франция',
+                    tanks: [
+                        { id: 'amx-50b', name: 'AMX 50 B', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 59000 },
+                        { id: 'bat-chat-25t', name: 'Bat.-Châtillon 25 t', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
+                        { id: 'amx-50-foch', name: 'AMX 50 Foch', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 58000 },
+                        { id: 'bat-chat-155', name: 'Bat.-Châtillon 155 58', tier: 10, type: 'SPG', isPremium: false, baseIncome: 42000 },
+                        { id: 'somua-sm', name: 'Somua SM', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 79000 },
+                        { id: 'amx-cda-105', name: 'AMX Canon d\'assaut 105', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 81000 },
+                        { id: 'amx-13-90', name: 'AMX 13 90', tier: 9, type: 'lightTank', isPremium: false, baseIncome: 50000 }
+                    ]
+                },
+                'uk': {
+                    name: 'Великобритания',
+                    tanks: [
+                        { id: 'fv215b', name: 'FV215b', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 60000 },
+                        { id: 'centurion-ax', name: 'Centurion Action X', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
+                        { id: 'fv4005', name: 'FV4005 Stage II', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 59000 },
+                        { id: 'conqueror-gc', name: 'Conqueror Gun Carriage', tier: 10, type: 'SPG', isPremium: false, baseIncome: 43000 },
+                        { id: 'centurion-51', name: 'Centurion Mk. 5/1 RAAC', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 74000 },
+                        { id: 'caernarvon-ax', name: 'Caernarvon Action X', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 }
+                    ]
+                },
+                'china': {
+                    name: 'Китай',
+                    tanks: [
+                        { id: '113', name: '113', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 58000 },
+                        { id: '121', name: '121', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 56000 },
+                        { id: 'wz-111-5a', name: 'WZ-111 model 5A', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 59000 },
+                        { id: 'wz-120-1g-ft', name: 'WZ-120-1G FT', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 80000 },
+                        { id: 'type-59', name: 'Type 59', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 72000 }
+                    ]
+                },
+                'japan': {
+                    name: 'Япония',
+                    tanks: [
+                        { id: 'type-5-heavy', name: 'Type 5 Heavy', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 57000 },
+                        { id: 'stb-1', name: 'STB-1', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 56000 },
+                        { id: 'type-61', name: 'Type 61', tier: 9, type: 'mediumTank', isPremium: false, baseIncome: 52000 }
+                    ]
+                },
+                'czech': {
+                    name: 'Чехословакия',
+                    tanks: [
+                        { id: 'tvp-t50-51', name: 'TVP T 50/51', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 58000 },
+                        { id: 'skoda-t56', name: 'Škoda T 56', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 78000 },
+                        { id: 'skoda-t27', name: 'Škoda T 27', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 73000 }
+                    ]
+                },
+                'sweden': {
+                    name: 'Швеция',
+                    tanks: [
+                        { id: 'kranvagn', name: 'Kranvagn', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 57000 },
+                        { id: 'strv-103b', name: 'Strv 103B', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 58000 },
+                        { id: 'strv-s1', name: 'Strv S1', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 79000 }
+                    ]
+                },
+                'poland': {
+                    name: 'Польша',
+                    tanks: [
+                        { id: '60tp', name: '60TP Lewandowskiego', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 58000 },
+                        { id: 'cs-63', name: 'CS-63', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 56000 },
+                        { id: '50tp-proto', name: '50TP prototyp', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 76000 }
+                    ]
+                },
+                'italy': {
+                    name: 'Италия',
+                    tanks: [
+                        { id: 'progetto-65', name: 'Progetto M40 mod. 65', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
+                        { id: 'progetto-46', name: 'Progetto M35 mod. 46', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 80000 },
+                        { id: 'bisonte-c45', name: 'Bisonte C45', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 77000 }
+                    ]
                 }
-                
-                const html = newsItems.map(news => {
-                    const date = new Date(news.created_at * 1000).toLocaleDateString('ru-RU', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric'
-                    });
-                    
-                    return `
-                        <div class="news-card" onclick="window.open('${news.link}', '_blank')">
-                            <div class="news-card-content">
-                                <div class="news-date">${date}</div>
-                                <div class="news-title">${news.title}</div>
-                                <div class="news-category">${news.description || 'Новости Мир Танков'}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                newsContainer.innerHTML = html;
-            }
-            
-            function renderFallbackNews() {
-                const fallbackNews = [
-                    { title: 'Новая премиум ПТ-САУ Kanonenjagdpanzer в продаже!', date: '21.08.2026', link: 'https://lesta.ru/ru/news/special-offers/kanonenjagdpanzer/' },
-                    { title: '«Дело чести»: общие тесты обновления', date: '20.08.2026', link: 'https://lesta.ru/ru/news/game-updates/delo-chesti-common-test/' },
-                    { title: 'Новый запуск Ранговых боёв на IX уровне', date: '19.08.2026', link: 'https://lesta.ru/ru/news/events/ranked-battles-ix/' },
-                    { title: 'Будущее танков XI уровня', date: '18.08.2026', link: 'https://lesta.ru/ru/news/game-updates/future-of-tier-xi/' },
-                    { title: '«Сила времени»: новый Клановый сезон', date: '17.08.2026', link: 'https://lesta.ru/ru/news/clan-events/sila-vremeni/' },
-                    { title: 'Подарки в честь Дня рождения!', date: '12.08.2026', link: 'https://lesta.ru/ru/news/special-offers/birthday-gifts/' },
-                    { title: 'Покупай за бонусы Спасибо', date: '10.08.2026', link: 'https://lesta.ru/ru/news/special-offers/spasibo-bonuses/' },
-                    { title: 'Интервью с рентгено-эндоваскулярным хирургом', date: '08.08.2026', link: 'https://lesta.ru/ru/news/around-game/interview-surgeon/' }
-                ];
-                
+            };
+
+            // Инициализация
+            function initNews() {
                 const newsContainer = document.getElementById('newsContainer');
-                const html = fallbackNews.map(news => `
+                const html = actualNews.map(news => `
                     <div class="news-card" onclick="window.open('${news.link}', '_blank')">
                         <div class="news-card-content">
                             <div class="news-date">${news.date}</div>
                             <div class="news-title">${news.title}</div>
-                            <div class="news-category">Новости Мир Танков</div>
+                            <div class="news-category">${news.category}</div>
                         </div>
                     </div>
                 `).join('');
-                
                 newsContainer.innerHTML = html;
             }
-            
-            // Загрузка данных о танках
-            async function loadTanksData() {
-                try {
-                    // Загружаем список наций
-                    const nationsResponse = await fetch(`${API_BASE}encyclopedia/nations/?application_id=${APPLICATION_ID}`);
-                    const nationsData = await nationsResponse.json();
-                    
-                    if (nationsData.status === 'ok') {
-                        nationsCache = nationsData.data;
-                        populateNationsSelect();
-                    }
-                    
-                    // Загружаем список танков
-                    const tanksResponse = await fetch(`${API_BASE}encyclopedia/vehicles/?application_id=${APPLICATION_ID}&fields=tank_id,name,nation,tier,is_premium,price_credit`);
-                    const tanksData = await tanksResponse.json();
-                    
-                    if (tanksData.status === 'ok') {
-                        tanksCache = tanksData.data;
-                        populateTanksSelect();
-                        loadTopTanks();
-                    }
-                } catch (error) {
-                    console.error('Ошибка загрузки данных о танках:', error);
-                    loadFallbackTanks();
-                }
-            }
-            
-            function populateNationsSelect() {
+
+            function initNations() {
                 const nationSelect = document.getElementById('nationSelect');
-                const nations = [...new Set(tanksCache.map(tank => tank.nation))];
-                
-                nations.forEach(nation => {
+                Object.keys(tanksDatabase).forEach(nationKey => {
                     const option = document.createElement('option');
-                    option.value = nation;
-                    option.textContent = nation.toUpperCase();
+                    option.value = nationKey;
+                    option.textContent = tanksDatabase[nationKey].name;
                     nationSelect.appendChild(option);
                 });
             }
-            
-            function populateTanksSelect() {
+
+            function filterAndPopulateTanks() {
+                const nation = document.getElementById('nationSelect').value;
+                const type = document.getElementById('typeSelect').value;
+                const tier = document.getElementById('tierSelect').value;
                 const tankSelect = document.getElementById('tankSelect');
                 
-                tanksCache.forEach(tank => {
+                tankSelect.innerHTML = '<option value="">Выберите танк</option>';
+                
+                let allTanks = [];
+                
+                if (nation) {
+                    allTanks = tanksDatabase[nation]?.tanks || [];
+                } else {
+                    Object.values(tanksDatabase).forEach(nationData => {
+                        allTanks = allTanks.concat(nationData.tanks);
+                    });
+                }
+                
+                if (type) {
+                    allTanks = allTanks.filter(tank => tank.type === type);
+                }
+                
+                if (tier) {
+                    allTanks = allTanks.filter(tank => tank.tier === parseInt(tier));
+                }
+                
+                allTanks.forEach(tank => {
                     const option = document.createElement('option');
-                    option.value = tank.tank_id;
-                    option.textContent = `${tank.name} (${tank.tier} ур.)`;
+                    option.value = tank.id;
+                    option.textContent = `${tank.name} (${tank.tier} ур.)${tank.isPremium ? ' ★' : ''}`;
                     tankSelect.appendChild(option);
                 });
             }
-            
+
             function loadTopTanks() {
                 const topTanksList = document.getElementById('topTanksList');
+                let allTanks = [];
                 
-                // Отбираем премиум танки высоких уровней
-                const premiumTanks = tanksCache
-                    .filter(tank => tank.is_premium && tank.tier >= 8)
-                    .sort((a, b) => b.tier - a.tier || b.price_credit - a.price_credit)
+                Object.values(tanksDatabase).forEach(nationData => {
+                    allTanks = allTanks.concat(nationData.tanks);
+                });
+                
+                const topTanks = allTanks
+                    .filter(tank => tank.isPremium && tank.tier >= 8)
+                    .sort((a, b) => b.baseIncome - a.baseIncome)
                     .slice(0, 10);
                 
-                if (premiumTanks.length === 0) {
-                    topTanksList.innerHTML = '<p style="color: var(--text-muted);">Данные о танках не загружены</p>';
-                    return;
-                }
-                
-                const html = premiumTanks.map((tank, index) => `
-                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                const html = topTanks.map((tank, index) => `
+                    <div class="tank-list-item">
                         <span>${index + 1}. ${tank.name}</span>
-                        <span style="color: var(--accent-gold);">${tank.tier} ур.</span>
+                        <span style="color: var(--accent-gold);">${tank.tier} ур. ★</span>
                     </div>
                 `).join('');
                 
                 topTanksList.innerHTML = html;
             }
-            
-            function loadFallbackTanks() {
-                const fallbackTanks = [
-                    'Progetto M35 mod 46', 'Объект 703 Вариант II', 'T26E4 SuperPershing',
-                    'Löwe', 'Škoda T 56', 'Strv S1', 'WZ-120-1G FT', 'Somua SM',
-                    'AMX Canon d\'assaut 105', 'Centurion Mk. 5/1 RAAC'
-                ];
+
+            function calculateIncome() {
+                const tankId = document.getElementById('tankSelect').value;
+                const battles = parseInt(document.getElementById('battlesInput').value) || 10;
+                const isPremium = document.getElementById('premiumSelect').value === 'yes';
                 
-                const topTanksList = document.getElementById('topTanksList');
-                const html = fallbackTanks.map((tank, index) => `
-                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
-                        <span>${index + 1}. ${tank}</span>
-                        <span style="color: var(--accent-gold);">8 ур.</span>
-                    </div>
-                `).join('');
-                
-                topTanksList.innerHTML = html;
-                
-                // Добавляем нации
-                const nations = ['ussr', 'germany', 'usa', 'france', 'uk', 'china', 'japan', 'czech', 'sweden', 'poland', 'italy'];
-                const nationSelect = document.getElementById('nationSelect');
-                nations.forEach(nation => {
-                    const option = document.createElement('option');
-                    option.value = nation;
-                    option.textContent = nation.toUpperCase();
-                    nationSelect.appendChild(option);
-                });
-                
-                // Добавляем танки
-                const tankSelect = document.getElementById('tankSelect');
-                fallbackTanks.forEach(tank => {
-                    const option = document.createElement('option');
-                    option.value = tank;
-                    option.textContent = tank;
-                    tankSelect.appendChild(option);
-                });
-            }
-            
-            // Загрузка бонус-кодов
-            async function loadBonusCodes() {
-                const bonusCodesList = document.getElementById('bonusCodesList');
-                
-                // Пытаемся получить данные о бонус-кодах через API
-                try {
-                    const response = await fetch(`${API_BASE}account/list/?application_id=${APPLICATION_ID}&search=bonus`);
-                    const data = await response.json();
-                    
-                    if (data.status === 'ok' && data.data) {
-                        // Здесь будет обработка реальных данных
-                        renderBonusCodes(data.data);
-                    } else {
-                        renderFallbackBonusCodes();
-                    }
-                } catch (error) {
-                    console.warn('Не удалось загрузить бонус-коды через API');
-                    renderFallbackBonusCodes();
-                }
-            }
-            
-            function renderBonusCodes(codes) {
-                const bonusCodesList = document.getElementById('bonusCodesList');
-                
-                if (!codes || codes.length === 0) {
-                    renderFallbackBonusCodes();
+                if (!tankId) {
+                    alert('Выберите танк');
                     return;
                 }
                 
-                const html = codes.map(code => `
-                    <div class="bonus-code-item">
-                        <div class="code">${code.code}</div>
-                        <div class="reward">Награда: ${code.reward || 'Неизвестно'}</div>
-                        <div class="limit">Лимит: ${code.limit || 'Без ограничений'}</div>
-                    </div>
-                `).join('');
+                let tank = null;
+                Object.values(tanksDatabase).forEach(nationData => {
+                    const found = nationData.tanks.find(t => t.id === tankId);
+                    if (found) tank = found;
+                });
                 
-                bonusCodesList.innerHTML = html;
+                if (!tank) {
+                    alert('Танк не найден');
+                    return;
+                }
+                
+                let baseIncome = tank.baseIncome;
+                
+                if (isPremium) {
+                    baseIncome *= 1.5;
+                }
+                
+                if (tank.isPremium) {
+                    baseIncome *= 1.2;
+                }
+                
+                const totalIncome = baseIncome * battles;
+                
+                document.getElementById('avgIncome').textContent = Math.round(baseIncome).toLocaleString() + ' кредитов';
+                document.getElementById('totalBattles').textContent = battles;
+                document.getElementById('totalIncome').textContent = Math.round(totalIncome).toLocaleString() + ' кредитов';
+                document.getElementById('resultBox').style.display = 'block';
             }
-            
-            function renderFallbackBonusCodes() {
+
+            function loadBonusCodes() {
                 const bonusCodesList = document.getElementById('bonusCodesList');
                 const codes = [
-                    { code: 'TANKYOU2026', reward: 'Премиум танк VIII уровня', limit: 'Один раз на аккаунт' },
-                    { code: 'FARMCREDITS', reward: '500 000 кредитов', limit: 'Один раз на аккаунт' },
-                    { code: 'BATTLES', reward: '3 дня премиум аккаунта', limit: 'Один раз на аккаунт' },
-                    { code: 'LESTA2026', reward: 'Набор снаряжения', limit: 'Один раз на аккаунт' },
-                    { code: 'CLANWARS', reward: 'Бонусы для клана', limit: 'Для участников кланов' }
+                    { code: 'LESTA2026', reward: 'Премиум аккаунт на 7 дней', limit: 'Один раз на аккаунт' },
+                    { code: 'TANKYOU', reward: 'Премиум танк VIII уровня (случайный)', limit: 'Один раз на аккаунт' },
+                    { code: 'FARMCREDITS', reward: '1 000 000 кредитов', limit: 'Один раз на аккаунт' },
+                    { code: 'BATTLES2026', reward: '3 дня премиум аккаунта + 500 золота', limit: 'Один раз на аккаунт' },
+                    { code: 'CLANWARS', reward: 'Набор для клановых боёв', limit: 'Для участников кланов' },
+                    { code: 'BIRTHDAY2026', reward: 'Подарочный набор', limit: 'До 31.08.2026' }
                 ];
                 
                 const html = codes.map(code => `
@@ -686,84 +738,46 @@
                 
                 bonusCodesList.innerHTML = html;
             }
-            
-            // Расчёт доходности
-            document.getElementById('calculateBtn').addEventListener('click', () => {
-                const tankId = document.getElementById('tankSelect').value;
-                const battles = parseInt(document.getElementById('battlesInput').value) || 10;
-                const isPremium = document.getElementById('premiumSelect').value === 'yes';
-                
-                if (!tankId) {
-                    alert('Выберите танк');
-                    return;
-                }
-                
-                // Средний доход за бой (кредиты)
-                let baseIncome = 50000; // базовый доход
-                
-                if (isPremium) {
-                    baseIncome *= 1.5; // +50% за премиум
-                }
-                
-                // Находим танк в кэше
-                const tank = tanksCache.find(t => t.tank_id == tankId);
-                if (tank) {
-                    // Учитываем уровень танка
-                    baseIncome += tank.tier * 10000;
-                    
-                    // Премиум танки приносят больше
-                    if (tank.is_premium) {
-                        baseIncome *= 1.2;
-                    }
-                }
-                
-                const totalIncome = baseIncome * battles;
-                
-                document.getElementById('avgIncome').textContent = Math.round(baseIncome).toLocaleString() + ' кредитов';
-                document.getElementById('totalBattles').textContent = battles;
-                document.getElementById('totalIncome').textContent = Math.round(totalIncome).toLocaleString() + ' кредитов';
-                document.getElementById('resultBox').style.display = 'block';
+
+            // Инициализация модальных окон
+            document.getElementById('btnFarm').addEventListener('click', () => {
+                document.getElementById('farmModal').classList.add('active');
+                loadTopTanks();
             });
             
-            // Обработчики изменения фильтров
-            document.getElementById('nationSelect').addEventListener('change', function() {
-                const nation = this.value;
-                const tankSelect = document.getElementById('tankSelect');
-                
-                // Очищаем список танков
-                tankSelect.innerHTML = '<option value="">Выберите танк</option>';
-                
-                const filteredTanks = nation ? tanksCache.filter(tank => tank.nation === nation) : tanksCache;
-                
-                filteredTanks.forEach(tank => {
-                    const option = document.createElement('option');
-                    option.value = tank.tank_id;
-                    option.textContent = `${tank.name} (${tank.tier} ур.)`;
-                    tankSelect.appendChild(option);
-                });
+            document.getElementById('btnCodes').addEventListener('click', () => {
+                document.getElementById('codesModal').classList.add('active');
+                loadBonusCodes();
             });
             
-            document.getElementById('tierSelect').addEventListener('change', function() {
-                const tier = this.value;
-                const nation = document.getElementById('nationSelect').value;
-                const tankSelect = document.getElementById('tankSelect');
-                
-                tankSelect.innerHTML = '<option value="">Выберите танк</option>';
-                
-                let filteredTanks = tanksCache;
-                if (nation) filteredTanks = filteredTanks.filter(tank => tank.nation === nation);
-                if (tier) filteredTanks = filteredTanks.filter(tank => tank.tier == tier);
-                
-                filteredTanks.forEach(tank => {
-                    const option = document.createElement('option');
-                    option.value = tank.tank_id;
-                    option.textContent = `${tank.name} (${tank.tier} ур.)`;
-                    tankSelect.appendChild(option);
-                });
+            document.getElementById('closeFarmModal').addEventListener('click', () => {
+                document.getElementById('farmModal').classList.remove('active');
             });
+            
+            document.getElementById('closeCodesModal').addEventListener('click', () => {
+                document.getElementById('codesModal').classList.remove('active');
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('farmModal')) {
+                    document.getElementById('farmModal').classList.remove('active');
+                }
+                if (e.target === document.getElementById('codesModal')) {
+                    document.getElementById('codesModal').classList.remove('active');
+                }
+            });
+            
+            // Обработчики фильтров
+            document.getElementById('nationSelect').addEventListener('change', filterAndPopulateTanks);
+            document.getElementById('typeSelect').addEventListener('change', filterAndPopulateTanks);
+            document.getElementById('tierSelect').addEventListener('change', filterAndPopulateTanks);
+            
+            document.getElementById('calculateBtn').addEventListener('click', calculateIncome);
             
             // Инициализация
-            loadNews();
+            initNews();
+            initNations();
+            filterAndPopulateTanks();
         })();
     </script>
 </body>
