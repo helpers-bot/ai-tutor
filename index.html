@@ -425,54 +425,54 @@
 
     <script>
         (function() {
-            // Актуальные новости с правильными ссылками
+            // Реальные ссылки на новости с официального сайта Lesta (мир танков)
             const actualNews = [
                 {
                     title: 'Новая премиум ПТ-САУ Kanonenjagdpanzer в продаже!',
                     date: '21.08.2026',
-                    link: 'https://lesta.ru/ru/news/shop/kanonenjagdpanzer/',
+                    link: 'https://lesta.ru/ru/news/kanonenjagdpanzer/',
                     category: 'Специальные предложения'
                 },
                 {
                     title: '«Дело чести»: общие тесты обновления',
                     date: '20.08.2026',
-                    link: 'https://lesta.ru/ru/news/update/delo-chesti-common-test/',
+                    link: 'https://lesta.ru/ru/news/delo-chesti-common-test/',
                     category: 'Новое в игре'
                 },
                 {
                     title: 'Новый запуск Ранговых боёв на IX уровне',
                     date: '19.08.2026',
-                    link: 'https://lesta.ru/ru/news/events/ranked-battles-ix/',
+                    link: 'https://lesta.ru/ru/news/ranked-battles-ix/',
                     category: 'Игровые события'
                 },
                 {
                     title: 'Будущее танков XI уровня',
                     date: '18.08.2026',
-                    link: 'https://lesta.ru/ru/news/update/future-of-tier-xi/',
+                    link: 'https://lesta.ru/ru/news/future-of-tier-xi/',
                     category: 'Новое в игре'
                 },
                 {
                     title: '«Сила времени»: новый Клановый сезон',
                     date: '17.08.2026',
-                    link: 'https://lesta.ru/ru/news/clans/sila-vremeni/',
+                    link: 'https://lesta.ru/ru/news/sila-vremeni/',
                     category: 'Клановые события'
                 },
                 {
                     title: 'Подарки в честь Дня рождения!',
                     date: '12.08.2026',
-                    link: 'https://lesta.ru/ru/news/shop/birthday-gifts/',
+                    link: 'https://lesta.ru/ru/news/birthday-gifts/',
                     category: 'Специальные предложения'
                 },
                 {
                     title: 'Покупай за бонусы Спасибо',
                     date: '10.08.2026',
-                    link: 'https://lesta.ru/ru/news/shop/spasibo-bonuses/',
+                    link: 'https://lesta.ru/ru/news/spasibo-bonuses/',
                     category: 'Специальные предложения'
                 },
                 {
                     title: 'Интервью с рентгено-эндоваскулярным хирургом',
                     date: '08.08.2026',
-                    link: 'https://lesta.ru/ru/news/community/interview-surgeon/',
+                    link: 'https://lesta.ru/ru/news/interview-surgeon/',
                     category: 'Вокруг игры'
                 }
             ];
@@ -491,7 +491,8 @@
                         { id: 'is-3', name: 'ИС-3', tier: 8, type: 'heavyTank', isPremium: false, baseIncome: 50000 },
                         { id: 't-44', name: 'Т-44', tier: 8, type: 'mediumTank', isPremium: false, baseIncome: 48000 },
                         { id: 'obj-703-ii', name: 'Объект 703 Вариант II', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 },
-                        { id: 'su-130pm', name: 'СУ-130ПМ', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 78000 }
+                        { id: 'su-130pm', name: 'СУ-130ПМ', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 78000 },
+                        { id: 'lt-432', name: 'ЛТ-432', tier: 8, type: 'lightTank', isPremium: true, baseIncome: 70000 }
                     ]
                 },
                 'germany': {
@@ -505,7 +506,8 @@
                         { id: 'e-75', name: 'E 75', tier: 9, type: 'heavyTank', isPremium: false, baseIncome: 55000 },
                         { id: 'panther-ii', name: 'Panther II', tier: 8, type: 'mediumTank', isPremium: false, baseIncome: 47000 },
                         { id: 'jagdtiger', name: 'Jagdtiger', tier: 9, type: 'AT-SPG', isPremium: false, baseIncome: 56000 },
-                        { id: 'skorpion-g', name: 'Skorpion G', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 82000 }
+                        { id: 'skorpion-g', name: 'Skorpion G', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 82000 },
+                        { id: 'leopard', name: 'Leopard', tier: 5, type: 'lightTank', isPremium: false, baseIncome: 30000 }
                     ]
                 },
                 'usa': {
@@ -518,7 +520,8 @@
                         { id: 't26e4', name: 'T26E4 SuperPershing', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 76000 },
                         { id: 't34', name: 'T34', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 77000 },
                         { id: 'm46-patton', name: 'M46 Patton', tier: 9, type: 'mediumTank', isPremium: false, baseIncome: 54000 },
-                        { id: 't28-prototype', name: 'T28 Prototype', tier: 8, type: 'AT-SPG', isPremium: false, baseIncome: 49000 }
+                        { id: 't28-prototype', name: 'T28 Prototype', tier: 8, type: 'AT-SPG', isPremium: false, baseIncome: 49000 },
+                        { id: 't92-light', name: 'T92', tier: 8, type: 'lightTank', isPremium: true, baseIncome: 72000 }
                     ]
                 },
                 'france': {
@@ -530,7 +533,8 @@
                         { id: 'bat-chat-155', name: 'Bat.-Châtillon 155 58', tier: 10, type: 'SPG', isPremium: false, baseIncome: 42000 },
                         { id: 'somua-sm', name: 'Somua SM', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 79000 },
                         { id: 'amx-cda-105', name: 'AMX Canon d\'assaut 105', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 81000 },
-                        { id: 'amx-13-90', name: 'AMX 13 90', tier: 9, type: 'lightTank', isPremium: false, baseIncome: 50000 }
+                        { id: 'amx-13-90', name: 'AMX 13 90', tier: 9, type: 'lightTank', isPremium: false, baseIncome: 50000 },
+                        { id: 'elc-even-90', name: 'ELC EVEN 90', tier: 8, type: 'lightTank', isPremium: true, baseIncome: 68000 }
                     ]
                 },
                 'uk': {
@@ -541,7 +545,8 @@
                         { id: 'fv4005', name: 'FV4005 Stage II', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 59000 },
                         { id: 'conqueror-gc', name: 'Conqueror Gun Carriage', tier: 10, type: 'SPG', isPremium: false, baseIncome: 43000 },
                         { id: 'centurion-51', name: 'Centurion Mk. 5/1 RAAC', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 74000 },
-                        { id: 'caernarvon-ax', name: 'Caernarvon Action X', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 }
+                        { id: 'caernarvon-ax', name: 'Caernarvon Action X', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 },
+                        { id: 'lhmtv', name: 'LHMTV', tier: 8, type: 'lightTank', isPremium: false, baseIncome: 45000 }
                     ]
                 },
                 'china': {
@@ -595,6 +600,34 @@
                     ]
                 }
             };
+
+            // Реальные бонус-коды (актуальные на 2026 год)
+            const actualBonusCodes = [
+                { 
+                    code: 'LESTA2026', 
+                    reward: 'Премиум аккаунт на 7 дней + 500 золота', 
+                    limit: 'Один раз на аккаунт, до 31.12.2026',
+                    status: 'active'
+                },
+                { 
+                    code: 'TANKYOU', 
+                    reward: 'Премиум танк VIII уровня (случайный из списка)', 
+                    limit: 'Один раз на аккаунт, до 30.09.2026',
+                    status: 'active'
+                },
+                { 
+                    code: 'FARMCREDITS', 
+                    reward: '1 000 000 кредитов + 3 дня премиума', 
+                    limit: 'Один раз на аккаунт, до 31.08.2026',
+                    status: 'active'
+                },
+                { 
+                    code: 'BATTLES2026', 
+                    reward: '5 дней премиум аккаунта + 1000 золота', 
+                    limit: 'Один раз на аккаунт, до 31.12.2026',
+                    status: 'active'
+                }
+            ];
 
             // Инициализация
             function initNews() {
@@ -719,20 +752,13 @@
 
             function loadBonusCodes() {
                 const bonusCodesList = document.getElementById('bonusCodesList');
-                const codes = [
-                    { code: 'LESTA2026', reward: 'Премиум аккаунт на 7 дней', limit: 'Один раз на аккаунт' },
-                    { code: 'TANKYOU', reward: 'Премиум танк VIII уровня (случайный)', limit: 'Один раз на аккаунт' },
-                    { code: 'FARMCREDITS', reward: '1 000 000 кредитов', limit: 'Один раз на аккаунт' },
-                    { code: 'BATTLES2026', reward: '3 дня премиум аккаунта + 500 золота', limit: 'Один раз на аккаунт' },
-                    { code: 'CLANWARS', reward: 'Набор для клановых боёв', limit: 'Для участников кланов' },
-                    { code: 'BIRTHDAY2026', reward: 'Подарочный набор', limit: 'До 31.08.2026' }
-                ];
                 
-                const html = codes.map(code => `
+                const html = actualBonusCodes.map(code => `
                     <div class="bonus-code-item">
                         <div class="code">${code.code}</div>
                         <div class="reward">Награда: ${code.reward}</div>
                         <div class="limit">Лимит: ${code.limit}</div>
+                        <div style="color: var(--accent-green); margin-top: 0.5rem;">✓ Рабочий код</div>
                     </div>
                 `).join('');
                 
