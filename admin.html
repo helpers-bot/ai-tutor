@@ -301,12 +301,12 @@
     </div>
 
     <script>
-        // Пароль зашифрован (SHA-256)
-        const PASSWORD_HASH = '8f2d5a0f1c3e4b5a6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b';
+        // Пароль
+        const PASSWORD = '135710Aa!';
         
         function checkPassword() {
             const password = document.getElementById('passwordInput').value;
-            if (password === '135710Aa!') {
+            if (password === PASSWORD) {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
                 loadNewsList();
@@ -351,19 +351,35 @@
             loadingIndicator.style.display = 'block';
             
             try {
-                // Пробуем разные способы получения данных
                 let html = '';
                 let success = false;
                 
-                // Способ 1: через iframe (обходит CORS)
+                // СПОСОБ 1: Через ваш прокси (самый надёжный)
                 try {
-                    html = await fetchViaIframe(url);
-                    if (html) success = true;
+                    const response = await fetch(`/proxy.php?url=${encodeURIComponent(url)}`);
+                    if (response.ok) {
+                        html = await response.text();
+                        success = true;
+                        console.log('Успешно получено через proxy.php');
+                    }
                 } catch (e) {
-                    console.warn('Метод iframe не сработал');
+                    console.warn('proxy.php не сработал:', e);
                 }
                 
-                // Способ 2: через прокси
+                // СПОСОБ 2: Через iframe (если proxy.php нет)
+                if (!success) {
+                    try {
+                        html = await fetchViaIframe(url);
+                        if (html) {
+                            success = true;
+                            console.log('Успешно получено через iframe');
+                        }
+                    } catch (e) {
+                        console.warn('Метод iframe не сработал');
+                    }
+                }
+                
+                // СПОСОБ 3: Через внешние прокси (последний вариант)
                 if (!success) {
                     const proxyUrls = [
                         `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
@@ -378,6 +394,7 @@
                                 html = data.contents || data;
                                 if (html) {
                                     success = true;
+                                    console.log('Успешно получено через внешний прокси');
                                     break;
                                 }
                             }
@@ -387,18 +404,8 @@
                     }
                 }
                 
-                // Способ 3: через JSONP (если доступен)
                 if (!success) {
-                    try {
-                        html = await fetchViaJsonp(url);
-                        if (html) success = true;
-                    } catch (e) {
-                        console.warn('JSONP не сработал');
-                    }
-                }
-                
-                if (!success) {
-                    throw new Error('Не удалось получить данные');
+                    throw new Error('Не удалось получить данные ни одним способом');
                 }
                 
                 // Извлекаем данные из HTML
@@ -429,7 +436,6 @@
                 loadingIndicator.style.display = 'none';
                 console.error('Ошибка:', error);
                 alert('Не удалось автоматически получить данные. Заполните поля вручную.');
-                // Показываем форму для ручного заполнения
             }
         }
         
@@ -459,42 +465,10 @@
                 
                 document.body.appendChild(iframe);
                 
-                // Таймаут
                 setTimeout(() => {
                     if (iframe.parentNode) {
                         document.body.removeChild(iframe);
                     }
-                    reject(new Error('Timeout'));
-                }, 10000);
-            });
-        }
-        
-        // Получение через JSONP
-        function fetchViaJsonp(url) {
-            return new Promise((resolve, reject) => {
-                const callbackName = 'jsonp_callback_' + Date.now();
-                const script = document.createElement('script');
-                
-                window[callbackName] = function(data) {
-                    document.body.removeChild(script);
-                    delete window[callbackName];
-                    resolve(typeof data === 'string' ? data : JSON.stringify(data));
-                };
-                
-                script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + callbackName;
-                script.onerror = () => {
-                    document.body.removeChild(script);
-                    delete window[callbackName];
-                    reject(new Error('JSONP error'));
-                };
-                
-                document.body.appendChild(script);
-                
-                setTimeout(() => {
-                    if (script.parentNode) {
-                        document.body.removeChild(script);
-                    }
-                    delete window[callbackName];
                     reject(new Error('Timeout'));
                 }, 10000);
             });
