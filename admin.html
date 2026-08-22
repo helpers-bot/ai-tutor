@@ -208,6 +208,22 @@
             padding: 1rem;
             color: var(--accent-blue);
         }
+
+        .preview-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-element);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+        }
+
+        .preview-box img {
+            max-width: 200px;
+            max-height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -224,24 +240,29 @@
             <button class="logout-btn" onclick="logout()">Выйти</button>
 
             <div class="section">
-                <h2>📰 Добавить новость по ссылке</h2>
+                <h2>📰 Добавить новость</h2>
                 <div class="form-group">
                     <label>Ссылка на новость (tanki.su)</label>
                     <input type="url" id="newsUrl" placeholder="https://tanki.su/ru/news/...">
                 </div>
-                <button class="btn" onclick="addNewsFromUrl()">Добавить новость</button>
+                <button class="btn" onclick="fetchNewsInfo()">🔍 Получить данные</button>
                 <div id="loadingIndicator" class="loading" style="display: none;">Загрузка данных...</div>
                 
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label>Или добавьте вручную:</label>
+                <div id="previewData" class="preview-box" style="display: none;">
+                    <h3 style="color: var(--accent-green);">Данные получены:</h3>
+                    <p><strong>Заголовок:</strong> <span id="previewTitle"></span></p>
+                    <p><strong>Дата:</strong> <span id="previewDate"></span></p>
+                    <p><strong>Описание:</strong> <span id="previewDescription"></span></p>
+                    <img id="previewImage" src="" alt="Превью">
                 </div>
-                <div class="form-group">
+                
+                <div class="form-group" style="margin-top: 1rem;">
                     <label>Заголовок</label>
                     <input type="text" id="newsTitle" placeholder="Заголовок новости">
                 </div>
                 <div class="form-group">
                     <label>Дата</label>
-                    <input type="date" id="newsDate">
+                    <input type="text" id="newsDate" placeholder="21.08.2026">
                 </div>
                 <div class="form-group">
                     <label>Описание</label>
@@ -251,7 +272,7 @@
                     <label>Ссылка на изображение</label>
                     <input type="url" id="newsImage" placeholder="https://...">
                 </div>
-                <button class="btn" onclick="addNewsManually()">Добавить вручную</button>
+                <button class="btn" onclick="addNews()">✅ Добавить новость</button>
             </div>
 
             <div class="section">
@@ -318,34 +339,172 @@
             localStorage.setItem('lesta_bonus_codes', JSON.stringify(codes));
         }
         
-        // Функция для обхода CORS с использованием прокси
-        async function fetchWithProxy(url) {
-            // Пробуем разные прокси-сервисы
-            const proxies = [
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-                `https://cors-anywhere.herokuapp.com/${url}`,
-                `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-            ];
-            
-            for (const proxyUrl of proxies) {
-                try {
-                    const response = await fetch(proxyUrl);
-                    if (response.ok) {
-                        return await response.text();
-                    }
-                } catch (error) {
-                    console.warn(`Прокси ${proxyUrl} не сработал:`, error);
-                }
+        // Функция для получения данных новости
+        async function fetchNewsInfo() {
+            const url = document.getElementById('newsUrl').value;
+            if (!url) {
+                alert('Введите ссылку на новость');
+                return;
             }
             
-            throw new Error('Не удалось получить данные через прокси');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.style.display = 'block';
+            
+            try {
+                // Пробуем разные способы получения данных
+                let html = '';
+                let success = false;
+                
+                // Способ 1: через iframe (обходит CORS)
+                try {
+                    html = await fetchViaIframe(url);
+                    if (html) success = true;
+                } catch (e) {
+                    console.warn('Метод iframe не сработал');
+                }
+                
+                // Способ 2: через прокси
+                if (!success) {
+                    const proxyUrls = [
+                        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+                        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+                    ];
+                    
+                    for (const proxyUrl of proxyUrls) {
+                        try {
+                            const response = await fetch(proxyUrl);
+                            if (response.ok) {
+                                const data = await response.json();
+                                html = data.contents || data;
+                                if (html) {
+                                    success = true;
+                                    break;
+                                }
+                            }
+                        } catch (e) {
+                            console.warn(`Прокси ${proxyUrl} не сработал`);
+                        }
+                    }
+                }
+                
+                // Способ 3: через JSONP (если доступен)
+                if (!success) {
+                    try {
+                        html = await fetchViaJsonp(url);
+                        if (html) success = true;
+                    } catch (e) {
+                        console.warn('JSONP не сработал');
+                    }
+                }
+                
+                if (!success) {
+                    throw new Error('Не удалось получить данные');
+                }
+                
+                // Извлекаем данные из HTML
+                const newsData = extractNewsData(html, url);
+                
+                // Заполняем форму
+                document.getElementById('newsTitle').value = newsData.title;
+                document.getElementById('newsDate').value = newsData.date;
+                document.getElementById('newsDescription').value = newsData.description;
+                document.getElementById('newsImage').value = newsData.image;
+                
+                // Показываем превью
+                document.getElementById('previewTitle').textContent = newsData.title;
+                document.getElementById('previewDate').textContent = newsData.date;
+                document.getElementById('previewDescription').textContent = newsData.description;
+                
+                if (newsData.image) {
+                    document.getElementById('previewImage').src = newsData.image;
+                    document.getElementById('previewImage').style.display = 'block';
+                } else {
+                    document.getElementById('previewImage').style.display = 'none';
+                }
+                
+                document.getElementById('previewData').style.display = 'block';
+                loadingIndicator.style.display = 'none';
+                
+            } catch (error) {
+                loadingIndicator.style.display = 'none';
+                console.error('Ошибка:', error);
+                alert('Не удалось автоматически получить данные. Заполните поля вручную.');
+                // Показываем форму для ручного заполнения
+            }
         }
         
-        // Функция для извлечения данных из HTML
+        // Получение через iframe
+        function fetchViaIframe(url) {
+            return new Promise((resolve, reject) => {
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = url;
+                
+                iframe.onload = () => {
+                    try {
+                        const doc = iframe.contentDocument || iframe.contentWindow.document;
+                        const html = doc.documentElement.outerHTML;
+                        document.body.removeChild(iframe);
+                        resolve(html);
+                    } catch (e) {
+                        document.body.removeChild(iframe);
+                        reject(e);
+                    }
+                };
+                
+                iframe.onerror = () => {
+                    document.body.removeChild(iframe);
+                    reject(new Error('Iframe error'));
+                };
+                
+                document.body.appendChild(iframe);
+                
+                // Таймаут
+                setTimeout(() => {
+                    if (iframe.parentNode) {
+                        document.body.removeChild(iframe);
+                    }
+                    reject(new Error('Timeout'));
+                }, 10000);
+            });
+        }
+        
+        // Получение через JSONP
+        function fetchViaJsonp(url) {
+            return new Promise((resolve, reject) => {
+                const callbackName = 'jsonp_callback_' + Date.now();
+                const script = document.createElement('script');
+                
+                window[callbackName] = function(data) {
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                    resolve(typeof data === 'string' ? data : JSON.stringify(data));
+                };
+                
+                script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + callbackName;
+                script.onerror = () => {
+                    document.body.removeChild(script);
+                    delete window[callbackName];
+                    reject(new Error('JSONP error'));
+                };
+                
+                document.body.appendChild(script);
+                
+                setTimeout(() => {
+                    if (script.parentNode) {
+                        document.body.removeChild(script);
+                    }
+                    delete window[callbackName];
+                    reject(new Error('Timeout'));
+                }, 10000);
+            });
+        }
+        
+        // Извлечение данных из HTML
         function extractNewsData(html, url) {
             const doc = new DOMParser().parseFromString(html, 'text/html');
             
-            // Извлекаем заголовок
+            // Заголовок
             let title = '';
             const titleSelectors = [
                 'h1',
@@ -363,7 +522,7 @@
                 }
             }
             
-            // Извлекаем изображение
+            // Изображение
             let image = '';
             const imageSelectors = [
                 'meta[property="og:image"]',
@@ -381,7 +540,7 @@
                 }
             }
             
-            // Извлекаем описание
+            // Описание
             let description = '';
             const descSelectors = [
                 'meta[property="og:description"]',
@@ -399,7 +558,7 @@
                 }
             }
             
-            // Извлекаем дату
+            // Дата
             let date = '';
             const dateSelectors = [
                 '.news-date',
@@ -431,51 +590,13 @@
             };
         }
         
-        // Добавление новости по URL
-        async function addNewsFromUrl() {
-            const url = document.getElementById('newsUrl').value;
-            if (!url) {
-                alert('Введите ссылку');
-                return;
-            }
-            
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            loadingIndicator.style.display = 'block';
-            
-            try {
-                // Пытаемся получить данные через прокси
-                const html = await fetchWithProxy(url);
-                const newsData = extractNewsData(html, url);
-                
-                const news = getNews();
-                news.push({
-                    id: Date.now(),
-                    title: newsData.title,
-                    date: newsData.date,
-                    description: newsData.description,
-                    image: newsData.image,
-                    category: 'Новости Мир Танков',
-                    url: url
-                });
-                
-                saveNews(news);
-                loadNewsList();
-                document.getElementById('newsUrl').value = '';
-                loadingIndicator.style.display = 'none';
-                alert('Новость добавлена!');
-            } catch (error) {
-                loadingIndicator.style.display = 'none';
-                console.error('Ошибка при загрузке:', error);
-                alert('Не удалось получить данные со страницы. Попробуйте добавить вручную или проверьте ссылку.');
-            }
-        }
-        
-        // Добавление новости вручную
-        function addNewsManually() {
+        // Добавление новости
+        function addNews() {
             const title = document.getElementById('newsTitle').value;
             const date = document.getElementById('newsDate').value;
             const description = document.getElementById('newsDescription').value;
             const image = document.getElementById('newsImage').value;
+            const url = document.getElementById('newsUrl').value;
             
             if (!title) {
                 alert('Введите заголовок');
@@ -490,16 +611,20 @@
                 description: description,
                 image: image,
                 category: 'Новости Мир Танков',
-                url: ''
+                url: url
             });
             
             saveNews(news);
             loadNewsList();
             
+            // Очищаем форму
+            document.getElementById('newsUrl').value = '';
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsDate').value = '';
             document.getElementById('newsDescription').value = '';
             document.getElementById('newsImage').value = '';
+            document.getElementById('previewData').style.display = 'none';
+            
             alert('Новость добавлена!');
         }
         
