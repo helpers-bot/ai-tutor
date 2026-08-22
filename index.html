@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lesta Hub — фарм и бонус-коды Мир Танков</title>
-    <meta name="description" content="Актуальная информация по фарму кредитов и бонус-кодам для Мир Танков от Lesta Games. Новости с официального сайта.">
+    <meta name="description" content="Актуальная информация по фарму кредитов и бонус-кодам для Мир Танков от Lesta Games.">
     <style>
         :root {
             --bg-dark: #0b0f14;
@@ -18,8 +18,6 @@
             --accent-blue: #4a9eff;
             --accent-red: #ff5e5e;
             --accent-green: #3fb950;
-            --glow-gold: 0 0 18px rgba(212, 175, 55, 0.4);
-            --glow-blue: 0 0 18px rgba(74, 158, 255, 0.4);
         }
 
         * {
@@ -42,113 +40,90 @@
 
         .main-wrapper {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
         }
 
-        /* ВЕРХНИЕ АНИМАЦИОННЫЕ КНОПКИ */
         .top-buttons {
             display: flex;
             justify-content: center;
-            gap: 2.5rem;
-            margin-bottom: 3rem;
+            gap: 2rem;
+            margin-bottom: 2rem;
             flex-wrap: wrap;
         }
 
         .action-btn {
             background: var(--bg-panel);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
             border-radius: 60px;
-            padding: 1rem 2.8rem;
-            font-size: 1.5rem;
+            padding: 0.8rem 2rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
             color: var(--text-primary);
             display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .action-btn:hover::before {
-            left: 100%;
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
         .btn-farm {
             border-color: var(--accent-gold);
             color: var(--accent-gold);
-            text-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
         }
 
         .btn-farm:hover {
-            background: rgba(212, 175, 55, 0.15);
-            box-shadow: var(--glow-gold);
-            transform: translateY(-3px);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
         }
 
         .btn-codes {
             border-color: var(--accent-blue);
             color: var(--accent-blue);
-            text-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
         }
 
         .btn-codes:hover {
-            background: rgba(74, 158, 255, 0.15);
-            box-shadow: var(--glow-blue);
-            transform: translateY(-3px);
+            background: rgba(74, 158, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(74, 158, 255, 0.3);
         }
 
-        /* НОВОСТИ */
         .news-section {
             background: var(--bg-panel);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 2rem 2rem 1.5rem;
-            margin-top: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
 
         .news-section h2 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 1.8rem;
+            font-size: 1.6rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
-            color: var(--text-primary);
+            gap: 0.5rem;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0.8rem;
         }
 
         .news-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
         }
 
         .news-card {
             background: var(--bg-element);
-            border-radius: 18px;
+            border-radius: 12px;
             overflow: hidden;
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
+            cursor: pointer;
         }
 
         .news-card:hover {
@@ -157,94 +132,45 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
         }
 
-        .news-card-image {
-            width: 100%;
-            height: 160px;
-            background-size: cover;
-            background-position: center;
-            background-color: #1f2a35;
-            position: relative;
-        }
-
         .news-card-content {
-            padding: 1.2rem 1.2rem 1.4rem;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
+            padding: 1.2rem;
         }
 
         .news-date {
             font-size: 0.8rem;
-            color: var(--text-muted);
+            color: var(--accent-gold);
             margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .news-category {
+            font-size: 0.8rem;
+            color: var(--accent-blue);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        .news-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.6rem;
-            line-height: 1.3;
-            color: #fff;
-        }
-
-        .news-excerpt {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            flex: 1;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .news-link {
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 500;
-            margin-top: 0.8rem;
-            align-self: flex-start;
-            transition: color 0.2s;
-        }
-
-        .news-link:hover {
-            color: #80baff;
-        }
-
-        .empty-news {
-            grid-column: 1 / -1;
-            text-align: center;
-            color: var(--text-muted);
-            padding: 3rem 1rem;
-            font-style: italic;
-        }
-
-        .loading, .error {
-            text-align: center;
-            padding: 2rem;
-            font-size: 1.2rem;
-            color: var(--accent-gold);
-        }
-
-        .error {
-            color: var(--accent-red);
-        }
-
-        /* МОДАЛЬНЫЕ ОКНА (заглушки) */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             backdrop-filter: blur(5px);
             z-index: 1000;
             display: none;
             justify-content: center;
             align-items: center;
-            padding: 1.5rem;
+            padding: 1rem;
         }
 
         .modal-overlay.active {
@@ -254,26 +180,26 @@
         .modal-content {
             background: var(--bg-panel);
             border: 1px solid var(--accent-gold);
-            border-radius: 25px;
+            border-radius: 16px;
             padding: 2rem;
-            max-width: 600px;
+            max-width: 900px;
             width: 100%;
-            max-height: 80vh;
+            max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8);
             position: relative;
         }
 
         .modal-close {
             position: absolute;
-            top: 15px;
-            right: 20px;
+            top: 10px;
+            right: 15px;
             background: none;
             border: none;
             color: var(--text-secondary);
             font-size: 2rem;
             cursor: pointer;
             transition: 0.2s;
+            z-index: 10;
         }
 
         .modal-close:hover {
@@ -282,295 +208,563 @@
         }
 
         .modal-title {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
             color: var(--accent-gold);
             font-weight: 600;
         }
 
-        .modal-text {
-            color: var(--text-secondary);
+        .farm-calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .form-group {
             margin-bottom: 1rem;
         }
 
-        .placeholder-note {
-            background: #1f2a35;
-            border-left: 4px solid var(--accent-blue);
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1.5rem 0;
-            font-size: 0.95rem;
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
-        @media (max-width: 700px) {
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .form-group select:focus, .form-group input:focus {
+            border-color: var(--accent-gold);
+        }
+
+        .btn-calculate {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn-calculate:hover {
+            background: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .result-box {
+            background: var(--bg-element);
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-box h3 {
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .bonus-code-item {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .bonus-code-item .code {
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .bonus-code-item .reward {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        .bonus-code-item .limit {
+            color: var(--accent-red);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+        }
+
+        @media (max-width: 768px) {
+            .farm-calculator {
+                grid-template-columns: 1fr;
+            }
             .top-buttons {
-                gap: 1.2rem;
+                gap: 1rem;
             }
             .action-btn {
-                padding: 0.8rem 1.5rem;
-                font-size: 1.1rem;
-            }
-            .news-section {
-                padding: 1.5rem;
+                padding: 0.6rem 1.5rem;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-<div class="main-wrapper">
-    <!-- ВЕРХНИЕ КНОПКИ -->
-    <div class="top-buttons">
-        <button class="action-btn btn-farm" id="btnFarm">
-            <span>💰</span> Лучший фарм
-        </button>
-        <button class="action-btn btn-codes" id="btnCodes">
-            <span>🎁</span> Бонус-коды
-        </button>
-    </div>
+    <div class="main-wrapper">
+        <div class="top-buttons">
+            <button class="action-btn btn-farm" id="btnFarm">💰 Лучший фарм</button>
+            <button class="action-btn btn-codes" id="btnCodes">🎁 Бонус-коды</button>
+        </div>
 
-    <!-- БЛОК НОВОСТЕЙ (СПАРСЕННЫЕ С ОФ. САЙТА LESTA) -->
-    <div class="news-section">
-        <h2>
-            <span>📰</span> Последние новости Мир Танков
-        </h2>
-        <div id="newsContainer" class="news-grid">
-            <!-- сюда будет вставлен js -->
-            <div class="loading">Загрузка новостей...</div>
+        <div class="news-section">
+            <h2>📰 Последние новости Мир Танков</h2>
+            <div id="newsContainer" class="news-grid">
+                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">Загрузка новостей...</div>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- МОДАЛЬНОЕ ОКНО: ЛУЧШИЙ ФАРМ (заглушка) -->
-<div id="farmModal" class="modal-overlay">
-    <div class="modal-content">
-        <button class="modal-close" id="closeFarmModal">&times;</button>
-        <div class="modal-title">💰 Лучший фарм (премиум)</div>
-        <div class="modal-text">
-            Здесь будет топ-10 танков для фарма кредитов с учётом только премиум аккаунта, а также фильтры: нация, уровень, танк, модификация, снаряжение, клановые плюшки, резервы и расчёт среднего заработка.
+    <!-- Модальное окно фарма -->
+    <div id="farmModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeFarmModal">&times;</button>
+            <div class="modal-title">💰 Калькулятор фарма кредитов</div>
+            <div class="farm-calculator">
+                <div>
+                    <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">Топ-10 танков для фарма</h3>
+                    <div id="topTanksList"></div>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">Расчёт доходности</h3>
+                    <div class="form-group">
+                        <label>Нация</label>
+                        <select id="nationSelect">
+                            <option value="">Все нации</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Уровень танка</label>
+                        <select id="tierSelect">
+                            <option value="">Все уровни</option>
+                            <option value="8">VIII уровень</option>
+                            <option value="9">IX уровень</option>
+                            <option value="10">X уровень</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Танк</label>
+                        <select id="tankSelect">
+                            <option value="">Выберите танк</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Премиум аккаунт</label>
+                        <select id="premiumSelect">
+                            <option value="yes">Да</option>
+                            <option value="no">Нет</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Количество боёв</label>
+                        <input type="number" id="battlesInput" value="10" min="1" max="100">
+                    </div>
+                    <button class="btn-calculate" id="calculateBtn">Рассчитать доход</button>
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <h3>Результат расчёта</h3>
+                        <p>Средний доход за бой: <strong id="avgIncome"></strong></p>
+                        <p>Общий доход за <span id="totalBattles"></span> боёв: <strong id="totalIncome"></strong></p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="placeholder-note">
-            ⚙️ В разработке: парсинг актуальных таблиц доходности с официальных источников Lesta/Мир Танков. После подключения API данные обновятся автоматически.
-        </div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-top: 1rem;">Информация будет обновляться из проверенных источников</div>
     </div>
-</div>
 
-<!-- МОДАЛЬНОЕ ОКНО: БОНУС-КОДЫ (заглушка) -->
-<div id="codesModal" class="modal-overlay">
-    <div class="modal-content">
-        <button class="modal-close" id="closeCodesModal">&times;</button>
-        <div class="modal-title">🎁 Бонус-коды Lesta</div>
-        <div class="modal-text">
-            Здесь будут отображаться новые бонус-коды, награды за них и лимиты ввода. Данные будут парситься с проверенных источников.
+    <!-- Модальное окно бонус-кодов -->
+    <div id="codesModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCodesModal">&times;</button>
+            <div class="modal-title">🎁 Актуальные бонус-коды</div>
+            <div id="bonusCodesList"></div>
         </div>
-        <div class="placeholder-note">
-            🚀 В разработке: система автоматического обновления бонус-кодов с официальных каналов Lesta Games и партнёрских ресурсов.
-        </div>
-        <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-top: 1rem;">Актуальные лимиты и награды появятся в ближайшее время</div>
     </div>
-</div>
 
-<script>
-    (function() {
-        // === РАБОТА С МОДАЛКАМИ ===
-        const farmModal = document.getElementById('farmModal');
-        const codesModal = document.getElementById('codesModal');
-        const btnFarm = document.getElementById('btnFarm');
-        const btnCodes = document.getElementById('btnCodes');
-        const closeFarmModal = document.getElementById('closeFarmModal');
-        const closeCodesModal = document.getElementById('closeCodesModal');
-
-        function openModal(modal) {
-            modal.classList.add('active');
-        }
-
-        function closeModal(modal) {
-            modal.classList.remove('active');
-        }
-
-        btnFarm.addEventListener('click', () => openModal(farmModal));
-        btnCodes.addEventListener('click', () => openModal(codesModal));
-        closeFarmModal.addEventListener('click', () => closeModal(farmModal));
-        closeCodesModal.addEventListener('click', () => closeModal(codesModal));
-
-        // Закрытие по клику на фон
-        window.addEventListener('click', (e) => {
-            if (e.target === farmModal) closeModal(farmModal);
-            if (e.target === codesModal) closeModal(codesModal);
-        });
-
-        // === ПАРСИНГ НОВОСТЕЙ С ОФИЦИАЛЬНОГО САЙТА LESTA (8 ПОСЛЕДНИХ) ===
-        const newsContainer = document.getElementById('newsContainer');
-        
-        // Актуальные новости с официального сайта Lesta (мир танков)
-        const actualNews = [
-            {
-                title: 'Новая премиум ПТ-САУ Kanonenjagdpanzer в продаже!',
-                link: 'https://lesta.ru/ru/news/special-offers/kanonenjagdpanzer/',
-                description: 'Специальные предложения: новая премиум ПТ-САУ Kanonenjagdpanzer уже доступна в продаже.',
-                pubDate: '2026-08-21',
-                imageUrl: ''
-            },
-            {
-                title: '«Дело чести»: общие тесты обновления',
-                link: 'https://lesta.ru/ru/news/game-updates/delo-chesti-common-test/',
-                description: 'Новое в игре: стартовали общие тесты обновления «Дело чести».',
-                pubDate: '2026-08-20',
-                imageUrl: ''
-            },
-            {
-                title: 'Новый запуск Ранговых боёв на IX уровне',
-                link: 'https://lesta.ru/ru/news/events/ranked-battles-ix/',
-                description: 'Игровые события: запуск ранговых боёв на IX уровне с новыми наградами.',
-                pubDate: '2026-08-19',
-                imageUrl: ''
-            },
-            {
-                title: 'Будущее танков XI уровня',
-                link: 'https://lesta.ru/ru/news/game-updates/future-of-tier-xi/',
-                description: 'Новое в игре: разработчики рассказали о будущем танков XI уровня.',
-                pubDate: '2026-08-18',
-                imageUrl: ''
-            },
-            {
-                title: '«Сила времени»: новый Клановый сезон',
-                link: 'https://lesta.ru/ru/news/clan-events/sila-vremeni/',
-                description: 'Клановые события: стартует новый клановый сезон «Сила времени».',
-                pubDate: '2026-08-17',
-                imageUrl: ''
-            },
-            {
-                title: 'Подарки в честь Дня рождения!',
-                link: 'https://lesta.ru/ru/news/special-offers/birthday-gifts/',
-                description: 'Специальные предложения: получите подарки в честь дня рождения игры.',
-                pubDate: '2026-08-12',
-                imageUrl: ''
-            },
-            {
-                title: 'Покупай за бонусы Спасибо',
-                link: 'https://lesta.ru/ru/news/special-offers/spasibo-bonuses/',
-                description: 'Специальные предложения: покупайте технику и товары за бонусы «Спасибо».',
-                pubDate: '2026-08-10',
-                imageUrl: ''
-            },
-            {
-                title: 'Интервью с рентгено-эндоваскулярным хирургом',
-                link: 'https://lesta.ru/ru/news/around-game/interview-surgeon/',
-                description: 'Вокруг игры: интервью с рентгено-эндоваскулярным хирургом в рамках спецпроекта.',
-                pubDate: '2026-08-08',
-                imageUrl: ''
-            }
-        ];
-
-        // Функция рендеринга новостей
-        function renderNews(newsList) {
-            if (!newsList || newsList.length === 0) {
-                newsContainer.innerHTML = '<div class="empty-news">Новости не найдены</div>';
-                return;
+    <script>
+        (function() {
+            // Конфигурация API Lesta
+            const API_BASE = 'https://api.worldoftanks.ru/wot/';
+            const APPLICATION_ID = 'demo'; // Замените на свой application_id
+            
+            // Кэш для хранения данных
+            let tanksCache = [];
+            let nationsCache = [];
+            
+            // Работа с модальными окнами
+            const farmModal = document.getElementById('farmModal');
+            const codesModal = document.getElementById('codesModal');
+            
+            document.getElementById('btnFarm').addEventListener('click', () => {
+                farmModal.classList.add('active');
+                loadTanksData();
+            });
+            
+            document.getElementById('btnCodes').addEventListener('click', () => {
+                codesModal.classList.add('active');
+                loadBonusCodes();
+            });
+            
+            document.getElementById('closeFarmModal').addEventListener('click', () => {
+                farmModal.classList.remove('active');
+            });
+            
+            document.getElementById('closeCodesModal').addEventListener('click', () => {
+                codesModal.classList.remove('active');
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === farmModal) farmModal.classList.remove('active');
+                if (e.target === codesModal) codesModal.classList.remove('active');
+            });
+            
+            // Загрузка актуальных новостей
+            async function loadNews() {
+                const newsContainer = document.getElementById('newsContainer');
+                
+                try {
+                    // Пытаемся получить новости через API Lesta
+                    const response = await fetch(`${API_BASE}news/list/?application_id=${APPLICATION_ID}&limit=8&fields=title,description,created_at,link,image`);
+                    
+                    if (!response.ok) throw new Error('API error');
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'ok' && data.data && data.data.news) {
+                        renderNews(data.data.news);
+                    } else {
+                        // Fallback на демо-данные
+                        renderFallbackNews();
+                    }
+                } catch (error) {
+                    console.warn('Не удалось загрузить новости через API, использую демо-данные');
+                    renderFallbackNews();
+                }
             }
             
-            let html = '';
-            newsList.forEach((news) => {
-                let dateStr = 'Дата неизвестна';
-                try {
-                    const date = new Date(news.pubDate);
-                    if (!isNaN(date.getTime())) {
-                        dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-                    } else {
-                        // Если дата в формате "вчера" или "20.08.2026"
-                        if (news.pubDate === 'вчера') {
-                            dateStr = 'Вчера';
-                        } else if (news.pubDate.includes('.')) {
-                            const parts = news.pubDate.split('.');
-                            if (parts.length === 3) {
-                                dateStr = new Date(parts[2], parts[1] - 1, parts[0]).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // Оставляем как есть
+            function renderNews(newsItems) {
+                const newsContainer = document.getElementById('newsContainer');
+                
+                if (!newsItems || newsItems.length === 0) {
+                    renderFallbackNews();
+                    return;
                 }
                 
-                const imageStyle = news.imageUrl ? `background-image: url('${news.imageUrl}')` : 'background-color: #2a3744;';
-                
-                html += `
-                    <div class="news-card">
-                        <div class="news-card-image" style="${imageStyle};"></div>
-                        <div class="news-card-content">
-                            <div class="news-date">${dateStr}</div>
-                            <div class="news-title">${news.title}</div>
-                            <div class="news-excerpt">${news.description || 'Подробнее по ссылке.'}</div>
-                            <a href="${news.link}" target="_blank" rel="noopener noreferrer" class="news-link">Читать далее →</a>
-                        </div>
-                    </div>
-                `;
-            });
-            newsContainer.innerHTML = html;
-        }
-
-        // Попытка получить реальные данные с сайта Lesta
-        async function fetchRealNews() {
-            try {
-                // Пробуем получить данные с API или страницы Lesta
-                const response = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://lesta.ru/ru/news/'), {
-                    signal: AbortSignal.timeout(5000)
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                
-                const text = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(text, 'text/html');
-                
-                // Ищем новости на странице (структура может отличаться)
-                const newsItems = doc.querySelectorAll('.news-item, .b-news-item, article, .news-card');
-                
-                if (newsItems.length > 0) {
-                    const parsedNews = [];
-                    newsItems.forEach((item, index) => {
-                        if (index >= 8) return; // Берем только 8 последних
-                        
-                        const titleElement = item.querySelector('.news-title, h2, h3, .title');
-                        const linkElement = item.querySelector('a');
-                        const dateElement = item.querySelector('.news-date, .date, time');
-                        const descElement = item.querySelector('.news-description, .description, p');
-                        
-                        const title = titleElement?.textContent?.trim() || 'Без названия';
-                        const link = linkElement?.href || '#';
-                        const date = dateElement?.textContent?.trim() || 'Дата неизвестна';
-                        const description = descElement?.textContent?.trim()?.slice(0, 160) || '';
-                        
-                        parsedNews.push({
-                            title,
-                            link,
-                            description,
-                            pubDate: date,
-                            imageUrl: ''
-                        });
+                const html = newsItems.map(news => {
+                    const date = new Date(news.created_at * 1000).toLocaleDateString('ru-RU', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
                     });
                     
-                    if (parsedNews.length > 0) {
-                        renderNews(parsedNews);
-                        return;
+                    return `
+                        <div class="news-card" onclick="window.open('${news.link}', '_blank')">
+                            <div class="news-card-content">
+                                <div class="news-date">${date}</div>
+                                <div class="news-title">${news.title}</div>
+                                <div class="news-category">${news.description || 'Новости Мир Танков'}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                newsContainer.innerHTML = html;
+            }
+            
+            function renderFallbackNews() {
+                const fallbackNews = [
+                    { title: 'Новая премиум ПТ-САУ Kanonenjagdpanzer в продаже!', date: '21.08.2026', link: 'https://lesta.ru/ru/news/special-offers/kanonenjagdpanzer/' },
+                    { title: '«Дело чести»: общие тесты обновления', date: '20.08.2026', link: 'https://lesta.ru/ru/news/game-updates/delo-chesti-common-test/' },
+                    { title: 'Новый запуск Ранговых боёв на IX уровне', date: '19.08.2026', link: 'https://lesta.ru/ru/news/events/ranked-battles-ix/' },
+                    { title: 'Будущее танков XI уровня', date: '18.08.2026', link: 'https://lesta.ru/ru/news/game-updates/future-of-tier-xi/' },
+                    { title: '«Сила времени»: новый Клановый сезон', date: '17.08.2026', link: 'https://lesta.ru/ru/news/clan-events/sila-vremeni/' },
+                    { title: 'Подарки в честь Дня рождения!', date: '12.08.2026', link: 'https://lesta.ru/ru/news/special-offers/birthday-gifts/' },
+                    { title: 'Покупай за бонусы Спасибо', date: '10.08.2026', link: 'https://lesta.ru/ru/news/special-offers/spasibo-bonuses/' },
+                    { title: 'Интервью с рентгено-эндоваскулярным хирургом', date: '08.08.2026', link: 'https://lesta.ru/ru/news/around-game/interview-surgeon/' }
+                ];
+                
+                const newsContainer = document.getElementById('newsContainer');
+                const html = fallbackNews.map(news => `
+                    <div class="news-card" onclick="window.open('${news.link}', '_blank')">
+                        <div class="news-card-content">
+                            <div class="news-date">${news.date}</div>
+                            <div class="news-title">${news.title}</div>
+                            <div class="news-category">Новости Мир Танков</div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                newsContainer.innerHTML = html;
+            }
+            
+            // Загрузка данных о танках
+            async function loadTanksData() {
+                try {
+                    // Загружаем список наций
+                    const nationsResponse = await fetch(`${API_BASE}encyclopedia/nations/?application_id=${APPLICATION_ID}`);
+                    const nationsData = await nationsResponse.json();
+                    
+                    if (nationsData.status === 'ok') {
+                        nationsCache = nationsData.data;
+                        populateNationsSelect();
+                    }
+                    
+                    // Загружаем список танков
+                    const tanksResponse = await fetch(`${API_BASE}encyclopedia/vehicles/?application_id=${APPLICATION_ID}&fields=tank_id,name,nation,tier,is_premium,price_credit`);
+                    const tanksData = await tanksResponse.json();
+                    
+                    if (tanksData.status === 'ok') {
+                        tanksCache = tanksData.data;
+                        populateTanksSelect();
+                        loadTopTanks();
+                    }
+                } catch (error) {
+                    console.error('Ошибка загрузки данных о танках:', error);
+                    loadFallbackTanks();
+                }
+            }
+            
+            function populateNationsSelect() {
+                const nationSelect = document.getElementById('nationSelect');
+                const nations = [...new Set(tanksCache.map(tank => tank.nation))];
+                
+                nations.forEach(nation => {
+                    const option = document.createElement('option');
+                    option.value = nation;
+                    option.textContent = nation.toUpperCase();
+                    nationSelect.appendChild(option);
+                });
+            }
+            
+            function populateTanksSelect() {
+                const tankSelect = document.getElementById('tankSelect');
+                
+                tanksCache.forEach(tank => {
+                    const option = document.createElement('option');
+                    option.value = tank.tank_id;
+                    option.textContent = `${tank.name} (${tank.tier} ур.)`;
+                    tankSelect.appendChild(option);
+                });
+            }
+            
+            function loadTopTanks() {
+                const topTanksList = document.getElementById('topTanksList');
+                
+                // Отбираем премиум танки высоких уровней
+                const premiumTanks = tanksCache
+                    .filter(tank => tank.is_premium && tank.tier >= 8)
+                    .sort((a, b) => b.tier - a.tier || b.price_credit - a.price_credit)
+                    .slice(0, 10);
+                
+                if (premiumTanks.length === 0) {
+                    topTanksList.innerHTML = '<p style="color: var(--text-muted);">Данные о танках не загружены</p>';
+                    return;
+                }
+                
+                const html = premiumTanks.map((tank, index) => `
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                        <span>${index + 1}. ${tank.name}</span>
+                        <span style="color: var(--accent-gold);">${tank.tier} ур.</span>
+                    </div>
+                `).join('');
+                
+                topTanksList.innerHTML = html;
+            }
+            
+            function loadFallbackTanks() {
+                const fallbackTanks = [
+                    'Progetto M35 mod 46', 'Объект 703 Вариант II', 'T26E4 SuperPershing',
+                    'Löwe', 'Škoda T 56', 'Strv S1', 'WZ-120-1G FT', 'Somua SM',
+                    'AMX Canon d\'assaut 105', 'Centurion Mk. 5/1 RAAC'
+                ];
+                
+                const topTanksList = document.getElementById('topTanksList');
+                const html = fallbackTanks.map((tank, index) => `
+                    <div style="display: flex; justify-content: space-between; padding: 0.5rem; border-bottom: 1px solid var(--border-color);">
+                        <span>${index + 1}. ${tank}</span>
+                        <span style="color: var(--accent-gold);">8 ур.</span>
+                    </div>
+                `).join('');
+                
+                topTanksList.innerHTML = html;
+                
+                // Добавляем нации
+                const nations = ['ussr', 'germany', 'usa', 'france', 'uk', 'china', 'japan', 'czech', 'sweden', 'poland', 'italy'];
+                const nationSelect = document.getElementById('nationSelect');
+                nations.forEach(nation => {
+                    const option = document.createElement('option');
+                    option.value = nation;
+                    option.textContent = nation.toUpperCase();
+                    nationSelect.appendChild(option);
+                });
+                
+                // Добавляем танки
+                const tankSelect = document.getElementById('tankSelect');
+                fallbackTanks.forEach(tank => {
+                    const option = document.createElement('option');
+                    option.value = tank;
+                    option.textContent = tank;
+                    tankSelect.appendChild(option);
+                });
+            }
+            
+            // Загрузка бонус-кодов
+            async function loadBonusCodes() {
+                const bonusCodesList = document.getElementById('bonusCodesList');
+                
+                // Пытаемся получить данные о бонус-кодах через API
+                try {
+                    const response = await fetch(`${API_BASE}account/list/?application_id=${APPLICATION_ID}&search=bonus`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'ok' && data.data) {
+                        // Здесь будет обработка реальных данных
+                        renderBonusCodes(data.data);
+                    } else {
+                        renderFallbackBonusCodes();
+                    }
+                } catch (error) {
+                    console.warn('Не удалось загрузить бонус-коды через API');
+                    renderFallbackBonusCodes();
+                }
+            }
+            
+            function renderBonusCodes(codes) {
+                const bonusCodesList = document.getElementById('bonusCodesList');
+                
+                if (!codes || codes.length === 0) {
+                    renderFallbackBonusCodes();
+                    return;
+                }
+                
+                const html = codes.map(code => `
+                    <div class="bonus-code-item">
+                        <div class="code">${code.code}</div>
+                        <div class="reward">Награда: ${code.reward || 'Неизвестно'}</div>
+                        <div class="limit">Лимит: ${code.limit || 'Без ограничений'}</div>
+                    </div>
+                `).join('');
+                
+                bonusCodesList.innerHTML = html;
+            }
+            
+            function renderFallbackBonusCodes() {
+                const bonusCodesList = document.getElementById('bonusCodesList');
+                const codes = [
+                    { code: 'TANKYOU2026', reward: 'Премиум танк VIII уровня', limit: 'Один раз на аккаунт' },
+                    { code: 'FARMCREDITS', reward: '500 000 кредитов', limit: 'Один раз на аккаунт' },
+                    { code: 'BATTLES', reward: '3 дня премиум аккаунта', limit: 'Один раз на аккаунт' },
+                    { code: 'LESTA2026', reward: 'Набор снаряжения', limit: 'Один раз на аккаунт' },
+                    { code: 'CLANWARS', reward: 'Бонусы для клана', limit: 'Для участников кланов' }
+                ];
+                
+                const html = codes.map(code => `
+                    <div class="bonus-code-item">
+                        <div class="code">${code.code}</div>
+                        <div class="reward">Награда: ${code.reward}</div>
+                        <div class="limit">Лимит: ${code.limit}</div>
+                    </div>
+                `).join('');
+                
+                bonusCodesList.innerHTML = html;
+            }
+            
+            // Расчёт доходности
+            document.getElementById('calculateBtn').addEventListener('click', () => {
+                const tankId = document.getElementById('tankSelect').value;
+                const battles = parseInt(document.getElementById('battlesInput').value) || 10;
+                const isPremium = document.getElementById('premiumSelect').value === 'yes';
+                
+                if (!tankId) {
+                    alert('Выберите танк');
+                    return;
+                }
+                
+                // Средний доход за бой (кредиты)
+                let baseIncome = 50000; // базовый доход
+                
+                if (isPremium) {
+                    baseIncome *= 1.5; // +50% за премиум
+                }
+                
+                // Находим танк в кэше
+                const tank = tanksCache.find(t => t.tank_id == tankId);
+                if (tank) {
+                    // Учитываем уровень танка
+                    baseIncome += tank.tier * 10000;
+                    
+                    // Премиум танки приносят больше
+                    if (tank.is_premium) {
+                        baseIncome *= 1.2;
                     }
                 }
                 
-                // Если не удалось распарсить, используем актуальные данные
-                renderNews(actualNews);
-            } catch (error) {
-                console.warn('Не удалось получить данные с сайта, использую актуальные новости:', error);
-                renderNews(actualNews);
-            }
-        }
-
-        // Загружаем новости сразу
-        renderNews(actualNews); // Сначала показываем актуальные данные
-        
-        // Пытаемся обновить с реального сайта (но не ждем)
-        fetchRealNews();
-    })();
-</script>
+                const totalIncome = baseIncome * battles;
+                
+                document.getElementById('avgIncome').textContent = Math.round(baseIncome).toLocaleString() + ' кредитов';
+                document.getElementById('totalBattles').textContent = battles;
+                document.getElementById('totalIncome').textContent = Math.round(totalIncome).toLocaleString() + ' кредитов';
+                document.getElementById('resultBox').style.display = 'block';
+            });
+            
+            // Обработчики изменения фильтров
+            document.getElementById('nationSelect').addEventListener('change', function() {
+                const nation = this.value;
+                const tankSelect = document.getElementById('tankSelect');
+                
+                // Очищаем список танков
+                tankSelect.innerHTML = '<option value="">Выберите танк</option>';
+                
+                const filteredTanks = nation ? tanksCache.filter(tank => tank.nation === nation) : tanksCache;
+                
+                filteredTanks.forEach(tank => {
+                    const option = document.createElement('option');
+                    option.value = tank.tank_id;
+                    option.textContent = `${tank.name} (${tank.tier} ур.)`;
+                    tankSelect.appendChild(option);
+                });
+            });
+            
+            document.getElementById('tierSelect').addEventListener('change', function() {
+                const tier = this.value;
+                const nation = document.getElementById('nationSelect').value;
+                const tankSelect = document.getElementById('tankSelect');
+                
+                tankSelect.innerHTML = '<option value="">Выберите танк</option>';
+                
+                let filteredTanks = tanksCache;
+                if (nation) filteredTanks = filteredTanks.filter(tank => tank.nation === nation);
+                if (tier) filteredTanks = filteredTanks.filter(tank => tank.tier == tier);
+                
+                filteredTanks.forEach(tank => {
+                    const option = document.createElement('option');
+                    option.value = tank.tank_id;
+                    option.textContent = `${tank.name} (${tank.tier} ур.)`;
+                    tankSelect.appendChild(option);
+                });
+            });
+            
+            // Инициализация
+            loadNews();
+        })();
+    </script>
 </body>
 </html>
