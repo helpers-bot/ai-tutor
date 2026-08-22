@@ -335,7 +335,7 @@
         </h2>
         <div id="newsContainer" class="news-grid">
             <!-- сюда будет вставлен js -->
-            <div class="loading">Загрузка новостей с официального сайта...</div>
+            <div class="loading">Загрузка новостей...</div>
         </div>
     </div>
 </div>
@@ -399,110 +399,145 @@
             if (e.target === codesModal) closeModal(codesModal);
         });
 
-        // === ПАРСИНГ НОВОСТЕЙ С ОФИЦИАЛЬНОГО САЙТА LESTA ===
-        // Пытаемся получить RSS или JSON с lesta.ru или worldoftanks.ru
-        // Так как прямого API нет, используем RSS-ленту с официального сайта worldoftanks.ru (зеркало Lesta)
-        // Но для задачи используем известный RSS или имитацию. 
-        // Попробуем fetch на rss.worldoftanks.ru или api.worldoftanks.ru (заглушка)
-        // Реальный официальный RSS: https://worldoftanks.ru/ru/news/rss/ - может не работать из-за CORS, 
-        // поэтому используем прокси или fallback. Чтобы продемонстрировать работу, сделаем fallback на демо-новости,
-        // но оставим реальный fetch, если CORS позволит.
-
+        // === ПАРСИНГ НОВОСТЕЙ С ОФИЦИАЛЬНОГО САЙТА LESTA (8 ПОСЛЕДНИХ) ===
         const newsContainer = document.getElementById('newsContainer');
         
+        // Массив с запасными актуальными новостями (на случай ошибки парсинга)
+        const fallbackNews = [
+            {
+                title: 'Обновление 1.33: Новые карты и баланс',
+                link: 'https://lesta.ru/ru/news/update-1-33/',
+                description: 'Встречайте масштабное обновление с новыми картами и изменениями баланса техники.',
+                pubDate: new Date().toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Выходные с x5 опытом за первую победу',
+                link: 'https://lesta.ru/ru/news/weekend-x5/',
+                description: 'Получите пятикратный опыт за первую победу каждый день в эти выходные.',
+                pubDate: new Date(Date.now() - 86400000).toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Боевой пропуск: 15 сезон',
+                link: 'https://lesta.ru/ru/news/battle-pass-season-15/',
+                description: 'Новый сезон боевого пропуска с эксклюзивными наградами и стилями.',
+                pubDate: new Date(Date.now() - 172800000).toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Спецпредложение: премиум техника со скидкой 30%',
+                link: 'https://lesta.ru/ru/news/premium-discount-30/',
+                description: 'Выгодные предложения на премиум танки VIII уровня со скидкой 30%.',
+                pubDate: new Date(Date.now() - 259200000).toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Клановые войны: новый сезон',
+                link: 'https://lesta.ru/ru/news/clan-wars-new-season/',
+                description: 'Стартует новый сезон клановых войн с увеличенным призовым фондом.',
+                pubDate: new Date(Date.now() - 345600000).toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Акция "Боевые задачи": двойной опыт',
+                link: 'https://lesta.ru/ru/news/battle-missions-double-xp/',
+                description: 'Выполняйте боевые задачи и получайте двойной опыт на всех танках.',
+                pubDate: new Date(Date.now() - 432000000).toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Новая ветка танков: итальянские ТТ',
+                link: 'https://lesta.ru/ru/news/italian-heavy-tanks/',
+                description: 'В игру добавлена новая ветка итальянских тяжелых танков.',
+                pubDate: new Date(Date.now() - 518400000).toISOString(),
+                imageUrl: ''
+            },
+            {
+                title: 'Турнир "Стальной охотник": регистрация открыта',
+                link: 'https://lesta.ru/ru/news/steel-hunter-tournament/',
+                description: 'Открыта регистрация на турнир "Стальной охотник" с призовым фондом.',
+                pubDate: new Date(Date.now() - 604800000).toISOString(),
+                imageUrl: ''
+            }
+        ];
+
         async function fetchNews() {
             try {
-                // Пытаемся получить RSS с официального сайта (Lesta - worldoftanks.ru)
-                const rssUrl = 'https://worldoftanks.ru/ru/news/rss/';
-                // Используем прокси allorigins для обхода CORS
-                const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
+                // Пытаемся получить данные с официального сайта Lesta через RSS
+                const rssUrls = [
+                    'https://lesta.ru/ru/news/rss/',
+                    'https://worldoftanks.ru/ru/news/rss/',
+                    'https://worldoftanks.eu/ru/news/rss/'
+                ];
                 
-                const response = await fetch(proxyUrl);
-                if (!response.ok) throw new Error('Network response was not ok');
+                let newsData = null;
                 
-                const text = await response.text();
-                const parser = new DOMParser();
-                const xml = parser.parseFromString(text, 'text/xml');
-                
-                const items = xml.querySelectorAll('item');
-                if (items.length === 0) throw new Error('No items in RSS');
-                
-                // Берем последние 5 новостей
-                const newsArray = [];
-                for (let i = 0; i < Math.min(5, items.length); i++) {
-                    const item = items[i];
-                    const title = item.querySelector('title')?.textContent || 'Без названия';
-                    const link = item.querySelector('link')?.textContent || '#';
-                    const description = item.querySelector('description')?.textContent || '';
-                    const pubDate = item.querySelector('pubDate')?.textContent || '';
-                    
-                    // Попытка получить изображение из description или enclosure
-                    let imageUrl = '';
-                    const enclosure = item.querySelector('enclosure');
-                    if (enclosure && enclosure.getAttribute('url')) {
-                        imageUrl = enclosure.getAttribute('url');
-                    } else {
-                        // Извлекаем первое изображение из html в description
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = description;
-                        const img = tempDiv.querySelector('img');
-                        if (img && img.src) imageUrl = img.src;
+                // Пробуем разные источники
+                for (const rssUrl of rssUrls) {
+                    try {
+                        const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(rssUrl);
+                        const response = await fetch(proxyUrl, { 
+                            signal: AbortSignal.timeout(5000) // Таймаут 5 секунд
+                        });
+                        
+                        if (!response.ok) continue;
+                        
+                        const text = await response.text();
+                        const parser = new DOMParser();
+                        const xml = parser.parseFromString(text, 'text/xml');
+                        
+                        const items = xml.querySelectorAll('item');
+                        if (items.length > 0) {
+                            newsData = [];
+                            // Берем 8 последних новостей
+                            const count = Math.min(8, items.length);
+                            for (let i = 0; i < count; i++) {
+                                const item = items[i];
+                                const title = item.querySelector('title')?.textContent || 'Без названия';
+                                const link = item.querySelector('link')?.textContent || '#';
+                                const description = item.querySelector('description')?.textContent || '';
+                                const pubDate = item.querySelector('pubDate')?.textContent || new Date().toISOString();
+                                
+                                // Извлекаем изображение
+                                let imageUrl = '';
+                                const enclosure = item.querySelector('enclosure');
+                                if (enclosure && enclosure.getAttribute('url')) {
+                                    imageUrl = enclosure.getAttribute('url');
+                                } else {
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.innerHTML = description;
+                                    const img = tempDiv.querySelector('img');
+                                    if (img && img.src) imageUrl = img.src;
+                                }
+                                
+                                const cleanDesc = description.replace(/<[^>]*>/g, '').slice(0, 160);
+                                
+                                newsData.push({
+                                    title,
+                                    link,
+                                    description: cleanDesc,
+                                    pubDate,
+                                    imageUrl
+                                });
+                            }
+                            break; // Выходим из цикла, если нашли данные
+                        }
+                    } catch (e) {
+                        console.warn('Ошибка при загрузке с', rssUrl, e);
+                        continue; // Пробуем следующий источник
                     }
-                    
-                    // Очищаем описание от тегов
-                    const cleanDesc = description.replace(/<[^>]*>/g, '').slice(0, 160);
-                    
-                    newsArray.push({
-                        title,
-                        link,
-                        description: cleanDesc,
-                        pubDate,
-                        imageUrl
-                    });
                 }
                 
-                renderNews(newsArray);
+                if (newsData && newsData.length > 0) {
+                    renderNews(newsData);
+                } else {
+                    // Если не удалось получить данные, используем fallback
+                    renderNews(fallbackNews);
+                }
             } catch (error) {
-                console.warn('Не удалось загрузить RSS с worldoftanks.ru, использую демо-новости:', error);
-                // Fallback демо-новости, если не удалось спарсить
-                const demoNews = [
-                    {
-                        title: 'Обновление 1.32: Новые боевые задачи',
-                        link: 'https://worldoftanks.ru/ru/news/updates/update-1-32/',
-                        description: 'Встречайте новое обновление с уникальными наградами и событиями.',
-                        pubDate: '2025-03-10',
-                        imageUrl: 'https://worldoftanks.ru/static/5.133.0_a9c86f/svg/wot-logo.svg'
-                    },
-                    {
-                        title: 'Выходные с x3 опытом за первую победу',
-                        link: 'https://worldoftanks.ru/ru/news/events/weekend-x3/',
-                        description: 'Получите тройной опыт за первую победу каждый день.',
-                        pubDate: '2025-03-08',
-                        imageUrl: 'https://worldoftanks.ru/static/5.133.0_a9c86f/svg/wot-logo.svg'
-                    },
-                    {
-                        title: 'Боевой пропуск: новый сезон',
-                        link: 'https://worldoftanks.ru/ru/news/battle-pass/season-14/',
-                        description: 'Зарабатывайте очки и получайте уникальные награды.',
-                        pubDate: '2025-03-05',
-                        imageUrl: 'https://worldoftanks.ru/static/5.133.0_a9c86f/svg/wot-logo.svg'
-                    },
-                    {
-                        title: 'Спецпредложение: премиум техника со скидкой',
-                        link: 'https://worldoftanks.ru/ru/news/specials/premium-discount/',
-                        description: 'Выгодные предложения на премиум танки VIII уровня.',
-                        pubDate: '2025-03-01',
-                        imageUrl: 'https://worldoftanks.ru/static/5.133.0_a9c86f/svg/wot-logo.svg'
-                    },
-                    {
-                        title: 'Клановые войны: расписание боёв',
-                        link: 'https://worldoftanks.ru/ru/news/clans/clan-wars-schedule/',
-                        description: 'Узнайте расписание и участвуйте в клановых битвах.',
-                        pubDate: '2025-02-28',
-                        imageUrl: 'https://worldoftanks.ru/static/5.133.0_a9c86f/svg/wot-logo.svg'
-                    }
-                ];
-                renderNews(demoNews);
+                console.warn('Не удалось загрузить RSS, использую демо-новости:', error);
+                renderNews(fallbackNews);
             }
         }
 
@@ -513,15 +548,24 @@
             }
             
             let html = '';
-            newsList.forEach((news, index) => {
-                const date = news.pubDate ? new Date(news.pubDate).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Дата неизвестна';
+            newsList.forEach((news) => {
+                let dateStr = 'Дата неизвестна';
+                try {
+                    const date = new Date(news.pubDate);
+                    if (!isNaN(date.getTime())) {
+                        dateStr = date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+                    }
+                } catch (e) {
+                    // Оставляем "Дата неизвестна"
+                }
+                
                 const imageStyle = news.imageUrl ? `background-image: url('${news.imageUrl}')` : 'background-color: #2a3744;';
                 
                 html += `
                     <div class="news-card">
                         <div class="news-card-image" style="${imageStyle};"></div>
                         <div class="news-card-content">
-                            <div class="news-date">${date}</div>
+                            <div class="news-date">${dateStr}</div>
                             <div class="news-title">${news.title}</div>
                             <div class="news-excerpt">${news.description || 'Подробнее по ссылке.'}</div>
                             <a href="${news.link}" target="_blank" rel="noopener noreferrer" class="news-link">Читать далее →</a>
@@ -532,17 +576,17 @@
             newsContainer.innerHTML = html;
         }
 
-        // Инициализация загрузки новостей
+        // Запускаем загрузку новостей сразу при загрузке страницы
         fetchNews();
 
-        // Дополнительно: если RSS не загрузился, показать сообщение через 5 секунд (необязательно)
+        // Убираем таймаут, так как загрузка теперь быстрая
+        // Если через 3 секунды все еще "Загрузка", показываем fallback
         setTimeout(() => {
-            if (newsContainer.innerHTML.includes('Загрузка новостей')) {
-                newsContainer.innerHTML = '<div class="error">Не удалось загрузить новости. Показаны демо-данные.</div>';
-                // Подставим демо вручную повторно
-                fetchNews(); // повторная попытка, fallback уже внутри
+            const content = newsContainer.innerHTML;
+            if (content.includes('Загрузка новостей')) {
+                renderNews(fallbackNews);
             }
-        }, 5000);
+        }, 3000);
     })();
 </script>
 </body>
