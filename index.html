@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lesta Hub — фарм и бонус-коды Мир Танков</title>
-    <meta name="description" content="Актуальная информация по фарму кредитов и бонус-кодам для Мир Танков от Lesta Games.">
     <style>
         :root {
             --bg-dark: #0b0f14;
@@ -132,6 +131,14 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.6);
         }
 
+        .news-card-image {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            background-color: #1f2a35;
+        }
+
         .news-card-content {
             padding: 1.2rem;
         }
@@ -158,6 +165,84 @@
             letter-spacing: 0.5px;
         }
 
+        /* Модальное окно новости */
+        .news-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .news-modal-overlay.active {
+            display: flex;
+        }
+
+        .news-modal-content {
+            background: var(--bg-panel);
+            border: 1px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .news-modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+        }
+
+        .news-modal-close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .news-modal-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .news-modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .news-modal-date {
+            font-size: 0.9rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+        }
+
+        .news-modal-text {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Остальные модальные окна */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -348,6 +433,17 @@
         </div>
     </div>
 
+    <!-- Модальное окно новости -->
+    <div id="newsModal" class="news-modal-overlay">
+        <div class="news-modal-content">
+            <button class="news-modal-close" id="closeNewsModal">&times;</button>
+            <img id="newsModalImage" class="news-modal-image" src="" alt="Новость">
+            <div id="newsModalTitle" class="news-modal-title"></div>
+            <div id="newsModalDate" class="news-modal-date"></div>
+            <div id="newsModalText" class="news-modal-text"></div>
+        </div>
+    </div>
+
     <!-- Модальное окно фарма -->
     <div id="farmModal" class="modal-overlay">
         <div class="modal-content">
@@ -425,59 +521,7 @@
 
     <script>
         (function() {
-            // Реальные ссылки на новости с tanki.su (официальный сайт Lesta)
-            const actualNews = [
-                {
-                    title: 'Новая премиум ПТ-САУ Kanonenjagdpanzer в продаже!',
-                    date: '21.08.2026',
-                    link: 'https://tanki.su/ru/news/special-offers/kanonenjagdpanzer-sale/',
-                    category: 'Специальные предложения'
-                },
-                {
-                    title: '«Дело чести»: общие тесты обновления',
-                    date: '20.08.2026',
-                    link: 'https://tanki.su/ru/news/game-updates/delo-chesti-common-test/',
-                    category: 'Новое в игре'
-                },
-                {
-                    title: 'Новый запуск Ранговых боёв на IX уровне',
-                    date: '19.08.2026',
-                    link: 'https://tanki.su/ru/news/game-events/ranked-battles-ix/',
-                    category: 'Игровые события'
-                },
-                {
-                    title: 'Будущее танков XI уровня',
-                    date: '18.08.2026',
-                    link: 'https://tanki.su/ru/news/game-updates/future-of-tier-xi/',
-                    category: 'Новое в игре'
-                },
-                {
-                    title: '«Сила времени»: новый Клановый сезон',
-                    date: '17.08.2026',
-                    link: 'https://tanki.su/ru/news/clan-events/sila-vremeni/',
-                    category: 'Клановые события'
-                },
-                {
-                    title: 'Подарки в честь Дня рождения!',
-                    date: '12.08.2026',
-                    link: 'https://tanki.su/ru/news/special-offers/birthday-gifts/',
-                    category: 'Специальные предложения'
-                },
-                {
-                    title: 'Покупай за бонусы Спасибо',
-                    date: '10.08.2026',
-                    link: 'https://tanki.su/ru/news/special-offers/spasibo-bonuses/',
-                    category: 'Специальные предложения'
-                },
-                {
-                    title: 'Интервью с рентгено-эндоваскулярным хирургом',
-                    date: '08.08.2026',
-                    link: 'https://tanki.su/ru/news/community/interview-surgeon/',
-                    category: 'Вокруг игры'
-                }
-            ];
-
-            // База данных танков (реальные танки из игры)
+            // База данных танков
             const tanksDatabase = {
                 'ussr': {
                     name: 'СССР',
@@ -601,49 +645,95 @@
                 }
             };
 
-            // Реальные бонус-коды (актуальные на 2026 год)
-            const actualBonusCodes = [
-                { 
-                    code: 'LESTA2026', 
-                    reward: 'Премиум аккаунт на 7 дней + 500 золота', 
-                    limit: 'Один раз на аккаунт, до 31.12.2026',
-                    status: 'active'
-                },
-                { 
-                    code: 'TANKYOU', 
-                    reward: 'Премиум танк VIII уровня (случайный из списка)', 
-                    limit: 'Один раз на аккаунт, до 30.09.2026',
-                    status: 'active'
-                },
-                { 
-                    code: 'FARMCREDITS', 
-                    reward: '1 000 000 кредитов + 3 дня премиума', 
-                    limit: 'Один раз на аккаунт, до 31.08.2026',
-                    status: 'active'
-                },
-                { 
-                    code: 'BATTLES2026', 
-                    reward: '5 дней премиум аккаунта + 1000 золота', 
-                    limit: 'Один раз на аккаунт, до 31.12.2026',
-                    status: 'active'
+            // Загрузка данных из localStorage
+            function loadNews() {
+                const savedNews = localStorage.getItem('lesta_news');
+                if (savedNews) {
+                    return JSON.parse(savedNews);
                 }
-            ];
+                return [];
+            }
 
-            // Инициализация
-            function initNews() {
+            function loadBonusCodes() {
+                const savedCodes = localStorage.getItem('lesta_bonus_codes');
+                if (savedCodes) {
+                    return JSON.parse(savedCodes);
+                }
+                return [];
+            }
+
+            // Отображение новостей
+            function displayNews() {
                 const newsContainer = document.getElementById('newsContainer');
-                const html = actualNews.map(news => `
-                    <div class="news-card" onclick="window.open('${news.link}', '_blank')">
+                const news = loadNews();
+                
+                if (news.length === 0) {
+                    newsContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">Нет добавленных новостей</div>';
+                    return;
+                }
+                
+                const html = news.map(item => `
+                    <div class="news-card" onclick="openNewsModal(${item.id})">
+                        ${item.image ? `<div class="news-card-image" style="background-image: url('${item.image}')"></div>` : ''}
                         <div class="news-card-content">
-                            <div class="news-date">${news.date}</div>
-                            <div class="news-title">${news.title}</div>
-                            <div class="news-category">${news.category}</div>
+                            <div class="news-date">${item.date}</div>
+                            <div class="news-title">${item.title}</div>
+                            <div class="news-category">${item.category || 'Новости'}</div>
                         </div>
                     </div>
                 `).join('');
+                
                 newsContainer.innerHTML = html;
             }
 
+            // Открытие модального окна новости
+            window.openNewsModal = function(id) {
+                const news = loadNews();
+                const item = news.find(n => n.id === id);
+                
+                if (!item) return;
+                
+                document.getElementById('newsModalImage').src = item.image || '';
+                document.getElementById('newsModalImage').style.display = item.image ? 'block' : 'none';
+                document.getElementById('newsModalTitle').textContent = item.title;
+                document.getElementById('newsModalDate').textContent = item.date;
+                document.getElementById('newsModalText').textContent = item.description || '';
+                
+                document.getElementById('newsModal').classList.add('active');
+            };
+
+            // Закрытие модального окна новости
+            document.getElementById('closeNewsModal').addEventListener('click', () => {
+                document.getElementById('newsModal').classList.remove('active');
+            });
+
+            document.getElementById('newsModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('newsModal')) {
+                    document.getElementById('newsModal').classList.remove('active');
+                }
+            });
+
+            // Отображение бонус-кодов
+            function displayBonusCodes() {
+                const bonusCodesList = document.getElementById('bonusCodesList');
+                const codes = loadBonusCodes();
+                
+                if (codes.length === 0) {
+                    bonusCodesList.innerHTML = '<div style="text-align: center; color: var(--text-muted);">Нет добавленных бонус-кодов</div>';
+                    return;
+                }
+                
+                const html = codes.map(code => `
+                    <div class="bonus-code-item">
+                        <div class="code">${code.code}</div>
+                        <div class="reward">${code.description || 'Описание отсутствует'}</div>
+                    </div>
+                `).join('');
+                
+                bonusCodesList.innerHTML = html;
+            }
+
+            // Инициализация фильтров танков
             function initNations() {
                 const nationSelect = document.getElementById('nationSelect');
                 Object.keys(tanksDatabase).forEach(nationKey => {
@@ -750,21 +840,6 @@
                 document.getElementById('resultBox').style.display = 'block';
             }
 
-            function loadBonusCodes() {
-                const bonusCodesList = document.getElementById('bonusCodesList');
-                
-                const html = actualBonusCodes.map(code => `
-                    <div class="bonus-code-item">
-                        <div class="code">${code.code}</div>
-                        <div class="reward">Награда: ${code.reward}</div>
-                        <div class="limit">Лимит: ${code.limit}</div>
-                        <div style="color: var(--accent-green); margin-top: 0.5rem;">✓ Рабочий код</div>
-                    </div>
-                `).join('');
-                
-                bonusCodesList.innerHTML = html;
-            }
-
             // Инициализация модальных окон
             document.getElementById('btnFarm').addEventListener('click', () => {
                 document.getElementById('farmModal').classList.add('active');
@@ -773,7 +848,7 @@
             
             document.getElementById('btnCodes').addEventListener('click', () => {
                 document.getElementById('codesModal').classList.add('active');
-                loadBonusCodes();
+                displayBonusCodes();
             });
             
             document.getElementById('closeFarmModal').addEventListener('click', () => {
@@ -801,9 +876,10 @@
             document.getElementById('calculateBtn').addEventListener('click', calculateIncome);
             
             // Инициализация
-            initNews();
             initNations();
             filterAndPopulateTanks();
+            displayNews();
+            displayBonusCodes();
         })();
     </script>
 </body>
