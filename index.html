@@ -138,18 +138,8 @@
             height: 200px;
             background-size: cover;
             background-position: center;
-            background-color: #1f2a35;
+            background-color: #2a3744;
             position: relative;
-        }
-
-        .news-card-image::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 60px;
-            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
         }
 
         .news-card-content {
@@ -254,6 +244,7 @@
             max-height: 400px;
             object-fit: cover;
             border-radius: 16px 16px 0 0;
+            display: block;
         }
 
         .news-modal-body {
@@ -286,10 +277,17 @@
             color: var(--accent-blue);
             text-decoration: none;
             font-weight: 500;
+            padding: 0.8rem 1.5rem;
+            background: var(--bg-element);
+            border: 1px solid var(--accent-blue);
+            border-radius: 8px;
+            transition: all 0.3s;
         }
 
         .news-modal-link:hover {
-            text-decoration: underline;
+            background: var(--accent-blue);
+            color: #fff;
+            text-decoration: none;
         }
 
         /* Остальные модальные окна */
@@ -481,12 +479,12 @@
     <div id="newsModal" class="news-modal-overlay">
         <div class="news-modal-content">
             <button class="news-modal-close" id="closeNewsModal">&times;</button>
-            <img id="newsModalImage" class="news-modal-image" src="" alt="Новость" style="display: none;">
+            <img id="newsModalImage" class="news-modal-image" src="" alt="Новость">
             <div class="news-modal-body">
                 <div id="newsModalTitle" class="news-modal-title"></div>
                 <div id="newsModalDate" class="news-modal-date"></div>
                 <div id="newsModalText" class="news-modal-text"></div>
-                <a id="newsModalLink" class="news-modal-link" href="#" target="_blank" style="display: none;">Читать на tanki.su →</a>
+                <a id="newsModalLink" class="news-modal-link" href="#" target="_blank">Читать на tanki.su →</a>
             </div>
         </div>
     </div>
@@ -721,7 +719,7 @@
                 
                 const html = news.map(item => `
                     <div class="news-card" onclick="openNewsModal(${item.id})">
-                        ${item.image ? `<div class="news-card-image" style="background-image: url('${item.image}')"></div>` : '<div class="news-card-image" style="background-color: #2a3744;"></div>'}
+                        ${item.image ? `<div class="news-card-image" style="background-image: url('${item.image}')"></div>` : '<div class="news-card-image"></div>'}
                         <div class="news-card-content">
                             <div class="news-date">${item.date}</div>
                             <div class="news-title">${item.title}</div>
@@ -747,19 +745,21 @@
                 document.getElementById('newsModalText').textContent = item.description || 'Описание отсутствует';
                 
                 // Изображение
+                const modalImage = document.getElementById('newsModalImage');
                 if (item.image) {
-                    document.getElementById('newsModalImage').src = item.image;
-                    document.getElementById('newsModalImage').style.display = 'block';
+                    modalImage.src = item.image;
+                    modalImage.style.display = 'block';
                 } else {
-                    document.getElementById('newsModalImage').style.display = 'none';
+                    modalImage.style.display = 'none';
                 }
                 
                 // Ссылка
+                const modalLink = document.getElementById('newsModalLink');
                 if (item.url) {
-                    document.getElementById('newsModalLink').href = item.url;
-                    document.getElementById('newsModalLink').style.display = 'inline-block';
+                    modalLink.href = item.url;
+                    modalLink.style.display = 'inline-block';
                 } else {
-                    document.getElementById('newsModalLink').style.display = 'none';
+                    modalLink.style.display = 'none';
                 }
                 
                 document.getElementById('newsModal').classList.add('active');
