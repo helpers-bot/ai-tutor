@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesta Hub — статистика игроков Мир Танков</title>
+    <title>Lesta Hub — статистика, фарм и бонус-коды Мир Танков</title>
     <style>
         :root {
             --bg-dark: #0b0f14;
@@ -39,7 +39,57 @@
 
         .main-wrapper {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
+        }
+
+        .top-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--bg-panel);
+            border: 2px solid var(--border-color);
+            border-radius: 60px;
+            padding: 0.8rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .btn-farm {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .btn-farm:hover {
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-codes {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        .btn-codes:hover {
+            background: rgba(74, 158, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(74, 158, 255, 0.3);
         }
 
         .search-section {
@@ -50,8 +100,8 @@
             margin-bottom: 2rem;
         }
 
-        .search-section h1 {
-            font-size: 2rem;
+        .search-section h2 {
+            font-size: 1.6rem;
             margin-bottom: 1.5rem;
             text-align: center;
             color: var(--accent-gold);
@@ -95,7 +145,6 @@
         .search-btn:hover {
             background: #ffd700;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
 
         .stats-container {
@@ -122,37 +171,9 @@
             margin-bottom: 0.5rem;
         }
 
-        .player-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .info-item {
-            background: var(--bg-panel);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem;
-        }
-
-        .info-label {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-value {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-primary);
-        }
-
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
             margin-top: 1rem;
         }
@@ -161,27 +182,25 @@
             background: var(--bg-element);
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            padding: 1.2rem;
+            padding: 1rem;
         }
 
         .stat-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--accent-blue);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
+            margin-bottom: 0.3rem;
         }
 
         .stat-value {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: #fff;
         }
 
         .loading {
             text-align: center;
-            padding: 2rem;
+            padding: 1rem;
             color: var(--accent-blue);
-            font-size: 1.2rem;
         }
 
         .error {
@@ -194,284 +213,520 @@
             margin-top: 1rem;
         }
 
-        .api-link {
-            text-align: center;
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-panel);
+            border: 1px solid var(--accent-gold);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            color: #fff;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .farm-calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
             margin-top: 1rem;
         }
 
-        .api-link a {
-            color: var(--accent-blue);
-            text-decoration: none;
+        .form-group {
+            margin-bottom: 1rem;
         }
 
-        .api-link a:hover {
-            text-decoration: underline;
+        .form-group label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .btn-calculate {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .result-box {
+            background: var(--bg-element);
+            border: 1px solid var(--accent-green);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .bonus-code-item {
+            background: var(--bg-element);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .bonus-code-item .code {
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+        }
+
+        .tank-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .farm-calculator {
+                grid-template-columns: 1fr;
+            }
+            .top-buttons {
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
+        <div class="top-buttons">
+            <button class="action-btn btn-farm" id="btnFarm">💰 Калькулятор фарма</button>
+            <button class="action-btn btn-codes" id="btnCodes">🎁 Бонус-коды</button>
+        </div>
+
         <div class="search-section">
-            <h1>🔍 Поиск игрока Мир Танков</h1>
+            <h2>🔍 Поиск игрока Мир Танков</h2>
             <div class="search-box">
                 <input type="text" class="search-input" id="playerSearch" placeholder="Введите ник игрока...">
                 <button class="search-btn" onclick="searchPlayer()">Найти</button>
             </div>
             <div id="errorContainer"></div>
             <div id="loadingContainer" class="loading" style="display: none;">Загрузка данных...</div>
-            
             <div class="stats-container" id="statsContainer">
                 <div id="playerStats"></div>
-            </div>
-            
-            <div class="api-link">
-                <a href="https://developers.lesta.ru/reference/all/wot/account/info/" target="_blank">Документация API Lesta</a>
             </div>
         </div>
     </div>
 
+    <!-- Модальное окно фарма -->
+    <div id="farmModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeFarmModal">&times;</button>
+            <div class="modal-title">💰 Калькулятор фарма кредитов</div>
+            <div class="farm-calculator">
+                <div>
+                    <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">Топ-10 премиум танков</h3>
+                    <div id="topTanksList"></div>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">Расчёт доходности</h3>
+                    <div class="form-group">
+                        <label>Танк</label>
+                        <select id="tankSelect">
+                            <option value="">Выберите танк</option>
+                            <option value="skorpion-g">Skorpion G (8 ур.) ★</option>
+                            <option value="lowe">Löwe (8 ур.) ★</option>
+                            <option value="progetto-46">Progetto M35 mod. 46 (8 ур.) ★</option>
+                            <option value="su-130pm">СУ-130ПМ (8 ур.) ★</option>
+                            <option value="strv-s1">Strv S1 (8 ур.) ★</option>
+                            <option value="wz-120-1g-ft">WZ-120-1G FT (8 ур.) ★</option>
+                            <option value="amx-cda-105">AMX Canon d'assaut 105 (8 ур.) ★</option>
+                            <option value="somua-sm">Somua SM (8 ур.) ★</option>
+                            <option value="obj-703-ii">Объект 703 Вариант II (8 ур.) ★</option>
+                            <option value="bisonte-c45">Bisonte C45 (8 ур.) ★</option>
+                            <option value="is-7">ИС-7 (10 ур.)</option>
+                            <option value="obj-277">Объект 277 (10 ур.)</option>
+                            <option value="t-62a">Т-62А (10 ур.)</option>
+                            <option value="e-100">E 100 (10 ур.)</option>
+                            <option value="leopard-1">Leopard 1 (10 ур.)</option>
+                            <option value="t110e5">T110E5 (10 ур.)</option>
+                            <option value="amx-50b">AMX 50 B (10 ур.)</option>
+                            <option value="fv215b">FV215b (10 ур.)</option>
+                            <option value="progetto-65">Progetto M40 mod. 65 (10 ур.)</option>
+                            <option value="kranvagn">Kranvagn (10 ур.)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Премиум аккаунт</label>
+                        <select id="premiumSelect">
+                            <option value="yes">Да (+50% кредитов)</option>
+                            <option value="no">Нет</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Количество боёв</label>
+                        <input type="number" id="battlesInput" value="10" min="1" max="100">
+                    </div>
+                    <button class="btn-calculate" id="calculateBtn">Рассчитать доход</button>
+                    <div id="resultBox" class="result-box" style="display: none;">
+                        <h3>Результат расчёта</h3>
+                        <p>Средний доход за бой: <strong id="avgIncome"></strong></p>
+                        <p>Общий доход за <span id="totalBattles"></span> боёв: <strong id="totalIncome"></strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно бонус-кодов -->
+    <div id="codesModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" id="closeCodesModal">&times;</button>
+            <div class="modal-title">🎁 Актуальные бонус-коды</div>
+            <div id="bonusCodesList"></div>
+        </div>
+    </div>
+
     <script>
-        // Конфигурация API Lesta
-        const API_CONFIG = {
-            baseUrl: 'https://api.worldoftanks.ru/wot/',
-            applicationId: 'demo', // Замените на свой application_id
-            realm: 'ru'
-        };
+        (function() {
+            // API Lesta (публичный, без регистрации)
+            const API_BASE = 'https://api.worldoftanks.ru/wot/';
+            const APP_ID = 'demo'; // Публичный ID для тестирования
 
-        // Функция для выполнения запросов к API
-        async function apiRequest(endpoint, params = {}) {
-            const queryParams = new URLSearchParams({
-                application_id: API_CONFIG.applicationId,
-                ...params
-            });
-            
-            const url = `${API_CONFIG.baseUrl}${endpoint}/?${queryParams}`;
-            
-            try {
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('API Error:', error);
-                throw error;
-            }
-        }
+            // База доходности танков
+            const tankIncome = {
+                'skorpion-g': { name: 'Skorpion G', tier: 8, premium: true, baseIncome: 82000 },
+                'lowe': { name: 'Löwe', tier: 8, premium: true, baseIncome: 80000 },
+                'progetto-46': { name: 'Progetto M35 mod. 46', tier: 8, premium: true, baseIncome: 80000 },
+                'su-130pm': { name: 'СУ-130ПМ', tier: 8, premium: true, baseIncome: 78000 },
+                'strv-s1': { name: 'Strv S1', tier: 8, premium: true, baseIncome: 79000 },
+                'wz-120-1g-ft': { name: 'WZ-120-1G FT', tier: 8, premium: true, baseIncome: 80000 },
+                'amx-cda-105': { name: 'AMX Canon d\'assaut 105', tier: 8, premium: true, baseIncome: 81000 },
+                'somua-sm': { name: 'Somua SM', tier: 8, premium: true, baseIncome: 79000 },
+                'obj-703-ii': { name: 'Объект 703 Вариант II', tier: 8, premium: true, baseIncome: 75000 },
+                'bisonte-c45': { name: 'Bisonte C45', tier: 8, premium: true, baseIncome: 77000 },
+                'is-7': { name: 'ИС-7', tier: 10, premium: false, baseIncome: 65000 },
+                'obj-277': { name: 'Объект 277', tier: 10, premium: false, baseIncome: 62000 },
+                't-62a': { name: 'Т-62А', tier: 10, premium: false, baseIncome: 58000 },
+                'e-100': { name: 'E 100', tier: 10, premium: false, baseIncome: 63000 },
+                'leopard-1': { name: 'Leopard 1', tier: 10, premium: false, baseIncome: 59000 },
+                't110e5': { name: 'T110E5', tier: 10, premium: false, baseIncome: 61000 },
+                'amx-50b': { name: 'AMX 50 B', tier: 10, premium: false, baseIncome: 59000 },
+                'fv215b': { name: 'FV215b', tier: 10, premium: false, baseIncome: 60000 },
+                'progetto-65': { name: 'Progetto M40 mod. 65', tier: 10, premium: false, baseIncome: 57000 },
+                'kranvagn': { name: 'Kranvagn', tier: 10, premium: false, baseIncome: 57000 }
+            };
 
-        // Функция поиска игрока
-        async function searchPlayer() {
-            const nickname = document.getElementById('playerSearch').value.trim();
-            
-            if (!nickname) {
-                showError('Введите ник игрока');
-                return;
-            }
-            
-            const loadingContainer = document.getElementById('loadingContainer');
-            const errorContainer = document.getElementById('errorContainer');
-            const statsContainer = document.getElementById('statsContainer');
-            
-            loadingContainer.style.display = 'block';
-            errorContainer.innerHTML = '';
-            statsContainer.classList.remove('active');
-            
-            try {
-                // Шаг 1: Поиск игрока по нику
-                const searchResult = await apiRequest('account/list', {
-                    search: nickname,
-                    type: 'exact'
-                });
+            // Поиск игрока
+            async function searchPlayer() {
+                const nickname = document.getElementById('playerSearch').value.trim();
                 
-                if (searchResult.status !== 'ok' || !searchResult.data || searchResult.data.length === 0) {
-                    throw new Error('Игрок не найден');
+                if (!nickname) {
+                    showError('Введите ник игрока');
+                    return;
                 }
                 
-                const accountId = searchResult.data[0].account_id;
+                const loadingContainer = document.getElementById('loadingContainer');
+                const errorContainer = document.getElementById('errorContainer');
+                const statsContainer = document.getElementById('statsContainer');
                 
-                // Шаг 2: Получение информации об игроке
-                const playerInfo = await apiRequest('account/info', {
-                    account_id: accountId,
-                    fields: 'account_id,nickname,created_at,last_battle_time,global_rating,clan_id,statistics'
-                });
+                loadingContainer.style.display = 'block';
+                errorContainer.innerHTML = '';
+                statsContainer.classList.remove('active');
                 
-                if (playerInfo.status !== 'ok' || !playerInfo.data || !playerInfo.data[accountId]) {
-                    throw new Error('Не удалось получить информацию об игроке');
-                }
-                
-                const playerData = playerInfo.data[accountId];
-                
-                // Шаг 3: Получение расширенной статистики
-                const statsData = await apiRequest('account/info', {
-                    account_id: accountId,
-                    fields: 'statistics.all,statistics.rating,statistics.frags,statistics.max_xp,statistics.max_damage'
-                });
-                
-                if (statsData.status !== 'ok' || !statsData.data || !statsData.data[accountId]) {
-                    throw new Error('Не удалось получить статистику');
-                }
-                
-                const statistics = statsData.data[accountId].statistics;
-                
-                // Шаг 4: Получение данных о последних боях (если доступно)
-                let recentBattles = null;
                 try {
-                    const battlesData = await apiRequest('account/list', {
-                        account_id: accountId,
-                        limit: 100
-                    });
+                    // Поиск аккаунта
+                    const searchUrl = `${API_BASE}account/list/?application_id=${APP_ID}&search=${encodeURIComponent(nickname)}&type=exact`;
+                    const searchResponse = await fetch(searchUrl);
+                    const searchData = await searchResponse.json();
                     
-                    if (battlesData.status === 'ok') {
-                        recentBattles = battlesData.data;
+                    if (searchData.status !== 'ok' || !searchData.data || searchData.data.length === 0) {
+                        throw new Error('Игрок не найден');
                     }
-                } catch (e) {
-                    console.warn('Не удалось получить данные о последних боях');
+                    
+                    const accountId = searchData.data[0].account_id;
+                    
+                    // Получение статистики
+                    const statsUrl = `${API_BASE}account/info/?application_id=${APP_ID}&account_id=${accountId}&fields=account_id,nickname,created_at,last_battle_time,global_rating,statistics.all,statistics.rating`;
+                    const statsResponse = await fetch(statsUrl);
+                    const statsData = await statsResponse.json();
+                    
+                    if (statsData.status !== 'ok' || !statsData.data || !statsData.data[accountId]) {
+                        throw new Error('Не удалось получить статистику');
+                    }
+                    
+                    const playerData = statsData.data[accountId];
+                    displayPlayerStats(playerData);
+                    
+                } catch (error) {
+                    showError(`Ошибка: ${error.message}`);
+                } finally {
+                    loadingContainer.style.display = 'none';
+                }
+            }
+
+            // Отображение статистики
+            function displayPlayerStats(playerData) {
+                const statsContainer = document.getElementById('statsContainer');
+                const playerStats = document.getElementById('playerStats');
+                
+                const all = playerData.statistics?.all || {};
+                const rating = playerData.statistics?.rating || {};
+                
+                const wins = all.wins || 0;
+                const battles = all.battles || 0;
+                const winRate = battles > 0 ? ((wins / battles) * 100).toFixed(2) : 0;
+                const avgDamage = battles > 0 ? Math.round((all.damage_dealt || 0) / battles) : 0;
+                const avgXp = battles > 0 ? Math.round((all.xp || 0) / battles) : 0;
+                
+                const html = `
+                    <div class="player-header">
+                        <div class="player-name">${playerData.nickname || 'Неизвестно'}</div>
+                        <div style="color: var(--text-secondary);">
+                            ID: ${playerData.account_id} | Создан: ${formatDate(playerData.created_at)}
+                        </div>
+                        <div style="color: var(--text-secondary);">
+                            Последний бой: ${formatDate(playerData.last_battle_time)} | Рейтинг: ${playerData.global_rating || 'Н/Д'}
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-title">Всего боёв</div>
+                            <div class="stat-value">${battles}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Процент побед</div>
+                            <div class="stat-value">${winRate}%</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Средний урон</div>
+                            <div class="stat-value">${avgDamage}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Средний опыт</div>
+                            <div class="stat-value">${avgXp}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Победы</div>
+                            <div class="stat-value">${wins}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Поражения</div>
+                            <div class="stat-value">${all.losses || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Уничтожено танков</div>
+                            <div class="stat-value">${all.frags || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Выжил в боях</div>
+                            <div class="stat-value">${all.survived_battles || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Общий урон</div>
+                            <div class="stat-value">${all.damage_dealt || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Общий опыт</div>
+                            <div class="stat-value">${all.xp || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Захват базы</div>
+                            <div class="stat-value">${all.capture_points || 0}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-title">Защита базы</div>
+                            <div class="stat-value">${all.dropped_capture_points || 0}</div>
+                        </div>
+                    </div>
+                `;
+                
+                playerStats.innerHTML = html;
+                statsContainer.classList.add('active');
+            }
+
+            // Форматирование даты
+            function formatDate(timestamp) {
+                if (!timestamp) return 'Н/Д';
+                const date = new Date(timestamp * 1000);
+                return date.toLocaleDateString('ru-RU', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+            }
+
+            // Отображение ошибки
+            function showError(message) {
+                const errorContainer = document.getElementById('errorContainer');
+                errorContainer.innerHTML = `<div class="error">${message}</div>`;
+            }
+
+            // Обработка Enter в поиске
+            document.getElementById('playerSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchPlayer();
+                }
+            });
+
+            // Калькулятор фарма
+            function loadTopTanks() {
+                const topTanksList = document.getElementById('topTanksList');
+                const topTanks = Object.values(tankIncome)
+                    .filter(tank => tank.premium)
+                    .sort((a, b) => b.baseIncome - a.baseIncome)
+                    .slice(0, 10);
+                
+                const html = topTanks.map((tank, index) => `
+                    <div class="tank-list-item">
+                        <span>${index + 1}. ${tank.name}</span>
+                        <span style="color: var(--accent-gold);">★ ${tank.tier} ур.</span>
+                    </div>
+                `).join('');
+                
+                topTanksList.innerHTML = html;
+            }
+
+            function calculateIncome() {
+                const tankId = document.getElementById('tankSelect').value;
+                const battles = parseInt(document.getElementById('battlesInput').value) || 10;
+                const isPremium = document.getElementById('premiumSelect').value === 'yes';
+                
+                if (!tankId) {
+                    alert('Выберите танк');
+                    return;
                 }
                 
-                // Отображение данных
-                displayPlayerStats(playerData, statistics, recentBattles);
+                const tank = tankIncome[tankId];
+                if (!tank) {
+                    alert('Танк не найден');
+                    return;
+                }
                 
-            } catch (error) {
-                showError(`Ошибка: ${error.message}`);
-            } finally {
-                loadingContainer.style.display = 'none';
+                let baseIncome = tank.baseIncome;
+                
+                if (isPremium) {
+                    baseIncome *= 1.5;
+                }
+                
+                if (tank.premium) {
+                    baseIncome *= 1.2;
+                }
+                
+                const totalIncome = baseIncome * battles;
+                
+                document.getElementById('avgIncome').textContent = Math.round(baseIncome).toLocaleString() + ' кредитов';
+                document.getElementById('totalBattles').textContent = battles;
+                document.getElementById('totalIncome').textContent = Math.round(totalIncome).toLocaleString() + ' кредитов';
+                document.getElementById('resultBox').style.display = 'block';
             }
-        }
 
-        // Функция отображения статистики игрока
-        function displayPlayerStats(playerData, statistics, recentBattles) {
-            const statsContainer = document.getElementById('statsContainer');
-            const playerStats = document.getElementById('playerStats');
-            
-            const allStats = statistics?.all || {};
-            const ratingStats = statistics?.rating || {};
-            
-            const html = `
-                <div class="player-header">
-                    <div class="player-name">${playerData.nickname || 'Неизвестно'}</div>
-                    <div style="color: var(--text-secondary);">
-                        ID: ${playerData.account_id} | Создан: ${formatDate(playerData.created_at)}
-                    </div>
-                    <div style="color: var(--text-secondary);">
-                        Последний бой: ${formatDate(playerData.last_battle_time)} | Глобальный рейтинг: ${playerData.global_rating || 'Н/Д'}
-                    </div>
-                </div>
+            // Бонус-коды
+            function loadBonusCodes() {
+                const bonusCodesList = document.getElementById('bonusCodesList');
+                const codes = JSON.parse(localStorage.getItem('lesta_bonus_codes') || '[]');
                 
-                <div class="player-info-grid">
-                    <div class="info-item">
-                        <div class="info-label">Боёв всего</div>
-                        <div class="info-value">${allStats.battles || 0}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Процент побед</div>
-                        <div class="info-value">${allStats.wins ? ((allStats.wins / allStats.battles * 100).toFixed(2)) : 0}%</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Средний урон</div>
-                        <div class="info-value">${allStats.damage_dealt ? Math.round(allStats.damage_dealt / allStats.battles) : 0}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Средний опыт</div>
-                        <div class="info-value">${allStats.xp ? Math.round(allStats.xp / allStats.battles) : 0}</div>
-                    </div>
-                </div>
+                if (codes.length === 0) {
+                    bonusCodesList.innerHTML = '<div style="text-align: center; color: var(--text-muted);">Нет добавленных бонус-кодов</div>';
+                    return;
+                }
                 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-title">Всего боёв</div>
-                        <div class="stat-value">${allStats.battles || 0}</div>
+                const html = codes.map(code => `
+                    <div class="bonus-code-item">
+                        <div class="code">${code.code}</div>
+                        <div style="color: var(--text-secondary); margin-top: 0.3rem;">${code.description || 'Описание отсутствует'}</div>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Победы</div>
-                        <div class="stat-value">${allStats.wins || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Поражения</div>
-                        <div class="stat-value">${allStats.losses || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Выжил в боях</div>
-                        <div class="stat-value">${allStats.survived_battles || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Уничтожено танков</div>
-                        <div class="stat-value">${allStats.frags || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Средний урон</div>
-                        <div class="stat-value">${allStats.damage_dealt ? Math.round(allStats.damage_dealt / allStats.battles) : 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Максимальный урон</div>
-                        <div class="stat-value">${statistics?.max_damage || 'Н/Д'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Максимальный опыт</div>
-                        <div class="stat-value">${statistics?.max_xp || 'Н/Д'}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Общий урон</div>
-                        <div class="stat-value">${allStats.damage_dealt || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Общий опыт</div>
-                        <div class="stat-value">${allStats.xp || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Захват базы</div>
-                        <div class="stat-value">${allStats.capture_points || 0}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-title">Защита базы</div>
-                        <div class="stat-value">${allStats.dropped_capture_points || 0}</div>
-                    </div>
-                </div>
+                `).join('');
                 
-                <div class="player-info-grid" style="margin-top: 1rem;">
-                    <div class="info-item">
-                        <div class="info-label">Рейтинг WN8</div>
-                        <div class="info-value">${ratingStats?.wn8 || 'Н/Д'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Рейтинг WGR</div>
-                        <div class="info-value">${ratingStats?.wgr || 'Н/Д'}</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Эффективность</div>
-                        <div class="info-value">${ratingStats?.efficiency || 'Н/Д'}</div>
-                    </div>
-                </div>
-            `;
-            
-            playerStats.innerHTML = html;
-            statsContainer.classList.add('active');
-        }
+                bonusCodesList.innerHTML = html;
+            }
 
-        // Функция форматирования даты
-        function formatDate(timestamp) {
-            if (!timestamp) return 'Н/Д';
-            const date = new Date(timestamp * 1000);
-            return date.toLocaleDateString('ru-RU', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric'
+            // Инициализация модальных окон
+            document.getElementById('btnFarm').addEventListener('click', () => {
+                document.getElementById('farmModal').classList.add('active');
+                loadTopTanks();
             });
-        }
-
-        // Функция отображения ошибки
-        function showError(message) {
-            const errorContainer = document.getElementById('errorContainer');
-            errorContainer.innerHTML = `<div class="error">${message}</div>`;
-        }
-
-        // Обработка нажатия Enter в поле поиска
-        document.getElementById('playerSearch').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchPlayer();
-            }
-        });
+            
+            document.getElementById('btnCodes').addEventListener('click', () => {
+                document.getElementById('codesModal').classList.add('active');
+                loadBonusCodes();
+            });
+            
+            document.getElementById('closeFarmModal').addEventListener('click', () => {
+                document.getElementById('farmModal').classList.remove('active');
+            });
+            
+            document.getElementById('closeCodesModal').addEventListener('click', () => {
+                document.getElementById('codesModal').classList.remove('active');
+            });
+            
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('farmModal')) {
+                    document.getElementById('farmModal').classList.remove('active');
+                }
+                if (e.target === document.getElementById('codesModal')) {
+                    document.getElementById('codesModal').classList.remove('active');
+                }
+            });
+            
+            document.getElementById('calculateBtn').addEventListener('click', calculateIncome);
+        })();
     </script>
 </body>
 </html>
