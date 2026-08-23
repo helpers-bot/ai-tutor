@@ -39,7 +39,7 @@
 
         .admin-wrapper {
             width: 100%;
-            max-width: 800px;
+            max-width: 600px;
         }
 
         h1 {
@@ -202,28 +202,6 @@
             border-radius: 8px;
             cursor: pointer;
         }
-
-        .loading {
-            text-align: center;
-            padding: 1rem;
-            color: var(--accent-blue);
-        }
-
-        .preview-box {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: var(--bg-element);
-            border: 1px solid var(--accent-blue);
-            border-radius: 8px;
-        }
-
-        .preview-box img {
-            max-width: 200px;
-            max-height: 150px;
-            object-fit: cover;
-            border-radius: 4px;
-            margin-top: 0.5rem;
-        }
     </style>
 </head>
 <body>
@@ -238,47 +216,6 @@
 
         <div class="admin-panel" id="adminPanel">
             <button class="logout-btn" onclick="logout()">Выйти</button>
-
-            <div class="section">
-                <h2>📰 Добавить новость</h2>
-                <div class="form-group">
-                    <label>Ссылка на новость (tanki.su)</label>
-                    <input type="url" id="newsUrl" placeholder="https://tanki.su/ru/news/...">
-                </div>
-                <button class="btn" onclick="fetchNewsInfo()">🔍 Получить данные</button>
-                <div id="loadingIndicator" class="loading" style="display: none;">Загрузка данных...</div>
-                
-                <div id="previewData" class="preview-box" style="display: none;">
-                    <h3 style="color: var(--accent-green);">Данные получены:</h3>
-                    <p><strong>Заголовок:</strong> <span id="previewTitle"></span></p>
-                    <p><strong>Дата:</strong> <span id="previewDate"></span></p>
-                    <p><strong>Описание:</strong> <span id="previewDescription"></span></p>
-                    <img id="previewImage" src="" alt="Превью">
-                </div>
-                
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label>Заголовок</label>
-                    <input type="text" id="newsTitle" placeholder="Заголовок новости">
-                </div>
-                <div class="form-group">
-                    <label>Дата</label>
-                    <input type="text" id="newsDate" placeholder="21.08.2026">
-                </div>
-                <div class="form-group">
-                    <label>Описание</label>
-                    <textarea id="newsDescription" placeholder="Описание новости"></textarea>
-                </div>
-                <div class="form-group">
-                    <label>Ссылка на изображение</label>
-                    <input type="url" id="newsImage" placeholder="https://...">
-                </div>
-                <button class="btn" onclick="addNews()">✅ Добавить новость</button>
-            </div>
-
-            <div class="section">
-                <h2>📋 Список новостей</h2>
-                <div id="newsList" class="item-list"></div>
-            </div>
 
             <div class="section">
                 <h2>🎁 Добавить бонус-код</h2>
@@ -309,7 +246,6 @@
             if (password === PASSWORD) {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('adminPanel').style.display = 'block';
-                loadNewsList();
                 loadBonusCodesList();
             } else {
                 alert('Неверный пароль');
@@ -323,316 +259,12 @@
         }
         
         // Работа с localStorage
-        function getNews() {
-            return JSON.parse(localStorage.getItem('lesta_news') || '[]');
-        }
-        
-        function saveNews(news) {
-            localStorage.setItem('lesta_news', JSON.stringify(news));
-        }
-        
         function getBonusCodes() {
             return JSON.parse(localStorage.getItem('lesta_bonus_codes') || '[]');
         }
         
         function saveBonusCodes(codes) {
             localStorage.setItem('lesta_bonus_codes', JSON.stringify(codes));
-        }
-        
-        // Функция для получения данных новости
-        async function fetchNewsInfo() {
-            const url = document.getElementById('newsUrl').value;
-            if (!url) {
-                alert('Введите ссылку на новость');
-                return;
-            }
-            
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            loadingIndicator.style.display = 'block';
-            
-            try {
-                let html = '';
-                let success = false;
-                
-                // СПОСОБ 1: Через ваш прокси (самый надёжный)
-                try {
-                    const response = await fetch(`/proxy.php?url=${encodeURIComponent(url)}`);
-                    if (response.ok) {
-                        html = await response.text();
-                        success = true;
-                        console.log('Успешно получено через proxy.php');
-                    }
-                } catch (e) {
-                    console.warn('proxy.php не сработал:', e);
-                }
-                
-                // СПОСОБ 2: Через iframe (если proxy.php нет)
-                if (!success) {
-                    try {
-                        html = await fetchViaIframe(url);
-                        if (html) {
-                            success = true;
-                            console.log('Успешно получено через iframe');
-                        }
-                    } catch (e) {
-                        console.warn('Метод iframe не сработал');
-                    }
-                }
-                
-                // СПОСОБ 3: Через внешние прокси (последний вариант)
-                if (!success) {
-                    const proxyUrls = [
-                        `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-                        `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-                    ];
-                    
-                    for (const proxyUrl of proxyUrls) {
-                        try {
-                            const response = await fetch(proxyUrl);
-                            if (response.ok) {
-                                const data = await response.json();
-                                html = data.contents || data;
-                                if (html) {
-                                    success = true;
-                                    console.log('Успешно получено через внешний прокси');
-                                    break;
-                                }
-                            }
-                        } catch (e) {
-                            console.warn(`Прокси ${proxyUrl} не сработал`);
-                        }
-                    }
-                }
-                
-                if (!success) {
-                    throw new Error('Не удалось получить данные ни одним способом');
-                }
-                
-                // Извлекаем данные из HTML
-                const newsData = extractNewsData(html, url);
-                
-                // Заполняем форму
-                document.getElementById('newsTitle').value = newsData.title;
-                document.getElementById('newsDate').value = newsData.date;
-                document.getElementById('newsDescription').value = newsData.description;
-                document.getElementById('newsImage').value = newsData.image;
-                
-                // Показываем превью
-                document.getElementById('previewTitle').textContent = newsData.title;
-                document.getElementById('previewDate').textContent = newsData.date;
-                document.getElementById('previewDescription').textContent = newsData.description;
-                
-                if (newsData.image) {
-                    document.getElementById('previewImage').src = newsData.image;
-                    document.getElementById('previewImage').style.display = 'block';
-                } else {
-                    document.getElementById('previewImage').style.display = 'none';
-                }
-                
-                document.getElementById('previewData').style.display = 'block';
-                loadingIndicator.style.display = 'none';
-                
-            } catch (error) {
-                loadingIndicator.style.display = 'none';
-                console.error('Ошибка:', error);
-                alert('Не удалось автоматически получить данные. Заполните поля вручную.');
-            }
-        }
-        
-        // Получение через iframe
-        function fetchViaIframe(url) {
-            return new Promise((resolve, reject) => {
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = url;
-                
-                iframe.onload = () => {
-                    try {
-                        const doc = iframe.contentDocument || iframe.contentWindow.document;
-                        const html = doc.documentElement.outerHTML;
-                        document.body.removeChild(iframe);
-                        resolve(html);
-                    } catch (e) {
-                        document.body.removeChild(iframe);
-                        reject(e);
-                    }
-                };
-                
-                iframe.onerror = () => {
-                    document.body.removeChild(iframe);
-                    reject(new Error('Iframe error'));
-                };
-                
-                document.body.appendChild(iframe);
-                
-                setTimeout(() => {
-                    if (iframe.parentNode) {
-                        document.body.removeChild(iframe);
-                    }
-                    reject(new Error('Timeout'));
-                }, 10000);
-            });
-        }
-        
-        // Извлечение данных из HTML
-        function extractNewsData(html, url) {
-            const doc = new DOMParser().parseFromString(html, 'text/html');
-            
-            // Заголовок
-            let title = '';
-            const titleSelectors = [
-                'h1',
-                '.news-title',
-                '.article-title',
-                'meta[property="og:title"]',
-                'title'
-            ];
-            
-            for (const selector of titleSelectors) {
-                const element = doc.querySelector(selector);
-                if (element) {
-                    title = element.textContent?.trim() || element.content?.trim() || '';
-                    if (title) break;
-                }
-            }
-            
-            // Изображение
-            let image = '';
-            const imageSelectors = [
-                'meta[property="og:image"]',
-                'meta[name="twitter:image"]',
-                '.news-image img',
-                '.article-image img',
-                'article img'
-            ];
-            
-            for (const selector of imageSelectors) {
-                const element = doc.querySelector(selector);
-                if (element) {
-                    image = element.content || element.src || '';
-                    if (image) break;
-                }
-            }
-            
-            // Описание
-            let description = '';
-            const descSelectors = [
-                'meta[property="og:description"]',
-                'meta[name="description"]',
-                '.news-description',
-                '.article-content p',
-                '.news-content p'
-            ];
-            
-            for (const selector of descSelectors) {
-                const element = doc.querySelector(selector);
-                if (element) {
-                    description = element.content || element.textContent?.trim() || '';
-                    if (description) break;
-                }
-            }
-            
-            // Дата
-            let date = '';
-            const dateSelectors = [
-                '.news-date',
-                '.article-date',
-                'time',
-                '.date',
-                'meta[property="article:published_time"]'
-            ];
-            
-            for (const selector of dateSelectors) {
-                const element = doc.querySelector(selector);
-                if (element) {
-                    date = element.textContent?.trim() || element.content || '';
-                    if (date) break;
-                }
-            }
-            
-            // Если дата не найдена, используем текущую
-            if (!date || date === '') {
-                date = new Date().toISOString().split('T')[0];
-            }
-            
-            return {
-                title: title || 'Без названия',
-                image: image || '',
-                description: description || '',
-                date: date,
-                url: url
-            };
-        }
-        
-        // Добавление новости
-        function addNews() {
-            const title = document.getElementById('newsTitle').value;
-            const date = document.getElementById('newsDate').value;
-            const description = document.getElementById('newsDescription').value;
-            const image = document.getElementById('newsImage').value;
-            const url = document.getElementById('newsUrl').value;
-            
-            if (!title) {
-                alert('Введите заголовок');
-                return;
-            }
-            
-            const news = getNews();
-            news.push({
-                id: Date.now(),
-                title: title,
-                date: date || new Date().toISOString().split('T')[0],
-                description: description,
-                image: image,
-                category: 'Новости Мир Танков',
-                url: url
-            });
-            
-            saveNews(news);
-            loadNewsList();
-            
-            // Очищаем форму
-            document.getElementById('newsUrl').value = '';
-            document.getElementById('newsTitle').value = '';
-            document.getElementById('newsDate').value = '';
-            document.getElementById('newsDescription').value = '';
-            document.getElementById('newsImage').value = '';
-            document.getElementById('previewData').style.display = 'none';
-            
-            alert('Новость добавлена!');
-        }
-        
-        // Удаление новости
-        function deleteNews(id) {
-            if (!confirm('Удалить новость?')) return;
-            
-            const news = getNews();
-            const filtered = news.filter(item => item.id !== id);
-            saveNews(filtered);
-            loadNewsList();
-        }
-        
-        // Загрузка списка новостей
-        function loadNewsList() {
-            const newsList = document.getElementById('newsList');
-            const news = getNews();
-            
-            if (news.length === 0) {
-                newsList.innerHTML = '<div style="color: var(--text-muted);">Нет новостей</div>';
-                return;
-            }
-            
-            newsList.innerHTML = news.map(item => `
-                <div class="item">
-                    <div class="item-info">
-                        <div class="item-title">${item.title}</div>
-                        <div class="item-meta">${item.date}</div>
-                    </div>
-                    <div class="item-actions">
-                        <button class="btn btn-danger btn-small" onclick="deleteNews(${item.id})">Удалить</button>
-                    </div>
-                </div>
-            `).join('');
         }
         
         // Добавление бонус-кода
