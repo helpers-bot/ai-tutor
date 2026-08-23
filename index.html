@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesta Hub — фарм и бонус-коды Мир Танков</title>
+    <title>Lesta Hub — статистика игроков Мир Танков</title>
     <style>
         :root {
             --bg-dark: #0b0f14;
@@ -39,60 +39,10 @@
 
         .main-wrapper {
             width: 100%;
-            max-width: 1400px;
+            max-width: 1200px;
         }
 
-        .top-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            background: var(--bg-panel);
-            border: 2px solid var(--border-color);
-            border-radius: 60px;
-            padding: 0.8rem 2rem;
-            font-size: 1.2rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-primary);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-
-        .btn-farm {
-            border-color: var(--accent-gold);
-            color: var(--accent-gold);
-        }
-
-        .btn-farm:hover {
-            background: rgba(212, 175, 55, 0.1);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
-        }
-
-        .btn-codes {
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        .btn-codes:hover {
-            background: rgba(74, 158, 255, 0.1);
-            box-shadow: 0 10px 25px rgba(74, 158, 255, 0.3);
-        }
-
-        .news-section {
+        .search-section {
             background: var(--bg-panel);
             border: 1px solid var(--border-color);
             border-radius: 20px;
@@ -100,850 +50,428 @@
             margin-bottom: 2rem;
         }
 
-        .news-section h2 {
-            font-size: 1.6rem;
+        .search-section h1 {
+            font-size: 2rem;
             margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--accent-gold);
+        }
+
+        .search-box {
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 0.8rem;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .news-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .news-card {
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
             background: var(--bg-element);
+            border: 2px solid var(--border-color);
             border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .news-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-gold);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
-        }
-
-        .news-card-image {
-            width: 100%;
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-            background-color: #2a3744;
-            position: relative;
-        }
-
-        .news-card-content {
-            padding: 1.2rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .news-date {
-            font-size: 0.8rem;
-            color: var(--accent-gold);
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-        }
-
-        .news-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            color: #fff;
-            line-height: 1.3;
-        }
-
-        .news-description {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            flex: 1;
-        }
-
-        .news-category {
-            font-size: 0.8rem;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 0.8rem;
-        }
-
-        /* Модальное окно новости */
-        .news-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .news-modal-overlay.active {
-            display: flex;
-        }
-
-        .news-modal-content {
-            background: var(--bg-panel);
-            border: 1px solid var(--accent-gold);
-            border-radius: 16px;
-            padding: 0;
-            max-width: 900px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .news-modal-close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: rgba(0,0,0,0.7);
-            border: none;
-            color: #fff;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: 0.2s;
-            z-index: 10;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .news-modal-close:hover {
-            background: rgba(255,0,0,0.8);
-            transform: rotate(90deg);
-        }
-
-        .news-modal-image {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 16px 16px 0 0;
-            display: block;
-        }
-
-        .news-modal-body {
-            padding: 2rem;
-        }
-
-        .news-modal-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.8rem;
-            color: #fff;
-        }
-
-        .news-modal-date {
-            font-size: 0.9rem;
-            color: var(--accent-gold);
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .news-modal-text {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        .news-modal-link {
-            display: inline-block;
-            margin-top: 1.5rem;
-            color: var(--accent-blue);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.8rem 1.5rem;
-            background: var(--bg-element);
-            border: 1px solid var(--accent-blue);
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-
-        .news-modal-link:hover {
-            background: var(--accent-blue);
-            color: #fff;
-            text-decoration: none;
-        }
-
-        /* Остальные модальные окна */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--bg-panel);
-            border: 1px solid var(--accent-gold);
-            border-radius: 16px;
-            padding: 2rem;
-            max-width: 1000px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 2rem;
-            cursor: pointer;
-            transition: 0.2s;
-            z-index: 10;
-        }
-
-        .modal-close:hover {
-            color: #fff;
-            transform: rotate(90deg);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--accent-gold);
-            font-weight: 600;
-        }
-
-        .farm-calculator {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.3rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .form-group select, .form-group input {
-            width: 100%;
-            padding: 0.6rem;
-            background: var(--bg-element);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             outline: none;
+            transition: border-color 0.3s;
         }
 
-        .form-group select:focus, .form-group input:focus {
+        .search-input:focus {
             border-color: var(--accent-gold);
         }
 
-        .btn-calculate {
+        .search-btn {
+            padding: 0.8rem 2rem;
             background: var(--accent-gold);
             color: #000;
             border: none;
-            padding: 0.8rem 1.5rem;
-            border-radius: 8px;
+            border-radius: 12px;
             font-weight: 700;
+            font-size: 1.1rem;
             cursor: pointer;
-            font-size: 1rem;
             transition: all 0.3s;
-            width: 100%;
-            margin-top: 1rem;
         }
 
-        .btn-calculate:hover {
+        .search-btn:hover {
             background: #ffd700;
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
 
-        .result-box {
+        .stats-container {
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .stats-container.active {
+            display: block;
+        }
+
+        .player-header {
             background: var(--bg-element);
-            border: 1px solid var(--accent-green);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
-        .result-box h3 {
-            color: var(--accent-green);
+        .player-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-gold);
             margin-bottom: 0.5rem;
         }
 
-        .bonus-code-item {
+        .player-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .info-item {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
             background: var(--bg-element);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-bottom: 0.8rem;
+            border-radius: 12px;
+            padding: 1.2rem;
         }
 
-        .bonus-code-item .code {
-            font-weight: 700;
-            color: var(--accent-gold);
-            font-size: 1.2rem;
-            letter-spacing: 1px;
-        }
-
-        .bonus-code-item .reward {
-            color: var(--text-secondary);
+        .stat-title {
             font-size: 0.9rem;
-            margin-top: 0.3rem;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
-        .tank-list-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-            cursor: pointer;
-            transition: background 0.2s;
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
         }
 
-        .tank-list-item:hover {
-            background: rgba(74, 158, 255, 0.1);
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--accent-blue);
+            font-size: 1.2rem;
         }
 
-        @media (max-width: 768px) {
-            .farm-calculator {
-                grid-template-columns: 1fr;
-            }
-            .top-buttons {
-                gap: 1rem;
-            }
-            .action-btn {
-                padding: 0.6rem 1.5rem;
-                font-size: 1rem;
-            }
+        .error {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 94, 94, 0.1);
+            border: 1px solid var(--accent-red);
+            border-radius: 12px;
+            color: var(--accent-red);
+            margin-top: 1rem;
+        }
+
+        .api-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .api-link a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        .api-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="main-wrapper">
-        <div class="top-buttons">
-            <button class="action-btn btn-farm" id="btnFarm">💰 Лучший фарм</button>
-            <button class="action-btn btn-codes" id="btnCodes">🎁 Бонус-коды</button>
-        </div>
-
-        <div class="news-section">
-            <h2>📰 Последние новости Мир Танков</h2>
-            <div id="newsContainer" class="news-grid">
-                <div style="text-align: center; padding: 2rem; color: var(--text-muted);">Загрузка новостей...</div>
+        <div class="search-section">
+            <h1>🔍 Поиск игрока Мир Танков</h1>
+            <div class="search-box">
+                <input type="text" class="search-input" id="playerSearch" placeholder="Введите ник игрока...">
+                <button class="search-btn" onclick="searchPlayer()">Найти</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно новости -->
-    <div id="newsModal" class="news-modal-overlay">
-        <div class="news-modal-content">
-            <button class="news-modal-close" id="closeNewsModal">&times;</button>
-            <img id="newsModalImage" class="news-modal-image" src="" alt="Новость">
-            <div class="news-modal-body">
-                <div id="newsModalTitle" class="news-modal-title"></div>
-                <div id="newsModalDate" class="news-modal-date"></div>
-                <div id="newsModalText" class="news-modal-text"></div>
-                <a id="newsModalLink" class="news-modal-link" href="#" target="_blank">Читать на tanki.su →</a>
+            <div id="errorContainer"></div>
+            <div id="loadingContainer" class="loading" style="display: none;">Загрузка данных...</div>
+            
+            <div class="stats-container" id="statsContainer">
+                <div id="playerStats"></div>
             </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно фарма -->
-    <div id="farmModal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close" id="closeFarmModal">&times;</button>
-            <div class="modal-title">💰 Калькулятор фарма кредитов</div>
-            <div class="farm-calculator">
-                <div>
-                    <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">Топ-10 танков для фарма</h3>
-                    <div id="topTanksList"></div>
-                </div>
-                <div>
-                    <h3 style="color: var(--accent-gold); margin-bottom: 1rem;">Расчёт доходности</h3>
-                    <div class="form-group">
-                        <label>Нация</label>
-                        <select id="nationSelect">
-                            <option value="">Все нации</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Тип техники</label>
-                        <select id="typeSelect">
-                            <option value="">Все типы</option>
-                            <option value="heavyTank">Тяжёлые танки (ТТ)</option>
-                            <option value="mediumTank">Средние танки (СТ)</option>
-                            <option value="lightTank">Лёгкие танки (ЛТ)</option>
-                            <option value="AT-SPG">ПТ-САУ</option>
-                            <option value="SPG">САУ (Артиллерия)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Уровень танка</label>
-                        <select id="tierSelect">
-                            <option value="">Все уровни</option>
-                            <option value="8">VIII уровень</option>
-                            <option value="9">IX уровень</option>
-                            <option value="10">X уровень</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Танк</label>
-                        <select id="tankSelect">
-                            <option value="">Выберите танк</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Премиум аккаунт</label>
-                        <select id="premiumSelect">
-                            <option value="yes">Да</option>
-                            <option value="no">Нет</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Количество боёв</label>
-                        <input type="number" id="battlesInput" value="10" min="1" max="100">
-                    </div>
-                    <button class="btn-calculate" id="calculateBtn">Рассчитать доход</button>
-                    <div id="resultBox" class="result-box" style="display: none;">
-                        <h3>Результат расчёта</h3>
-                        <p>Средний доход за бой: <strong id="avgIncome"></strong></p>
-                        <p>Общий доход за <span id="totalBattles"></span> боёв: <strong id="totalIncome"></strong></p>
-                    </div>
-                </div>
+            
+            <div class="api-link">
+                <a href="https://developers.lesta.ru/reference/all/wot/account/info/" target="_blank">Документация API Lesta</a>
             </div>
-        </div>
-    </div>
-
-    <!-- Модальное окно бонус-кодов -->
-    <div id="codesModal" class="modal-overlay">
-        <div class="modal-content">
-            <button class="modal-close" id="closeCodesModal">&times;</button>
-            <div class="modal-title">🎁 Актуальные бонус-коды</div>
-            <div id="bonusCodesList"></div>
         </div>
     </div>
 
     <script>
-        (function() {
-            // База данных танков
-            const tanksDatabase = {
-                'ussr': {
-                    name: 'СССР',
-                    tanks: [
-                        { id: 'is-7', name: 'ИС-7', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 65000 },
-                        { id: 'obj-277', name: 'Объект 277', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 62000 },
-                        { id: 't-62a', name: 'Т-62А', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 58000 },
-                        { id: 'obj-140', name: 'Объект 140', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
-                        { id: 'obj-268', name: 'Объект 268', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 60000 },
-                        { id: 'obj-261', name: 'Объект 261', tier: 10, type: 'SPG', isPremium: false, baseIncome: 45000 },
-                        { id: 'is-3', name: 'ИС-3', tier: 8, type: 'heavyTank', isPremium: false, baseIncome: 50000 },
-                        { id: 't-44', name: 'Т-44', tier: 8, type: 'mediumTank', isPremium: false, baseIncome: 48000 },
-                        { id: 'obj-703-ii', name: 'Объект 703 Вариант II', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 },
-                        { id: 'su-130pm', name: 'СУ-130ПМ', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 78000 },
-                        { id: 'lt-432', name: 'ЛТ-432', tier: 8, type: 'lightTank', isPremium: true, baseIncome: 70000 }
-                    ]
-                },
-                'germany': {
-                    name: 'Германия',
-                    tanks: [
-                        { id: 'e-100', name: 'E 100', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 63000 },
-                        { id: 'leopard-1', name: 'Leopard 1', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 59000 },
-                        { id: 'grille-15', name: 'Grille 15', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 61000 },
-                        { id: 'g-w-e-100', name: 'G.W. E 100', tier: 10, type: 'SPG', isPremium: false, baseIncome: 44000 },
-                        { id: 'lowe', name: 'Löwe', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 80000 },
-                        { id: 'e-75', name: 'E 75', tier: 9, type: 'heavyTank', isPremium: false, baseIncome: 55000 },
-                        { id: 'panther-ii', name: 'Panther II', tier: 8, type: 'mediumTank', isPremium: false, baseIncome: 47000 },
-                        { id: 'jagdtiger', name: 'Jagdtiger', tier: 9, type: 'AT-SPG', isPremium: false, baseIncome: 56000 },
-                        { id: 'skorpion-g', name: 'Skorpion G', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 82000 },
-                        { id: 'leopard', name: 'Leopard', tier: 5, type: 'lightTank', isPremium: false, baseIncome: 30000 }
-                    ]
-                },
-                'usa': {
-                    name: 'США',
-                    tanks: [
-                        { id: 't110e5', name: 'T110E5', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 61000 },
-                        { id: 'm48-patton', name: 'M48 Patton', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 58000 },
-                        { id: 't110e4', name: 'T110E4', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 60000 },
-                        { id: 't92', name: 'T92', tier: 10, type: 'SPG', isPremium: false, baseIncome: 43000 },
-                        { id: 't26e4', name: 'T26E4 SuperPershing', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 76000 },
-                        { id: 't34', name: 'T34', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 77000 },
-                        { id: 'm46-patton', name: 'M46 Patton', tier: 9, type: 'mediumTank', isPremium: false, baseIncome: 54000 },
-                        { id: 't28-prototype', name: 'T28 Prototype', tier: 8, type: 'AT-SPG', isPremium: false, baseIncome: 49000 },
-                        { id: 't92-light', name: 'T92', tier: 8, type: 'lightTank', isPremium: true, baseIncome: 72000 }
-                    ]
-                },
-                'france': {
-                    name: 'Франция',
-                    tanks: [
-                        { id: 'amx-50b', name: 'AMX 50 B', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 59000 },
-                        { id: 'bat-chat-25t', name: 'Bat.-Châtillon 25 t', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
-                        { id: 'amx-50-foch', name: 'AMX 50 Foch', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 58000 },
-                        { id: 'bat-chat-155', name: 'Bat.-Châtillon 155 58', tier: 10, type: 'SPG', isPremium: false, baseIncome: 42000 },
-                        { id: 'somua-sm', name: 'Somua SM', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 79000 },
-                        { id: 'amx-cda-105', name: 'AMX Canon d\'assaut 105', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 81000 },
-                        { id: 'amx-13-90', name: 'AMX 13 90', tier: 9, type: 'lightTank', isPremium: false, baseIncome: 50000 },
-                        { id: 'elc-even-90', name: 'ELC EVEN 90', tier: 8, type: 'lightTank', isPremium: true, baseIncome: 68000 }
-                    ]
-                },
-                'uk': {
-                    name: 'Великобритания',
-                    tanks: [
-                        { id: 'fv215b', name: 'FV215b', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 60000 },
-                        { id: 'centurion-ax', name: 'Centurion Action X', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
-                        { id: 'fv4005', name: 'FV4005 Stage II', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 59000 },
-                        { id: 'conqueror-gc', name: 'Conqueror Gun Carriage', tier: 10, type: 'SPG', isPremium: false, baseIncome: 43000 },
-                        { id: 'centurion-51', name: 'Centurion Mk. 5/1 RAAC', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 74000 },
-                        { id: 'caernarvon-ax', name: 'Caernarvon Action X', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 75000 },
-                        { id: 'lhmtv', name: 'LHMTV', tier: 8, type: 'lightTank', isPremium: false, baseIncome: 45000 }
-                    ]
-                },
-                'china': {
-                    name: 'Китай',
-                    tanks: [
-                        { id: '113', name: '113', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 58000 },
-                        { id: '121', name: '121', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 56000 },
-                        { id: 'wz-111-5a', name: 'WZ-111 model 5A', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 59000 },
-                        { id: 'wz-120-1g-ft', name: 'WZ-120-1G FT', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 80000 },
-                        { id: 'type-59', name: 'Type 59', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 72000 }
-                    ]
-                },
-                'japan': {
-                    name: 'Япония',
-                    tanks: [
-                        { id: 'type-5-heavy', name: 'Type 5 Heavy', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 57000 },
-                        { id: 'stb-1', name: 'STB-1', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 56000 },
-                        { id: 'type-61', name: 'Type 61', tier: 9, type: 'mediumTank', isPremium: false, baseIncome: 52000 }
-                    ]
-                },
-                'czech': {
-                    name: 'Чехословакия',
-                    tanks: [
-                        { id: 'tvp-t50-51', name: 'TVP T 50/51', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 58000 },
-                        { id: 'skoda-t56', name: 'Škoda T 56', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 78000 },
-                        { id: 'skoda-t27', name: 'Škoda T 27', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 73000 }
-                    ]
-                },
-                'sweden': {
-                    name: 'Швеция',
-                    tanks: [
-                        { id: 'kranvagn', name: 'Kranvagn', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 57000 },
-                        { id: 'strv-103b', name: 'Strv 103B', tier: 10, type: 'AT-SPG', isPremium: false, baseIncome: 58000 },
-                        { id: 'strv-s1', name: 'Strv S1', tier: 8, type: 'AT-SPG', isPremium: true, baseIncome: 79000 }
-                    ]
-                },
-                'poland': {
-                    name: 'Польша',
-                    tanks: [
-                        { id: '60tp', name: '60TP Lewandowskiego', tier: 10, type: 'heavyTank', isPremium: false, baseIncome: 58000 },
-                        { id: 'cs-63', name: 'CS-63', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 56000 },
-                        { id: '50tp-proto', name: '50TP prototyp', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 76000 }
-                    ]
-                },
-                'italy': {
-                    name: 'Италия',
-                    tanks: [
-                        { id: 'progetto-65', name: 'Progetto M40 mod. 65', tier: 10, type: 'mediumTank', isPremium: false, baseIncome: 57000 },
-                        { id: 'progetto-46', name: 'Progetto M35 mod. 46', tier: 8, type: 'mediumTank', isPremium: true, baseIncome: 80000 },
-                        { id: 'bisonte-c45', name: 'Bisonte C45', tier: 8, type: 'heavyTank', isPremium: true, baseIncome: 77000 }
-                    ]
-                }
-            };
+        // Конфигурация API Lesta
+        const API_CONFIG = {
+            baseUrl: 'https://api.worldoftanks.ru/wot/',
+            applicationId: 'demo', // Замените на свой application_id
+            realm: 'ru'
+        };
 
-            // Загрузка данных из localStorage
-            function loadNews() {
-                const savedNews = localStorage.getItem('lesta_news');
-                if (savedNews) {
-                    return JSON.parse(savedNews);
-                }
-                return [];
-            }
-
-            function loadBonusCodes() {
-                const savedCodes = localStorage.getItem('lesta_bonus_codes');
-                if (savedCodes) {
-                    return JSON.parse(savedCodes);
-                }
-                return [];
-            }
-
-            // Отображение новостей
-            function displayNews() {
-                const newsContainer = document.getElementById('newsContainer');
-                const news = loadNews();
-                
-                if (news.length === 0) {
-                    newsContainer.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--text-muted);">Нет добавленных новостей</div>';
-                    return;
-                }
-                
-                const html = news.map(item => `
-                    <div class="news-card" onclick="openNewsModal(${item.id})">
-                        ${item.image ? `<div class="news-card-image" style="background-image: url('${item.image}')"></div>` : '<div class="news-card-image"></div>'}
-                        <div class="news-card-content">
-                            <div class="news-date">${item.date}</div>
-                            <div class="news-title">${item.title}</div>
-                            <div class="news-description">${item.description || 'Описание отсутствует'}</div>
-                            <div class="news-category">${item.category || 'Новости Мир Танков'}</div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                newsContainer.innerHTML = html;
-            }
-
-            // Открытие модального окна новости
-            window.openNewsModal = function(id) {
-                const news = loadNews();
-                const item = news.find(n => n.id === id);
-                
-                if (!item) return;
-                
-                // Заполняем модальное окно
-                document.getElementById('newsModalTitle').textContent = item.title;
-                document.getElementById('newsModalDate').textContent = item.date;
-                document.getElementById('newsModalText').textContent = item.description || 'Описание отсутствует';
-                
-                // Изображение
-                const modalImage = document.getElementById('newsModalImage');
-                if (item.image) {
-                    modalImage.src = item.image;
-                    modalImage.style.display = 'block';
-                } else {
-                    modalImage.style.display = 'none';
-                }
-                
-                // Ссылка
-                const modalLink = document.getElementById('newsModalLink');
-                if (item.url) {
-                    modalLink.href = item.url;
-                    modalLink.style.display = 'inline-block';
-                } else {
-                    modalLink.style.display = 'none';
-                }
-                
-                document.getElementById('newsModal').classList.add('active');
-            };
-
-            // Закрытие модального окна новости
-            document.getElementById('closeNewsModal').addEventListener('click', () => {
-                document.getElementById('newsModal').classList.remove('active');
+        // Функция для выполнения запросов к API
+        async function apiRequest(endpoint, params = {}) {
+            const queryParams = new URLSearchParams({
+                application_id: API_CONFIG.applicationId,
+                ...params
             });
-
-            document.getElementById('newsModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('newsModal')) {
-                    document.getElementById('newsModal').classList.remove('active');
-                }
-            });
-
-            // Отображение бонус-кодов
-            function displayBonusCodes() {
-                const bonusCodesList = document.getElementById('bonusCodesList');
-                const codes = loadBonusCodes();
-                
-                if (codes.length === 0) {
-                    bonusCodesList.innerHTML = '<div style="text-align: center; color: var(--text-muted);">Нет добавленных бонус-кодов</div>';
-                    return;
+            
+            const url = `${API_CONFIG.baseUrl}${endpoint}/?${queryParams}`;
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
                 
-                const html = codes.map(code => `
-                    <div class="bonus-code-item">
-                        <div class="code">${code.code}</div>
-                        <div class="reward">${code.description || 'Описание отсутствует'}</div>
-                    </div>
-                `).join('');
-                
-                bonusCodesList.innerHTML = html;
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
             }
+        }
 
-            // Инициализация фильтров танков
-            function initNations() {
-                const nationSelect = document.getElementById('nationSelect');
-                Object.keys(tanksDatabase).forEach(nationKey => {
-                    const option = document.createElement('option');
-                    option.value = nationKey;
-                    option.textContent = tanksDatabase[nationKey].name;
-                    nationSelect.appendChild(option);
+        // Функция поиска игрока
+        async function searchPlayer() {
+            const nickname = document.getElementById('playerSearch').value.trim();
+            
+            if (!nickname) {
+                showError('Введите ник игрока');
+                return;
+            }
+            
+            const loadingContainer = document.getElementById('loadingContainer');
+            const errorContainer = document.getElementById('errorContainer');
+            const statsContainer = document.getElementById('statsContainer');
+            
+            loadingContainer.style.display = 'block';
+            errorContainer.innerHTML = '';
+            statsContainer.classList.remove('active');
+            
+            try {
+                // Шаг 1: Поиск игрока по нику
+                const searchResult = await apiRequest('account/list', {
+                    search: nickname,
+                    type: 'exact'
                 });
-            }
-
-            function filterAndPopulateTanks() {
-                const nation = document.getElementById('nationSelect').value;
-                const type = document.getElementById('typeSelect').value;
-                const tier = document.getElementById('tierSelect').value;
-                const tankSelect = document.getElementById('tankSelect');
                 
-                tankSelect.innerHTML = '<option value="">Выберите танк</option>';
+                if (searchResult.status !== 'ok' || !searchResult.data || searchResult.data.length === 0) {
+                    throw new Error('Игрок не найден');
+                }
                 
-                let allTanks = [];
+                const accountId = searchResult.data[0].account_id;
                 
-                if (nation) {
-                    allTanks = tanksDatabase[nation]?.tanks || [];
-                } else {
-                    Object.values(tanksDatabase).forEach(nationData => {
-                        allTanks = allTanks.concat(nationData.tanks);
+                // Шаг 2: Получение информации об игроке
+                const playerInfo = await apiRequest('account/info', {
+                    account_id: accountId,
+                    fields: 'account_id,nickname,created_at,last_battle_time,global_rating,clan_id,statistics'
+                });
+                
+                if (playerInfo.status !== 'ok' || !playerInfo.data || !playerInfo.data[accountId]) {
+                    throw new Error('Не удалось получить информацию об игроке');
+                }
+                
+                const playerData = playerInfo.data[accountId];
+                
+                // Шаг 3: Получение расширенной статистики
+                const statsData = await apiRequest('account/info', {
+                    account_id: accountId,
+                    fields: 'statistics.all,statistics.rating,statistics.frags,statistics.max_xp,statistics.max_damage'
+                });
+                
+                if (statsData.status !== 'ok' || !statsData.data || !statsData.data[accountId]) {
+                    throw new Error('Не удалось получить статистику');
+                }
+                
+                const statistics = statsData.data[accountId].statistics;
+                
+                // Шаг 4: Получение данных о последних боях (если доступно)
+                let recentBattles = null;
+                try {
+                    const battlesData = await apiRequest('account/list', {
+                        account_id: accountId,
+                        limit: 100
                     });
+                    
+                    if (battlesData.status === 'ok') {
+                        recentBattles = battlesData.data;
+                    }
+                } catch (e) {
+                    console.warn('Не удалось получить данные о последних боях');
                 }
                 
-                if (type) {
-                    allTanks = allTanks.filter(tank => tank.type === type);
-                }
+                // Отображение данных
+                displayPlayerStats(playerData, statistics, recentBattles);
                 
-                if (tier) {
-                    allTanks = allTanks.filter(tank => tank.tier === parseInt(tier));
-                }
-                
-                allTanks.forEach(tank => {
-                    const option = document.createElement('option');
-                    option.value = tank.id;
-                    option.textContent = `${tank.name} (${tank.tier} ур.)${tank.isPremium ? ' ★' : ''}`;
-                    tankSelect.appendChild(option);
-                });
+            } catch (error) {
+                showError(`Ошибка: ${error.message}`);
+            } finally {
+                loadingContainer.style.display = 'none';
             }
+        }
 
-            function loadTopTanks() {
-                const topTanksList = document.getElementById('topTanksList');
-                let allTanks = [];
-                
-                Object.values(tanksDatabase).forEach(nationData => {
-                    allTanks = allTanks.concat(nationData.tanks);
-                });
-                
-                const topTanks = allTanks
-                    .filter(tank => tank.isPremium && tank.tier >= 8)
-                    .sort((a, b) => b.baseIncome - a.baseIncome)
-                    .slice(0, 10);
-                
-                const html = topTanks.map((tank, index) => `
-                    <div class="tank-list-item">
-                        <span>${index + 1}. ${tank.name}</span>
-                        <span style="color: var(--accent-gold);">${tank.tier} ур. ★</span>
+        // Функция отображения статистики игрока
+        function displayPlayerStats(playerData, statistics, recentBattles) {
+            const statsContainer = document.getElementById('statsContainer');
+            const playerStats = document.getElementById('playerStats');
+            
+            const allStats = statistics?.all || {};
+            const ratingStats = statistics?.rating || {};
+            
+            const html = `
+                <div class="player-header">
+                    <div class="player-name">${playerData.nickname || 'Неизвестно'}</div>
+                    <div style="color: var(--text-secondary);">
+                        ID: ${playerData.account_id} | Создан: ${formatDate(playerData.created_at)}
                     </div>
-                `).join('');
+                    <div style="color: var(--text-secondary);">
+                        Последний бой: ${formatDate(playerData.last_battle_time)} | Глобальный рейтинг: ${playerData.global_rating || 'Н/Д'}
+                    </div>
+                </div>
                 
-                topTanksList.innerHTML = html;
-            }
+                <div class="player-info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Боёв всего</div>
+                        <div class="info-value">${allStats.battles || 0}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Процент побед</div>
+                        <div class="info-value">${allStats.wins ? ((allStats.wins / allStats.battles * 100).toFixed(2)) : 0}%</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Средний урон</div>
+                        <div class="info-value">${allStats.damage_dealt ? Math.round(allStats.damage_dealt / allStats.battles) : 0}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Средний опыт</div>
+                        <div class="info-value">${allStats.xp ? Math.round(allStats.xp / allStats.battles) : 0}</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Всего боёв</div>
+                        <div class="stat-value">${allStats.battles || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Победы</div>
+                        <div class="stat-value">${allStats.wins || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Поражения</div>
+                        <div class="stat-value">${allStats.losses || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Выжил в боях</div>
+                        <div class="stat-value">${allStats.survived_battles || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Уничтожено танков</div>
+                        <div class="stat-value">${allStats.frags || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Средний урон</div>
+                        <div class="stat-value">${allStats.damage_dealt ? Math.round(allStats.damage_dealt / allStats.battles) : 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Максимальный урон</div>
+                        <div class="stat-value">${statistics?.max_damage || 'Н/Д'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Максимальный опыт</div>
+                        <div class="stat-value">${statistics?.max_xp || 'Н/Д'}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Общий урон</div>
+                        <div class="stat-value">${allStats.damage_dealt || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Общий опыт</div>
+                        <div class="stat-value">${allStats.xp || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Захват базы</div>
+                        <div class="stat-value">${allStats.capture_points || 0}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Защита базы</div>
+                        <div class="stat-value">${allStats.dropped_capture_points || 0}</div>
+                    </div>
+                </div>
+                
+                <div class="player-info-grid" style="margin-top: 1rem;">
+                    <div class="info-item">
+                        <div class="info-label">Рейтинг WN8</div>
+                        <div class="info-value">${ratingStats?.wn8 || 'Н/Д'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Рейтинг WGR</div>
+                        <div class="info-value">${ratingStats?.wgr || 'Н/Д'}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Эффективность</div>
+                        <div class="info-value">${ratingStats?.efficiency || 'Н/Д'}</div>
+                    </div>
+                </div>
+            `;
+            
+            playerStats.innerHTML = html;
+            statsContainer.classList.add('active');
+        }
 
-            function calculateIncome() {
-                const tankId = document.getElementById('tankSelect').value;
-                const battles = parseInt(document.getElementById('battlesInput').value) || 10;
-                const isPremium = document.getElementById('premiumSelect').value === 'yes';
-                
-                if (!tankId) {
-                    alert('Выберите танк');
-                    return;
-                }
-                
-                let tank = null;
-                Object.values(tanksDatabase).forEach(nationData => {
-                    const found = nationData.tanks.find(t => t.id === tankId);
-                    if (found) tank = found;
-                });
-                
-                if (!tank) {
-                    alert('Танк не найден');
-                    return;
-                }
-                
-                let baseIncome = tank.baseIncome;
-                
-                if (isPremium) {
-                    baseIncome *= 1.5;
-                }
-                
-                if (tank.isPremium) {
-                    baseIncome *= 1.2;
-                }
-                
-                const totalIncome = baseIncome * battles;
-                
-                document.getElementById('avgIncome').textContent = Math.round(baseIncome).toLocaleString() + ' кредитов';
-                document.getElementById('totalBattles').textContent = battles;
-                document.getElementById('totalIncome').textContent = Math.round(totalIncome).toLocaleString() + ' кредитов';
-                document.getElementById('resultBox').style.display = 'block';
-            }
+        // Функция форматирования даты
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Н/Д';
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
 
-            // Инициализация модальных окон
-            document.getElementById('btnFarm').addEventListener('click', () => {
-                document.getElementById('farmModal').classList.add('active');
-                loadTopTanks();
-            });
-            
-            document.getElementById('btnCodes').addEventListener('click', () => {
-                document.getElementById('codesModal').classList.add('active');
-                displayBonusCodes();
-            });
-            
-            document.getElementById('closeFarmModal').addEventListener('click', () => {
-                document.getElementById('farmModal').classList.remove('active');
-            });
-            
-            document.getElementById('closeCodesModal').addEventListener('click', () => {
-                document.getElementById('codesModal').classList.remove('active');
-            });
-            
-            window.addEventListener('click', (e) => {
-                if (e.target === document.getElementById('farmModal')) {
-                    document.getElementById('farmModal').classList.remove('active');
-                }
-                if (e.target === document.getElementById('codesModal')) {
-                    document.getElementById('codesModal').classList.remove('active');
-                }
-            });
-            
-            // Обработчики фильтров
-            document.getElementById('nationSelect').addEventListener('change', filterAndPopulateTanks);
-            document.getElementById('typeSelect').addEventListener('change', filterAndPopulateTanks);
-            document.getElementById('tierSelect').addEventListener('change', filterAndPopulateTanks);
-            
-            document.getElementById('calculateBtn').addEventListener('click', calculateIncome);
-            
-            // Инициализация
-            initNations();
-            filterAndPopulateTanks();
-            displayNews();
-            displayBonusCodes();
-        })();
+        // Функция отображения ошибки
+        function showError(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.innerHTML = `<div class="error">${message}</div>`;
+        }
+
+        // Обработка нажатия Enter в поле поиска
+        document.getElementById('playerSearch').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchPlayer();
+            }
+        });
     </script>
 </body>
 </html>
