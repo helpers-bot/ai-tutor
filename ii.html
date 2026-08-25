@@ -998,3 +998,89 @@
    998	                AIState.stats.energy = Math.max(0, AIState.stats.energy - 0.08);
    999	                AIState.stats.stress = Math.min(100, AIState.stats.stress + 0.05);
   1000	            } else if (action === 'eat') {
+  1001	                AIState.stats.satiety = Math.min(100, AIState.stats.satiety + 0.1);
+  1002	                AIState.stats.energy = Math.min(100, AIState.stats.energy + 0.02);
+  1003	            } else if (action === 'drink') {
+  1004	                AIState.stats.hydration = Math.min(100, AIState.stats.hydration + 0.15);
+  1005	                AIState.stats.stress = Math.max(0, AIState.stats.stress - 0.02);
+  1006	            } else if (action === 'idle') {
+  1007	                AIState.stats.energy = Math.min(100, AIState.stats.energy + 0.03);
+  1008	                AIState.stats.stress = Math.max(0, AIState.stats.stress - 0.01);
+  1009	            }
+  1010	
+  1011	            statusText.innerHTML = `
+  1012	                Состояние: <span>${stateNames[action] || action}</span><br>
+  1013	                Энергия: <span>${Math.floor(AIState.stats.energy)}%</span><br>
+  1014	                Гидратация: <span>${Math.floor(AIState.stats.hydration)}%</span><br>
+  1015	                Сытость: <span>${Math.floor(AIState.stats.satiety)}%</span><br>
+  1016	                Стресс: <span>${Math.floor(AIState.stats.stress)}%</span>
+  1017	            `;
+  1018	        }
+  1019	
+  1020	        function setAction(action) {
+  1021	            if (AIState.currentAction === action) return;
+  1022	
+  1023	            AIState.previousAction = AIState.currentAction;
+  1024	            AIState.currentAction = action;
+  1025	            animator.reset();
+  1026	
+  1027	            if (action === 'jump') {
+  1028	                setTimeout(() => {
+  1029	                    if (AIState.currentAction === 'jump') {
+  1030	                        setAction('idle');
+  1031	                    }
+  1032	                }, 1500);
+  1033	            }
+  1034	
+  1035	            setActiveButton(action);
+  1036	        }
+  1037	
+  1038	        Object.keys(buttons).forEach(action => {
+  1039	            buttons[action].addEventListener('click', () => setAction(action));
+  1040	        });
+  1041	
+  1042	        document.addEventListener('keydown', (e) => {
+  1043	            const keyMap = {
+  1044	                '1': 'idle', '2': 'walk', '3': 'run', '4': 'jump',
+  1045	                '5': 'eat', '6': 'drink', '7': 'box', '8': 'muay', '9': 'combat'
+  1046	            };
+  1047	            if (keyMap[e.key]) setAction(keyMap[e.key]);
+  1048	        });
+  1049	
+  1050	        let lastTime = performance.now();
+  1051	        let frameCount = 0;
+  1052	
+  1053	        function animate() {
+  1054	            requestAnimationFrame(animate);
+  1055	
+  1056	            const now = performance.now();
+  1057	            const dt = Math.min((now - lastTime) / 1000, 0.05);
+  1058	            lastTime = now;
+  1059	            frameCount++;
+  1060	
+  1061	            world.step(CONFIG.timestep);
+  1062	            animator.update(AIState.currentAction, dt);
+  1063	            human.update();
+  1064	            updateLearning(AIState.currentAction, dt);
+  1065	            updateStatus(AIState.currentAction);
+  1066	
+  1067	            if (frameCount % 3 === 0) {
+  1068	                neuralViz.update(AIState.currentAction);
+  1069	            }
+  1070	
+  1071	            controls.update();
+  1072	            renderer.render(scene, camera);
+  1073	        }
+  1074	
+  1075	        window.addEventListener('resize', () => {
+  1076	            camera.aspect = window.innerWidth / window.innerHeight;
+  1077	            camera.updateProjectionMatrix();
+  1078	            renderer.setSize(window.innerWidth, window.innerHeight);
+  1079	        });
+  1080	
+  1081	        human.resetPosition();
+  1082	        animate();
+  1083	    </script>
+  1084	</body>
+  1085	</html>
+  1086	
