@@ -1,0 +1,1000 @@
+     1	<!DOCTYPE html>
+     2	<html lang="ru">
+     3	<head>
+     4	    <meta charset="UTF-8">
+     5	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     6	    <title>AI Humanoid - Интерактивный ИИ-человек</title>
+     7	    <style>
+     8	        * { margin: 0; padding: 0; box-sizing: border-box; }
+     9	        body { 
+    10	            overflow: hidden; 
+    11	            background: #0a0a0a; 
+    12	            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    13	            color: #fff;
+    14	        }
+    15	        #canvas-container { 
+    16	            width: 100vw; 
+    17	            height: 100vh; 
+    18	            position: relative; 
+    19	        }
+    20	        canvas { display: block; }
+    21	
+    22	        .ui-panel {
+    23	            position: fixed;
+    24	            top: 20px;
+    25	            left: 20px;
+    26	            background: rgba(10, 15, 30, 0.92);
+    27	            border: 1px solid rgba(0, 200, 255, 0.3);
+    28	            border-radius: 16px;
+    29	            padding: 20px;
+    30	            min-width: 280px;
+    31	            max-height: 90vh;
+    32	            overflow-y: auto;
+    33	            backdrop-filter: blur(12px);
+    34	            box-shadow: 0 8px 32px rgba(0, 150, 255, 0.15);
+    35	            z-index: 100;
+    36	        }
+    37	
+    38	        .ui-panel h1 {
+    39	            font-size: 18px;
+    40	            margin-bottom: 5px;
+    41	            background: linear-gradient(90deg, #00d4ff, #0099ff);
+    42	            -webkit-background-clip: text;
+    43	            -webkit-text-fill-color: transparent;
+    44	            text-align: center;
+    45	        }
+    46	
+    47	        .ui-panel .subtitle {
+    48	            font-size: 11px;
+    49	            color: #8899aa;
+    50	            text-align: center;
+    51	            margin-bottom: 15px;
+    52	            letter-spacing: 1px;
+    53	        }
+    54	
+    55	        .section {
+    56	            margin-bottom: 15px;
+    57	            padding-bottom: 15px;
+    58	            border-bottom: 1px solid rgba(255,255,255,0.08);
+    59	        }
+    60	
+    61	        .section-title {
+    62	            font-size: 12px;
+    63	            text-transform: uppercase;
+    64	            color: #00c8ff;
+    65	            margin-bottom: 10px;
+    66	            letter-spacing: 2px;
+    67	            font-weight: 600;
+    68	        }
+    69	
+    70	        .btn-grid {
+    71	            display: grid;
+    72	            grid-template-columns: 1fr 1fr;
+    73	            gap: 8px;
+    74	        }
+    75	
+    76	        button {
+    77	            padding: 10px 14px;
+    78	            border: none;
+    79	            border-radius: 10px;
+    80	            background: rgba(0, 150, 255, 0.12);
+    81	            color: #cceeff;
+    82	            font-size: 12px;
+    83	            cursor: pointer;
+    84	            transition: all 0.3s ease;
+    85	            border: 1px solid rgba(0, 200, 255, 0.15);
+    86	            font-weight: 500;
+    87	            position: relative;
+    88	            overflow: hidden;
+    89	        }
+    90	
+    91	        button:hover {
+    92	            background: rgba(0, 180, 255, 0.25);
+    93	            transform: translateY(-2px);
+    94	            box-shadow: 0 4px 15px rgba(0, 150, 255, 0.3);
+    95	            border-color: rgba(0, 220, 255, 0.4);
+    96	        }
+    97	
+    98	        button:active {
+    99	            transform: translateY(0);
+   100	        }
+   101	
+   102	        button.active {
+   103	            background: rgba(0, 200, 255, 0.35);
+   104	            border-color: #00c8ff;
+   105	            color: #fff;
+   106	            box-shadow: 0 0 20px rgba(0, 200, 255, 0.3);
+   107	        }
+   108	
+   109	        button.combat {
+   110	            background: rgba(255, 60, 60, 0.12);
+   111	            border-color: rgba(255, 80, 80, 0.2);
+   112	            color: #ffcccc;
+   113	        }
+   114	
+   115	        button.combat:hover {
+   116	            background: rgba(255, 80, 80, 0.25);
+   117	            border-color: rgba(255, 100, 100, 0.4);
+   118	            box-shadow: 0 4px 15px rgba(255, 60, 60, 0.3);
+   119	        }
+   120	
+   121	        button.combat.active {
+   122	            background: rgba(255, 60, 60, 0.4);
+   123	            border-color: #ff4444;
+   124	            color: #fff;
+   125	            box-shadow: 0 0 20px rgba(255, 60, 60, 0.4);
+   126	        }
+   127	
+   128	        .learning-bar {
+   129	            width: 100%;
+   130	            height: 6px;
+   131	            background: rgba(255,255,255,0.08);
+   132	            border-radius: 3px;
+   133	            margin-top: 5px;
+   134	            overflow: hidden;
+   135	        }
+   136	
+   137	        .learning-progress {
+   138	            height: 100%;
+   139	            background: linear-gradient(90deg, #00d4ff, #00ff88);
+   140	            border-radius: 3px;
+   141	            transition: width 0.5s ease;
+   142	            width: 0%;
+   143	        }
+   144	
+   145	        .status-display {
+   146	            background: rgba(0, 0, 0, 0.4);
+   147	            border-radius: 8px;
+   148	            padding: 10px;
+   149	            font-size: 11px;
+   150	            line-height: 1.6;
+   151	            color: #aaccdd;
+   152	            font-family: 'Courier New', monospace;
+   153	        }
+   154	
+   155	        .status-display span {
+   156	            color: #00ff88;
+   157	        }
+   158	
+   159	        .neural-viz {
+   160	            position: fixed;
+   161	            bottom: 20px;
+   162	            right: 20px;
+   163	            width: 200px;
+   164	            height: 120px;
+   165	            background: rgba(10, 15, 30, 0.9);
+   166	            border: 1px solid rgba(0, 200, 255, 0.2);
+   167	            border-radius: 12px;
+   168	            padding: 10px;
+   169	            backdrop-filter: blur(8px);
+   170	        }
+   171	
+   172	        .neural-viz canvas {
+   173	            width: 100%;
+   174	            height: 100%;
+   175	        }
+   176	
+   177	        .info-tip {
+   178	            position: fixed;
+   179	            bottom: 20px;
+   180	            left: 50%;
+   181	            transform: translateX(-50%);
+   182	            background: rgba(0, 0, 0, 0.7);
+   183	            padding: 8px 20px;
+   184	            border-radius: 20px;
+   185	            font-size: 12px;
+   186	            color: #88aabb;
+   187	            pointer-events: none;
+   188	            opacity: 0.8;
+   189	        }
+   190	
+   191	        .ui-panel::-webkit-scrollbar { width: 6px; }
+   192	        .ui-panel::-webkit-scrollbar-track { background: transparent; }
+   193	        .ui-panel::-webkit-scrollbar-thumb { background: rgba(0,200,255,0.3); border-radius: 3px; }
+   194	    </style>
+   195	
+   196	    <script type="importmap">
+   197	    {
+   198	        "imports": {
+   199	            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+   200	            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+   201	            "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+   202	        }
+   203	    }
+   204	    </script>
+   205	</head>
+   206	<body>
+   207	    <div id="canvas-container"></div>
+   208	
+   209	    <div class="ui-panel">
+   210	        <h1>AI HUMANOID</h1>
+   211	        <div class="subtitle">NEURAL NETWORK v2.0</div>
+   212	
+   213	        <div class="section">
+   214	            <div class="section-title">Основные действия</div>
+   215	            <div class="btn-grid">
+   216	                <button id="btn-idle" class="active">Покой</button>
+   217	                <button id="btn-walk">Ходьба</button>
+   218	                <button id="btn-run">Бег</button>
+   219	                <button id="btn-jump">Прыжок</button>
+   220	            </div>
+   221	        </div>
+   222	
+   223	        <div class="section">
+   224	            <div class="section-title">Потребности</div>
+   225	            <div class="btn-grid">
+   226	                <button id="btn-eat">Есть</button>
+   227	                <button id="btn-drink">Пить</button>
+   228	            </div>
+   229	        </div>
+   230	
+   231	        <div class="section">
+   232	            <div class="section-title">Боевые искусства</div>
+   233	            <div class="btn-grid">
+   234	                <button id="btn-box" class="combat">Бокс</button>
+   235	                <button id="btn-muay" class="combat">Тайский бокс</button>
+   236	                <button id="btn-combat" class="combat">Рукопашный бой</button>
+   237	            </div>
+   238	        </div>
+   239	
+   240	        <div class="section">
+   241	            <div class="section-title">Прогресс обучения</div>
+   242	            <div style="font-size: 11px; color: #8899aa; margin-bottom: 5px;">
+   243	                Ходьба: <span id="learn-walk">0%</span>
+   244	            </div>
+   245	            <div class="learning-bar"><div class="learning-progress" id="bar-walk"></div></div>
+   246	            <div style="font-size: 11px; color: #8899aa; margin: 8px 0 5px;">
+   247	                Бег: <span id="learn-run">0%</span>
+   248	            </div>
+   249	            <div class="learning-bar"><div class="learning-progress" id="bar-run"></div></div>
+   250	            <div style="font-size: 11px; color: #8899aa; margin: 8px 0 5px;">
+   251	                Боевые искусства: <span id="learn-combat">0%</span>
+   252	            </div>
+   253	            <div class="learning-bar"><div class="learning-progress" id="bar-combat"></div></div>
+   254	        </div>
+   255	
+   256	        <div class="section" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+   257	            <div class="section-title">Статус ИИ</div>
+   258	            <div class="status-display" id="status-text">
+   259	                Состояние: <span>Инициализация...</span><br>
+   260	                Энергия: <span>100%</span><br>
+   261	                Гидратация: <span>100%</span><br>
+   262	                Сытость: <span>100%</span><br>
+   263	                Стресс: <span>0%</span>
+   264	            </div>
+   265	        </div>
+   266	    </div>
+   267	
+   268	    <div class="neural-viz">
+   269	        <canvas id="neural-canvas"></canvas>
+   270	    </div>
+   271	
+   272	    <div class="info-tip">ЛКМ — вращение камеры | ПКМ — перемещение | Колесико — зум</div>
+   273	
+   274	    <script type="module">
+   275	
+   276	        import * as THREE from 'three';
+   277	        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+   278	        import * as CANNON from 'cannon-es';
+   279	
+   280	        const CONFIG = {
+   281	            gravity: -9.82,
+   282	            timestep: 1/60,
+   283	            colors: {
+   284	                skin: 0xffdbac,
+   285	                joint: 0x333333,
+   286	                muscle: 0xcc8866,
+   287	                bone: 0xeeeeee,
+   288	                highlight: 0x00d4ff,
+   289	                combat: 0xff3333
+   290	            }
+   291	        };
+   292	
+   293	        const AIState = {
+   294	            currentAction: 'idle',
+   295	            previousAction: 'idle',
+   296	            learningProgress: { walk: 0, run: 0, combat: 0, jump: 0, eat: 0, drink: 0 },
+   297	            stats: { energy: 100, hydration: 100, satiety: 100, stress: 0 },
+   298	            animationTime: 0,
+   299	            isGrounded: true
+   300	        };
+   301	
+   302	        const container = document.getElementById('canvas-container');
+   303	        const scene = new THREE.Scene();
+   304	        scene.background = new THREE.Color(0x0a0a12);
+   305	        scene.fog = new THREE.Fog(0x0a0a12, 10, 50);
+   306	
+   307	        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 100);
+   308	        camera.position.set(0, 3, 6);
+   309	
+   310	        const renderer = new THREE.WebGLRenderer({ antialias: true });
+   311	        renderer.setSize(window.innerWidth, window.innerHeight);
+   312	        renderer.shadowMap.enabled = true;
+   313	        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+   314	        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+   315	        container.appendChild(renderer.domElement);
+   316	
+   317	        const controls = new OrbitControls(camera, renderer.domElement);
+   318	        controls.enableDamping = true;
+   319	        controls.dampingFactor = 0.05;
+   320	        controls.target.set(0, 1, 0);
+   321	        controls.maxPolarAngle = Math.PI/2 - 0.05;
+   322	
+   323	        const ambientLight = new THREE.AmbientLight(0x404060, 0.5);
+   324	        scene.add(ambientLight);
+   325	
+   326	        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+   327	        dirLight.position.set(5, 10, 5);
+   328	        dirLight.castShadow = true;
+   329	        dirLight.shadow.mapSize.width = 2048;
+   330	        dirLight.shadow.mapSize.height = 2048;
+   331	        dirLight.shadow.camera.near = 0.5;
+   332	        dirLight.shadow.camera.far = 50;
+   333	        dirLight.shadow.camera.left = -10;
+   334	        dirLight.shadow.camera.right = 10;
+   335	        dirLight.shadow.camera.top = 10;
+   336	        dirLight.shadow.camera.bottom = -10;
+   337	        scene.add(dirLight);
+   338	
+   339	        const rimLight = new THREE.DirectionalLight(0x0088ff, 0.5);
+   340	        rimLight.position.set(-5, 5, -5);
+   341	        scene.add(rimLight);
+   342	
+   343	        const fillLight = new THREE.DirectionalLight(0xffaa44, 0.3);
+   344	        fillLight.position.set(-5, 3, 5);
+   345	        scene.add(fillLight);
+   346	
+   347	        const world = new CANNON.World();
+   348	        world.gravity.set(0, CONFIG.gravity, 0);
+   349	        world.broadphase = new CANNON.SAPBroadphase(world);
+   350	        world.solver.iterations = 20;
+   351	        world.solver.tolerance = 0.001;
+   352	
+   353	        const groundMat = new CANNON.Material();
+   354	        const bodyMat = new CANNON.Material();
+   355	        const bodyGroundContact = new CANNON.ContactMaterial(groundMat, bodyMat, {
+   356	            friction: 0.8,
+   357	            restitution: 0.1
+   358	        });
+   359	        world.addContactMaterial(bodyGroundContact);
+   360	
+   361	        const groundShape = new CANNON.Plane();
+   362	        const groundBody = new CANNON.Body({ mass: 0, material: groundMat });
+   363	        groundBody.addShape(groundShape);
+   364	        groundBody.quaternion.setFromEuler(-Math.PI/2, 0, 0);
+   365	        world.addBody(groundBody);
+   366	
+   367	        const groundGeo = new THREE.PlaneGeometry(50, 50);
+   368	        const groundMeshMat = new THREE.MeshStandardMaterial({ 
+   369	            color: 0x111118,
+   370	            roughness: 0.8,
+   371	            metalness: 0.2
+   372	        });
+   373	        const groundMesh = new THREE.Mesh(groundGeo, groundMeshMat);
+   374	        groundMesh.rotation.x = -Math.PI/2;
+   375	        groundMesh.receiveShadow = true;
+   376	        scene.add(groundMesh);
+   377	
+   378	        const gridHelper = new THREE.GridHelper(50, 50, 0x1a3a5a, 0x0f1f2f);
+   379	        gridHelper.position.y = 0.01;
+   380	        scene.add(gridHelper);
+   381	
+   382	        class HumanRagdoll {
+   383	            constructor() {
+   384	                this.parts = {};
+   385	                this.constraints = [];
+   386	                this.meshes = {};
+   387	                this.joints = [];
+   388	                this.createHuman();
+   389	            }
+   390	
+   391	            createBoxShape(w, h, d) {
+   392	                return new CANNON.Box(new CANNON.Vec3(w/2, h/2, d/2));
+   393	            }
+   394	
+   395	            createBodyPart(name, shape, mass, pos, color) {
+   396	                const body = new CANNON.Body({ mass, material: bodyMat });
+   397	                body.addShape(shape);
+   398	                body.position.set(pos.x, pos.y, pos.z);
+   399	                body.linearDamping = 0.3;
+   400	                body.angularDamping = 0.3;
+   401	                world.addBody(body);
+   402	
+   403	                const geo = new THREE.BoxGeometry(shape.halfExtents.x*2, shape.halfExtents.y*2, shape.halfExtents.z*2);
+   404	                const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.6, metalness: 0.1 });
+   405	                const mesh = new THREE.Mesh(geo, mat);
+   406	                mesh.castShadow = true;
+   407	                mesh.receiveShadow = true;
+   408	                scene.add(mesh);
+   409	
+   410	                this.parts[name] = body;
+   411	                this.meshes[name] = mesh;
+   412	                return body;
+   413	            }
+   414	
+   415	            createJoint(name, bodyA, bodyB, pivotA, pivotB, axisA, axisB) {
+   416	                const constraint = new CANNON.ConeTwistConstraint(bodyA, bodyB, {
+   417	                    pivotA: new CANNON.Vec3(pivotA.x, pivotA.y, pivotA.z),
+   418	                    pivotB: new CANNON.Vec3(pivotB.x, pivotB.y, pivotB.z),
+   419	                    axisA: new CANNON.Vec3(axisA.x, axisA.y, axisA.z),
+   420	                    axisB: new CANNON.Vec3(axisB.x, axisB.y, axisB.z),
+   421	                    collideConnected: false
+   422	                });
+   423	                world.addConstraint(constraint);
+   424	                this.constraints.push(constraint);
+   425	
+   426	                const jointGeo = new THREE.SphereGeometry(0.04, 16, 16);
+   427	                const jointMat = new THREE.MeshStandardMaterial({ color: CONFIG.colors.joint, emissive: 0x111111 });
+   428	                const jointMesh = new THREE.Mesh(jointGeo, jointMat);
+   429	                scene.add(jointMesh);
+   430	                this.joints.push({ mesh: jointMesh, bodyA, bodyB, pivotA, pivotB });
+   431	                return constraint;
+   432	            }
+   433	
+   434	            createHuman() {
+   435	                const c = CONFIG.colors;
+   436	
+   437	                this.createBodyPart('pelvis', this.createBoxShape(0.28, 0.18, 0.22), 15, {x:0, y:1.0, z:0}, c.muscle);
+   438	                this.createBodyPart('abdomen', this.createBoxShape(0.26, 0.22, 0.20), 10, {x:0, y:1.25, z:0}, c.muscle);
+   439	                this.createJoint('spine_lower', this.parts.pelvis, this.parts.abdomen,
+   440	                    {x:0, y:0.09, z:0}, {x:0, y:-0.11, z:0}, {x:0, y:1, z:0}, {x:0, y:1, z:0});
+   441	
+   442	                this.createBodyPart('chest', this.createBoxShape(0.30, 0.25, 0.22), 12, {x:0, y:1.55, z:0}, c.muscle);
+   443	                this.createJoint('spine_upper', this.parts.abdomen, this.parts.chest,
+   444	                    {x:0, y:0.11, z:0}, {x:0, y:-0.125, z:0}, {x:0, y:1, z:0}, {x:0, y:1, z:0});
+   445	
+   446	                this.createBodyPart('neck', this.createBoxShape(0.10, 0.08, 0.10), 2, {x:0, y:1.75, z:0}, c.skin);
+   447	                this.createJoint('neck_joint', this.parts.chest, this.parts.neck,
+   448	                    {x:0, y:0.125, z:0}, {x:0, y:-0.04, z:0}, {x:0, y:1, z:0}, {x:0, y:1, z:0});
+   449	
+   450	                this.createBodyPart('head', this.createBoxShape(0.18, 0.22, 0.20), 5, {x:0, y:1.95, z:0}, c.skin);
+   451	                this.createJoint('head_joint', this.parts.neck, this.parts.head,
+   452	                    {x:0, y:0.04, z:0}, {x:0, y:-0.11, z:0}, {x:0, y:1, z:0}, {x:0, y:1, z:0});
+   453	
+   454	                this.createBodyPart('shoulderL', this.createBoxShape(0.10, 0.10, 0.10), 2, {x:0.20, y:1.60, z:0}, c.joint);
+   455	                this.createJoint('shoulderL_joint', this.parts.chest, this.parts.shoulderL,
+   456	                    {x:0.15, y:0.08, z:0}, {x:-0.05, y:0, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   457	
+   458	                this.createBodyPart('upperArmL', this.createBoxShape(0.09, 0.28, 0.09), 4, {x:0.20, y:1.38, z:0}, c.skin);
+   459	                this.createJoint('elbowL_joint', this.parts.shoulderL, this.parts.upperArmL,
+   460	                    {x:0, y:-0.05, z:0}, {x:0, y:0.14, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   461	
+   462	                this.createBodyPart('forearmL', this.createBoxShape(0.08, 0.26, 0.08), 3, {x:0.20, y:1.10, z:0}, c.skin);
+   463	                this.createJoint('wristL_joint', this.parts.upperArmL, this.parts.forearmL,
+   464	                    {x:0, y:-0.14, z:0}, {x:0, y:0.13, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   465	
+   466	                this.createBodyPart('handL', this.createBoxShape(0.07, 0.09, 0.09), 1, {x:0.20, y:0.88, z:0}, c.skin);
+   467	                this.createJoint('handL_joint', this.parts.forearmL, this.parts.handL,
+   468	                    {x:0, y:-0.13, z:0}, {x:0, y:0.045, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   469	
+   470	                this.createBodyPart('shoulderR', this.createBoxShape(0.10, 0.10, 0.10), 2, {x:-0.20, y:1.60, z:0}, c.joint);
+   471	                this.createJoint('shoulderR_joint', this.parts.chest, this.parts.shoulderR,
+   472	                    {x:-0.15, y:0.08, z:0}, {x:0.05, y:0, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   473	
+   474	                this.createBodyPart('upperArmR', this.createBoxShape(0.09, 0.28, 0.09), 4, {x:-0.20, y:1.38, z:0}, c.skin);
+   475	                this.createJoint('elbowR_joint', this.parts.shoulderR, this.parts.upperArmR,
+   476	                    {x:0, y:-0.05, z:0}, {x:0, y:0.14, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   477	
+   478	                this.createBodyPart('forearmR', this.createBoxShape(0.08, 0.26, 0.08), 3, {x:-0.20, y:1.10, z:0}, c.skin);
+   479	                this.createJoint('wristR_joint', this.parts.upperArmR, this.parts.forearmR,
+   480	                    {x:0, y:-0.14, z:0}, {x:0, y:0.13, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   481	
+   482	                this.createBodyPart('handR', this.createBoxShape(0.07, 0.09, 0.09), 1, {x:-0.20, y:0.88, z:0}, c.skin);
+   483	                this.createJoint('handR_joint', this.parts.forearmR, this.parts.handR,
+   484	                    {x:0, y:-0.13, z:0}, {x:0, y:0.045, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   485	
+   486	                this.createBodyPart('thighL', this.createBoxShape(0.13, 0.38, 0.13), 8, {x:0.10, y:0.72, z:0}, 0x334455);
+   487	                this.createJoint('hipL_joint', this.parts.pelvis, this.parts.thighL,
+   488	                    {x:0.08, y:-0.09, z:0}, {x:0, y:0.19, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   489	
+   490	                this.createBodyPart('shinL', this.createBoxShape(0.11, 0.36, 0.11), 6, {x:0.10, y:0.34, z:0}, 0x334455);
+   491	                this.createJoint('kneeL_joint', this.parts.thighL, this.parts.shinL,
+   492	                    {x:0, y:-0.19, z:0}, {x:0, y:0.18, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   493	
+   494	                this.createBodyPart('footL', this.createBoxShape(0.10, 0.06, 0.20), 2, {x:0.10, y:0.10, z:0.04}, 0x222222);
+   495	                this.createJoint('ankleL_joint', this.parts.shinL, this.parts.footL,
+   496	                    {x:0, y:-0.18, z:0}, {x:0, y:0.03, z:-0.04}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   497	
+   498	                this.createBodyPart('thighR', this.createBoxShape(0.13, 0.38, 0.13), 8, {x:-0.10, y:0.72, z:0}, 0x334455);
+   499	                this.createJoint('hipR_joint', this.parts.pelvis, this.parts.thighR,
+   500	                    {x:-0.08, y:-0.09, z:0}, {x:0, y:0.19, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   501	
+   502	                this.createBodyPart('shinR', this.createBoxShape(0.11, 0.36, 0.11), 6, {x:-0.10, y:0.34, z:0}, 0x334455);
+   503	                this.createJoint('kneeR_joint', this.parts.thighR, this.parts.shinR,
+   504	                    {x:0, y:-0.19, z:0}, {x:0, y:0.18, z:0}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   505	
+   506	                this.createBodyPart('footR', this.createBoxShape(0.10, 0.06, 0.20), 2, {x:-0.10, y:0.10, z:0.04}, 0x222222);
+   507	                this.createJoint('ankleR_joint', this.parts.shinR, this.parts.footR,
+   508	                    {x:0, y:-0.18, z:0}, {x:0, y:0.03, z:-0.04}, {x:1, y:0, z:0}, {x:1, y:0, z:0});
+   509	
+   510	                this.enhanceAppearance();
+   511	            }
+   512	
+   513	            enhanceAppearance() {
+   514	                const eyeGeo = new THREE.SphereGeometry(0.025, 16, 16);
+   515	                const eyeMat = new THREE.MeshStandardMaterial({ 
+   516	                    color: 0x00d4ff, emissive: 0x0088ff, emissiveIntensity: 0.5
+   517	                });
+   518	                const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+   519	                eyeL.position.set(0.06, 1.98, 0.10);
+   520	                scene.add(eyeL);
+   521	                const eyeR = new THREE.Mesh(eyeGeo, eyeMat);
+   522	                eyeR.position.set(-0.06, 1.98, 0.10);
+   523	                scene.add(eyeR);
+   524	                this.meshes['eyeL'] = eyeL;
+   525	                this.meshes['eyeR'] = eyeR;
+   526	
+   527	                const hairGeo = new THREE.BoxGeometry(0.20, 0.08, 0.22);
+   528	                const hairMat = new THREE.MeshStandardMaterial({ color: 0x221100 });
+   529	                const hair = new THREE.Mesh(hairGeo, hairMat);
+   530	                hair.position.set(0, 2.08, 0);
+   531	                scene.add(hair);
+   532	                this.meshes['hair'] = hair;
+   533	            }
+   534	
+   535	            update() {
+   536	                for (const [name, body] of Object.entries(this.parts)) {
+   537	                    if (this.meshes[name]) {
+   538	                        this.meshes[name].position.copy(body.position);
+   539	                        this.meshes[name].quaternion.copy(body.quaternion);
+   540	                    }
+   541	                }
+   542	
+   543	                for (const joint of this.joints) {
+   544	                    const posA = new CANNON.Vec3();
+   545	                    joint.bodyA.pointToWorldFrame(
+   546	                        new CANNON.Vec3(joint.pivotA.x, joint.pivotA.y, joint.pivotA.z), posA);
+   547	                    joint.mesh.position.set(posA.x, posA.y, posA.z);
+   548	                }
+   549	
+   550	                if (this.parts.head) {
+   551	                    const headPos = this.parts.head.position;
+   552	                    const headQuat = this.parts.head.quaternion;
+   553	                    const offsetL = new CANNON.Vec3(0.06, 0.03, 0.10);
+   554	                    const offsetR = new CANNON.Vec3(-0.06, 0.03, 0.10);
+   555	                    headQuat.vmult(offsetL, offsetL);
+   556	                    headQuat.vmult(offsetR, offsetR);
+   557	
+   558	                    if (this.meshes.eyeL) {
+   559	                        this.meshes.eyeL.position.set(headPos.x + offsetL.x, headPos.y + offsetL.y, headPos.z + offsetL.z);
+   560	                        this.meshes.eyeL.quaternion.copy(headQuat);
+   561	                    }
+   562	                    if (this.meshes.eyeR) {
+   563	                        this.meshes.eyeR.position.set(headPos.x + offsetR.x, headPos.y + offsetR.y, headPos.z + offsetR.z);
+   564	                        this.meshes.eyeR.quaternion.copy(headQuat);
+   565	                    }
+   566	                    if (this.meshes.hair) {
+   567	                        const hairOffset = new CANNON.Vec3(0, 0.13, 0);
+   568	                        headQuat.vmult(hairOffset, hairOffset);
+   569	                        this.meshes.hair.position.set(headPos.x + hairOffset.x, headPos.y + hairOffset.y, headPos.z + hairOffset.z);
+   570	                        this.meshes.hair.quaternion.copy(headQuat);
+   571	                    }
+   572	                }
+   573	            }
+   574	
+   575	            resetPosition() {
+   576	                const startY = 1.0;
+   577	                this.parts.pelvis.position.set(0, startY, 0);
+   578	                this.parts.pelvis.velocity.set(0, 0, 0);
+   579	                this.parts.pelvis.angularVelocity.set(0, 0, 0);
+   580	                this.parts.pelvis.quaternion.set(0, 0, 0, 1);
+   581	
+   582	                const offsets = {
+   583	                    abdomen: {x:0, y:0.25, z:0}, chest: {x:0, y:0.55, z:0},
+   584	                    neck: {x:0, y:0.75, z:0}, head: {x:0, y:0.95, z:0},
+   585	                    shoulderL: {x:0.20, y:0.60, z:0}, upperArmL: {x:0.20, y:0.38, z:0},
+   586	                    forearmL: {x:0.20, y:0.10, z:0}, handL: {x:0.20, y:-0.12, z:0},
+   587	                    shoulderR: {x:-0.20, y:0.60, z:0}, upperArmR: {x:-0.20, y:0.38, z:0},
+   588	                    forearmR: {x:-0.20, y:0.10, z:0}, handR: {x:-0.20, y:-0.12, z:0},
+   589	                    thighL: {x:0.10, y:-0.28, z:0}, shinL: {x:0.10, y:-0.66, z:0},
+   590	                    footL: {x:0.10, y:-0.90, z:0.04}, thighR: {x:-0.10, y:-0.28, z:0},
+   591	                    shinR: {x:-0.10, y:-0.66, z:0}, footR: {x:-0.10, y:-0.90, z:0.04}
+   592	                };
+   593	
+   594	                for (const [name, offset] of Object.entries(offsets)) {
+   595	                    if (this.parts[name]) {
+   596	                        this.parts[name].position.set(
+   597	                            this.parts.pelvis.position.x + offset.x,
+   598	                            this.parts.pelvis.position.y + offset.y,
+   599	                            this.parts.pelvis.position.z + offset.z
+   600	                        );
+   601	                        this.parts[name].velocity.set(0, 0, 0);
+   602	                        this.parts[name].angularVelocity.set(0, 0, 0);
+   603	                        this.parts[name].quaternion.set(0, 0, 0, 1);
+   604	                    }
+   605	                }
+   606	            }
+   607	        }
+   608	
+   609	        class AnimationSystem {
+   610	            constructor(human) {
+   611	                this.human = human;
+   612	                this.time = 0;
+   613	                this.walkCycle = 0;
+   614	                this.balanceForce = 800;
+   615	            }
+   616	
+   617	            applyBalance() {
+   618	                const pelvis = this.human.parts.pelvis;
+   619	                const targetY = 1.0;
+   620	                const error = targetY - pelvis.position.y;
+   621	
+   622	                if (Math.abs(error) > 0.01) {
+   623	                    pelvis.applyForce(new CANNON.Vec3(0, error * this.balanceForce, 0), pelvis.position);
+   624	                }
+   625	
+   626	                pelvis.applyForce(new CANNON.Vec3(-pelvis.position.x * 200, 0, -pelvis.position.z * 200), pelvis.position);
+   627	                pelvis.angularVelocity.x *= 0.95;
+   628	                pelvis.angularVelocity.z *= 0.95;
+   629	            }
+   630	
+   631	            animateIdle(dt) {
+   632	                this.applyBalance();
+   633	                const t = this.time;
+   634	                const breath = Math.sin(t * 2) * 0.02;
+   635	                this.human.parts.chest.position.y += breath * 0.01;
+   636	                this.applyJointTorque('upperArmL', 0, 0, Math.sin(t) * 0.5);
+   637	                this.applyJointTorque('upperArmR', 0, 0, -Math.sin(t) * 0.5);
+   638	            }
+   639	
+   640	            animateWalk(dt) {
+   641	                this.applyBalance();
+   642	                const speed = 4;
+   643	                this.walkCycle += dt * speed;
+   644	                const t = this.walkCycle;
+   645	
+   646	                const legAmp = 0.6;
+   647	                this.applyJointTorque('thighL', Math.sin(t) * legAmp, 0, 0);
+   648	                this.applyJointTorque('thighR', Math.sin(t + Math.PI) * legAmp, 0, 0);
+   649	                this.applyJointTorque('shinL', Math.max(0, Math.sin(t)) * 0.8, 0, 0);
+   650	                this.applyJointTorque('shinR', Math.max(0, Math.sin(t + Math.PI)) * 0.8, 0, 0);
+   651	
+   652	                const armAmp = 0.5;
+   653	                this.applyJointTorque('upperArmL', Math.sin(t + Math.PI) * armAmp, 0, 0.3);
+   654	                this.applyJointTorque('upperArmR', Math.sin(t) * armAmp, 0, -0.3);
+   655	                this.applyJointTorque('abdomen', 0.2, 0, 0);
+   656	                this.human.parts.pelvis.applyForce(new CANNON.Vec3(0, 0, 150), this.human.parts.pelvis.position);
+   657	            }
+   658	
+   659	            animateRun(dt) {
+   660	                this.applyBalance();
+   661	                const speed = 8;
+   662	                this.walkCycle += dt * speed;
+   663	                const t = this.walkCycle;
+   664	
+   665	                const legAmp = 1.2;
+   666	                this.applyJointTorque('thighL', Math.sin(t) * legAmp, 0, 0);
+   667	                this.applyJointTorque('thighR', Math.sin(t + Math.PI) * legAmp, 0, 0);
+   668	                this.applyJointTorque('shinL', Math.max(0, Math.sin(t)) * 1.5, 0, 0);
+   669	                this.applyJointTorque('shinR', Math.max(0, Math.sin(t + Math.PI)) * 1.5, 0, 0);
+   670	
+   671	                const armAmp = 1.0;
+   672	                this.applyJointTorque('upperArmL', Math.sin(t + Math.PI) * armAmp, 0, 0.5);
+   673	                this.applyJointTorque('upperArmR', Math.sin(t) * armAmp, 0, -0.5);
+   674	                this.applyJointTorque('forearmL', -0.5, 0, 0);
+   675	                this.applyJointTorque('forearmR', -0.5, 0, 0);
+   676	                this.applyJointTorque('abdomen', 0.4, 0, 0);
+   677	                this.applyJointTorque('chest', 0.1, 0, 0);
+   678	                this.human.parts.pelvis.applyForce(new CANNON.Vec3(0, 0, 300), this.human.parts.pelvis.position);
+   679	
+   680	                if (Math.sin(t) > 0.8 && this.human.parts.pelvis.position.y < 1.1) {
+   681	                    this.human.parts.pelvis.applyForce(new CANNON.Vec3(0, 200, 0), this.human.parts.pelvis.position);
+   682	                }
+   683	            }
+   684	
+   685	            animateJump(dt) {
+   686	                this.applyBalance();
+   687	                const pelvis = this.human.parts.pelvis;
+   688	
+   689	                if (this.time < 0.3) {
+   690	                    this.applyJointTorque('thighL', -0.8, 0, 0);
+   691	                    this.applyJointTorque('thighR', -0.8, 0, 0);
+   692	                    this.applyJointTorque('shinL', 1.0, 0, 0);
+   693	                    this.applyJointTorque('shinR', 1.0, 0, 0);
+   694	                    this.applyJointTorque('abdomen', -0.3, 0, 0);
+   695	                } else if (this.time < 0.5) {
+   696	                    this.applyJointTorque('thighL', 1.5, 0, 0);
+   697	                    this.applyJointTorque('thighR', 1.5, 0, 0);
+   698	                    this.applyJointTorque('shinL', -0.5, 0, 0);
+   699	                    this.applyJointTorque('shinR', -0.5, 0, 0);
+   700	                    pelvis.applyForce(new CANNON.Vec3(0, 800, 100), pelvis.position);
+   701	                    this.applyJointTorque('upperArmL', -2.0, 0, 0);
+   702	                    this.applyJointTorque('upperArmR', -2.0, 0, 0);
+   703	                } else {
+   704	                    this.applyJointTorque('thighL', -0.3, 0, 0);
+   705	                    this.applyJointTorque('thighR', -0.3, 0, 0);
+   706	                    this.applyJointTorque('shinL', 0.5, 0, 0);
+   707	                    this.applyJointTorque('shinR', 0.5, 0, 0);
+   708	                }
+   709	            }
+   710	
+   711	            animateEat(dt) {
+   712	                this.applyBalance();
+   713	                const t = this.time * 3;
+   714	                this.applyJointTorque('upperArmR', -1.2, 0, -0.5);
+   715	                this.applyJointTorque('forearmR', -2.0, 0, 0);
+   716	                this.applyJointTorque('handR', -0.5, 0, 0);
+   717	                this.applyJointTorque('upperArmL', -0.5, 0, 0.3);
+   718	                this.applyJointTorque('forearmL', -1.0, 0, 0);
+   719	                this.applyJointTorque('head', Math.sin(t * 4) * 0.1, 0, 0);
+   720	                this.applyJointTorque('abdomen', 0.2, 0, 0);
+   721	            }
+   722	
+   723	            animateDrink(dt) {
+   724	                this.applyBalance();
+   725	                const t = this.time * 2;
+   726	                this.applyJointTorque('upperArmR', -1.0, 0, -0.3);
+   727	                this.applyJointTorque('forearmR', -1.8, 0, 0);
+   728	                this.applyJointTorque('handR', -0.8, 0, 0);
+   729	                this.applyJointTorque('head', -0.3 + Math.sin(t) * 0.1, 0, 0);
+   730	                this.applyJointTorque('neck', -0.2, 0, 0);
+   731	                this.applyJointTorque('chest', Math.sin(t * 2) * 0.05, 0, 0);
+   732	            }
+   733	
+   734	            animateBox(dt) {
+   735	                this.applyBalance();
+   736	                const t = this.time * 5;
+   737	                const combo = Math.floor(this.time * 2) % 4;
+   738	
+   739	                this.applyJointTorque('thighL', -0.3, 0, 0.3);
+   740	                this.applyJointTorque('thighR', -0.3, 0, -0.3);
+   741	                this.applyJointTorque('shinL', 0.4, 0, 0);
+   742	                this.applyJointTorque('shinR', 0.4, 0, 0);
+   743	                this.applyJointTorque('upperArmL', -1.5, 0, 0.8);
+   744	                this.applyJointTorque('forearmL', -2.0, 0, 0);
+   745	                this.applyJointTorque('upperArmR', -1.5, 0, -0.8);
+   746	                this.applyJointTorque('forearmR', -2.0, 0, 0);
+   747	
+   748	                if (combo === 0) {
+   749	                    this.applyJointTorque('upperArmL', -0.5, 0, 1.5);
+   750	                    this.applyJointTorque('forearmL', -1.0, 0, 0);
+   751	                } else if (combo === 1) {
+   752	                    this.applyJointTorque('upperArmR', -0.5, 0, -1.5);
+   753	                    this.applyJointTorque('forearmR', -1.0, 0, 0);
+   754	                } else if (combo === 2) {
+   755	                    this.applyJointTorque('upperArmL', -1.0, 0, 2.0);
+   756	                    this.applyJointTorque('forearmL', -1.5, 0, 0);
+   757	                } else {
+   758	                    this.applyJointTorque('upperArmR', -2.0, 0, -0.5);
+   759	                    this.applyJointTorque('forearmR', -2.5, 0, 0);
+   760	                }
+   761	
+   762	                this.applyJointTorque('abdomen', 0.1, Math.sin(t) * 0.3, 0);
+   763	                this.applyJointTorque('chest', 0.05, Math.sin(t * 0.5) * 0.2, 0);
+   764	            }
+   765	
+   766	            animateMuayThai(dt) {
+   767	                this.applyBalance();
+   768	                const t = this.time * 4;
+   769	                const phase = Math.floor(this.time * 1.5) % 5;
+   770	
+   771	                this.applyJointTorque('thighL', -0.4, 0, 0.5);
+   772	                this.applyJointTorque('thighR', -0.4, 0, -0.5);
+   773	                this.applyJointTorque('shinL', 0.3, 0, 0);
+   774	                this.applyJointTorque('shinR', 0.3, 0, 0);
+   775	                this.applyJointTorque('upperArmL', -2.0, 0, 0.5);
+   776	                this.applyJointTorque('forearmL', -2.5, 0, 0);
+   777	                this.applyJointTorque('upperArmR', -2.0, 0, -0.5);
+   778	                this.applyJointTorque('forearmR', -2.5, 0, 0);
+   779	
+   780	                if (phase === 0) {
+   781	                    this.applyJointTorque('thighR', -1.5, 0, -1.0);
+   782	                    this.applyJointTorque('shinR', -2.0, 0, 0);
+   783	                    this.applyJointTorque('footR', -0.5, 0, 0);
+   784	                } else if (phase === 1) {
+   785	                    this.applyJointTorque('thighL', -1.0, 0, 0.5);
+   786	                    this.applyJointTorque('shinL', -2.5, 0, 0);
+   787	                } else if (phase === 2) {
+   788	                    this.applyJointTorque('upperArmR', -1.0, 0, -1.5);
+   789	                    this.applyJointTorque('forearmR', -2.5, 0, 0);
+   790	                } else if (phase === 3) {
+   791	                    this.applyJointTorque('thighL', -1.5, 0, 1.0);
+   792	                    this.applyJointTorque('shinL', -2.0, 0, 0);
+   793	                } else {
+   794	                    this.applyJointTorque('abdomen', 0.2, 0, 0);
+   795	                }
+   796	
+   797	                this.applyJointTorque('abdomen', 0.1, Math.sin(t) * 0.2, 0);
+   798	            }
+   799	
+   800	            animateCombat(dt) {
+   801	                this.applyBalance();
+   802	                const t = this.time * 3;
+   803	                const phase = Math.floor(this.time) % 6;
+   804	
+   805	                this.applyJointTorque('thighL', -0.5, 0, 0.2);
+   806	                this.applyJointTorque('thighR', -0.3, 0, -0.2);
+   807	                this.applyJointTorque('shinL', 0.5, 0, 0);
+   808	                this.applyJointTorque('shinR', 0.3, 0, 0);
+   809	                this.applyJointTorque('upperArmL', -0.8, 0, 0.5);
+   810	                this.applyJointTorque('forearmL', -1.5, 0, 0);
+   811	                this.applyJointTorque('upperArmR', -0.8, 0, -0.5);
+   812	                this.applyJointTorque('forearmR', -1.5, 0, 0);
+   813	
+   814	                if (phase === 0) {
+   815	                    this.applyJointTorque('forearmL', -2.5, 0, 0);
+   816	                    this.applyJointTorque('forearmR', -2.5, 0, 0);
+   817	                } else if (phase === 1) {
+   818	                    this.applyJointTorque('upperArmR', -0.3, 0, -1.5);
+   819	                    this.applyJointTorque('forearmR', -1.0, 0, 0);
+   820	                } else if (phase === 2) {
+   821	                    this.applyJointTorque('upperArmL', -0.5, 0, 1.0);
+   822	                    this.applyJointTorque('upperArmR', -0.5, 0, -1.0);
+   823	                    this.applyJointTorque('forearmL', -1.5, 0, 0);
+   824	                    this.applyJointTorque('forearmR', -1.5, 0, 0);
+   825	                } else if (phase === 3) {
+   826	                    this.applyJointTorque('abdomen', 0.5, 0, 0);
+   827	                    this.applyJointTorque('chest', 0.3, 0, 0);
+   828	                    this.applyJointTorque('thighL', -1.0, 0, 0.5);
+   829	                } else if (phase === 4) {
+   830	                    this.applyJointTorque('thighR', -1.2, 0, -0.8);
+   831	                    this.applyJointTorque('shinR', -2.0, 0, 0);
+   832	                } else {
+   833	                    this.applyJointTorque('head', -0.2, 0, 0);
+   834	                }
+   835	
+   836	                this.applyJointTorque('abdomen', 0.1, Math.sin(t) * 0.3, 0);
+   837	                this.applyJointTorque('chest', 0.05, Math.cos(t) * 0.2, 0);
+   838	            }
+   839	
+   840	            applyJointTorque(partName, x, y, z) {
+   841	                if (this.human.parts[partName]) {
+   842	                    const body = this.human.parts[partName];
+   843	                    const torque = new CANNON.Vec3(x * 20, y * 20, z * 20);
+   844	                    body.torque.vadd(torque, body.torque);
+   845	                }
+   846	            }
+   847	
+   848	            update(action, dt) {
+   849	                this.time += dt;
+   850	                switch(action) {
+   851	                    case 'idle': this.animateIdle(dt); break;
+   852	                    case 'walk': this.animateWalk(dt); break;
+   853	                    case 'run': this.animateRun(dt); break;
+   854	                    case 'jump': this.animateJump(dt); break;
+   855	                    case 'eat': this.animateEat(dt); break;
+   856	                    case 'drink': this.animateDrink(dt); break;
+   857	                    case 'box': this.animateBox(dt); break;
+   858	                    case 'muay': this.animateMuayThai(dt); break;
+   859	                    case 'combat': this.animateCombat(dt); break;
+   860	                }
+   861	            }
+   862	
+   863	            reset() {
+   864	                this.time = 0;
+   865	                this.walkCycle = 0;
+   866	            }
+   867	        }
+   868	
+   869	        class NeuralVisualizer {
+   870	            constructor() {
+   871	                this.canvas = document.getElementById('neural-canvas');
+   872	                this.ctx = this.canvas.getContext('2d');
+   873	                this.canvas.width = 200;
+   874	                this.canvas.height = 120;
+   875	                this.nodes = [];
+   876	                this.connections = [];
+   877	                this.initNetwork();
+   878	            }
+   879	
+   880	            initNetwork() {
+   881	                for (let i = 0; i < 20; i++) {
+   882	                    this.nodes.push({
+   883	                        x: Math.random() * this.canvas.width,
+   884	                        y: Math.random() * this.canvas.height,
+   885	                        vx: (Math.random() - 0.5) * 0.5,
+   886	                        vy: (Math.random() - 0.5) * 0.5,
+   887	                        activation: Math.random()
+   888	                    });
+   889	                }
+   890	                for (let i = 0; i < this.nodes.length; i++) {
+   891	                    for (let j = i + 1; j < this.nodes.length; j++) {
+   892	                        if (Math.random() < 0.15) {
+   893	                            this.connections.push({ from: i, to: j, weight: Math.random() });
+   894	                        }
+   895	                    }
+   896	                }
+   897	            }
+   898	
+   899	            update(action) {
+   900	                const ctx = this.ctx;
+   901	                ctx.fillStyle = 'rgba(10, 15, 30, 0.3)';
+   902	                ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+   903	
+   904	                this.nodes.forEach(node => {
+   905	                    node.x += node.vx;
+   906	                    node.y += node.vy;
+   907	                    if (node.x < 0 || node.x > this.canvas.width) node.vx *= -1;
+   908	                    if (node.y < 0 || node.y > this.canvas.height) node.vy *= -1;
+   909	
+   910	                    const baseActivation = action === 'idle' ? 0.3 : 
+   911	                                          action === 'walk' ? 0.5 :
+   912	                                          action === 'run' ? 0.7 :
+   913	                                          action === 'combat' || action === 'box' || action === 'muay' ? 0.9 : 0.4;
+   914	                    node.activation += (baseActivation + Math.random() * 0.2 - node.activation) * 0.1;
+   915	                });
+   916	
+   917	                this.connections.forEach(conn => {
+   918	                    const from = this.nodes[conn.from];
+   919	                    const to = this.nodes[conn.to];
+   920	                    const avgActivation = (from.activation + to.activation) / 2;
+   921	
+   922	                    ctx.beginPath();
+   923	                    ctx.moveTo(from.x, from.y);
+   924	                    ctx.lineTo(to.x, to.y);
+   925	                    ctx.strokeStyle = `rgba(0, 200, 255, ${avgActivation * 0.3})`;
+   926	                    ctx.lineWidth = avgActivation * 1.5;
+   927	                    ctx.stroke();
+   928	                });
+   929	
+   930	                this.nodes.forEach(node => {
+   931	                    ctx.beginPath();
+   932	                    ctx.arc(node.x, node.y, 2 + node.activation * 3, 0, Math.PI * 2);
+   933	                    ctx.fillStyle = `rgba(0, 212, 255, ${0.4 + node.activation * 0.6})`;
+   934	                    ctx.fill();
+   935	                });
+   936	            }
+   937	        }
+   938	
+   939	        const human = new HumanRagdoll();
+   940	        const animator = new AnimationSystem(human);
+   941	        const neuralViz = new NeuralVisualizer();
+   942	
+   943	        const buttons = {
+   944	            idle: document.getElementById('btn-idle'),
+   945	            walk: document.getElementById('btn-walk'),
+   946	            run: document.getElementById('btn-run'),
+   947	            jump: document.getElementById('btn-jump'),
+   948	            eat: document.getElementById('btn-eat'),
+   949	            drink: document.getElementById('btn-drink'),
+   950	            box: document.getElementById('btn-box'),
+   951	            muay: document.getElementById('btn-muay'),
+   952	            combat: document.getElementById('btn-combat')
+   953	        };
+   954	
+   955	        const learningBars = {
+   956	            walk: document.getElementById('bar-walk'),
+   957	            run: document.getElementById('bar-run'),
+   958	            combat: document.getElementById('bar-combat')
+   959	        };
+   960	
+   961	        const learningTexts = {
+   962	            walk: document.getElementById('learn-walk'),
+   963	            run: document.getElementById('learn-run'),
+   964	            combat: document.getElementById('learn-combat')
+   965	        };
+   966	
+   967	        const statusText = document.getElementById('status-text');
+   968	
+   969	        function setActiveButton(action) {
+   970	            Object.values(buttons).forEach(btn => btn.classList.remove('active'));
+   971	            if (buttons[action]) buttons[action].classList.add('active');
+   972	        }
+   973	
+   974	        function updateLearning(action, dt) {
+   975	            const learnMap = { walk: 'walk', run: 'run', box: 'combat', muay: 'combat', combat: 'combat' };
+   976	            const key = learnMap[action];
+   977	            if (key && AIState.learningProgress[key] < 100) {
+   978	                AIState.learningProgress[key] += dt * 8;
+   979	                if (AIState.learningProgress[key] > 100) AIState.learningProgress[key] = 100;
+   980	                learningBars[key].style.width = AIState.learningProgress[key] + '%';
+   981	                learningTexts[key].textContent = Math.floor(AIState.learningProgress[key]) + '%';
+   982	            }
+   983	        }
+   984	
+   985	        function updateStatus(action) {
+   986	            const stateNames = {
+   987	                idle: 'Покой', walk: 'Ходьба', run: 'Бег', jump: 'Прыжок',
+   988	                eat: 'Приём пищи', drink: 'Питьё', box: 'Бокс',
+   989	                muay: 'Тайский бокс', combat: 'Рукопашный бой'
+   990	            };
+   991	
+   992	            if (action === 'run') {
+   993	                AIState.stats.energy = Math.max(0, AIState.stats.energy - 0.05);
+   994	                AIState.stats.hydration = Math.max(0, AIState.stats.hydration - 0.03);
+   995	            } else if (action === 'walk') {
+   996	                AIState.stats.energy = Math.max(0, AIState.stats.energy - 0.01);
+   997	            } else if (action === 'combat' || action === 'box' || action === 'muay') {
+   998	                AIState.stats.energy = Math.max(0, AIState.stats.energy - 0.08);
+   999	                AIState.stats.stress = Math.min(100, AIState.stats.stress + 0.05);
+  1000	            } else if (action === 'eat') {
