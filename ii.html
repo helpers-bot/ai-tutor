@@ -1,1028 +1,980 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Humanoid - Обучающийся ИИ</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { overflow: hidden; background: #0a0a12; font-family: 'Segoe UI', sans-serif; color: #fff; }
-        #game-container { width: 100vw; height: 100vh; position: relative; }
-        canvas { display: block; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Humanoid - Обучающийся ИИ</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { overflow: hidden; background: #0a0a12; font-family: 'Segoe UI', sans-serif; color: #fff; user-select: none; }
+#game-container { width: 100vw; height: 100vh; position: relative; cursor: crosshair; }
+canvas { display: block; }
 
-        .training-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 200;
-            transition: opacity 0.5s;
-        }
-        .training-overlay.hidden { opacity: 0; pointer-events: none; }
+.game-ui {
+    position: fixed; top: 20px; left: 20px;
+    background: rgba(10, 15, 30, 0.92);
+    border: 1px solid rgba(0, 200, 255, 0.3);
+    border-radius: 16px; padding: 15px; min-width: 280px;
+    backdrop-filter: blur(12px); z-index: 100;
+    box-shadow: 0 8px 32px rgba(0, 150, 255, 0.15);
+}
+.game-ui h2 {
+    font-size: 16px; margin-bottom: 10px;
+    background: linear-gradient(90deg, #00d4ff, #0099ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.skill-item {
+    display: flex; align-items: center; margin: 8px 0;
+    font-size: 12px; color: #aaccdd;
+}
+.skill-icon {
+    width: 24px; height: 24px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 10px; font-size: 14px;
+    background: rgba(255,255,255,0.1);
+}
+.skill-bar {
+    flex: 1; height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; margin-left: 10px; overflow: hidden;
+}
+.skill-bar-fill {
+    height: 100%; border-radius: 3px;
+    background: linear-gradient(90deg, #00d4ff, #00ff88);
+    transition: width 0.3s; width: 0%;
+}
+.skill-value {
+    width: 35px; text-align: right; font-size: 11px;
+    color: #00ff88; font-family: monospace; margin-left: 5px;
+}
+.inventory {
+    position: fixed; bottom: 20px; left: 50%;
+    transform: translateX(-50%); display: flex; gap: 10px;
+    background: rgba(10, 15, 30, 0.92);
+    border: 1px solid rgba(0, 200, 255, 0.3);
+    border-radius: 16px; padding: 12px;
+    backdrop-filter: blur(12px); z-index: 100;
+}
+.inv-slot {
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 10px; display: flex;
+    flex-direction: column; align-items: center;
+    justify-content: center; font-size: 24px;
+    transition: all 0.3s; position: relative;
+}
+.inv-slot.has-item {
+    border-color: rgba(0, 200, 255, 0.5);
+    background: rgba(0, 200, 255, 0.1);
+}
+.inv-slot .count {
+    position: absolute; bottom: 2px; right: 4px;
+    font-size: 11px; color: #00ff88; font-weight: bold;
+}
+.notification {
+    position: fixed; top: 100px; right: 20px;
+    background: rgba(0, 200, 255, 0.15);
+    border: 1px solid rgba(0, 200, 255, 0.4);
+    border-radius: 12px; padding: 15px 20px;
+    backdrop-filter: blur(8px); z-index: 150;
+    transform: translateX(400px); transition: transform 0.5s ease;
+    max-width: 300px;
+}
+.notification.show { transform: translateX(0); }
+.notification-title { font-size: 14px; font-weight: bold; color: #00d4ff; margin-bottom: 5px; }
+.notification-text { font-size: 12px; color: #aaccdd; }
+.controls-hint {
+    position: fixed; bottom: 100px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    padding: 8px 20px; border-radius: 20px;
+    font-size: 12px; color: #88aabb;
+    pointer-events: none; opacity: 0.8; z-index: 90;
+}
+.minimap {
+    position: fixed; top: 20px; right: 20px;
+    width: 150px; height: 150px;
+    background: rgba(10, 15, 30, 0.92);
+    border: 1px solid rgba(0, 200, 255, 0.3);
+    border-radius: 12px; overflow: hidden; z-index: 100;
+}
+.minimap canvas { width: 100%; height: 100%; }
+.stats-bar {
+    position: fixed; top: 20px; left: 50%;
+    transform: translateX(-50%); display: flex; gap: 15px;
+    z-index: 100;
+}
+.stat-item {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(10, 15, 30, 0.92);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 6px 12px;
+    font-size: 12px;
+}
+.stat-item .bar {
+    width: 80px; height: 8px; background: rgba(255,255,255,0.1);
+    border-radius: 4px; overflow: hidden;
+}
+.stat-item .bar-fill {
+    height: 100%; border-radius: 4px; transition: width 0.3s;
+}
+.hp .bar-fill { background: #ff4444; }
+.energy .bar-fill { background: #ffaa00; }
+.hunger .bar-fill { background: #ff8844; }
+.thirst .bar-fill { background: #4488ff; }
+.stumble-effect {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(255, 0, 0, 0.15); pointer-events: none;
+    opacity: 0; transition: opacity 0.2s; z-index: 50;
+}
+.stumble-effect.active { opacity: 1; }
+</style>
 
-        .training-title {
-            font-size: 42px; font-weight: bold;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 30px; text-align: center;
-        }
-
-        .training-desc {
-            font-size: 18px; color: #aaccdd; margin-bottom: 40px;
-            text-align: center; max-width: 600px; line-height: 1.6;
-        }
-
-        .training-visual {
-            width: 300px; height: 300px; position: relative;
-            margin-bottom: 30px;
-        }
-
-        .training-progress {
-            width: 400px; height: 30px;
-            background: rgba(255,255,255,0.1); border-radius: 15px;
-            overflow: hidden; border: 2px solid rgba(0,200,255,0.3);
-        }
-
-        .training-progress-bar {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            border-radius: 15px; transition: width 0.3s ease;
-            box-shadow: 0 0 20px rgba(0,212,255,0.5);
-        }
-
-        .training-percent {
-            font-size: 36px; font-weight: bold; color: #00ff88;
-            margin-top: 15px; font-family: monospace;
-        }
-
-        .training-hint {
-            font-size: 14px; color: #6688aa; margin-top: 20px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-
-        .game-ui {
-            position: fixed; top: 20px; left: 20px;
-            background: rgba(10, 15, 30, 0.9);
-            border: 1px solid rgba(0, 200, 255, 0.3);
-            border-radius: 16px; padding: 15px; min-width: 250px;
-            backdrop-filter: blur(12px); z-index: 100;
-            box-shadow: 0 8px 32px rgba(0, 150, 255, 0.15);
-        }
-
-        .game-ui h2 {
-            font-size: 16px; margin-bottom: 10px;
-            background: linear-gradient(90deg, #00d4ff, #0099ff);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-
-        .skill-item {
-            display: flex; align-items: center; margin: 8px 0;
-            font-size: 12px; color: #aaccdd;
-        }
-
-        .skill-icon {
-            width: 24px; height: 24px; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 10px; font-size: 14px;
-        }
-
-        .skill-icon.locked { background: rgba(255,255,255,0.1); }
-        .skill-icon.learned { background: rgba(0,255,136,0.2); color: #00ff88; }
-
-        .skill-bar {
-            flex: 1; height: 6px; background: rgba(255,255,255,0.08);
-            border-radius: 3px; margin-left: 10px; overflow: hidden;
-        }
-
-        .skill-bar-fill {
-            height: 100%; border-radius: 3px;
-            background: linear-gradient(90deg, #00d4ff, #00ff88);
-            transition: width 0.3s; width: 0%;
-        }
-
-        .inventory {
-            position: fixed; bottom: 20px; left: 50%;
-            transform: translateX(-50%); display: flex; gap: 10px;
-            background: rgba(10, 15, 30, 0.9);
-            border: 1px solid rgba(0, 200, 255, 0.3);
-            border-radius: 16px; padding: 12px;
-            backdrop-filter: blur(12px); z-index: 100;
-        }
-
-        .inv-slot {
-            width: 60px; height: 60px;
-            background: rgba(255,255,255,0.05);
-            border: 2px solid rgba(255,255,255,0.1);
-            border-radius: 10px; display: flex;
-            flex-direction: column; align-items: center;
-            justify-content: center; font-size: 24px;
-            transition: all 0.3s; position: relative;
-        }
-
-        .inv-slot.has-item {
-            border-color: rgba(0, 200, 255, 0.5);
-            background: rgba(0, 200, 255, 0.1);
-        }
-
-        .inv-slot .count {
-            position: absolute; bottom: 2px; right: 4px;
-            font-size: 11px; color: #00ff88; font-weight: bold;
-        }
-
-        .notification {
-            position: fixed; top: 100px; right: 20px;
-            background: rgba(0, 200, 255, 0.15);
-            border: 1px solid rgba(0, 200, 255, 0.4);
-            border-radius: 12px; padding: 15px 20px;
-            backdrop-filter: blur(8px); z-index: 150;
-            transform: translateX(400px); transition: transform 0.5s ease;
-            max-width: 300px;
-        }
-
-        .notification.show { transform: translateX(0); }
-
-        .notification-title {
-            font-size: 14px; font-weight: bold; color: #00d4ff; margin-bottom: 5px;
-        }
-
-        .notification-text { font-size: 12px; color: #aaccdd; }
-
-        .controls-hint {
-            position: fixed; bottom: 100px; left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 20px; border-radius: 20px;
-            font-size: 12px; color: #88aabb;
-            pointer-events: none; opacity: 0.8; z-index: 90;
-        }
-
-        .minimap {
-            position: fixed; top: 20px; right: 20px;
-            width: 150px; height: 150px;
-            background: rgba(10, 15, 30, 0.9);
-            border: 1px solid rgba(0, 200, 255, 0.3);
-            border-radius: 12px; overflow: hidden; z-index: 100;
-        }
-
-        .minimap canvas { width: 100%; height: 100%; }
-
-        .crosshair {
-            position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 20px; height: 20px; z-index: 50;
-            pointer-events: none;
-        }
-
-        .crosshair::before, .crosshair::after {
-            content: ''; position: absolute; background: rgba(0, 200, 255, 0.6);
-        }
-
-        .crosshair::before { width: 2px; height: 20px; left: 9px; top: 0; }
-        .crosshair::after { width: 20px; height: 2px; left: 0; top: 9px; }
-
-        .stats-bar {
-            position: fixed; top: 20px; left: 50%;
-            transform: translateX(-50%); display: flex; gap: 15px;
-            z-index: 100;
-        }
-
-        .stat-item {
-            display: flex; align-items: center; gap: 5px;
-            background: rgba(10, 15, 30, 0.9);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 10px; padding: 6px 12px;
-            font-size: 12px;
-        }
-
-        .stat-item .bar {
-            width: 80px; height: 8px; background: rgba(255,255,255,0.1);
-            border-radius: 4px; overflow: hidden;
-        }
-
-        .stat-item .bar-fill {
-            height: 100%; border-radius: 4px; transition: width 0.3s;
-        }
-
-        .hp .bar-fill { background: #ff4444; width: 100%; }
-        .energy .bar-fill { background: #ffaa00; width: 100%; }
-        .hunger .bar-fill { background: #ff8844; width: 100%; }
-        .thirst .bar-fill { background: #4488ff; width: 100%; }
-    </style>
-
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-        }
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
     }
-    </script>
+}
+</script>
 </head>
 <body>
-    <div id="game-container"></div>
+<div id="game-container"></div>
 
-    <div class="training-overlay" id="training-overlay">
-        <div class="training-title" id="training-title">НАЧАЛО ОБУЧЕНИЯ</div>
-        <div class="training-desc" id="training-desc">
-            ИИ-гуманоид только что создан. Он не умеет ничего.<br>
-            Нажмите кнопку, чтобы начать обучение ходьбе.
-        </div>
-        <div class="training-visual" id="training-visual">
-            <canvas id="training-canvas" width="300" height="300"></canvas>
-        </div>
-        <div class="training-progress">
-            <div class="training-progress-bar" id="training-bar"></div>
-        </div>
-        <div class="training-percent" id="training-percent">0%</div>
-        <div class="training-hint" id="training-hint">Нажмите ПРОБЕЛ для ускорения обучения</div>
+<div class="game-ui" id="game-ui">
+    <h2>Навыки ИИ (обучение идёт)</h2>
+    <div class="skill-item">
+        <div class="skill-icon">🚶</div>
+        <span>Ходьба</span>
+        <div class="skill-bar"><div class="skill-bar-fill" id="skill-walk"></div></div>
+        <div class="skill-value" id="val-walk">0%</div>
     </div>
-
-    <div class="game-ui" id="game-ui" style="display:none;">
-        <h2>Навыки ИИ</h2>
-        <div class="skill-item">
-            <div class="skill-icon locked" id="icon-walk">🔒</div>
-            <span>Ходьба</span>
-            <div class="skill-bar"><div class="skill-bar-fill" id="skill-walk"></div></div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-icon locked" id="icon-run">🔒</div>
-            <span>Бег</span>
-            <div class="skill-bar"><div class="skill-bar-fill" id="skill-run"></div></div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-icon locked" id="icon-jump">🔒</div>
-            <span>Прыжок</span>
-            <div class="skill-bar"><div class="skill-bar-fill" id="skill-jump"></div></div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-icon locked" id="icon-eat">🔒</div>
-            <span>Питание</span>
-            <div class="skill-bar"><div class="skill-bar-fill" id="skill-eat"></div></div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-icon locked" id="icon-drink">🔒</div>
-            <span>Питьё</span>
-            <div class="skill-bar"><div class="skill-bar-fill" id="skill-drink"></div></div>
-        </div>
-        <div class="skill-item">
-            <div class="skill-icon locked" id="icon-combat">🔒</div>
-            <span>Боевые искусства</span>
-            <div class="skill-bar"><div class="skill-bar-fill" id="skill-combat"></div></div>
-        </div>
+    <div class="skill-item">
+        <div class="skill-icon">🏃</div>
+        <span>Бег</span>
+        <div class="skill-bar"><div class="skill-bar-fill" id="skill-run"></div></div>
+        <div class="skill-value" id="val-run">0%</div>
     </div>
-
-    <div class="stats-bar" id="stats-bar" style="display:none;">
-        <div class="stat-item hp">
-            <span>❤</span>
-            <div class="bar"><div class="bar-fill" id="hp-bar"></div></div>
-        </div>
-        <div class="stat-item energy">
-            <span>⚡</span>
-            <div class="bar"><div class="bar-fill" id="energy-bar"></div></div>
-        </div>
-        <div class="stat-item hunger">
-            <span>🍖</span>
-            <div class="bar"><div class="bar-fill" id="hunger-bar"></div></div>
-        </div>
-        <div class="stat-item thirst">
-            <span>💧</span>
-            <div class="bar"><div class="bar-fill" id="thirst-bar"></div></div>
-        </div>
+    <div class="skill-item">
+        <div class="skill-icon">🦘</div>
+        <span>Прыжок</span>
+        <div class="skill-bar"><div class="skill-bar-fill" id="skill-jump"></div></div>
+        <div class="skill-value" id="val-jump">0%</div>
     </div>
-
-    <div class="inventory" id="inventory" style="display:none;">
-        <div class="inv-slot" id="slot-food">
-            🍖<div class="count" id="count-food">0</div>
-        </div>
-        <div class="inv-slot" id="slot-water">
-            💧<div class="count" id="count-water">0</div>
-        </div>
+    <div class="skill-item">
+        <div class="skill-icon">🍖</div>
+        <span>Питание</span>
+        <div class="skill-bar"><div class="skill-bar-fill" id="skill-eat"></div></div>
+        <div class="skill-value" id="val-eat">0%</div>
     </div>
-
-    <div class="minimap" id="minimap" style="display:none;">
-        <canvas id="minimap-canvas" width="150" height="150"></canvas>
+    <div class="skill-item">
+        <div class="skill-icon">💧</div>
+        <span>Питьё</span>
+        <div class="skill-bar"><div class="skill-bar-fill" id="skill-drink"></div></div>
+        <div class="skill-value" id="val-drink">0%</div>
     </div>
-
-    <div class="crosshair" id="crosshair" style="display:none;"></div>
-
-    <div class="notification" id="notification">
-        <div class="notification-title" id="notif-title"></div>
-        <div class="notification-text" id="notif-text"></div>
+    <div class="skill-item">
+        <div class="skill-icon">👊</div>
+        <span>Бой</span>
+        <div class="skill-bar"><div class="skill-bar-fill" id="skill-combat"></div></div>
+        <div class="skill-value" id="val-combat">0%</div>
     </div>
+</div>
 
-    <div class="controls-hint" id="controls-hint" style="display:none;">
-        WASD — движение | Пробел — прыжок | ЛКМ — удар | E — взаимодействие
+<div class="stats-bar" id="stats-bar">
+    <div class="stat-item hp">
+        <span>HP</span>
+        <div class="bar"><div class="bar-fill" id="hp-bar"></div></div>
     </div>
+    <div class="stat-item energy">
+        <span>EN</span>
+        <div class="bar"><div class="bar-fill" id="energy-bar"></div></div>
+    </div>
+    <div class="stat-item hunger">
+        <span>Еда</span>
+        <div class="bar"><div class="bar-fill" id="hunger-bar"></div></div>
+    </div>
+    <div class="stat-item thirst">
+        <span>Вода</span>
+        <div class="bar"><div class="bar-fill" id="thirst-bar"></div></div>
+    </div>
+</div>
 
-    <script type="module">
+<div class="inventory" id="inventory">
+    <div class="inv-slot" id="slot-food">
+        🍖<div class="count" id="count-food">0</div>
+    </div>
+    <div class="inv-slot" id="slot-water">
+        💧<div class="count" id="count-water">0</div>
+    </div>
+</div>
 
-        import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+<div class="minimap" id="minimap">
+    <canvas id="minimap-canvas" width="150" height="150"></canvas>
+</div>
 
-        const Game = {
-            skills: {
-                walk: { learned: false, progress: 0, name: 'Ходьба', desc: 'ИИ учится координировать ноги...' },
-                run: { learned: false, progress: 0, name: 'Бег', desc: 'ИИ учится бежать быстрее...' },
-                jump: { learned: false, progress: 0, name: 'Прыжок', desc: 'ИИ учится отрываться от земли...' },
-                eat: { learned: false, progress: 0, name: 'Питание', desc: 'ИИ учится есть для выживания...' },
-                drink: { learned: false, progress: 0, name: 'Питьё', desc: 'ИИ учится утолять жажду...' },
-                combat: { learned: false, progress: 0, name: 'Боевые искусства', desc: 'ИИ учится драться...' }
-            },
-            currentTraining: null,
-            trainingSpeed: 1,
-            player: {
-                hp: 100, maxHp: 100,
-                energy: 100, maxEnergy: 100,
-                hunger: 100, maxHunger: 100,
-                thirst: 100, maxThirst: 100,
-                inventory: { food: 0, water: 0 }
-            },
-            worldSize: 200,
-            objects: [],
-            enemies: [],
-            time: 0
-        };
+<div class="notification" id="notification">
+    <div class="notification-title" id="notif-title"></div>
+    <div class="notification-text" id="notif-text"></div>
+</div>
 
-        const TrainingOrder = ['walk', 'run', 'jump', 'eat', 'drink', 'combat'];
-        let currentTrainingIndex = 0;
+<div class="controls-hint" id="controls-hint">
+    КЛИКНИТЕ ЭКРАН чтобы захватить мышь | WASD — движение | Мышь — камера | Пробел — прыжок | ЛКМ — удар | E — собрать/использовать | Shift — бег
+</div>
 
-        const container = document.getElementById('game-container');
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
-        scene.fog = new THREE.Fog(0x87CEEB, 30, 120);
+<div class="stumble-effect" id="stumble-effect"></div>
 
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 300);
-        camera.position.set(0, 8, 12);
+<script type="module">
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        container.appendChild(renderer.domElement);
+import * as THREE from 'three';
 
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
-        scene.add(hemiLight);
+const Game = {
+    skills: {
+        walk: { progress: 0, max: 100, name: 'Ходьба' },
+        run: { progress: 0, max: 100, name: 'Бег' },
+        jump: { progress: 0, max: 100, name: 'Прыжок' },
+        eat: { progress: 0, max: 100, name: 'Питание' },
+        drink: { progress: 0, max: 100, name: 'Питьё' },
+        combat: { progress: 0, max: 100, name: 'Бой' }
+    },
+    player: {
+        hp: 100, maxHp: 100,
+        energy: 100, maxEnergy: 100,
+        hunger: 100, maxHunger: 100,
+        thirst: 100, maxThirst: 100,
+        inventory: { food: 0, water: 0 }
+    },
+    worldSize: 200,
+    objects: [],
+    enemies: [],
+    time: 0,
+    cameraYaw: 0,
+    cameraPitch: 0.3
+};
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        dirLight.position.set(50, 100, 50);
-        dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 2048;
-        dirLight.shadow.mapSize.height = 2048;
-        dirLight.shadow.camera.left = -100;
-        dirLight.shadow.camera.right = 100;
-        dirLight.shadow.camera.top = 100;
-        dirLight.shadow.camera.bottom = -100;
-        dirLight.shadow.camera.far = 200;
-        scene.add(dirLight);
+const container = document.getElementById('game-container');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87CEEB);
+scene.fog = new THREE.Fog(0x87CEEB, 40, 150);
 
-        const groundGeo = new THREE.PlaneGeometry(Game.worldSize * 2, Game.worldSize * 2, 100, 100);
-        const groundMat = new THREE.MeshStandardMaterial({ color: 0x3a7a3a, roughness: 0.9 });
-        const ground = new THREE.Mesh(groundGeo, groundMat);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 300);
 
-        const posAttr = groundGeo.attributes.position;
-        for (let i = 0; i < posAttr.count; i++) {
-            const x = posAttr.getX(i);
-            const y = posAttr.getY(i);
-            const height = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 2 + Math.sin(x * 0.1 + y * 0.1) * 1;
-            posAttr.setZ(i, height);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+scene.add(hemiLight);
+
+const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+dirLight.position.set(50, 100, 50);
+dirLight.castShadow = true;
+dirLight.shadow.mapSize.width = 2048;
+dirLight.shadow.mapSize.height = 2048;
+dirLight.shadow.camera.left = -100;
+dirLight.shadow.camera.right = 100;
+dirLight.shadow.camera.top = 100;
+dirLight.shadow.camera.bottom = -100;
+dirLight.shadow.camera.far = 200;
+scene.add(dirLight);
+
+const groundGeo = new THREE.PlaneGeometry(Game.worldSize * 2, Game.worldSize * 2, 100, 100);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x3a7a3a, roughness: 0.9 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const posAttr = groundGeo.attributes.position;
+for (let i = 0; i < posAttr.count; i++) {
+    const x = posAttr.getX(i);
+    const y = posAttr.getY(i);
+    const height = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 2 + Math.sin(x * 0.1 + y * 0.1) * 0.5;
+    posAttr.setZ(i, height);
+}
+groundGeo.computeVertexNormals();
+
+function createTree(x, z) {
+    const group = new THREE.Group();
+    const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 3, 8);
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5C4033 });
+    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+    trunk.position.y = 1.5;
+    trunk.castShadow = true;
+    group.add(trunk);
+    const leavesGeo = new THREE.ConeGeometry(2.5, 5, 8);
+    const leavesMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+    const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+    leaves.position.y = 4.5;
+    leaves.castShadow = true;
+    group.add(leaves);
+    const leaves2 = leaves.clone();
+    leaves2.scale.set(0.8, 0.8, 0.8);
+    leaves2.position.y = 6;
+    group.add(leaves2);
+    group.position.set(x, 0, z);
+    scene.add(group);
+}
+
+function createRock(x, z) {
+    const geo = new THREE.DodecahedronGeometry(Math.random() * 1 + 0.5);
+    const mat = new THREE.MeshStandardMaterial({ color: 0x888888 });
+    const rock = new THREE.Mesh(geo, mat);
+    rock.position.set(x, 0.5, z);
+    rock.castShadow = true;
+    rock.receiveShadow = true;
+    scene.add(rock);
+}
+
+for (let i = 0; i < 80; i++) {
+    const x = (Math.random() - 0.5) * Game.worldSize * 1.5;
+    const z = (Math.random() - 0.5) * Game.worldSize * 1.5;
+    if (Math.abs(x) > 10 || Math.abs(z) > 10) createTree(x, z);
+}
+
+for (let i = 0; i < 40; i++) {
+    const x = (Math.random() - 0.5) * Game.worldSize * 1.5;
+    const z = (Math.random() - 0.5) * Game.worldSize * 1.5;
+    createRock(x, z);
+}
+
+class Collectible {
+    constructor(type, x, z) {
+        this.type = type;
+        this.collected = false;
+        if (type === 'food') {
+            const geo = new THREE.SphereGeometry(0.4, 16, 16);
+            const mat = new THREE.MeshStandardMaterial({ color: 0xff6644, emissive: 0xff2200, emissiveIntensity: 0.3 });
+            this.mesh = new THREE.Mesh(geo, mat);
+            this.mesh.position.set(x, 1, z);
+            const leafGeo = new THREE.ConeGeometry(0.3, 0.5, 8);
+            const leafMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
+            const leaf = new THREE.Mesh(leafGeo, leafMat);
+            leaf.position.y = 0.5;
+            this.mesh.add(leaf);
+        } else {
+            const geo = new THREE.CylinderGeometry(0.3, 0.3, 1.2, 16);
+            const mat = new THREE.MeshStandardMaterial({ color: 0x4488ff, emissive: 0x0044ff, emissiveIntensity: 0.3, transparent: true, opacity: 0.8 });
+            this.mesh = new THREE.Mesh(geo, mat);
+            this.mesh.position.set(x, 0.6, z);
         }
-        groundGeo.computeVertexNormals();
+        this.mesh.castShadow = true;
+        scene.add(this.mesh);
+        const indicatorGeo = new THREE.RingGeometry(0.5, 0.7, 32);
+        const indicatorMat = new THREE.MeshBasicMaterial({ color: type === 'food' ? 0xff6644 : 0x4488ff, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+        this.indicator = new THREE.Mesh(indicatorGeo, indicatorMat);
+        this.indicator.rotation.x = -Math.PI / 2;
+        this.indicator.position.set(x, 0.1, z);
+        scene.add(this.indicator);
+    }
+    update(time) {
+        if (this.collected) return;
+        this.mesh.position.y = (this.type === 'food' ? 1 : 0.6) + Math.sin(time * 3) * 0.15;
+        this.mesh.rotation.y += 0.02;
+        this.indicator.rotation.z += 0.03;
+        this.indicator.material.opacity = 0.3 + Math.sin(time * 4) * 0.2;
+    }
+    collect() {
+        if (this.collected) return false;
+        this.collected = true;
+        scene.remove(this.mesh);
+        scene.remove(this.indicator);
+        return true;
+    }
+}
 
-        function createTree(x, z) {
-            const group = new THREE.Group();
-            const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 3, 8);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5C4033 });
-            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-            trunk.position.y = 1.5;
-            trunk.castShadow = true;
-            group.add(trunk);
-            const leavesGeo = new THREE.ConeGeometry(2.5, 5, 8);
-            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
-            const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-            leaves.position.y = 4.5;
-            leaves.castShadow = true;
-            group.add(leaves);
-            const leaves2 = leaves.clone();
-            leaves2.scale.set(0.8, 0.8, 0.8);
-            leaves2.position.y = 6;
-            group.add(leaves2);
-            group.position.set(x, 0, z);
-            scene.add(group);
-            return group;
+function spawnCollectibles() {
+    for (let i = 0; i < 30; i++) {
+        Game.objects.push(new Collectible('food', (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100));
+    }
+    for (let i = 0; i < 20; i++) {
+        Game.objects.push(new Collectible('water', (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100));
+    }
+}
+spawnCollectibles();
+
+class Enemy {
+    constructor(x, z) {
+        this.hp = 50;
+        this.maxHp = 50;
+        this.speed = 2;
+        this.attackRange = 2;
+        this.attackCooldown = 0;
+        const group = new THREE.Group();
+        const bodyGeo = new THREE.BoxGeometry(0.8, 1.2, 0.5);
+        const bodyMat = new THREE.MeshStandardMaterial({ color: 0x8B0000 });
+        const body = new THREE.Mesh(bodyGeo, bodyMat);
+        body.position.y = 0.6;
+        body.castShadow = true;
+        group.add(body);
+        const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0x660000 });
+        const head = new THREE.Mesh(headGeo, headMat);
+        head.position.y = 1.5;
+        head.castShadow = true;
+        group.add(head);
+        const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
+        eyeL.position.set(0.15, 1.55, 0.2);
+        group.add(eyeL);
+        const eyeR = eyeL.clone();
+        eyeR.position.set(-0.15, 1.55, 0.2);
+        group.add(eyeR);
+        group.position.set(x, 0, z);
+        scene.add(group);
+        this.mesh = group;
+        this.dead = false;
+    }
+    update(dt, playerPos) {
+        if (this.dead) return;
+        const dist = this.mesh.position.distanceTo(playerPos);
+        if (dist < 20 && dist > this.attackRange) {
+            const dir = new THREE.Vector3().subVectors(playerPos, this.mesh.position).normalize();
+            this.mesh.position.add(dir.multiplyScalar(this.speed * dt));
+            this.mesh.lookAt(playerPos);
         }
-
-        function createRock(x, z) {
-            const geo = new THREE.DodecahedronGeometry(Math.random() * 1 + 0.5);
-            const mat = new THREE.MeshStandardMaterial({ color: 0x888888 });
-            const rock = new THREE.Mesh(geo, mat);
-            rock.position.set(x, 0.5, z);
-            rock.castShadow = true;
-            rock.receiveShadow = true;
-            scene.add(rock);
-            return rock;
+        if (dist <= this.attackRange && this.attackCooldown <= 0) {
+            Game.player.hp -= 10;
+            this.attackCooldown = 1.5;
+            showNotification('Получен урон!', 'Враг атаковал! HP: ' + Math.floor(Game.player.hp));
         }
-
-        for (let i = 0; i < 80; i++) {
-            const x = (Math.random() - 0.5) * Game.worldSize * 1.5;
-            const z = (Math.random() - 0.5) * Game.worldSize * 1.5;
-            if (Math.abs(x) > 10 || Math.abs(z) > 10) createTree(x, z);
-        }
-
-        for (let i = 0; i < 40; i++) {
-            const x = (Math.random() - 0.5) * Game.worldSize * 1.5;
-            const z = (Math.random() - 0.5) * Game.worldSize * 1.5;
-            createRock(x, z);
-        }
-                class Collectible {
-            constructor(type, x, z) {
-                this.type = type;
-                this.collected = false;
-                if (type === 'food') {
-                    const geo = new THREE.SphereGeometry(0.4, 16, 16);
-                    const mat = new THREE.MeshStandardMaterial({ color: 0xff6644, emissive: 0xff2200, emissiveIntensity: 0.3 });
-                    this.mesh = new THREE.Mesh(geo, mat);
-                    this.mesh.position.set(x, 1, z);
-                    const leafGeo = new THREE.ConeGeometry(0.3, 0.5, 8);
-                    const leafMat = new THREE.MeshStandardMaterial({ color: 0x228B22 });
-                    const leaf = new THREE.Mesh(leafGeo, leafMat);
-                    leaf.position.y = 0.5;
-                    this.mesh.add(leaf);
-                } else {
-                    const geo = new THREE.CylinderGeometry(0.3, 0.3, 1.2, 16);
-                    const mat = new THREE.MeshStandardMaterial({ color: 0x4488ff, emissive: 0x0044ff, emissiveIntensity: 0.3, transparent: true, opacity: 0.8 });
-                    this.mesh = new THREE.Mesh(geo, mat);
-                    this.mesh.position.set(x, 0.6, z);
-                }
-                this.mesh.castShadow = true;
-                scene.add(this.mesh);
-                const indicatorGeo = new THREE.RingGeometry(0.5, 0.7, 32);
-                const indicatorMat = new THREE.MeshBasicMaterial({ color: type === 'food' ? 0xff6644 : 0x4488ff, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
-                this.indicator = new THREE.Mesh(indicatorGeo, indicatorMat);
-                this.indicator.rotation.x = -Math.PI / 2;
-                this.indicator.position.set(x, 0.1, z);
-                scene.add(this.indicator);
+        if (this.attackCooldown > 0) this.attackCooldown -= dt;
+    }
+    takeDamage(dmg) {
+        this.hp -= dmg;
+        this.mesh.children.forEach(child => {
+            if (child.material) {
+                const oldColor = child.material.color.getHex();
+                child.material.color.setHex(0xffffff);
+                setTimeout(() => child.material.color.setHex(oldColor), 100);
             }
-            update(time) {
-                if (this.collected) return;
-                this.mesh.position.y = (this.type === 'food' ? 1 : 0.6) + Math.sin(time * 3) * 0.15;
-                this.mesh.rotation.y += 0.02;
-                this.indicator.rotation.z += 0.03;
-                this.indicator.material.opacity = 0.3 + Math.sin(time * 4) * 0.2;
-            }
-            collect() {
-                if (this.collected) return false;
-                this.collected = true;
-                scene.remove(this.mesh);
-                scene.remove(this.indicator);
-                return true;
-            }
-        }
-
-        function spawnCollectibles() {
-            for (let i = 0; i < 30; i++) {
-                Game.objects.push(new Collectible('food', (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100));
-            }
-            for (let i = 0; i < 20; i++) {
-                Game.objects.push(new Collectible('water', (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 100));
-            }
-        }
-        spawnCollectibles();
-
-        class Enemy {
-            constructor(x, z) {
-                this.hp = 50;
-                this.maxHp = 50;
-                this.speed = 2;
-                this.attackRange = 2;
-                this.attackCooldown = 0;
-                const group = new THREE.Group();
-                const bodyGeo = new THREE.BoxGeometry(0.8, 1.2, 0.5);
-                const bodyMat = new THREE.MeshStandardMaterial({ color: 0x8B0000 });
-                const body = new THREE.Mesh(bodyGeo, bodyMat);
-                body.position.y = 0.6;
-                body.castShadow = true;
-                group.add(body);
-                const headGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-                const headMat = new THREE.MeshStandardMaterial({ color: 0x660000 });
-                const head = new THREE.Mesh(headGeo, headMat);
-                head.position.y = 1.5;
-                head.castShadow = true;
-                group.add(head);
-                const eyeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-                const eyeMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-                const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
-                eyeL.position.set(0.15, 1.55, 0.2);
-                group.add(eyeL);
-                const eyeR = eyeL.clone();
-                eyeR.position.set(-0.15, 1.55, 0.2);
-                group.add(eyeR);
-                group.position.set(x, 0, z);
-                scene.add(group);
-                this.mesh = group;
-                this.dead = false;
-            }
-            update(dt, playerPos) {
-                if (this.dead) return;
-                const dist = this.mesh.position.distanceTo(playerPos);
-                if (dist < 20 && dist > this.attackRange) {
-                    const dir = new THREE.Vector3().subVectors(playerPos, this.mesh.position).normalize();
-                    this.mesh.position.add(dir.multiplyScalar(this.speed * dt));
-                    this.mesh.lookAt(playerPos);
-                }
-                if (dist <= this.attackRange && this.attackCooldown <= 0) {
-                    Game.player.hp -= 10;
-                    this.attackCooldown = 1.5;
-                    showNotification('Получен урон!', 'Враг атаковал вас! HP: ' + Game.player.hp);
-                }
-                if (this.attackCooldown > 0) this.attackCooldown -= dt;
-            }
-            takeDamage(dmg) {
-                this.hp -= dmg;
-                this.mesh.children.forEach(child => {
-                    if (child.material) {
-                        const oldColor = child.material.color.getHex();
-                        child.material.color.setHex(0xffffff);
-                        setTimeout(() => child.material.color.setHex(oldColor), 100);
-                    }
-                });
-                if (this.hp <= 0) {
-                    this.dead = true;
-                    scene.remove(this.mesh);
-                    showNotification('Враг уничтожен!', 'Вы победили врага!');
-                }
-            }
-        }
-
-        for (let i = 0; i < 8; i++) {
-            const x = (Math.random() - 0.5) * 80;
-            const z = (Math.random() - 0.5) * 80;
-            if (Math.abs(x) > 15 || Math.abs(z) > 15) Game.enemies.push(new Enemy(x, z));
-        }
-
-        class PlayerCharacter {
-            constructor() {
-                this.mesh = new THREE.Group();
-                this.velocity = new THREE.Vector3();
-                this.isGrounded = true;
-                this.isAttacking = false;
-                this.attackCooldown = 0;
-                this.animTime = 0;
-                this.createBody();
-                scene.add(this.mesh);
-                this.mesh.position.set(0, 0, 0);
-            }
-            createBody() {
-                const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac, roughness: 0.6 });
-                const clothesMat = new THREE.MeshStandardMaterial({ color: 0x3366aa, roughness: 0.7 });
-                const pantsMat = new THREE.MeshStandardMaterial({ color: 0x333344, roughness: 0.8 });
-                const pelvis = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.2, 0.25), pantsMat);
-                pelvis.position.y = 1.0;
-                pelvis.castShadow = true;
-                this.mesh.add(pelvis);
-                this.pelvis = pelvis;
-                const torso = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5, 0.25), clothesMat);
-                torso.position.y = 1.35;
-                torso.castShadow = true;
-                this.mesh.add(torso);
-                this.torso = torso;
-                const chest = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.3, 0.28), clothesMat);
-                chest.position.y = 1.75;
-                chest.castShadow = true;
-                this.mesh.add(chest);
-                this.chest = chest;
-                const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.15), skinMat);
-                neck.position.y = 2.0;
-                this.mesh.add(neck);
-                const head = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.24), skinMat);
-                head.position.y = 2.2;
-                head.castShadow = true;
-                this.mesh.add(head);
-                this.head = head;
-                const eyeGeo = new THREE.SphereGeometry(0.035, 8, 8);
-                const eyeMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff });
-                const eyeL = new THREE.Mesh(eyeGeo, eyeMat);
-                eyeL.position.set(0.06, 2.25, 0.1);
-                this.mesh.add(eyeL);
-                const eyeR = eyeL.clone();
-                eyeR.position.set(-0.06, 2.25, 0.1);
-                this.mesh.add(eyeR);
-                const hair = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.26), new THREE.MeshStandardMaterial({ color: 0x221100 }));
-                hair.position.y = 2.38;
-                this.mesh.add(hair);
-                this.armL = this.createLimb(0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
-                this.armR = this.createLimb(-0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
-                this.forearmL = this.createLimb(0.32, 1.25, 0, 0.07, 0.3, skinMat, null);
-                this.forearmR = this.createLimb(-0.32, 1.25, 0, 0.07, 0.3, skinMat, null);
-                this.handL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.1), skinMat);
-                this.handL.position.set(0.32, 0.95, 0);
-                this.mesh.add(this.handL);
-                this.handR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.1), skinMat);
-                this.handR.position.set(-0.32, 0.95, 0);
-                this.mesh.add(this.handR);
-                this.legL = this.createLimb(0.12, 0.6, 0, 0.12, 0.4, pantsMat, null);
-                this.legR = this.createLimb(-0.12, 0.6, 0, 0.12, 0.4, pantsMat, null);
-                this.shinL = this.createLimb(0.12, 0.2, 0, 0.1, 0.35, pantsMat, null);
-                this.shinR = this.createLimb(-0.12, 0.2, 0, 0.1, 0.35, pantsMat, null);
-                this.footL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.22), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-                this.footL.position.set(0.12, 0.04, 0.05);
-                this.mesh.add(this.footL);
-                this.footR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.22), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-                this.footR.position.set(-0.12, 0.04, 0.05);
-                this.mesh.add(this.footR);
-            }
-            createLimb(x, y, z, radius, length, mat1, mat2) {
-                const group = new THREE.Group();
-                const upper = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.8, length), mat1);
-                upper.position.y = -length / 2;
-                upper.castShadow = true;
-                group.add(upper);
-                if (mat2) {
-                    const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(radius * 1.1, radius * 1.1, length * 0.3), mat2);
-                    sleeve.position.y = -length * 0.15;
-                    group.add(sleeve);
-                }
-                group.position.set(x, y, z);
-                this.mesh.add(group);
-                return group;
-            }
-                        update(dt, input) {
-                this.animTime += dt;
-                const pos = this.mesh.position;
-                if (!this.isGrounded) this.velocity.y -= 25 * dt;
-                const moveSpeed = Game.skills.run.learned ? 6 : (Game.skills.walk.learned ? 3 : 0);
-                const moveDir = new THREE.Vector3();
-                if (input.keys.w) moveDir.z -= 1;
-                if (input.keys.s) moveDir.z += 1;
-                if (input.keys.a) moveDir.x -= 1;
-                if (input.keys.d) moveDir.x += 1;
-                if (moveDir.length() > 0) {
-                    moveDir.normalize();
-                    const targetRot = Math.atan2(moveDir.x, moveDir.z);
-                    let rotDiff = targetRot - this.mesh.rotation.y;
-                    while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
-                    while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-                    this.mesh.rotation.y += rotDiff * 10 * dt;
-                    this.velocity.x = moveDir.x * moveSpeed;
-                    this.velocity.z = moveDir.z * moveSpeed;
-                    const animSpeed = Game.skills.run.learned ? 12 : 6;
-                    this.legL.rotation.x = Math.sin(this.animTime * animSpeed) * 0.5;
-                    this.legR.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * 0.5;
-                    this.shinL.rotation.x = Math.max(0, Math.sin(this.animTime * animSpeed)) * 0.5;
-                    this.shinR.rotation.x = Math.max(0, Math.sin(this.animTime * animSpeed + Math.PI)) * 0.5;
-                    this.armL.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * 0.4;
-                    this.armR.rotation.x = Math.sin(this.animTime * animSpeed) * 0.4;
-                    Game.player.energy -= Game.skills.run.learned ? 0.05 : 0.02;
-                } else {
-                    this.velocity.x *= 0.8;
-                    this.velocity.z *= 0.8;
-                    this.legL.rotation.x *= 0.9;
-                    this.legR.rotation.x *= 0.9;
-                    this.shinL.rotation.x *= 0.9;
-                    this.shinR.rotation.x *= 0.9;
-                    this.armL.rotation.x *= 0.9;
-                    this.armR.rotation.x *= 0.9;
-                    this.armL.rotation.z = Math.sin(this.animTime * 2) * 0.05;
-                    this.armR.rotation.z = -Math.sin(this.animTime * 2) * 0.05;
-                    Game.player.energy = Math.min(Game.player.maxEnergy, Game.player.energy + 0.03);
-                }
-                if (input.keys.space && this.isGrounded && Game.skills.jump.learned) {
-                    this.velocity.y = 10;
-                    this.isGrounded = false;
-                    Game.player.energy -= 5;
-                }
-                pos.add(this.velocity.clone().multiplyScalar(dt));
-                if (pos.y <= 0) {
-                    pos.y = 0;
-                    this.velocity.y = 0;
-                    this.isGrounded = true;
-                }
-                pos.x = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.x));
-                pos.z = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.z));
-                if (this.attackCooldown > 0) this.attackCooldown -= dt;
-                if (input.mouseDown && this.attackCooldown <= 0 && Game.skills.combat.learned) this.attack();
-                if (input.keys.e) {
-                    this.interact();
-                    input.keys.e = false;
-                }
-                Game.player.hunger -= 0.01;
-                Game.player.thirst -= 0.015;
-                if (Game.player.hunger <= 0) { Game.player.hunger = 0; Game.player.hp -= 0.05; }
-                if (Game.player.thirst <= 0) { Game.player.thirst = 0; Game.player.hp -= 0.08; }
-                if (Game.player.energy <= 0) { Game.player.energy = 0; }
-                const camOffset = new THREE.Vector3(0, 6, 10);
-                camOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.mesh.rotation.y);
-                camera.position.lerp(pos.clone().add(camOffset), 0.05);
-                camera.lookAt(pos.clone().add(new THREE.Vector3(0, 2, 0)));
-            }
-            attack() {
-                this.isAttacking = true;
-                this.attackCooldown = 0.4;
-                const punchSide = Math.random() > 0.5 ? 'right' : 'left';
-                const arm = punchSide === 'right' ? this.armR : this.armL;
-                const forearm = punchSide === 'right' ? this.forearmR : this.forearmL;
-                arm.rotation.x = -1.5;
-                forearm.rotation.x = -1.0;
-                setTimeout(() => {
-                    arm.rotation.x = 0;
-                    forearm.rotation.x = 0;
-                    this.isAttacking = false;
-                }, 200);
-                const attackPos = this.mesh.position.clone();
-                attackPos.y += 1.5;
-                Game.enemies.forEach(enemy => {
-                    if (enemy.dead) return;
-                    const dist = enemy.mesh.position.distanceTo(attackPos);
-                    if (dist < 3) {
-                        enemy.takeDamage(15);
-                        const knockDir = enemy.mesh.position.clone().sub(this.mesh.position).normalize();
-                        enemy.mesh.position.add(knockDir.multiplyScalar(2));
-                    }
-                });
-            }
-            interact() {
-                const pos = this.mesh.position;
-                Game.objects.forEach(obj => {
-                    if (obj.collected) return;
-                    const dist = obj.mesh.position.distanceTo(pos);
-                    if (dist < 3) {
-                        if (obj.type === 'food' && Game.skills.eat.learned) {
-                            obj.collect();
-                            Game.player.inventory.food++;
-                            showNotification('Собрано!', 'Вы нашли еду! Нажмите E, чтобы съесть.');
-                        } else if (obj.type === 'water' && Game.skills.drink.learned) {
-                            obj.collect();
-                            Game.player.inventory.water++;
-                            showNotification('Собрано!', 'Вы нашли воду! Нажмите E, чтобы выпить.');
-                        }
-                    }
-                });
-                if (Game.player.inventory.food > 0 && Game.player.hunger < 80) {
-                    Game.player.inventory.food--;
-                    Game.player.hunger = Math.min(Game.player.maxHunger, Game.player.hunger + 30);
-                    Game.player.hp = Math.min(Game.player.maxHp, Game.player.hp + 10);
-                    showNotification('Поедание', 'Вы съели еду. Голод уменьшился.');
-                }
-                if (Game.player.inventory.water > 0 && Game.player.thirst < 80) {
-                    Game.player.inventory.water--;
-                    Game.player.thirst = Math.min(Game.player.maxThirst, Game.player.thirst + 40);
-                    Game.player.energy = Math.min(Game.player.maxEnergy, Game.player.energy + 15);
-                    showNotification('Питьё', 'Вы выпили воду. Жажда утолена.');
-                }
-            }
-        }
-
-        const player = new PlayerCharacter();
-
-        const input = { keys: {}, mouseDown: false };
-        document.addEventListener('keydown', (e) => {
-            input.keys[e.key.toLowerCase()] = true;
-            if (e.key === ' ' && Game.currentTraining) Game.trainingSpeed = 5;
         });
-        document.addEventListener('keyup', (e) => {
-            input.keys[e.key.toLowerCase()] = false;
-            if (e.key === ' ') Game.trainingSpeed = 1;
-        });
-        document.addEventListener('mousedown', () => input.mouseDown = true);
-        document.addEventListener('mouseup', () => input.mouseDown = false);
+        if (this.hp <= 0) {
+            this.dead = true;
+            scene.remove(this.mesh);
+            showNotification('Враг уничтожен!', 'Вы победили!');
+        }
+    }
+}
 
-        const trainingCanvas = document.getElementById('training-canvas');
-        const trainingCtx = trainingCanvas.getContext('2d');
+for (let i = 0; i < 8; i++) {
+    const x = (Math.random() - 0.5) * 80;
+    const z = (Math.random() - 0.5) * 80;
+    if (Math.abs(x) > 15 || Math.abs(z) > 15) Game.enemies.push(new Enemy(x, z));
+}
+    class PlayerCharacter {
+    constructor() {
+        this.mesh = new THREE.Group();
+        this.velocity = new THREE.Vector3();
+        this.isGrounded = true;
+        this.isAttacking = false;
+        this.attackCooldown = 0;
+        this.animTime = 0;
+        this.stumbleTimer = 0;
+        this.isStumbling = false;
+        this.fallTimer = 0;
+        this.isFallen = false;
+        this.getUpTimer = 0;
+        this.createBody();
+        scene.add(this.mesh);
+        this.mesh.position.set(0, 0, 0);
+    }
 
-        function startTraining(skillKey) {
-            const skill = Game.skills[skillKey];
-            Game.currentTraining = skillKey;
-            document.getElementById('training-title').textContent = 'ОБУЧЕНИЕ: ' + skill.name.toUpperCase();
-            document.getElementById('training-desc').innerHTML = skill.desc + '<br><br>Нажмите ПРОБЕЛ для ускорения!';
-            document.getElementById('training-overlay').classList.remove('hidden');
-            document.getElementById('game-ui').style.display = 'none';
-            document.getElementById('stats-bar').style.display = 'none';
-            document.getElementById('inventory').style.display = 'none';
-            skill.progress = 0;
+    createBody() {
+        const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac, roughness: 0.6 });
+        const clothesMat = new THREE.MeshStandardMaterial({ color: 0x3366aa, roughness: 0.7 });
+        const pantsMat = new THREE.MeshStandardMaterial({ color: 0x333344, roughness: 0.8 });
+
+        const pelvis = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.2, 0.25), pantsMat);
+        pelvis.position.y = 1.0;
+        pelvis.castShadow = true;
+        this.mesh.add(pelvis);
+        this.pelvis = pelvis;
+
+        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5, 0.25), clothesMat);
+        torso.position.y = 1.35;
+        torso.castShadow = true;
+        this.mesh.add(torso);
+        this.torso = torso;
+
+        const chest = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.3, 0.28), clothesMat);
+        chest.position.y = 1.75;
+        chest.castShadow = true;
+        this.mesh.add(chest);
+        this.chest = chest;
+
+        const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.15), skinMat);
+        neck.position.y = 2.0;
+        this.mesh.add(neck);
+
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.24), skinMat);
+        head.position.y = 2.2;
+        head.castShadow = true;
+        this.mesh.add(head);
+        this.head = head;
+
+        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.26), new THREE.MeshStandardMaterial({ color: 0x221100 }));
+        hair.position.y = 2.38;
+        this.mesh.add(hair);
+
+        this.armL = this.createLimb(0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
+        this.armR = this.createLimb(-0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
+        this.forearmL = this.createLimb(0.32, 1.25, 0, 0.07, 0.3, skinMat, null);
+        this.forearmR = this.createLimb(-0.32, 1.25, 0, 0.07, 0.3, skinMat, null);
+
+        this.handL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.1), skinMat);
+        this.handL.position.set(0.32, 0.95, 0);
+        this.mesh.add(this.handL);
+        this.handR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.1, 0.1), skinMat);
+        this.handR.position.set(-0.32, 0.95, 0);
+        this.mesh.add(this.handR);
+
+        this.legL = this.createLimb(0.12, 0.6, 0, 0.12, 0.4, pantsMat, null);
+        this.legR = this.createLimb(-0.12, 0.6, 0, 0.12, 0.4, pantsMat, null);
+        this.shinL = this.createLimb(0.12, 0.2, 0, 0.1, 0.35, pantsMat, null);
+        this.shinR = this.createLimb(-0.12, 0.2, 0, 0.1, 0.35, pantsMat, null);
+
+        this.footL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.22), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+        this.footL.position.set(0.12, 0.04, 0.05);
+        this.mesh.add(this.footL);
+        this.footR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.22), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+        this.footR.position.set(-0.12, 0.04, 0.05);
+        this.mesh.add(this.footR);
+    }
+
+    createLimb(x, y, z, radius, length, mat1, mat2) {
+        const group = new THREE.Group();
+        const upper = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius * 0.8, length), mat1);
+        upper.position.y = -length / 2;
+        upper.castShadow = true;
+        group.add(upper);
+        if (mat2) {
+            const sleeve = new THREE.Mesh(new THREE.CylinderGeometry(radius * 1.1, radius * 1.1, length * 0.3), mat2);
+            sleeve.position.y = -length * 0.15;
+            group.add(sleeve);
+        }
+        group.position.set(x, y, z);
+        this.mesh.add(group);
+        return group;
+    }
+            update(dt, input) {
+        this.animTime += dt;
+        const pos = this.mesh.position;
+        const walkSkill = Game.skills.walk.progress;
+        const runSkill = Game.skills.run.progress;
+        const jumpSkill = Game.skills.jump.progress;
+        const combatSkill = Game.skills.combat.progress;
+
+        if (!this.isGrounded) {
+            this.velocity.y -= 25 * dt;
         }
 
-        function updateTraining(dt) {
-            if (!Game.currentTraining) return;
-            const skill = Game.skills[Game.currentTraining];
-            skill.progress += dt * 15 * Game.trainingSpeed;
-            if (skill.progress >= 100) {
-                skill.progress = 100;
-                skill.learned = true;
-                finishTraining();
-                return;
-            }
-            document.getElementById('training-bar').style.width = skill.progress + '%';
-            document.getElementById('training-percent').textContent = Math.floor(skill.progress) + '%';
-            drawTrainingVisual(Game.currentTraining, skill.progress);
+        let moveSpeed = 0;
+        if (walkSkill > 0) {
+            const baseSpeed = 0.5 + (walkSkill / 100) * 5;
+            const isRunning = input.keys.shift && runSkill > 0;
+            const runMult = isRunning ? (1 + runSkill / 100) : 1;
+            moveSpeed = baseSpeed * runMult;
         }
 
-        function drawTrainingVisual(skill, progress) {
-            const ctx = trainingCtx;
-            const w = trainingCanvas.width;
-            const h = trainingCanvas.height;
-            ctx.fillStyle = '#0a0a12';
-            ctx.fillRect(0, 0, w, h);
-            const cx = w / 2;
-            const cy = h / 2;
-            if (skill === 'walk') {
-                ctx.strokeStyle = '#00d4ff';
-                ctx.lineWidth = 8;
-                const legAngle = Math.sin(progress * 0.3) * 0.5;
-                ctx.beginPath();
-                ctx.moveTo(cx - 20, cy + 40);
-                ctx.lineTo(cx - 20 + Math.sin(legAngle) * 30, cy + 80);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(cx + 20, cy + 40);
-                ctx.lineTo(cx + 20 + Math.sin(-legAngle) * 30, cy + 80);
-                ctx.stroke();
-                ctx.fillStyle = '#ffdbac';
-                ctx.fillRect(cx - 25, cy - 40, 50, 80);
-                ctx.strokeStyle = '#00ff88';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.arc(cx, cy, 100, -Math.PI/2, -Math.PI/2 + (progress / 100) * Math.PI * 2);
-                ctx.stroke();
-            } else if (skill === 'run') {
-                ctx.strokeStyle = '#ffaa00';
-                ctx.lineWidth = 8;
-                for (let i = 0; i < 3; i++) {
-                    const offset = i * 40;
-                    ctx.beginPath();
-                    ctx.moveTo(cx - 30 + offset, cy + 50);
-                    ctx.lineTo(cx - 10 + offset, cy + 90);
-                    ctx.stroke();
-                }
-                ctx.fillStyle = '#ffdbac';
-                ctx.fillRect(cx - 20, cy - 30, 40, 60);
-                ctx.fillStyle = '#ffaa00';
-                ctx.font = 'bold 20px monospace';
-                ctx.fillText('SPEED: ' + Math.floor(progress) + '%', cx - 60, cy - 60);
-            } else if (skill === 'jump') {
-                const jumpHeight = Math.abs(Math.sin(progress * 0.1)) * 60;
-                ctx.fillStyle = '#ffdbac';
-                ctx.fillRect(cx - 20, cy + 40 - jumpHeight, 40, 60);
-                ctx.strokeStyle = '#00ff88';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(cx - 50, cy + 100);
-                ctx.quadraticCurveTo(cx, cy - 20, cx + 50, cy + 100);
-                ctx.stroke();
-            } else if (skill === 'eat') {
-                ctx.fillStyle = '#ff6644';
-                ctx.beginPath();
-                ctx.arc(cx, cy, 30 + Math.sin(progress * 0.2) * 5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#ffdbac';
-                ctx.lineWidth = 10;
-                const reach = Math.min(progress / 100, 1) * 40;
-                ctx.beginPath();
-                ctx.moveTo(cx + 60, cy + 40);
-                ctx.lineTo(cx + 20 + reach, cy);
-                ctx.stroke();
-            } else if (skill === 'drink') {
-                ctx.fillStyle = '#4488ff';
-                ctx.fillRect(cx - 20, cy - 30, 40, 60);
-                for (let i = 0; i < 5; i++) {
-                    const bx = cx + (i - 2) * 15;
-                    const by = cy - 40 - (progress * 0.5 + i * 10) % 50;
-                    ctx.fillStyle = 'rgba(100, 200, 255, ' + (0.5 + Math.sin(progress * 0.1 + i) * 0.3) + ')';
-                    ctx.beginPath();
-                    ctx.arc(bx, by, 5, 0, Math.PI * 2);
-                    ctx.fill();
-                }
-            } else if (skill === 'combat') {
-                ctx.fillStyle = '#ff4444';
-                ctx.fillRect(cx - 30, cy - 30, 60, 60);
-                const punchPhase = Math.floor(progress / 20) % 4;
-                const colors = ['#ff0000', '#ff8800', '#ffff00', '#ff0000'];
-                ctx.strokeStyle = colors[punchPhase];
-                ctx.lineWidth = 6;
-                ctx.beginPath();
-                ctx.moveTo(cx + 40, cy - 20);
-                ctx.lineTo(cx + 80 + Math.sin(progress * 0.5) * 20, cy - 20);
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.moveTo(cx - 40, cy + 20);
-                ctx.lineTo(cx - 80 - Math.sin(progress * 0.5) * 20, cy + 20);
-                ctx.stroke();
-            }
-        }
+        const moveDir = new THREE.Vector3();
+        if (input.keys.w) moveDir.z -= 1;
+        if (input.keys.s) moveDir.z += 1;
+        if (input.keys.a) moveDir.x -= 1;
+        if (input.keys.d) moveDir.x += 1;
 
-        function finishTraining() {
-            const skill = Game.skills[Game.currentTraining];
-            skill.learned = true;
-            showNotification('Навык изучен!', 'ИИ научился: ' + skill.name);
-            document.getElementById('training-overlay').classList.add('hidden');
-            document.getElementById('game-ui').style.display = 'block';
-            document.getElementById('stats-bar').style.display = 'flex';
-            document.getElementById('inventory').style.display = 'flex';
-            document.getElementById('minimap').style.display = 'block';
-            document.getElementById('crosshair').style.display = 'block';
-            document.getElementById('controls-hint').style.display = 'block';
-            const icon = document.getElementById('icon-' + Game.currentTraining);
-            icon.textContent = '✓';
-            icon.classList.remove('locked');
-            icon.classList.add('learned');
-            Game.currentTraining = null;
-            currentTrainingIndex++;
-            if (currentTrainingIndex < TrainingOrder.length) {
-                setTimeout(() => startTraining(TrainingOrder[currentTrainingIndex]), 5000);
-            }
-        }
+        const stumbleChance = walkSkill < 30 ? (30 - walkSkill) * 0.0008 : 0;
+        const fallChance = walkSkill < 10 ? (10 - walkSkill) * 0.001 : 0;
 
-        function showNotification(title, text) {
-            const notif = document.getElementById('notification');
-            document.getElementById('notif-title').textContent = title;
-            document.getElementById('notif-text').textContent = text;
-            notif.classList.add('show');
-            setTimeout(() => notif.classList.remove('show'), 3000);
-        }
-
-        function updateUI() {
-            for (const [key, skill] of Object.entries(Game.skills)) {
-                document.getElementById('skill-' + key).style.width = skill.progress + '%';
-            }
-            document.getElementById('hp-bar').style.width = (Game.player.hp / Game.player.maxHp * 100) + '%';
-            document.getElementById('energy-bar').style.width = (Game.player.energy / Game.player.maxEnergy * 100) + '%';
-            document.getElementById('hunger-bar').style.width = (Game.player.hunger / Game.player.maxHunger * 100) + '%';
-            document.getElementById('thirst-bar').style.width = (Game.player.thirst / Game.player.maxThirst * 100) + '%';
-            document.getElementById('count-food').textContent = Game.player.inventory.food;
-            document.getElementById('count-water').textContent = Game.player.inventory.water;
-            document.getElementById('slot-food').classList.toggle('has-item', Game.player.inventory.food > 0);
-            document.getElementById('slot-water').classList.toggle('has-item', Game.player.inventory.water > 0);
-        }
-
-        const minimapCanvas = document.getElementById('minimap-canvas');
-        const minimapCtx = minimapCanvas.getContext('2d');
-
-        function updateMinimap() {
-            const ctx = minimapCtx;
-            const w = minimapCanvas.width;
-            const h = minimapCanvas.height;
-            ctx.fillStyle = '#1a3a1a';
-            ctx.fillRect(0, 0, w, h);
-            const scale = w / 200;
-            const px = w / 2 + player.mesh.position.x * scale;
-            const pz = h / 2 + player.mesh.position.z * scale;
-            Game.objects.forEach(obj => {
-                if (obj.collected) return;
-                const ox = w / 2 + obj.mesh.position.x * scale;
-                const oz = h / 2 + obj.mesh.position.z * scale;
-                ctx.fillStyle = obj.type === 'food' ? '#ff6644' : '#4488ff';
-                ctx.fillRect(ox - 2, oz - 2, 4, 4);
-            });
-            Game.enemies.forEach(enemy => {
-                if (enemy.dead) return;
-                const ex = w / 2 + enemy.mesh.position.x * scale;
-                const ez = h / 2 + enemy.mesh.position.z * scale;
-                ctx.fillStyle = '#ff0000';
-                ctx.fillRect(ex - 3, ez - 3, 6, 6);
-            });
-            ctx.fillStyle = '#00ff88';
-            ctx.beginPath();
-            ctx.arc(px, pz, 5, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#00ff88';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(px, pz);
-            ctx.lineTo(px + Math.sin(player.mesh.rotation.y) * 10, pz + Math.cos(player.mesh.rotation.y) * 10);
-            ctx.stroke();
-        }
-
-        let lastTime = performance.now();
-        function gameLoop() {
-            requestAnimationFrame(gameLoop);
-            const now = performance.now();
-            const dt = Math.min((now - lastTime) / 1000, 0.05);
-            lastTime = now;
-            Game.time += dt;
-            if (Game.currentTraining) {
-                updateTraining(dt);
+        if (this.isFallen) {
+            this.fallTimer -= dt;
+            if (this.fallTimer <= 0) {
+                this.getUpTimer = 2 - (walkSkill / 100) * 1.5;
+                this.isFallen = false;
+                this.isGettingUp = true;
+                showNotification('Встаёт...', 'ИИ учится подниматься...');
             } else {
-                player.update(dt, input);
-                Game.objects.forEach(obj => obj.update(Game.time));
-                Game.enemies.forEach(enemy => enemy.update(dt, player.mesh.position));
-                updateUI();
-                updateMinimap();
+                this.mesh.rotation.x = Math.PI / 2 + Math.sin(this.animTime * 3) * 0.1;
+                this.armL.rotation.x = -1;
+                this.armR.rotation.x = -1;
+                this.legL.rotation.x = Math.sin(this.animTime * 2) * 0.3;
+                this.legR.rotation.x = Math.sin(this.animTime * 2 + 1) * 0.3;
             }
-            renderer.render(scene, camera);
+            return;
         }
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+        if (this.isGettingUp) {
+            this.getUpTimer -= dt;
+            const progress = 1 - (this.getUpTimer / (2 - (walkSkill / 100) * 1.5));
+            this.mesh.rotation.x = (1 - progress) * Math.PI / 2;
+            this.mesh.position.y = progress * 0;
+            if (this.getUpTimer <= 0) {
+                this.isGettingUp = false;
+                this.mesh.rotation.x = 0;
+                this.mesh.position.y = 0;
+            }
+            return;
+        }
+
+        if (this.isStumbling) {
+            this.stumbleTimer -= dt;
+            this.mesh.rotation.z = Math.sin(this.stumbleTimer * 15) * 0.4 * (1 - walkSkill / 50);
+            this.mesh.position.y = Math.abs(Math.sin(this.stumbleTimer * 10)) * 0.1;
+            if (this.stumbleTimer <= 0) {
+                this.isStumbling = false;
+                this.mesh.rotation.z = 0;
+                this.mesh.position.y = 0;
+                if (Math.random() < fallChance && walkSkill < 15) {
+                    this.fall();
+                }
+            }
+            return;
+        }
+
+        if (moveDir.length() > 0 && moveSpeed > 0) {
+            moveDir.normalize();
+
+            const camDir = new THREE.Vector3();
+            camera.getWorldDirection(camDir);
+            camDir.y = 0;
+            camDir.normalize();
+            const camRight = new THREE.Vector3().crossVectors(camDir, new THREE.Vector3(0, 1, 0)).normalize();
+
+            const worldDir = new THREE.Vector3()
+                .addScaledVector(camDir, -moveDir.z)
+                .addScaledVector(camRight, moveDir.x);
+
+            if (worldDir.length() > 0) {
+                worldDir.normalize();
+                const targetRot = Math.atan2(worldDir.x, worldDir.z);
+                let rotDiff = targetRot - this.mesh.rotation.y;
+                while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
+                while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
+                this.mesh.rotation.y += rotDiff * 8 * dt;
+
+                this.velocity.x = worldDir.x * moveSpeed;
+                this.velocity.z = worldDir.z * moveSpeed;
+            }
+
+            if (Math.random() < stumbleChance) {
+                this.stumble();
+            }
+
+            if (!this.isStumbling && !this.isFallen) {
+                const animSpeed = moveSpeed * 2.5;
+                const legAmp = 0.3 + (walkSkill / 100) * 0.4;
+                this.legL.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp;
+                this.legR.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * legAmp;
+                this.shinL.rotation.x = Math.max(0, Math.sin(this.animTime * animSpeed)) * legAmp * 0.8;
+                this.shinR.rotation.x = Math.max(0, Math.sin(this.animTime * animSpeed + Math.PI)) * legAmp * 0.8;
+                this.armL.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * legAmp * 0.7;
+                this.armR.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp * 0.7;
+
+                if (walkSkill < 20) {
+                    this.mesh.rotation.z = Math.sin(this.animTime * 3) * 0.05 * (20 - walkSkill) / 20;
+                }
+            }
+
+            Game.player.energy -= moveSpeed * 0.008;
+        } else {
+            this.velocity.x *= 0.85;
+            this.velocity.z *= 0.85;
+            this.legL.rotation.x *= 0.9;
+            this.legR.rotation.x *= 0.9;
+            this.shinL.rotation.x *= 0.9;
+            this.shinR.rotation.x *= 0.9;
+            this.armL.rotation.x *= 0.9;
+            this.armR.rotation.x *= 0.9;
+            this.mesh.rotation.z *= 0.9;
+            this.armL.rotation.z = Math.sin(this.animTime * 2) * 0.05;
+            this.armR.rotation.z = -Math.sin(this.animTime * 2) * 0.05;
+            Game.player.energy = Math.min(Game.player.maxEnergy, Game.player.energy + 0.02);
+        }
+
+        if (input.keys.space && this.isGrounded && jumpSkill > 0) {
+            const jumpPower = 3 + (jumpSkill / 100) * 12;
+            this.velocity.y = jumpPower;
+            this.isGrounded = false;
+            Game.player.energy -= 3;
+        }
+
+        pos.add(this.velocity.clone().multiplyScalar(dt));
+
+        if (pos.y <= 0) {
+            pos.y = 0;
+            this.velocity.y = 0;
+            this.isGrounded = true;
+        }
+
+        pos.x = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.x));
+        pos.z = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.z));
+
+        if (this.attackCooldown > 0) this.attackCooldown -= dt;
+        if (input.mouseDown && this.attackCooldown <= 0 && combatSkill > 0) {
+            this.attack();
+        }
+
+        if (input.keys.e) {
+            this.interact();
+            input.keys.e = false;
+        }
+
+        Game.player.hunger -= 0.008;
+        Game.player.thirst -= 0.012;
+        if (Game.player.hunger <= 0) { Game.player.hunger = 0; Game.player.hp -= 0.03; }
+        if (Game.player.thirst <= 0) { Game.player.thirst = 0; Game.player.hp -= 0.05; }
+        if (Game.player.energy <= 0) { Game.player.energy = 0; moveSpeed *= 0.3; }
+        if (Game.player.hp <= 0) {
+            Game.player.hp = 0;
+            showNotification('Вы погибли!', 'Возрождение...');
+            Game.player.hp = 50;
+            pos.set(0, 0, 0);
+        }
+
+        this.trainSkills(dt, moveDir.length() > 0 && moveSpeed > 0);
+    }
+
+    stumble() {
+        this.isStumbling = true;
+        this.stumbleTimer = 0.8 - (Game.skills.walk.progress / 100) * 0.5;
+        document.getElementById('stumble-effect').classList.add('active');
+        setTimeout(() => document.getElementById('stumble-effect').classList.remove('active'), 300);
+    }
+
+    fall() {
+        this.isFallen = true;
+        this.fallTimer = 1 + Math.random();
+        showNotification('Упал!', 'ИИ ещё не уверенно ходит...');
+    }
+
+    trainSkills(dt, isMoving) {
+        if (isMoving && Game.skills.walk.progress < 100) {
+            Game.skills.walk.progress += dt * 1.5;
+            if (Game.skills.walk.progress > 100) Game.skills.walk.progress = 100;
+        }
+        if (isMoving && input.keys.shift && Game.skills.run.progress < 100) {
+            Game.skills.run.progress += dt * 1.2;
+            if (Game.skills.run.progress > 100) Game.skills.run.progress = 100;
+        }
+        if (!this.isGrounded && Game.skills.jump.progress < 100) {
+            Game.skills.jump.progress += dt * 2;
+            if (Game.skills.jump.progress > 100) Game.skills.jump.progress = 100;
+        }
+        if (this.isAttacking && Game.skills.combat.progress < 100) {
+            Game.skills.combat.progress += dt * 4;
+            if (Game.skills.combat.progress > 100) Game.skills.combat.progress = 100;
+        }
+    }
+
+    attack() {
+        this.isAttacking = true;
+        const combatSkill = Game.skills.combat.progress;
+        this.attackCooldown = Math.max(0.3, 0.8 - combatSkill / 200);
+        const punchSide = Math.random() > 0.5 ? 'right' : 'left';
+        const arm = punchSide === 'right' ? this.armR : this.armL;
+        const forearm = punchSide === 'right' ? this.forearmR : this.forearmL;
+        arm.rotation.x = -1.5;
+        forearm.rotation.x = -1.2;
+        setTimeout(() => {
+            arm.rotation.x = 0;
+            forearm.rotation.x = 0;
+            this.isAttacking = false;
+        }, 200);
+
+        const attackPos = this.mesh.position.clone();
+        attackPos.y += 1.5;
+        const attackDir = new THREE.Vector3(0, 0, -1).applyAxisAngle(new THREE.Vector3(0, 1, 0), this.mesh.rotation.y);
+
+        Game.enemies.forEach(enemy => {
+            if (enemy.dead) return;
+            const dist = enemy.mesh.position.distanceTo(attackPos);
+            const enemyDir = enemy.mesh.position.clone().sub(attackPos).normalize();
+            const angle = attackDir.angleTo(enemyDir);
+            if (dist < 3.5 && angle < Math.PI / 3) {
+                const dmg = 5 + (combatSkill / 100) * 25;
+                enemy.takeDamage(dmg);
+                const knockDir = enemy.mesh.position.clone().sub(attackPos).normalize();
+                enemy.mesh.position.add(knockDir.multiplyScalar(2 + combatSkill / 30));
+            }
+        });
+    }
+
+    interact() {
+        const pos = this.mesh.position;
+        let interacted = false;
+
+        Game.objects.forEach(obj => {
+            if (obj.collected) return;
+            const dist = obj.mesh.position.distanceTo(pos);
+            if (dist < 3) {
+                if (obj.type === 'food') {
+                    if (Game.skills.eat.progress < 100) {
+                        Game.skills.eat.progress += 15;
+                        if (Game.skills.eat.progress > 100) Game.skills.eat.progress = 100;
+                    }
+                    obj.collect();
+                    Game.player.inventory.food++;
+                    showNotification('Собрано!', 'Еда в инвентаре. Нажми E чтобы съесть.');
+                    interacted = true;
+                } else if (obj.type === 'water') {
+                    if (Game.skills.drink.progress < 100) {
+                        Game.skills.drink.progress += 15;
+                        if (Game.skills.drink.progress > 100) Game.skills.drink.progress = 100;
+                    }
+                    obj.collect();
+                    Game.player.inventory.water++;
+                    showNotification('Собрано!', 'Вода в инвентаре. Нажми E чтобы выпить.');
+                    interacted = true;
+                }
+            }
         });
 
-        startTraining(TrainingOrder[0]);
-        gameLoop();
-    </script>
+        if (!interacted) {
+            if (Game.player.inventory.food > 0 && Game.player.hunger < 90) {
+                const eatTime = Math.max(0.5, 3 - Game.skills.eat.progress / 40);
+                Game.player.inventory.food--;
+                Game.player.hunger = Math.min(Game.player.maxHunger, Game.player.hunger + 25);
+                Game.player.hp = Math.min(Game.player.maxHp, Game.player.hp + 5);
+                showNotification('Поедание', 'Скорость: ' + eatTime.toFixed(1) + 'с (навык ' + Math.floor(Game.skills.eat.progress) + '%)');
+            }
+            if (Game.player.inventory.water > 0 && Game.player.thirst < 90) {
+                const drinkTime = Math.max(0.5, 3 - Game.skills.drink.progress / 40);
+                Game.player.inventory.water--;
+                Game.player.thirst = Math.min(Game.player.maxThirst, Game.player.thirst + 35);
+                Game.player.energy = Math.min(Game.player.maxEnergy, Game.player.energy + 10);
+                showNotification('Питьё', 'Скорость: ' + drinkTime.toFixed(1) + 'с (навык ' + Math.floor(Game.skills.drink.progress) + '%)');
+            }
+        }
+    }
+}
+
+const player = new PlayerCharacter();
+
+const input = { keys: {}, mouseDown: false };
+document.addEventListener('keydown', (e) => {
+    input.keys[e.key.toLowerCase()] = true;
+});
+document.addEventListener('keyup', (e) => {
+    input.keys[e.key.toLowerCase()] = false;
+});
+document.addEventListener('mousedown', () => input.mouseDown = true);
+document.addEventListener('mouseup', () => input.mouseDown = false);
+
+document.addEventListener('mousemove', (e) => {
+    if (document.pointerLockElement === container) {
+        Game.cameraYaw -= e.movementX * 0.002;
+        Game.cameraPitch -= e.movementY * 0.002;
+        Game.cameraPitch = Math.max(-0.3, Math.min(0.6, Game.cameraPitch));
+    }
+});
+
+container.addEventListener('click', () => {
+    container.requestPointerLock();
+});
+
+function updateCamera() {
+    const pos = player.mesh.position;
+    const dist = 6 + Math.cos(Game.cameraPitch) * 2;
+    const height = 2 + Math.sin(Game.cameraPitch) * 4;
+
+    const camX = pos.x + Math.sin(Game.cameraYaw) * dist;
+    const camZ = pos.z + Math.cos(Game.cameraYaw) * dist;
+    const camY = pos.y + height;
+
+    camera.position.set(camX, camY, camZ);
+    camera.lookAt(pos.x, pos.y + 1.2, pos.z);
+}
+    function showNotification(title, text) {
+    const notif = document.getElementById('notification');
+    document.getElementById('notif-title').textContent = title;
+    document.getElementById('notif-text').textContent = text;
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 3000);
+}
+
+function updateUI() {
+    for (const [key, skill] of Object.entries(Game.skills)) {
+        document.getElementById('skill-' + key).style.width = skill.progress + '%';
+        document.getElementById('val-' + key).textContent = Math.floor(skill.progress) + '%';
+    }
+    document.getElementById('hp-bar').style.width = (Game.player.hp / Game.player.maxHp * 100) + '%';
+    document.getElementById('energy-bar').style.width = (Game.player.energy / Game.player.maxEnergy * 100) + '%';
+    document.getElementById('hunger-bar').style.width = (Game.player.hunger / Game.player.maxHunger * 100) + '%';
+    document.getElementById('thirst-bar').style.width = (Game.player.thirst / Game.player.maxThirst * 100) + '%';
+    document.getElementById('count-food').textContent = Game.player.inventory.food;
+    document.getElementById('count-water').textContent = Game.player.inventory.water;
+    document.getElementById('slot-food').classList.toggle('has-item', Game.player.inventory.food > 0);
+    document.getElementById('slot-water').classList.toggle('has-item', Game.player.inventory.water > 0);
+}
+
+const minimapCanvas = document.getElementById('minimap-canvas');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+function updateMinimap() {
+    const ctx = minimapCtx;
+    const w = minimapCanvas.width;
+    const h = minimapCanvas.height;
+    ctx.fillStyle = '#1a3a1a';
+    ctx.fillRect(0, 0, w, h);
+    const scale = w / 200;
+    const px = w / 2 + player.mesh.position.x * scale;
+    const pz = h / 2 + player.mesh.position.z * scale;
+    Game.objects.forEach(obj => {
+        if (obj.collected) return;
+        const ox = w / 2 + obj.mesh.position.x * scale;
+        const oz = h / 2 + obj.mesh.position.z * scale;
+        ctx.fillStyle = obj.type === 'food' ? '#ff6644' : '#4488ff';
+        ctx.fillRect(ox - 2, oz - 2, 4, 4);
+    });
+    Game.enemies.forEach(enemy => {
+        if (enemy.dead) return;
+        const ex = w / 2 + enemy.mesh.position.x * scale;
+        const ez = h / 2 + enemy.mesh.position.z * scale;
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(ex - 3, ez - 3, 6, 6);
+    });
+    ctx.fillStyle = '#00ff88';
+    ctx.beginPath();
+    ctx.arc(px, pz, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#00ff88';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(px, pz);
+    ctx.lineTo(px + Math.sin(player.mesh.rotation.y) * 10, pz + Math.cos(player.mesh.rotation.y) * 10);
+    ctx.stroke();
+}
+
+let lastTime = performance.now();
+
+function gameLoop() {
+    requestAnimationFrame(gameLoop);
+    const now = performance.now();
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+    Game.time += dt;
+
+    player.update(dt, input);
+    updateCamera();
+    Game.objects.forEach(obj => obj.update(Game.time));
+    Game.enemies.forEach(enemy => enemy.update(dt, player.mesh.position));
+    updateUI();
+    updateMinimap();
+
+    renderer.render(scene, camera);
+}
+
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+gameLoop();
+</script>
 </body>
 </html>
