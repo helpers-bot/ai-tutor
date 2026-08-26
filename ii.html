@@ -180,7 +180,7 @@ canvas { display: block; }
 <div id="game-container"></div>
 
 <div class="game-ui" id="game-ui">
-    <h2>Навыки ИИ (нажми 1-6 для обучения)</h2>
+    <h2 id="ui-title">Навыки ИИ</h2>
     <div class="skill-item" id="skill-row-walk" data-skill="walk">
         <div class="skill-key">1</div>
         <div class="skill-icon">🚶</div>
@@ -542,7 +542,6 @@ class PlayerCharacter {
         const eyePupilMat = new THREE.MeshStandardMaterial({ color: 0x221100, roughness: 0.3 });
         const mouthMat = new THREE.MeshStandardMaterial({ color: 0xcc6666, roughness: 0.5 });
 
-        // Туловище (единое, без разрыва с ногами)
         const torsoGeo = new THREE.BoxGeometry(0.42, 0.75, 0.26);
         const torso = new THREE.Mesh(torsoGeo, clothesMat);
         torso.position.y = 1.35;
@@ -550,53 +549,42 @@ class PlayerCharacter {
         this.mesh.add(torso);
         this.torso = torso;
 
-        // Грудь
         const chest = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.3, 0.28), clothesMat);
         chest.position.y = 1.88;
         chest.castShadow = true;
         this.mesh.add(chest);
         this.chest = chest;
 
-        // Шея
         const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.15), skinMat);
         neck.position.y = 2.12;
         this.mesh.add(neck);
 
-        // Голова
         const head = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.28, 0.26), skinMat);
         head.position.y = 2.32;
         head.castShadow = true;
         this.mesh.add(head);
         this.head = head;
 
-        // Волосы
         const hair = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.1, 0.28), new THREE.MeshStandardMaterial({ color: 0x221100 }));
         hair.position.y = 2.52;
         this.mesh.add(hair);
 
-        // === ЛИЦО ===
-        // Левый глаз (белок)
         const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), eyeWhiteMat);
         eyeL.position.set(0.06, 2.35, 0.14);
         this.mesh.add(eyeL);
-        // Левый зрачок
         const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyePupilMat);
         pupilL.position.set(0.06, 2.35, 0.17);
         this.mesh.add(pupilL);
-        // Правый глаз (белок)
         const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), eyeWhiteMat);
         eyeR.position.set(-0.06, 2.35, 0.14);
         this.mesh.add(eyeR);
-        // Правый зрачок
         const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyePupilMat);
         pupilR.position.set(-0.06, 2.35, 0.17);
         this.mesh.add(pupilR);
-        // Рот
         const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 0.01), mouthMat);
         mouth.position.set(0, 2.22, 0.14);
         this.mesh.add(mouth);
 
-        // Руки
         this.armL = this.createLimb(0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
         this.armR = this.createLimb(-0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
         this.forearmL = this.createLimb(0.32, 1.25, 0, 0.07, 0.3, skinMat, null);
@@ -609,7 +597,6 @@ class PlayerCharacter {
         this.handR.position.set(-0.32, 0.95, 0);
         this.mesh.add(this.handR);
 
-        // Ноги — присоединены к туловищу без разрыва (y = 0.95, верх ноги)
         this.legL = this.createLimb(0.12, 0.95, 0, 0.12, 0.4, pantsMat, null);
         this.legR = this.createLimb(-0.12, 0.95, 0, 0.12, 0.4, pantsMat, null);
         this.shinL = this.createLimb(0.12, 0.55, 0, 0.1, 0.35, pantsMat, null);
@@ -651,9 +638,7 @@ class PlayerCharacter {
             this.velocity.y -= 25 * dt;
         }
 
-        // === ДВИЖЕНИЕ: даже 1% позволяет ходить, но очень плохо ===
         let moveSpeed = 0;
-        // Базовая скорость: минимум 0.3 даже при 1%, максимум 6 при 100%
         const baseSpeed = 0.3 + (walkSkill / 100) * 5.7;
         const isRunning = input.keys.shift && runSkill > 0;
         const runMult = isRunning ? (1 + runSkill / 100) : 1;
@@ -665,7 +650,6 @@ class PlayerCharacter {
         if (input.keys.a) moveDir.x -= 1;
         if (input.keys.d) moveDir.x += 1;
 
-        // Шанс споткнуться: выше при низком навыке
         const stumbleChance = walkSkill < 30 ? (30 - walkSkill) * 0.0008 : 0;
         const fallChance = walkSkill < 10 ? (10 - walkSkill) * 0.001 : 0;
 
@@ -733,7 +717,6 @@ class PlayerCharacter {
                 let rotDiff = targetRot - this.mesh.rotation.y;
                 while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
                 while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-                // Поворот зависит от навыка: при 1% поворот очень медленный и неуверенный
                 const turnSpeed = 2 + (walkSkill / 100) * 10;
                 this.mesh.rotation.y += rotDiff * turnSpeed * dt;
 
@@ -746,11 +729,8 @@ class PlayerCharacter {
             }
 
             if (!this.isStumbling && !this.isFallen) {
-                // Анимация ходьбы зависит от навыка
                 const animSpeed = moveSpeed * (2 + walkSkill / 50);
                 const legAmp = 0.15 + (walkSkill / 100) * 0.55;
-
-                // При низком навыке — неровная, неуверенная походка
                 const wobble = walkSkill < 20 ? Math.sin(this.animTime * 4) * 0.08 * (20 - walkSkill) / 20 : 0;
 
                 this.legL.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp + wobble;
@@ -760,7 +740,6 @@ class PlayerCharacter {
                 this.armL.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * legAmp * 0.7;
                 this.armR.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp * 0.7;
 
-                // Неуверенная походка при низком навыке
                 if (walkSkill < 30) {
                     this.mesh.rotation.z = Math.sin(this.animTime * 3) * 0.06 * (30 - walkSkill) / 30;
                     this.mesh.position.y = Math.abs(Math.sin(this.animTime * 6)) * 0.03 * (30 - walkSkill) / 30;
@@ -784,7 +763,6 @@ class PlayerCharacter {
             Game.player.energy = Math.min(Game.player.maxEnergy, Game.player.energy + 0.02);
         }
 
-        // Прыжок: зависит от навыка
         if (input.keys.space && this.isGrounded) {
             const jumpPower = 1 + (jumpSkill / 100) * 14;
             this.velocity.y = jumpPower;
@@ -803,7 +781,6 @@ class PlayerCharacter {
         pos.x = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.x));
         pos.z = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.z));
 
-        // Атака: зависит от навыка
         if (this.attackCooldown > 0) this.attackCooldown -= dt;
         if (input.mouseDown && this.attackCooldown <= 0) {
             this.attack();
@@ -843,13 +820,10 @@ class PlayerCharacter {
     attack() {
         this.isAttacking = true;
         const combatSkill = Game.skills.combat.progress;
-        // Кулдаун зависит от навыка
         this.attackCooldown = Math.max(0.2, 1.0 - combatSkill / 100);
         const punchSide = Math.random() > 0.5 ? 'right' : 'left';
         const arm = punchSide === 'right' ? this.armR : this.armL;
         const forearm = punchSide === 'right' ? this.forearmR : this.forearmL;
-
-        // Точность удара зависит от навыка
         const accuracy = combatSkill / 100;
         arm.rotation.x = -1.5 + (1 - accuracy) * (Math.random() - 0.5);
         forearm.rotation.x = -1.2 + (1 - accuracy) * (Math.random() - 0.5);
@@ -869,7 +843,6 @@ class PlayerCharacter {
             const dist = enemy.mesh.position.distanceTo(attackPos);
             const enemyDir = enemy.mesh.position.clone().sub(attackPos).normalize();
             const angle = attackDir.angleTo(enemyDir);
-            // Угол попадания зависит от навыка
             const hitAngle = Math.PI / 2 - (combatSkill / 100) * Math.PI / 6;
             if (dist < 3.5 && angle < hitAngle) {
                 const dmg = 2 + (combatSkill / 100) * 28;
@@ -925,7 +898,6 @@ const player = new PlayerCharacter();
 
 const input = { keys: {}, mouseDown: false };
 
-// Переключение обучения по клавишам 1-6
 function toggleTraining(skillKey) {
     const skill = Game.skills[skillKey];
     skill.training = !skill.training;
@@ -939,6 +911,17 @@ function toggleTraining(skillKey) {
         statusEl.classList.remove('training');
         rowEl.classList.remove('active');
         showNotification('Обучение', skill.name + ' — обучение остановлено');
+    }
+    updateTrainingTitle();
+}
+
+function updateTrainingTitle() {
+    const anyTraining = Object.values(Game.skills).some(s => s.training);
+    const titleEl = document.getElementById('ui-title');
+    if (anyTraining) {
+        titleEl.textContent = 'Навыки ИИ — обучение идёт';
+    } else {
+        titleEl.textContent = 'Навыки ИИ';
     }
 }
 
@@ -960,11 +943,13 @@ document.addEventListener('keyup', (e) => {
 document.addEventListener('mousedown', () => input.mouseDown = true);
 document.addEventListener('mouseup', () => input.mouseDown = false);
 
+// === Камера как в CS — вращение вокруг персонажа, без опускания под землю ===
 document.addEventListener('mousemove', (e) => {
     if (document.pointerLockElement === container) {
         Game.cameraYaw -= e.movementX * 0.002;
         Game.cameraPitch -= e.movementY * 0.002;
-        Game.cameraPitch = Math.max(-0.3, Math.min(0.6, Game.cameraPitch));
+        // Ограничиваем pitch: не смотрим под землю и не слишком вверх
+        Game.cameraPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, Game.cameraPitch));
     }
 });
 
@@ -974,14 +959,18 @@ container.addEventListener('click', () => {
 
 function updateCamera() {
     const pos = player.mesh.position;
-    const dist = 6 + Math.cos(Game.cameraPitch) * 2;
-    const height = 2 + Math.sin(Game.cameraPitch) * 4;
+    const dist = 6;
 
-    const camX = pos.x + Math.sin(Game.cameraYaw) * dist;
-    const camZ = pos.z + Math.cos(Game.cameraYaw) * dist;
-    const camY = pos.y + height;
+    // Камера вращается вокруг персонажа по сфере
+    const camX = pos.x + Math.sin(Game.cameraYaw) * Math.cos(Game.cameraPitch) * dist;
+    const camY = pos.y + 1.5 + Math.sin(Game.cameraPitch) * dist;
+    const camZ = pos.z + Math.cos(Game.cameraYaw) * Math.cos(Game.cameraPitch) * dist;
 
-    camera.position.set(camX, camY, camZ);
+    // Не опускаем камеру ниже уровня земли + небольшой отступ
+    const minCameraY = 0.5;
+    const finalCamY = Math.max(minCameraY, camY);
+
+    camera.position.set(camX, finalCamY, camZ);
     camera.lookAt(pos.x, pos.y + 1.2, pos.z);
 }
 
@@ -1055,12 +1044,12 @@ function gameLoop() {
     lastTime = now;
     Game.time += dt;
 
-    // === Постепенное обучение навыкам ===
+    // === Постепенное обучение: 1 минута = 1% ===
+    // 1% за 60 секунд = 0.01667% в секунду = 0.0002778% в кадре (при 60fps)
+    const learnRatePerSecond = 1 / 60; // 1% за 60 секунд
     for (const [key, skill] of Object.entries(Game.skills)) {
         if (skill.training && skill.progress < 100) {
-            // Скорость обучения зависит от текущего прогресса: чем выше, тем медленнее
-            const learnRate = 0.3 * (1 - skill.progress / 150);
-            skill.progress = Math.min(100, skill.progress + learnRate * dt);
+            skill.progress = Math.min(100, skill.progress + learnRatePerSecond * dt);
         }
     }
 
