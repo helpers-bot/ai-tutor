@@ -14,7 +14,7 @@ canvas { display: block; }
     position: fixed; top: 20px; left: 20px;
     background: rgba(10, 15, 30, 0.92);
     border: 1px solid rgba(0, 200, 255, 0.3);
-    border-radius: 16px; padding: 15px; min-width: 280px;
+    border-radius: 16px; padding: 15px; min-width: 340px;
     backdrop-filter: blur(12px); z-index: 100;
     box-shadow: 0 8px 32px rgba(0, 150, 255, 0.15);
 }
@@ -26,6 +26,17 @@ canvas { display: block; }
 .skill-item {
     display: flex; align-items: center; margin: 8px 0;
     font-size: 12px; color: #aaccdd;
+    cursor: pointer;
+    transition: background 0.2s;
+    padding: 4px 6px;
+    border-radius: 8px;
+}
+.skill-item:hover {
+    background: rgba(0, 200, 255, 0.1);
+}
+.skill-item.active {
+    background: rgba(0, 200, 255, 0.2);
+    border: 1px solid rgba(0, 200, 255, 0.4);
 }
 .skill-icon {
     width: 24px; height: 24px; border-radius: 6px;
@@ -45,6 +56,31 @@ canvas { display: block; }
 .skill-value {
     width: 35px; text-align: right; font-size: 11px;
     color: #00ff88; font-family: monospace; margin-left: 5px;
+}
+.skill-key {
+    width: 20px; height: 20px;
+    background: rgba(0, 200, 255, 0.2);
+    border: 1px solid rgba(0, 200, 255, 0.4);
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: bold; color: #00d4ff;
+    margin-right: 8px;
+}
+.skill-status {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-left: 6px;
+    background: #333;
+    transition: background 0.3s;
+}
+.skill-status.training {
+    background: #00ff88;
+    box-shadow: 0 0 6px #00ff88;
+    animation: pulse 0.8s infinite alternate;
+}
+@keyframes pulse {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
 }
 .inventory {
     position: fixed; bottom: 20px; left: 50%;
@@ -138,47 +174,60 @@ canvas { display: block; }
     }
 }
 </script>
+<base target="_blank">
 </head>
 <body>
 <div id="game-container"></div>
 
 <div class="game-ui" id="game-ui">
-    <h2>Навыки ИИ (обучение идёт)</h2>
-    <div class="skill-item">
+    <h2>Навыки ИИ (нажми 1-6 для обучения)</h2>
+    <div class="skill-item" id="skill-row-walk" data-skill="walk">
+        <div class="skill-key">1</div>
         <div class="skill-icon">🚶</div>
         <span>Ходьба</span>
         <div class="skill-bar"><div class="skill-bar-fill" id="skill-walk"></div></div>
         <div class="skill-value" id="val-walk">0%</div>
+        <div class="skill-status" id="status-walk"></div>
     </div>
-    <div class="skill-item">
+    <div class="skill-item" id="skill-row-run" data-skill="run">
+        <div class="skill-key">2</div>
         <div class="skill-icon">🏃</div>
         <span>Бег</span>
         <div class="skill-bar"><div class="skill-bar-fill" id="skill-run"></div></div>
         <div class="skill-value" id="val-run">0%</div>
+        <div class="skill-status" id="status-run"></div>
     </div>
-    <div class="skill-item">
+    <div class="skill-item" id="skill-row-jump" data-skill="jump">
+        <div class="skill-key">3</div>
         <div class="skill-icon">🦘</div>
         <span>Прыжок</span>
         <div class="skill-bar"><div class="skill-bar-fill" id="skill-jump"></div></div>
         <div class="skill-value" id="val-jump">0%</div>
+        <div class="skill-status" id="status-jump"></div>
     </div>
-    <div class="skill-item">
+    <div class="skill-item" id="skill-row-eat" data-skill="eat">
+        <div class="skill-key">4</div>
         <div class="skill-icon">🍖</div>
         <span>Питание</span>
         <div class="skill-bar"><div class="skill-bar-fill" id="skill-eat"></div></div>
         <div class="skill-value" id="val-eat">0%</div>
+        <div class="skill-status" id="status-eat"></div>
     </div>
-    <div class="skill-item">
+    <div class="skill-item" id="skill-row-drink" data-skill="drink">
+        <div class="skill-key">5</div>
         <div class="skill-icon">💧</div>
         <span>Питьё</span>
         <div class="skill-bar"><div class="skill-bar-fill" id="skill-drink"></div></div>
         <div class="skill-value" id="val-drink">0%</div>
+        <div class="skill-status" id="status-drink"></div>
     </div>
-    <div class="skill-item">
+    <div class="skill-item" id="skill-row-combat" data-skill="combat">
+        <div class="skill-key">6</div>
         <div class="skill-icon">👊</div>
         <span>Бой</span>
         <div class="skill-bar"><div class="skill-bar-fill" id="skill-combat"></div></div>
         <div class="skill-value" id="val-combat">0%</div>
+        <div class="skill-status" id="status-combat"></div>
     </div>
 </div>
 
@@ -220,7 +269,7 @@ canvas { display: block; }
 </div>
 
 <div class="controls-hint" id="controls-hint">
-    КЛИКНИТЕ ЭКРАН чтобы захватить мышь | WASD — движение | Мышь — камера | Пробел — прыжок | ЛКМ — удар | E — собрать/использовать | Shift — бег
+    КЛИКНИТЕ ЭКРАН чтобы захватить мышь | WASD — движение | Мышь — камера | Пробел — прыжок | ЛКМ — удар | E — собрать/использовать | Shift — бег | 1-6 — вкл/выкл обучение
 </div>
 
 <div class="stumble-effect" id="stumble-effect"></div>
@@ -231,12 +280,12 @@ import * as THREE from 'three';
 
 const Game = {
     skills: {
-        walk: { progress: 0, max: 100, name: 'Ходьба' },
-        run: { progress: 0, max: 100, name: 'Бег' },
-        jump: { progress: 0, max: 100, name: 'Прыжок' },
-        eat: { progress: 0, max: 100, name: 'Питание' },
-        drink: { progress: 0, max: 100, name: 'Питьё' },
-        combat: { progress: 0, max: 100, name: 'Бой' }
+        walk: { progress: 0, max: 100, name: 'Ходьба', training: false },
+        run: { progress: 0, max: 100, name: 'Бег', training: false },
+        jump: { progress: 0, max: 100, name: 'Прыжок', training: false },
+        eat: { progress: 0, max: 100, name: 'Питание', training: false },
+        drink: { progress: 0, max: 100, name: 'Питьё', training: false },
+        combat: { progress: 0, max: 100, name: 'Бой', training: false }
     },
     player: {
         hp: 100, maxHp: 100,
@@ -466,7 +515,8 @@ for (let i = 0; i < 8; i++) {
     const z = (Math.random() - 0.5) * 80;
     if (Math.abs(x) > 15 || Math.abs(z) > 15) Game.enemies.push(new Enemy(x, z));
 }
-    class PlayerCharacter {
+
+class PlayerCharacter {
     constructor() {
         this.mesh = new THREE.Group();
         this.velocity = new THREE.Vector3();
@@ -488,39 +538,65 @@ for (let i = 0; i < 8; i++) {
         const skinMat = new THREE.MeshStandardMaterial({ color: 0xffdbac, roughness: 0.6 });
         const clothesMat = new THREE.MeshStandardMaterial({ color: 0x3366aa, roughness: 0.7 });
         const pantsMat = new THREE.MeshStandardMaterial({ color: 0x333344, roughness: 0.8 });
+        const eyeWhiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const eyePupilMat = new THREE.MeshStandardMaterial({ color: 0x221100, roughness: 0.3 });
+        const mouthMat = new THREE.MeshStandardMaterial({ color: 0xcc6666, roughness: 0.5 });
 
-        const pelvis = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.2, 0.25), pantsMat);
-        pelvis.position.y = 1.0;
-        pelvis.castShadow = true;
-        this.mesh.add(pelvis);
-        this.pelvis = pelvis;
-
-        const torso = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.5, 0.25), clothesMat);
+        // Туловище (единое, без разрыва с ногами)
+        const torsoGeo = new THREE.BoxGeometry(0.42, 0.75, 0.26);
+        const torso = new THREE.Mesh(torsoGeo, clothesMat);
         torso.position.y = 1.35;
         torso.castShadow = true;
         this.mesh.add(torso);
         this.torso = torso;
 
+        // Грудь
         const chest = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.3, 0.28), clothesMat);
-        chest.position.y = 1.75;
+        chest.position.y = 1.88;
         chest.castShadow = true;
         this.mesh.add(chest);
         this.chest = chest;
 
+        // Шея
         const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.15), skinMat);
-        neck.position.y = 2.0;
+        neck.position.y = 2.12;
         this.mesh.add(neck);
 
-        const head = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 0.24), skinMat);
-        head.position.y = 2.2;
+        // Голова
+        const head = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.28, 0.26), skinMat);
+        head.position.y = 2.32;
         head.castShadow = true;
         this.mesh.add(head);
         this.head = head;
 
-        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.08, 0.26), new THREE.MeshStandardMaterial({ color: 0x221100 }));
-        hair.position.y = 2.38;
+        // Волосы
+        const hair = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.1, 0.28), new THREE.MeshStandardMaterial({ color: 0x221100 }));
+        hair.position.y = 2.52;
         this.mesh.add(hair);
 
+        // === ЛИЦО ===
+        // Левый глаз (белок)
+        const eyeL = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), eyeWhiteMat);
+        eyeL.position.set(0.06, 2.35, 0.14);
+        this.mesh.add(eyeL);
+        // Левый зрачок
+        const pupilL = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyePupilMat);
+        pupilL.position.set(0.06, 2.35, 0.17);
+        this.mesh.add(pupilL);
+        // Правый глаз (белок)
+        const eyeR = new THREE.Mesh(new THREE.SphereGeometry(0.05, 8, 8), eyeWhiteMat);
+        eyeR.position.set(-0.06, 2.35, 0.14);
+        this.mesh.add(eyeR);
+        // Правый зрачок
+        const pupilR = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyePupilMat);
+        pupilR.position.set(-0.06, 2.35, 0.17);
+        this.mesh.add(pupilR);
+        // Рот
+        const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.02, 0.01), mouthMat);
+        mouth.position.set(0, 2.22, 0.14);
+        this.mesh.add(mouth);
+
+        // Руки
         this.armL = this.createLimb(0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
         this.armR = this.createLimb(-0.32, 1.6, 0, 0.08, 0.35, skinMat, clothesMat);
         this.forearmL = this.createLimb(0.32, 1.25, 0, 0.07, 0.3, skinMat, null);
@@ -533,10 +609,11 @@ for (let i = 0; i < 8; i++) {
         this.handR.position.set(-0.32, 0.95, 0);
         this.mesh.add(this.handR);
 
-        this.legL = this.createLimb(0.12, 0.6, 0, 0.12, 0.4, pantsMat, null);
-        this.legR = this.createLimb(-0.12, 0.6, 0, 0.12, 0.4, pantsMat, null);
-        this.shinL = this.createLimb(0.12, 0.2, 0, 0.1, 0.35, pantsMat, null);
-        this.shinR = this.createLimb(-0.12, 0.2, 0, 0.1, 0.35, pantsMat, null);
+        // Ноги — присоединены к туловищу без разрыва (y = 0.95, верх ноги)
+        this.legL = this.createLimb(0.12, 0.95, 0, 0.12, 0.4, pantsMat, null);
+        this.legR = this.createLimb(-0.12, 0.95, 0, 0.12, 0.4, pantsMat, null);
+        this.shinL = this.createLimb(0.12, 0.55, 0, 0.1, 0.35, pantsMat, null);
+        this.shinR = this.createLimb(-0.12, 0.55, 0, 0.1, 0.35, pantsMat, null);
 
         this.footL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.08, 0.22), new THREE.MeshStandardMaterial({ color: 0x111111 }));
         this.footL.position.set(0.12, 0.04, 0.05);
@@ -561,7 +638,8 @@ for (let i = 0; i < 8; i++) {
         this.mesh.add(group);
         return group;
     }
-            update(dt, input) {
+
+    update(dt, input) {
         this.animTime += dt;
         const pos = this.mesh.position;
         const walkSkill = Game.skills.walk.progress;
@@ -573,13 +651,13 @@ for (let i = 0; i < 8; i++) {
             this.velocity.y -= 25 * dt;
         }
 
+        // === ДВИЖЕНИЕ: даже 1% позволяет ходить, но очень плохо ===
         let moveSpeed = 0;
-        if (walkSkill > 0) {
-            const baseSpeed = 0.5 + (walkSkill / 100) * 5;
-            const isRunning = input.keys.shift && runSkill > 0;
-            const runMult = isRunning ? (1 + runSkill / 100) : 1;
-            moveSpeed = baseSpeed * runMult;
-        }
+        // Базовая скорость: минимум 0.3 даже при 1%, максимум 6 при 100%
+        const baseSpeed = 0.3 + (walkSkill / 100) * 5.7;
+        const isRunning = input.keys.shift && runSkill > 0;
+        const runMult = isRunning ? (1 + runSkill / 100) : 1;
+        moveSpeed = baseSpeed * runMult;
 
         const moveDir = new THREE.Vector3();
         if (input.keys.w) moveDir.z -= 1;
@@ -587,6 +665,7 @@ for (let i = 0; i < 8; i++) {
         if (input.keys.a) moveDir.x -= 1;
         if (input.keys.d) moveDir.x += 1;
 
+        // Шанс споткнуться: выше при низком навыке
         const stumbleChance = walkSkill < 30 ? (30 - walkSkill) * 0.0008 : 0;
         const fallChance = walkSkill < 10 ? (10 - walkSkill) * 0.001 : 0;
 
@@ -635,7 +714,7 @@ for (let i = 0; i < 8; i++) {
             return;
         }
 
-        if (moveDir.length() > 0 && moveSpeed > 0) {
+        if (moveDir.length() > 0) {
             moveDir.normalize();
 
             const camDir = new THREE.Vector3();
@@ -654,7 +733,9 @@ for (let i = 0; i < 8; i++) {
                 let rotDiff = targetRot - this.mesh.rotation.y;
                 while (rotDiff > Math.PI) rotDiff -= Math.PI * 2;
                 while (rotDiff < -Math.PI) rotDiff += Math.PI * 2;
-                this.mesh.rotation.y += rotDiff * 8 * dt;
+                // Поворот зависит от навыка: при 1% поворот очень медленный и неуверенный
+                const turnSpeed = 2 + (walkSkill / 100) * 10;
+                this.mesh.rotation.y += rotDiff * turnSpeed * dt;
 
                 this.velocity.x = worldDir.x * moveSpeed;
                 this.velocity.z = worldDir.z * moveSpeed;
@@ -665,17 +746,24 @@ for (let i = 0; i < 8; i++) {
             }
 
             if (!this.isStumbling && !this.isFallen) {
-                const animSpeed = moveSpeed * 2.5;
-                const legAmp = 0.3 + (walkSkill / 100) * 0.4;
-                this.legL.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp;
-                this.legR.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * legAmp;
+                // Анимация ходьбы зависит от навыка
+                const animSpeed = moveSpeed * (2 + walkSkill / 50);
+                const legAmp = 0.15 + (walkSkill / 100) * 0.55;
+
+                // При низком навыке — неровная, неуверенная походка
+                const wobble = walkSkill < 20 ? Math.sin(this.animTime * 4) * 0.08 * (20 - walkSkill) / 20 : 0;
+
+                this.legL.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp + wobble;
+                this.legR.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * legAmp - wobble;
                 this.shinL.rotation.x = Math.max(0, Math.sin(this.animTime * animSpeed)) * legAmp * 0.8;
                 this.shinR.rotation.x = Math.max(0, Math.sin(this.animTime * animSpeed + Math.PI)) * legAmp * 0.8;
                 this.armL.rotation.x = Math.sin(this.animTime * animSpeed + Math.PI) * legAmp * 0.7;
                 this.armR.rotation.x = Math.sin(this.animTime * animSpeed) * legAmp * 0.7;
 
-                if (walkSkill < 20) {
-                    this.mesh.rotation.z = Math.sin(this.animTime * 3) * 0.05 * (20 - walkSkill) / 20;
+                // Неуверенная походка при низком навыке
+                if (walkSkill < 30) {
+                    this.mesh.rotation.z = Math.sin(this.animTime * 3) * 0.06 * (30 - walkSkill) / 30;
+                    this.mesh.position.y = Math.abs(Math.sin(this.animTime * 6)) * 0.03 * (30 - walkSkill) / 30;
                 }
             }
 
@@ -690,13 +778,15 @@ for (let i = 0; i < 8; i++) {
             this.armL.rotation.x *= 0.9;
             this.armR.rotation.x *= 0.9;
             this.mesh.rotation.z *= 0.9;
+            this.mesh.position.y *= 0.9;
             this.armL.rotation.z = Math.sin(this.animTime * 2) * 0.05;
             this.armR.rotation.z = -Math.sin(this.animTime * 2) * 0.05;
             Game.player.energy = Math.min(Game.player.maxEnergy, Game.player.energy + 0.02);
         }
 
-        if (input.keys.space && this.isGrounded && jumpSkill > 0) {
-            const jumpPower = 3 + (jumpSkill / 100) * 12;
+        // Прыжок: зависит от навыка
+        if (input.keys.space && this.isGrounded) {
+            const jumpPower = 1 + (jumpSkill / 100) * 14;
             this.velocity.y = jumpPower;
             this.isGrounded = false;
             Game.player.energy -= 3;
@@ -713,8 +803,9 @@ for (let i = 0; i < 8; i++) {
         pos.x = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.x));
         pos.z = Math.max(-Game.worldSize, Math.min(Game.worldSize, pos.z));
 
+        // Атака: зависит от навыка
         if (this.attackCooldown > 0) this.attackCooldown -= dt;
-        if (input.mouseDown && this.attackCooldown <= 0 && combatSkill > 0) {
+        if (input.mouseDown && this.attackCooldown <= 0) {
             this.attack();
         }
 
@@ -734,8 +825,6 @@ for (let i = 0; i < 8; i++) {
             Game.player.hp = 50;
             pos.set(0, 0, 0);
         }
-
-        this.trainSkills(dt, moveDir.length() > 0 && moveSpeed > 0);
     }
 
     stumble() {
@@ -751,34 +840,20 @@ for (let i = 0; i < 8; i++) {
         showNotification('Упал!', 'ИИ ещё не уверенно ходит...');
     }
 
-    trainSkills(dt, isMoving) {
-        if (isMoving && Game.skills.walk.progress < 100) {
-            Game.skills.walk.progress += dt * 1.5;
-            if (Game.skills.walk.progress > 100) Game.skills.walk.progress = 100;
-        }
-        if (isMoving && input.keys.shift && Game.skills.run.progress < 100) {
-            Game.skills.run.progress += dt * 1.2;
-            if (Game.skills.run.progress > 100) Game.skills.run.progress = 100;
-        }
-        if (!this.isGrounded && Game.skills.jump.progress < 100) {
-            Game.skills.jump.progress += dt * 2;
-            if (Game.skills.jump.progress > 100) Game.skills.jump.progress = 100;
-        }
-        if (this.isAttacking && Game.skills.combat.progress < 100) {
-            Game.skills.combat.progress += dt * 4;
-            if (Game.skills.combat.progress > 100) Game.skills.combat.progress = 100;
-        }
-    }
-
     attack() {
         this.isAttacking = true;
         const combatSkill = Game.skills.combat.progress;
-        this.attackCooldown = Math.max(0.3, 0.8 - combatSkill / 200);
+        // Кулдаун зависит от навыка
+        this.attackCooldown = Math.max(0.2, 1.0 - combatSkill / 100);
         const punchSide = Math.random() > 0.5 ? 'right' : 'left';
         const arm = punchSide === 'right' ? this.armR : this.armL;
         const forearm = punchSide === 'right' ? this.forearmR : this.forearmL;
-        arm.rotation.x = -1.5;
-        forearm.rotation.x = -1.2;
+
+        // Точность удара зависит от навыка
+        const accuracy = combatSkill / 100;
+        arm.rotation.x = -1.5 + (1 - accuracy) * (Math.random() - 0.5);
+        forearm.rotation.x = -1.2 + (1 - accuracy) * (Math.random() - 0.5);
+
         setTimeout(() => {
             arm.rotation.x = 0;
             forearm.rotation.x = 0;
@@ -794,11 +869,13 @@ for (let i = 0; i < 8; i++) {
             const dist = enemy.mesh.position.distanceTo(attackPos);
             const enemyDir = enemy.mesh.position.clone().sub(attackPos).normalize();
             const angle = attackDir.angleTo(enemyDir);
-            if (dist < 3.5 && angle < Math.PI / 3) {
-                const dmg = 5 + (combatSkill / 100) * 25;
+            // Угол попадания зависит от навыка
+            const hitAngle = Math.PI / 2 - (combatSkill / 100) * Math.PI / 6;
+            if (dist < 3.5 && angle < hitAngle) {
+                const dmg = 2 + (combatSkill / 100) * 28;
                 enemy.takeDamage(dmg);
                 const knockDir = enemy.mesh.position.clone().sub(attackPos).normalize();
-                enemy.mesh.position.add(knockDir.multiplyScalar(2 + combatSkill / 30));
+                enemy.mesh.position.add(knockDir.multiplyScalar(1 + combatSkill / 20));
             }
         });
     }
@@ -812,19 +889,11 @@ for (let i = 0; i < 8; i++) {
             const dist = obj.mesh.position.distanceTo(pos);
             if (dist < 3) {
                 if (obj.type === 'food') {
-                    if (Game.skills.eat.progress < 100) {
-                        Game.skills.eat.progress += 15;
-                        if (Game.skills.eat.progress > 100) Game.skills.eat.progress = 100;
-                    }
                     obj.collect();
                     Game.player.inventory.food++;
                     showNotification('Собрано!', 'Еда в инвентаре. Нажми E чтобы съесть.');
                     interacted = true;
                 } else if (obj.type === 'water') {
-                    if (Game.skills.drink.progress < 100) {
-                        Game.skills.drink.progress += 15;
-                        if (Game.skills.drink.progress > 100) Game.skills.drink.progress = 100;
-                    }
                     obj.collect();
                     Game.player.inventory.water++;
                     showNotification('Собрано!', 'Вода в инвентаре. Нажми E чтобы выпить.');
@@ -855,8 +924,35 @@ for (let i = 0; i < 8; i++) {
 const player = new PlayerCharacter();
 
 const input = { keys: {}, mouseDown: false };
+
+// Переключение обучения по клавишам 1-6
+function toggleTraining(skillKey) {
+    const skill = Game.skills[skillKey];
+    skill.training = !skill.training;
+    const statusEl = document.getElementById('status-' + skillKey);
+    const rowEl = document.getElementById('skill-row-' + skillKey);
+    if (skill.training) {
+        statusEl.classList.add('training');
+        rowEl.classList.add('active');
+        showNotification('Обучение', skill.name + ' — обучение запущено');
+    } else {
+        statusEl.classList.remove('training');
+        rowEl.classList.remove('active');
+        showNotification('Обучение', skill.name + ' — обучение остановлено');
+    }
+}
+
 document.addEventListener('keydown', (e) => {
     input.keys[e.key.toLowerCase()] = true;
+
+    switch(e.key) {
+        case '1': toggleTraining('walk'); break;
+        case '2': toggleTraining('run'); break;
+        case '3': toggleTraining('jump'); break;
+        case '4': toggleTraining('eat'); break;
+        case '5': toggleTraining('drink'); break;
+        case '6': toggleTraining('combat'); break;
+    }
 });
 document.addEventListener('keyup', (e) => {
     input.keys[e.key.toLowerCase()] = false;
@@ -888,7 +984,8 @@ function updateCamera() {
     camera.position.set(camX, camY, camZ);
     camera.lookAt(pos.x, pos.y + 1.2, pos.z);
 }
-    function showNotification(title, text) {
+
+function showNotification(title, text) {
     const notif = document.getElementById('notification');
     document.getElementById('notif-title').textContent = title;
     document.getElementById('notif-text').textContent = text;
@@ -957,6 +1054,15 @@ function gameLoop() {
     const dt = Math.min((now - lastTime) / 1000, 0.05);
     lastTime = now;
     Game.time += dt;
+
+    // === Постепенное обучение навыкам ===
+    for (const [key, skill] of Object.entries(Game.skills)) {
+        if (skill.training && skill.progress < 100) {
+            // Скорость обучения зависит от текущего прогресса: чем выше, тем медленнее
+            const learnRate = 0.3 * (1 - skill.progress / 150);
+            skill.progress = Math.min(100, skill.progress + learnRate * dt);
+        }
+    }
 
     player.update(dt, input);
     updateCamera();
