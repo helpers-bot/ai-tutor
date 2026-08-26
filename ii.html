@@ -164,6 +164,108 @@ canvas { display: block; }
     opacity: 0; transition: opacity 0.2s; z-index: 50;
 }
 .stumble-effect.active { opacity: 1; }
+
+/* === НАСТРОЙКИ === */
+.settings-btn {
+    position: fixed; top: 20px; right: 180px;
+    width: 36px; height: 36px;
+    background: rgba(10, 15, 30, 0.92);
+    border: 1px solid rgba(0, 200, 255, 0.3);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #00d4ff; cursor: pointer;
+    z-index: 200; backdrop-filter: blur(12px);
+    transition: all 0.3s;
+}
+.settings-btn:hover {
+    background: rgba(0, 200, 255, 0.2);
+    border-color: rgba(0, 200, 255, 0.6);
+}
+.settings-panel {
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: rgba(10, 15, 30, 0.97);
+    border: 1px solid rgba(0, 200, 255, 0.4);
+    border-radius: 20px; padding: 25px;
+    min-width: 320px;
+    backdrop-filter: blur(20px); z-index: 300;
+    box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+    opacity: 0; pointer-events: none;
+    transition: all 0.3s ease;
+}
+.settings-panel.open {
+    opacity: 1; pointer-events: all;
+    transform: translate(-50%, -50%) scale(1);
+}
+.settings-panel h3 {
+    font-size: 18px; margin-bottom: 20px;
+    background: linear-gradient(90deg, #00d4ff, #0099ff);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+.settings-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 250;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+}
+.settings-overlay.open {
+    opacity: 1; pointer-events: all;
+}
+.setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 15px 0;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.setting-row:last-child {
+    border-bottom: none;
+}
+.setting-label {
+    font-size: 14px; color: #aaccdd;
+}
+.setting-desc {
+    font-size: 11px; color: #6688aa;
+    margin-top: 2px;
+}
+.toggle-switch {
+    width: 44px; height: 24px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    flex-shrink: 0;
+}
+.toggle-switch.on {
+    background: #00ff88;
+}
+.toggle-switch::after {
+    content: '';
+    position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+.toggle-switch.on::after {
+    transform: translateX(20px);
+}
+.settings-close {
+    display: block; width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background: linear-gradient(90deg, #00d4ff, #0099ff);
+    border: none; border-radius: 10px;
+    color: #fff; font-size: 14px; font-weight: bold;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.settings-close:hover {
+    opacity: 0.8;
+}
 </style>
 
 <script type="importmap">
@@ -269,10 +371,43 @@ canvas { display: block; }
 </div>
 
 <div class="controls-hint" id="controls-hint">
-    КЛИКНИТЕ ЭКРАН чтобы захватить мышь | WASD — движение | Мышь — камера | Пробел — прыжок | ЛКМ — удар | E — собрать/использовать | Shift — бег | 1-6 — вкл/выкл обучение
+    КЛИКНИТЕ ЭКРАН чтобы захватить мышь | WASD — движение | Мышь — камера | Пробел — прыжок | ЛКМ — удар | E — собрать/использовать | Shift — бег | 1-6 — вкл/выкл обучение | Esc — настройки
 </div>
 
 <div class="stumble-effect" id="stumble-effect"></div>
+
+<!-- Кнопка настроек -->
+<div class="settings-btn" id="settings-btn" title="Настройки">⚙️</div>
+
+<!-- Оверлей настроек -->
+<div class="settings-overlay" id="settings-overlay"></div>
+
+<!-- Панель настроек -->
+<div class="settings-panel" id="settings-panel">
+    <h3>⚙️ Настройки</h3>
+    <div class="setting-row">
+        <div>
+            <div class="setting-label">Инверсия мыши по вертикали</div>
+            <div class="setting-desc">Вверх — вниз, вниз — вверх</div>
+        </div>
+        <div class="toggle-switch" id="toggle-invert-y"></div>
+    </div>
+    <div class="setting-row">
+        <div>
+            <div class="setting-label">Инверсия мыши по горизонтали</div>
+            <div class="setting-desc">Влево — вправо, вправо — влево</div>
+        </div>
+        <div class="toggle-switch" id="toggle-invert-x"></div>
+    </div>
+    <div class="setting-row">
+        <div>
+            <div class="setting-label">Чувствительность мыши</div>
+            <div class="setting-desc">Скорость поворота камеры</div>
+        </div>
+        <div class="toggle-switch" id="toggle-sens"></div>
+    </div>
+    <button class="settings-close" id="settings-close">Закрыть</button>
+</div>
 
 <script type="module">
 
@@ -299,7 +434,12 @@ const Game = {
     enemies: [],
     time: 0,
     cameraYaw: 0,
-    cameraPitch: 0.3
+    cameraPitch: 0.3,
+    settings: {
+        invertY: false,
+        invertX: false,
+        highSens: false
+    }
 };
 
 const container = document.getElementById('game-container');
@@ -510,10 +650,14 @@ class Enemy {
     }
 }
 
+// Враги спавнятся далеко от старта (минимум 40 единиц)
 for (let i = 0; i < 8; i++) {
-    const x = (Math.random() - 0.5) * 80;
-    const z = (Math.random() - 0.5) * 80;
-    if (Math.abs(x) > 15 || Math.abs(z) > 15) Game.enemies.push(new Enemy(x, z));
+    let x, z;
+    do {
+        x = (Math.random() - 0.5) * 160;
+        z = (Math.random() - 0.5) * 160;
+    } while (Math.sqrt(x*x + z*z) < 40);
+    Game.enemies.push(new Enemy(x, z));
 }
 
 class PlayerCharacter {
@@ -898,20 +1042,72 @@ const player = new PlayerCharacter();
 
 const input = { keys: {}, mouseDown: false };
 
+// === НАСТРОЙКИ ===
+const settingsPanel = document.getElementById('settings-panel');
+const settingsOverlay = document.getElementById('settings-overlay');
+const settingsBtn = document.getElementById('settings-btn');
+const settingsClose = document.getElementById('settings-close');
+
+function openSettings() {
+    settingsPanel.classList.add('open');
+    settingsOverlay.classList.add('open');
+    document.exitPointerLock();
+}
+
+function closeSettings() {
+    settingsPanel.classList.remove('open');
+    settingsOverlay.classList.remove('open');
+}
+
+settingsBtn.addEventListener('click', openSettings);
+settingsOverlay.addEventListener('click', closeSettings);
+settingsClose.addEventListener('click', closeSettings);
+
+// Тогглы настроек
+function setupToggle(id, settingKey) {
+    const el = document.getElementById(id);
+    el.addEventListener('click', () => {
+        Game.settings[settingKey] = !Game.settings[settingKey];
+        el.classList.toggle('on', Game.settings[settingKey]);
+    });
+}
+
+setupToggle('toggle-invert-y', 'invertY');
+setupToggle('toggle-invert-x', 'invertX');
+setupToggle('toggle-sens', 'highSens');
+
+// === ОБУЧЕНИЕ: только одно за раз ===
 function toggleTraining(skillKey) {
     const skill = Game.skills[skillKey];
-    skill.training = !skill.training;
-    const statusEl = document.getElementById('status-' + skillKey);
-    const rowEl = document.getElementById('skill-row-' + skillKey);
+
+    // Если уже обучаем этот навык — останавливаем
     if (skill.training) {
-        statusEl.classList.add('training');
-        rowEl.classList.add('active');
-        showNotification('Обучение', skill.name + ' — обучение запущено');
-    } else {
+        skill.training = false;
+        const statusEl = document.getElementById('status-' + skillKey);
+        const rowEl = document.getElementById('skill-row-' + skillKey);
         statusEl.classList.remove('training');
         rowEl.classList.remove('active');
         showNotification('Обучение', skill.name + ' — обучение остановлено');
+        updateTrainingTitle();
+        return;
     }
+
+    // Останавливаем все другие обучения
+    for (const [key, s] of Object.entries(Game.skills)) {
+        if (s.training) {
+            s.training = false;
+            document.getElementById('status-' + key).classList.remove('training');
+            document.getElementById('skill-row-' + key).classList.remove('active');
+        }
+    }
+
+    // Запускаем новое обучение
+    skill.training = true;
+    const statusEl = document.getElementById('status-' + skillKey);
+    const rowEl = document.getElementById('skill-row-' + skillKey);
+    statusEl.classList.add('training');
+    rowEl.classList.add('active');
+    showNotification('Обучение', skill.name + ' — обучение запущено');
     updateTrainingTitle();
 }
 
@@ -928,6 +1124,19 @@ function updateTrainingTitle() {
 document.addEventListener('keydown', (e) => {
     input.keys[e.key.toLowerCase()] = true;
 
+    // Esc — открыть настройки
+    if (e.key === 'Escape') {
+        if (settingsPanel.classList.contains('open')) {
+            closeSettings();
+        } else {
+            openSettings();
+        }
+        return;
+    }
+
+    // Не обрабатываем цифры если открыты настройки
+    if (settingsPanel.classList.contains('open')) return;
+
     switch(e.key) {
         case '1': toggleTraining('walk'); break;
         case '2': toggleTraining('run'); break;
@@ -943,30 +1152,33 @@ document.addEventListener('keyup', (e) => {
 document.addEventListener('mousedown', () => input.mouseDown = true);
 document.addEventListener('mouseup', () => input.mouseDown = false);
 
-// === Камера как в CS — вращение вокруг персонажа, без опускания под землю ===
+// === Камера с настройками инверсии ===
 document.addEventListener('mousemove', (e) => {
     if (document.pointerLockElement === container) {
-        Game.cameraYaw -= e.movementX * 0.002;
-        Game.cameraPitch -= e.movementY * 0.002;
-        // Ограничиваем pitch: не смотрим под землю и не слишком вверх
+        const sens = Game.settings.highSens ? 0.004 : 0.002;
+        const invertX = Game.settings.invertX ? -1 : 1;
+        const invertY = Game.settings.invertY ? -1 : 1;
+
+        Game.cameraYaw -= e.movementX * sens * invertX;
+        Game.cameraPitch -= e.movementY * sens * invertY;
         Game.cameraPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, Game.cameraPitch));
     }
 });
 
 container.addEventListener('click', () => {
-    container.requestPointerLock();
+    if (!settingsPanel.classList.contains('open')) {
+        container.requestPointerLock();
+    }
 });
 
 function updateCamera() {
     const pos = player.mesh.position;
     const dist = 6;
 
-    // Камера вращается вокруг персонажа по сфере
     const camX = pos.x + Math.sin(Game.cameraYaw) * Math.cos(Game.cameraPitch) * dist;
     const camY = pos.y + 1.5 + Math.sin(Game.cameraPitch) * dist;
     const camZ = pos.z + Math.cos(Game.cameraYaw) * Math.cos(Game.cameraPitch) * dist;
 
-    // Не опускаем камеру ниже уровня земли + небольшой отступ
     const minCameraY = 0.5;
     const finalCamY = Math.max(minCameraY, camY);
 
@@ -1045,8 +1257,7 @@ function gameLoop() {
     Game.time += dt;
 
     // === Постепенное обучение: 1 минута = 1% ===
-    // 1% за 60 секунд = 0.01667% в секунду = 0.0002778% в кадре (при 60fps)
-    const learnRatePerSecond = 1 / 60; // 1% за 60 секунд
+    const learnRatePerSecond = 1 / 60;
     for (const [key, skill] of Object.entries(Game.skills)) {
         if (skill.training && skill.progress < 100) {
             skill.progress = Math.min(100, skill.progress + learnRatePerSecond * dt);
